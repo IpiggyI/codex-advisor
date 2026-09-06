@@ -5,12 +5,16 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: inspect-agent-runtime.sh [--sessions-dir DIR] THREAD_ID
+Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT] THREAD_ID
 
 Read the one rollout file whose filename ends with THREAD_ID and emit a compact JSON
 object containing only safe routing metadata. Without --sessions-dir, the sessions
 root is "$CODEX_HOME/sessions" when CODEX_HOME is already set, otherwise
 "$HOME/.codex/sessions".
+
+--advisor-effort requires the native Astra Advisor, the requested effort, and
+observable permission metadata. It validates routing evidence, not task completion
+or enforced isolation. Without this option, emit generic routing evidence.
 EOF
 }
 
@@ -20,24 +24,21 @@ fail() {
 }
 
 sessions_dir=''
-case "$#" in
-  1)
-    thread_id=$1
-    ;;
-  3)
-    [ "$1" = "--sessions-dir" ] || {
-      usage >&2
-      exit 2
-    }
-    [ -n "$2" ] || fail "--sessions-dir requires a non-empty directory."
-    sessions_dir=$2
-    thread_id=$3
-    ;;
-  *)
-    usage >&2
-    exit 2
-    ;;
-esac
+advisor_effort=''
+while [ "$#" -gt 1 ]; do
+  case "$1" in
+    --sessions-dir)
+      [ -n "$2" ] || fail "--sessions-dir requires a directory."
+      sessions_dir=$2; shift 2 ;;
+    --advisor-effort)
+      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Advisor effort." ;; esac
+      advisor_effort=$2; shift 2 ;;
+    *) fail "unknown argument." ;;
+  esac
+done
+[ "$#" -eq 1 ] || fail "exactly one THREAD_ID is required."
+case "$1" in --help|-h) usage; exit 0 ;; esac
+thread_id=$1
 
 if ! printf '%s\n' "$thread_id" | LC_ALL=C grep -Eq '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
   fail "THREAD_ID must be a lowercase UUID."
@@ -64,7 +65,7 @@ matches_file=''
 cleanup() {
   if [ -n "$matches_file" ] && [ -f "$matches_file" ]; then
     case "$matches_file" in
-      "$tmp_base"/sol-advisor-runtime.*)
+      "$tmp_base"/codex-advisor-runtime.*)
         rm -f "$matches_file"
         ;;
       *)
@@ -76,7 +77,7 @@ cleanup() {
 
 trap cleanup 0 HUP INT TERM
 
-matches_file=$(mktemp "$tmp_base/sol-advisor-runtime.XXXXXX") || fail "could not create a temporary match list."
+matches_file=$(mktemp "$tmp_base/codex-advisor-runtime.XXXXXX") || fail "could not create a temporary match list."
 
 # Match only the exact rollout filename suffix; do not inspect any rollout contents
 # until exactly one filename has been found.
@@ -96,7 +97,7 @@ IFS= read -r rollout_file < "$matches_file" || fail "could not read the matched 
 
 # The jq program reads only the matched JSONL and constructs a new allowlisted object.
 # It rejects absent or conflicting required routing values instead of inferring them.
-if ! jq -ce -s --arg expected_thread_id "$thread_id" '
+if ! jq -ce -s --arg expected_thread_id "$thread_id" --arg advisor_effort "$advisor_effort" '
   def string_or_null:
     if type == "string" then . else null end;
 
@@ -136,6 +137,14 @@ if ! jq -ce -s --arg expected_thread_id "$thread_id" '
       error("conflicting permission profile types")
     elif ($cwds | unique | length) != 1 then
       error("conflicting working directories")
+    elif $advisor_effort != "" and
+      ($agent_role != "codex_advisor_astra_advisor" or $models[0] != "gpt-6-astra"
+       or $efforts[0] != $advisor_effort) then
+      error("Advisor role, model, or effort does not match the requested consultation")
+    elif $advisor_effort != "" and
+      (any($sandbox_types[]; . == null or . == "") or
+       any($permission_types[]; . == null or . == "")) then
+      error("Advisor permission evidence is missing")
     else
       {
         thread_id: $session_thread_id,
@@ -152,5 +161,5 @@ if ! jq -ce -s --arg expected_thread_id "$thread_id" '
     end
   end
 ' "$rollout_file" 2>/dev/null; then
-  fail "rollout is missing, ambiguous, invalid, or inconsistent required routing metadata."
+  fail "missing, ambiguous, invalid, or conflicting routing/permission evidence, or Advisor settings mismatch."
 fi

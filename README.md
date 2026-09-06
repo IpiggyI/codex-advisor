@@ -1,83 +1,74 @@
-# Sol Advisor
+# Codex Advisor
 
-**Sol / High runs the show. It declares a risk-gated route before task tools, keeps
-solo as the default, and uses a single auxiliary only when that improves delivery.**
+Codex Advisor is a Codex-only fork of
+[Sol Advisor](https://github.com/DannyMac180/sol-advisor).
+Your primary model and reasoning effort remain your choice.
 
-Sol Advisor is a Codex-only workflow for capability-routed software delivery. You
-bring the goal and constraints; Sol owns the plan, implementation or delegation,
-verification, and acceptance.
+Sol, Luna, and other non-Astra primary sessions do their own work and consult an
+independent Astra Advisor at consequential decisions and before multi-step delivery.
+Astra primary sessions can work solo. Selecting Astra or proposing Architect mode
+does not authorize delegation-only work.
 
-## Go deeper
+This release delivers independent installation and Advisor mode. Architect-mode
+implementation and independent final review are planned in later tickets.
 
-I write [**Attention Heads**](https://attentionheads.substack.com/?utm_source=github&utm_medium=readme&utm_campaign=sol-advisor) — deep, evidence-backed writing on AI, cognition, and agentic engineering. The **Agentic Engineering Field Notes** series is where I publish practical advice on the craft of using AI. [Subscribe](https://attentionheads.substack.com/subscribe?utm_source=github&utm_medium=readme&utm_campaign=sol-advisor) to get new posts to your inbox.
+## Install from this checkout
 
-## Quick start
-
-You need a current Codex CLI or ChatGPT desktop app with plugins enabled, GPT-5.6
-Sol / High for the primary session, native custom-agent support, and jq. GPT-5.6
-Luna / Max or Terra / High access is needed only when the selected route delegates.
+Use a current Codex host with plugins and native custom agents, plus `jq`.
+Use your actual checkout path:
 
 ~~~sh
-codex plugin marketplace add DannyMac180/sol-advisor --ref main
-codex plugin add sol-advisor@sol-advisor
-plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor") | .source.path')" && test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
+codex plugin marketplace add /absolute/path/to/codex-advisor
+codex plugin add codex-advisor@codex-advisor
+plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "codex-advisor@codex-advisor") | .source.path')"
+test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
 ~~~
 
-The companion installer verifies all three exact role files after installation. It is
-fail-closed: modified, unsafe, nonregular, symlinked, unknown, or differing files
-are left untouched. It does not edit Codex configuration. Start a fresh Codex task
-after installation so native roles are discovered.
+The companion installer adds the fork's native roles under `$CODEX_HOME/agents`,
+or `~/.codex/agents` when `CODEX_HOME` is unset. It preserves existing Sol Advisor
+files, unrelated agents, and primary-session configuration. Modified or unsafe
+destinations are refused. Repeating installation leaves exact files unchanged.
 
-Use this one prompt in the new task:
+Start a fresh Codex task after installation. Confirm that it exposes
+`codex-advisor:orchestration` and the native roles listed by the installer.
+A listed plugin alone does not establish native-agent discovery.
+
+## Use
 
 ~~~text
-Use $sol-advisor:orchestration to build this feature and verify it. Declare the selective route before task tools.
+Use $codex-advisor:orchestration to implement and verify this feature.
 ~~~
 
-## What you do
+In Advisor mode, the primary agent consults Astra before architecture decisions,
+data migrations, API designs, and refactors touching at least three files; after
+two distinct unsuccessful attempts at the same problem; and before declaring a
+multi-step deliverable complete. It explains its decision and any disagreement
+with the Advisor. Existing user authorization and project approval gates apply.
 
-Give Sol the outcome, constraints, and any important repository context. You do not
-need to select or manage a lane; Sol records the route and owns verification and
-acceptance.
+Astra consultation defaults to `high`. You can request another supported effort
+in normal conversation. The workflow checks the actual model and effort; an
+unavailable Astra or missing or conflicting evidence pauses the affected step.
+Consultation does not establish independent final review of the actual changes.
 
-## Routes
+## Check and update
 
-| Mode | Use it when | Delivery |
-|---|---|---|
-| `solo` | Default; risk is contained. | Root plans, implements, tests, and self-reviews. |
-| `delegate` | A complete spec is better executed by one implementer. | Luna / Max for bounded work, or Terra / High for judgment-heavy or high-risk work; root verifies. |
-| `audit` | Independent final scrutiny matters more than delegation. | Root implements; a fresh read-only Sol / High reviews. |
-| `full` | Explicit broad or high-risk exception. | One selected implementer, root verification, and a fresh Sol / High review. |
-
-Solo is the default. One auxiliary is the default maximum; `full` is the explicit
-exception. Sol emits a `SELECTIVE ROUTE` declaration with the mode and concise risk
-rationale before the first task tool call. It can escalate only when newly observed
-risk justifies it and never silently downgrades.
-
-## What happens automatically
-
-Sol / High keeps architecture, decomposition, route selection, parent verification,
-escalation decisions, and acceptance in the primary task. Auxiliary work substitutes
-for root work; it does not duplicate it. The root inspects the complete diff and
-reruns the requested checks. When the selected route includes a review, a fresh Sol /
-High reviewer returns ship, fix-first, or rethink; any fix requires a new review.
-
-## Updating
-
-Update the marketplace plugin, reinstall the companion roles, and start a new task:
+Check without changing installed files:
 
 ~~~sh
-codex plugin marketplace upgrade sol-advisor
-codex plugin add sol-advisor@sol-advisor
-plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor") | .source.path')" && test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
+sh "$plugin_dir/scripts/install-agents.sh" --check
 ~~~
 
-For exact spawn, runtime-evidence, sandbox, installer, and maintainer verification
-details, read [advanced native operations](plugins/sol-advisor/skills/orchestration/references/operations.md).
-For local development, install this checkout as a marketplace:
+After updating this checkout, repeat plugin installation and the companion installer,
+then start a fresh task. The installer refuses changed role destinations; inspect
+and reconcile them explicitly before retrying. It never deletes another installation.
 
-~~~sh
-cd /absolute/path/to/sol-advisor
-codex plugin marketplace add /absolute/path/to/sol-advisor
-codex plugin add sol-advisor@sol-advisor
-~~~
+For selective checks, disposable development installs, runtime evidence, permissions,
+and verification, read [native operations](plugins/codex-advisor/skills/orchestration/references/operations.md).
+Installation, discovery, and live model routing are separate checks.
+
+## Attribution
+
+The upstream author writes [**Attention Heads**](https://attentionheads.substack.com/?utm_source=github&utm_medium=readme&utm_campaign=sol-advisor)
+and the **Agentic Engineering Field Notes** series on AI and agentic engineering.
+[Subscribe](https://attentionheads.substack.com/subscribe?utm_source=github&utm_medium=readme&utm_campaign=sol-advisor).
+The original MIT attribution remains in [LICENSE](LICENSE).

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Advisor Orchestration"
+  short_description: "Consult Astra while keeping your primary model and effort"
+  default_prompt: "Use $codex-advisor:orchestration to implement and verify this feature with Astra advice at the required boundaries."
