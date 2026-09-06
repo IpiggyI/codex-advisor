@@ -43,10 +43,11 @@ After the response, the primary agent checks the cited evidence and states its
 decision. If it disagrees, it explains why. Missing evidence keeps a required
 consultation pending. Readiness advice does not constitute independent final review.
 
-## Luna Implementer
+## Implementers
 
-The Astra architect supplies this complete specification to
-`codex_advisor_luna_implementer`. Resolve material ambiguity before dispatch.
+The Astra architect selects Luna or Sol using the orchestration skill and supplies
+the same complete specification to `codex_advisor_luna_implementer` or
+`codex_advisor_sol_implementer`. Resolve material ambiguity before dispatch.
 
 ~~~text
 OBJECTIVE
@@ -63,7 +64,9 @@ INTERFACES
 CONSTRAINTS
 <Settled decisions, user authorization, project gates, and scope limits.
 Perform implementation yourself; return scheduling to the architect and do not
-delegate implementation further. Report material ambiguity before dependent edits.>
+delegate implementation further. Surface material ambiguity and scope conflicts
+before dependent edits; architecture and ownership changes require the architect's
+resolution within the user's authorization.>
 
 VERIFICATION
 <Exact meaningful checks, expected outcomes, and failure conditions. Inspect the

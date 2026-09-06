@@ -3,7 +3,8 @@
 ## Install and discover
 
 The plugin supplies `codex-advisor:orchestration`. Its companion installer supplies
-`codex_advisor_astra_advisor`, `codex_advisor_luna_implementer`, and
+`codex_advisor_astra_advisor`, `codex_advisor_luna_implementer`,
+`codex_advisor_sol_implementer`, and
 `codex_advisor_astra_reviewer`.
 Resolve scripts from the installed skill directory:
 
@@ -30,7 +31,7 @@ The installer performs preflight checks before writing files. Exact destinations
 remain unchanged. Modified, conflicting, nonregular, and symlinked destinations or
 ancestors are refused. Dot path segments and the filesystem root are refused.
 Use `--check` for all shipped roles or repeat `--check-role advisor`,
-`--check-role luna`, and `--check-role reviewer` for the required calls.
+`--check-role luna`, `--check-role sol`, and `--check-role reviewer` for the required calls.
 Neither check creates directories or changes files. The installer does not migrate,
 delete, or rewrite an upstream installation or primary-session configuration.
 
@@ -112,6 +113,72 @@ Missing, conflicting, or mismatched evidence pauses acceptance without certifyin
 implementation. Inspect all actual changes and rerun the specification's key checks.
 Use a new or resumed Implementer for corrections; the architect remains responsible
 for the verification after each correction. A worker's report is a claim to check.
+
+## Invoke and accept Sol implementation
+
+Use the orchestration skill's selection rule and the shared implementation packet.
+Check `--check-role sol` before the first Sol call. Use native spawn:
+
+~~~text
+agent_type: codex_advisor_sol_implementer
+fork_turns: none
+reasoning_effort: high
+message: <complete implementation specification from role-contracts.md>
+~~~
+
+Always pass `high` or the user's explicitly requested supported effort. The role
+pins `gpt-5.6-sol` and omits `model_reasoning_effort` so it can honor adjustments.
+Changing this delegated effort requires no primary-session or role-file change.
+Confirm accepted native invocation and actual settings; the inspector's recognized
+effort values alone do not establish host or account support.
+
+~~~sh
+sh "$runtime_inspector" --sol-effort high <native-thread-id>
+~~~
+
+Pass the effort actually requested, including adjustments. Validate the exact role,
+Sol model, effort, parent linkage, and permissions against public metadata. Failed
+calls and missing or mismatched evidence leave affected acceptance pending without
+substitution. Inspect every owned change and rerun key checks, including after
+corrections. Higher-risk work proceeds to independent Astra review below only after
+the architect's checks; the Sol report alone cannot complete the task.
+
+## Schedule multiple implementation tasks
+
+Before dispatch, record each task's dependencies, exact ownership, and acceptance
+checks. Include shared files, generated outputs, and verification side effects when
+checking for conflicts. Capture the scoped starting state and identify user or peer
+edits that must survive. Give each worker the complete shared implementation packet;
+reuse the orchestration skill's role-selection rule and the invocation contracts above.
+
+Establish available native slots from the host's limit and currently active agents.
+Dispatch at least two ready tasks concurrently when they are independent, their
+ownership is disjoint, and capacity permits. Start the ready calls before waiting
+for their results. Count existing agents against the host limit; do not manufacture
+parallelism by nesting implementation workers. If capacity is unknown, use one
+worker at a time until it is established. If no slot is available, wait for capacity
+and report the delay. On a host capacity refusal, retain undispatched work as pending
+and sequence it after capacity is available.
+
+Sequence a dependent task after its prerequisite result has been inspected and its
+key checks rerun. Sequence overlapping ownership after the first worker has finished
+and its actual changes are available; update the next packet to preserve that state.
+Do not split a shared file into nominally independent owners to evade this rule.
+Release finished agents through the host lifecycle interface when needed for slots,
+after obtaining their reports and retaining task evidence.
+
+Collect each worker's changes, checks, judgment calls, and gaps. A failure, blocked
+task, absent report, or incomplete output leaves that task and its dependents pending.
+Independent work may continue. Assign any correction through the same implementation
+contract; never infer whole-task success from a completed sibling.
+
+Inspect all actual changes against the captured state and ownership, then rerun the
+key checks on the combined result. Reconcile conflicting or missing evidence before
+acceptance, and perform the applicable independent review on that combined result.
+Report the tasks actually completed and any remaining gaps. Claim concurrent execution
+only when host events or task activity show overlapping worker lifetimes; requests
+alone prove dispatch intent. Record sequencing and capacity limits when overlap did
+not occur.
 
 ## Select and invoke independent Astra review
 
@@ -205,6 +272,10 @@ Advisor effort adjustment, disagreement, and unavailable or unobservable consult
 For Architect work, cover authorization lifetimes, Luna edits and corrections,
 worker-evidence rejection, ordinary completion, required review, effort floors and
 overrides, required-review failure, and the observed judgment permission boundary.
+Cover direct Sol selection, default and adjusted effort, and higher-risk completion
+through review. For scheduling, exercise two independent Luna tasks with observed
+overlap, dependencies, conflicting ownership, limited capacity, and incomplete output;
+inspect each result and the meaningful combined check independently of worker claims.
 Record actual model, effort, permission evidence, primary response, and unrun cases
 in the ticket acceptance record. Fixtures validate parsing and refusals; only live
 calls can validate host routing and model-dependent workflow behavior.

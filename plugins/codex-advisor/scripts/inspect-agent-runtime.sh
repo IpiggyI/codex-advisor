@@ -5,7 +5,7 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT | --luna] THREAD_ID
+Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT | --luna | --sol-effort EFFORT] THREAD_ID
        inspect-agent-runtime.sh [--sessions-dir DIR] --review-primary-effort EFFORT [--reviewer-effort EFFORT] THREAD_ID
        inspect-agent-runtime.sh --select-review-effort --review-primary-effort EFFORT [--reviewer-effort EFFORT]
 
@@ -18,6 +18,8 @@ root is "$CODEX_HOME/sessions" when CODEX_HOME is already set, otherwise
 observable permission metadata. It validates routing evidence, not task completion
 or enforced isolation. --luna requires the native Luna Implementer at max with
 observable permission metadata. Without a role option, emit generic routing evidence.
+--sol-effort requires the native Sol Implementer at the requested effort (pass high
+for the default delegated call), with observable permission metadata.
 --review-primary-effort requires the native Astra Independent reviewer at the
 default floor, or the explicit --reviewer-effort at or above the primary effort.
 --select-review-effort prints that selection without reading runtime records.
@@ -49,7 +51,7 @@ select_review=0
 thread_id=''
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --sessions-dir|--advisor-effort|--review-primary-effort|--reviewer-effort)
+    --sessions-dir|--advisor-effort|--sol-effort|--review-primary-effort|--reviewer-effort)
       [ "$#" -ge 2 ] && [ -n "$2" ] || fail "option requires a value."
       case "$2" in --*) fail "option requires an explicit value." ;; esac ;;
   esac
@@ -68,6 +70,12 @@ while [ "$#" -gt 0 ]; do
       expected_model=gpt-5.6-luna
       expected_effort=max
       shift ;;
+    --sol-effort)
+      [ -z "$expected_role" ] || fail "select exactly one role contract."
+      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Sol effort." ;; esac
+      expected_role=codex_advisor_sol_implementer
+      expected_model=gpt-5.6-sol
+      expected_effort=$2; shift 2 ;;
     --review-primary-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."
       expected_role=codex_advisor_astra_reviewer

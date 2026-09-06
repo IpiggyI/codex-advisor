@@ -10,7 +10,7 @@ Astra primary sessions can work solo. Selecting Astra or proposing Architect mod
 does not authorize delegation-only work.
 
 This release delivers independent installation, Advisor mode, and explicitly
-authorized Astra Architect work with bounded Luna implementation and independent
+authorized Astra Architect work with Luna or Sol implementation and independent
 Astra review when required.
 
 ## Install from this checkout
@@ -61,10 +61,16 @@ The primary session must already use Astra. Authorization covers the task and it
 follow-ups; an unrelated task needs new authorization unless you explicitly chose
 Architect mode for the whole session. The plugin preserves your primary effort.
 The architect specifies work and delegates every implementation edit, including
-one-line changes and corrections, to Luna at `max`. It inspects all actual changes
-and reruns key checks before acceptance. Missing or incorrect routing evidence
-keeps acceptance pending. Direct Sol implementation and parallel implementation
-remain planned for later tickets.
+one-line changes and corrections. Bounded, fully specified work goes to Luna at
+`max`; judgment-heavy, context-heavy, or higher-risk work goes directly to Sol at
+`high`, with explicit supported effort adjustments allowed. A Luna attempt is not
+required first. It inspects all actual changes and reruns key checks before
+acceptance. Missing or incorrect routing evidence keeps acceptance pending.
+
+Independent tasks with disjoint ownership run concurrently within the host's
+available capacity. Dependencies, conflicting ownership, and capacity limits cause
+sequencing. The architect obtains every worker's report and checks the combined
+result; incomplete work remains pending even when another worker succeeds.
 
 High-risk work and explicit review requests receive a fresh Astra Independent
 reviewer after the architect's own checks. Ordinary work does not automatically

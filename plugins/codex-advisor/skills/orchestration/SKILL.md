@@ -33,26 +33,41 @@ The architect owns design, task specifications, scheduling, and acceptance. Ever
 implementation edit belongs to an Implementer, including one-line changes and
 corrections. The architect may write design and task-specification artifacts.
 
-For bounded, fully specified work, read the implementation packet in
+Before implementation, read the shared implementation packet in
 [role-contracts.md](references/role-contracts.md) and the installation, invocation,
-and evidence checks in [operations.md](references/operations.md). Delegate to the
-native Luna Implementer at `max`. Validate the observed role, model, effort, and
-permissions; incorrect or unavailable routing evidence leaves acceptance pending.
-These settings apply to delegated calls, not a directly selected Luna primary.
-Direct Sol implementation and parallel implementation are not delivered in this
-release; pause work that requires those capabilities and explain the limitation.
+and evidence checks in [operations.md](references/operations.md). Select the native
+Luna Implementer at `max` for bounded, fully specified work. Select the native Sol
+Implementer directly for judgment-heavy, context-heavy, or higher-risk work; a
+failed Luna attempt is not a prerequisite. Sol defaults to `high`; explicitly pass
+that effort or the user's supported adjustment. These are the two implementation
+roles; there is no additional Terra lane.
+
+Validate the observed role, model, requested effort, and permissions for every call.
+An invalid or unavailable model or effort, or missing or conflicting evidence,
+leaves affected acceptance pending. Report the reason without silently substituting
+a role or setting. Delegated settings never restrict a directly used primary session.
+
+When a task has multiple implementation parts, read the scheduling procedure in
+[operations.md](references/operations.md). Dispatch independent parts with disjoint
+ownership concurrently when host capacity permits. Sequence dependencies, conflicting
+ownership, and work exceeding available capacity. Scheduling stays with the primary;
+Implementers perform their assigned work without further implementation delegation.
 
 Inspect every actual change, including new files and corrections, against the
 ownership boundary and specification. Rerun key verification yourself. Check the
 worker's report against those observations; missing, false, failed, or skipped
 evidence cannot establish acceptance. Send any correction to an Implementer and
-repeat the affected checks. A report alone never completes this step.
+repeat the affected checks. Obtain every required worker report and rerun key checks
+against the combined deliverable before acceptance. A failed, blocked, or incomplete
+worker leaves its affected work pending; another worker's success cannot complete
+the whole task. A report alone never completes this step.
 
 After these checks, ordinary bounded work may complete without adding a reviewer.
 High-risk work and explicit user requests for independent review require a fresh
 Astra Independent reviewer after the architect's checks. Read the review packet in
 [role-contracts.md](references/role-contracts.md) and the floor selection, invocation,
 and permission safeguards in [operations.md](references/operations.md).
+Apply these obligations to the combined deliverable, including parallel work.
 
 Resolve the current Astra primary effort from actual host evidence. Select the
 default review effort as the higher of `high` and that effort using the inspector's
