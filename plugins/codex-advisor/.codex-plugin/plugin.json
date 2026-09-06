@@ -1,15 +1,15 @@
 {
   "name": "codex-advisor",
   "version": "0.1.0",
-  "description": "Codex-native Astra advice for primary agents, with ordinary Astra solo work and user-owned model settings.",
+  "description": "Codex-native Astra advice and explicitly authorized Architect work with Luna implementation and independent Astra review.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
   "license": "MIT",
   "keywords": ["codex", "orchestration", "advisor", "gpt-6-astra"],
   "skills": "./skills/",
   "interface": {
     "displayName": "Codex Advisor",
-    "shortDescription": "Work in your primary session and consult Astra at decision boundaries.",
-    "longDescription": "Codex Advisor lets non-Astra primary agents implement work while consulting an independent Astra Advisor before consequential decisions and multi-step completion. Astra remains available for ordinary solo work without Architect-mode authorization. Primary model and reasoning settings remain user-owned. Required consultation pauses when actual model or effort evidence is unavailable or conflicting.",
+    "shortDescription": "Use Astra advice or authorize Architect work with delegated implementation.",
+    "longDescription": "Codex Advisor lets non-Astra primary agents implement work with Astra advice at consequential decisions and multi-step completion. Explicitly authorized Astra architects delegate bounded implementation to Luna at max, inspect actual changes, and rerun key checks. High-risk work and user review requests add a fresh Astra Independent reviewer at the required effort floor. Astra remains available for ordinary solo work. Primary model and effort remain user-owned; missing or conflicting required routing evidence pauses the affected step.",
     "developerName": "Daniel McAteer",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

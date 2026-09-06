@@ -1,6 +1,6 @@
 ---
 name: orchestration
-description: "Use for Codex delivery with Astra advice at design decisions, persistent failures, and multi-step completion, while preserving ordinary Astra solo work."
+description: "Use for authorized Astra Architect work with delegated implementation, or primary implementation with Astra advice at design decisions, persistent failures, and multi-step completion."
 ---
 
 # Codex Advisor orchestration
@@ -17,10 +17,58 @@ Do not infer it from the installed plugin or a model's self-description.
 - An Astra primary session without an explicit user request or accepted proposal for
   Architect mode continues ordinary solo work. A suggestion alone and a generic
   request to implement do not authorize delegation-only Architect mode.
-- Architect mode requires Astra and user authorization. This release does not yet
-  deliver Architect-mode implementation. If requested, explain that limitation and
-  pause mode-dependent work without claiming activation. A dedicated mode-switch
-  command is not required; model selection remains a host operation.
+- Architect mode requires both Astra and an explicit user request or accepted
+  proposal. Record the authorizing request and its scope in task context. By default
+  it covers the current task, its follow-up turns, and implementation subtasks;
+  expire it for an unrelated new task. Only explicit session-wide authorization
+  carries into subsequent tasks, and Astra remains a prerequisite. Recheck scope
+  at task boundaries and identity when the host model changes.
+- If a non-Astra primary receives an Architect-mode request, explain the unmet
+  prerequisite without claiming activation or changing the primary model. A
+  dedicated mode-switch command is not required.
+
+## Carry out authorized Architect-mode work
+
+The architect owns design, task specifications, scheduling, and acceptance. Every
+implementation edit belongs to an Implementer, including one-line changes and
+corrections. The architect may write design and task-specification artifacts.
+
+For bounded, fully specified work, read the implementation packet in
+[role-contracts.md](references/role-contracts.md) and the installation, invocation,
+and evidence checks in [operations.md](references/operations.md). Delegate to the
+native Luna Implementer at `max`. Validate the observed role, model, effort, and
+permissions; incorrect or unavailable routing evidence leaves acceptance pending.
+These settings apply to delegated calls, not a directly selected Luna primary.
+Direct Sol implementation and parallel implementation are not delivered in this
+release; pause work that requires those capabilities and explain the limitation.
+
+Inspect every actual change, including new files and corrections, against the
+ownership boundary and specification. Rerun key verification yourself. Check the
+worker's report against those observations; missing, false, failed, or skipped
+evidence cannot establish acceptance. Send any correction to an Implementer and
+repeat the affected checks. A report alone never completes this step.
+
+After these checks, ordinary bounded work may complete without adding a reviewer.
+High-risk work and explicit user requests for independent review require a fresh
+Astra Independent reviewer after the architect's checks. Read the review packet in
+[role-contracts.md](references/role-contracts.md) and the floor selection, invocation,
+and permission safeguards in [operations.md](references/operations.md).
+
+Resolve the current Astra primary effort from actual host evidence. Select the
+default review effort as the higher of `high` and that effort using the inspector's
+deterministic selector. Explicit supported adjustments may be below `high` only
+when they remain at or above the primary effort. This rule never restricts the
+primary session. Unknown ordering or unavailable primary evidence leaves the
+review floor unestablished and the required review pending.
+
+Validate the actual reviewer role, Astra model, selected effort, fresh context,
+permissions, and unchanged scoped state before accepting its judgment. If the
+required call is unavailable, fails, or has missing or conflicting evidence, pause
+the affected review/completion step with the reason. No substitute or successful
+review claim is permitted. Advisor consultation does not satisfy this contract.
+The Independent reviewer supplies findings, while the architect owns acceptance.
+Assign corrections to an Implementer, inspect them, rerun affected checks, and
+obtain a fresh review of the revised deliverable before required-review completion.
 
 ## Carry out Advisor-mode work
 
@@ -53,7 +101,7 @@ step. Report the reason and the evidence gap. Do not silently substitute a model
 skip a required consultation, or claim it occurred. Independent unaffected work
 may continue while the affected step remains explicitly pending.
 
-## Own the decision and delivery
+## Own the Advisor-mode decision and delivery
 
 Check the Advisor's cited evidence against the scoped sources. Explain the
 recommendation, your resulting decision, and the reasons for any disagreement.

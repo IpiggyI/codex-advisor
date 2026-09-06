@@ -9,8 +9,9 @@ independent Astra Advisor at consequential decisions and before multi-step deliv
 Astra primary sessions can work solo. Selecting Astra or proposing Architect mode
 does not authorize delegation-only work.
 
-This release delivers independent installation and Advisor mode. Architect-mode
-implementation and independent final review are planned in later tickets.
+This release delivers independent installation, Advisor mode, and explicitly
+authorized Astra Architect work with bounded Luna implementation and independent
+Astra review when required.
 
 ## Install from this checkout
 
@@ -49,6 +50,30 @@ Astra consultation defaults to `high`. You can request another supported effort
 in normal conversation. The workflow checks the actual model and effort; an
 unavailable Astra or missing or conflicting evidence pauses the affected step.
 Consultation does not establish independent final review of the actual changes.
+
+Request Architect mode in normal conversation, for example:
+
+~~~text
+Use $codex-advisor:orchestration in Architect mode for this task.
+~~~
+
+The primary session must already use Astra. Authorization covers the task and its
+follow-ups; an unrelated task needs new authorization unless you explicitly chose
+Architect mode for the whole session. The plugin preserves your primary effort.
+The architect specifies work and delegates every implementation edit, including
+one-line changes and corrections, to Luna at `max`. It inspects all actual changes
+and reruns key checks before acceptance. Missing or incorrect routing evidence
+keeps acceptance pending. Direct Sol implementation and parallel implementation
+remain planned for later tickets.
+
+High-risk work and explicit review requests receive a fresh Astra Independent
+reviewer after the architect's own checks. Ordinary work does not automatically
+add this reviewer. Default review effort is the higher of `high` and the resolved
+primary effort; an explicit supported adjustment must stay at or above the primary.
+Missing, conflicting, or unavailable review evidence pauses completion. Reviewers
+provide findings; Implementers make corrections and the architect owns acceptance.
+Read-only behavior under broader host permissions is reported separately from
+enforced isolation.
 
 ## Check and update
 

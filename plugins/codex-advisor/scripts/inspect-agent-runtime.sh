@@ -5,7 +5,9 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT] THREAD_ID
+Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT | --luna] THREAD_ID
+       inspect-agent-runtime.sh [--sessions-dir DIR] --review-primary-effort EFFORT [--reviewer-effort EFFORT] THREAD_ID
+       inspect-agent-runtime.sh --select-review-effort --review-primary-effort EFFORT [--reviewer-effort EFFORT]
 
 Read the one rollout file whose filename ends with THREAD_ID and emit a compact JSON
 object containing only safe routing metadata. Without --sessions-dir, the sessions
@@ -14,7 +16,13 @@ root is "$CODEX_HOME/sessions" when CODEX_HOME is already set, otherwise
 
 --advisor-effort requires the native Astra Advisor, the requested effort, and
 observable permission metadata. It validates routing evidence, not task completion
-or enforced isolation. Without this option, emit generic routing evidence.
+or enforced isolation. --luna requires the native Luna Implementer at max with
+observable permission metadata. Without a role option, emit generic routing evidence.
+--review-primary-effort requires the native Astra Independent reviewer at the
+default floor, or the explicit --reviewer-effort at or above the primary effort.
+--select-review-effort prints that selection without reading runtime records.
+The caller must establish the primary effort from host evidence and confirm host
+support. Selection alone proves neither actual invocation nor primary settings.
 EOF
 }
 
@@ -23,22 +31,76 @@ fail() {
   exit 1
 }
 
+effort_rank() {
+  case "$1" in
+    low) printf '1\n' ;; medium) printf '2\n' ;; high) printf '3\n' ;;
+    xhigh) printf '4\n' ;; max) printf '5\n' ;;
+    *) fail "unsupported or unestablished review effort order." ;;
+  esac
+}
+
 sessions_dir=''
-advisor_effort=''
-while [ "$#" -gt 1 ]; do
+expected_role=''
+expected_model=''
+expected_effort=''
+primary_effort=''
+reviewer_effort=''
+select_review=0
+thread_id=''
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --sessions-dir|--advisor-effort|--review-primary-effort|--reviewer-effort)
+      [ "$#" -ge 2 ] && [ -n "$2" ] || fail "option requires a value."
+      case "$2" in --*) fail "option requires an explicit value." ;; esac ;;
+  esac
   case "$1" in
     --sessions-dir)
-      [ -n "$2" ] || fail "--sessions-dir requires a directory."
       sessions_dir=$2; shift 2 ;;
     --advisor-effort)
+      [ -z "$expected_role" ] || fail "select exactly one role contract."
       case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Advisor effort." ;; esac
-      advisor_effort=$2; shift 2 ;;
-    *) fail "unknown argument." ;;
+      expected_role=codex_advisor_astra_advisor
+      expected_model=gpt-6-astra
+      expected_effort=$2; shift 2 ;;
+    --luna)
+      [ -z "$expected_role" ] || fail "select exactly one role contract."
+      expected_role=codex_advisor_luna_implementer
+      expected_model=gpt-5.6-luna
+      expected_effort=max
+      shift ;;
+    --review-primary-effort)
+      [ -z "$expected_role" ] || fail "select exactly one role contract."
+      expected_role=codex_advisor_astra_reviewer
+      expected_model=gpt-6-astra
+      primary_effort=$2; shift 2 ;;
+    --reviewer-effort)
+      [ -z "$reviewer_effort" ] || fail "supply reviewer effort only once."
+      reviewer_effort=$2; shift 2 ;;
+    --select-review-effort) select_review=1; shift ;;
+    --help|-h) usage; exit 0 ;;
+    --*) fail "unknown argument." ;;
+    *) [ "$#" -eq 1 ] || fail "exactly one trailing THREAD_ID is required."
+       thread_id=$1; shift ;;
   esac
 done
-[ "$#" -eq 1 ] || fail "exactly one THREAD_ID is required."
-case "$1" in --help|-h) usage; exit 0 ;; esac
-thread_id=$1
+if [ -n "$primary_effort" ]; then
+  primary_rank=$(effort_rank "$primary_effort")
+  expected_effort=high
+  [ "$primary_rank" -le 3 ] || expected_effort=$primary_effort
+  if [ -n "$reviewer_effort" ]; then
+    reviewer_rank=$(effort_rank "$reviewer_effort")
+    [ "$reviewer_rank" -ge "$primary_rank" ] || fail "reviewer effort is below the primary session effort."
+    expected_effort=$reviewer_effort
+  fi
+elif [ -n "$reviewer_effort" ] || [ "$select_review" -eq 1 ]; then
+  fail "review selection requires the resolved primary effort."
+fi
+if [ "$select_review" -eq 1 ]; then
+  [ -z "$thread_id$sessions_dir" ] || fail "selection does not accept a thread or sessions directory."
+  printf '%s\n' "$expected_effort"
+  exit 0
+fi
+[ -n "$thread_id" ] || fail "exactly one THREAD_ID is required."
 
 if ! printf '%s\n' "$thread_id" | LC_ALL=C grep -Eq '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
   fail "THREAD_ID must be a lowercase UUID."
@@ -97,7 +159,8 @@ IFS= read -r rollout_file < "$matches_file" || fail "could not read the matched 
 
 # The jq program reads only the matched JSONL and constructs a new allowlisted object.
 # It rejects absent or conflicting required routing values instead of inferring them.
-if ! jq -ce -s --arg expected_thread_id "$thread_id" --arg advisor_effort "$advisor_effort" '
+if ! jq -ce -s --arg expected_thread_id "$thread_id" --arg expected_role "$expected_role" \
+  --arg expected_model "$expected_model" --arg expected_effort "$expected_effort" '
   def string_or_null:
     if type == "string" then . else null end;
 
@@ -137,14 +200,14 @@ if ! jq -ce -s --arg expected_thread_id "$thread_id" --arg advisor_effort "$advi
       error("conflicting permission profile types")
     elif ($cwds | unique | length) != 1 then
       error("conflicting working directories")
-    elif $advisor_effort != "" and
-      ($agent_role != "codex_advisor_astra_advisor" or $models[0] != "gpt-6-astra"
-       or $efforts[0] != $advisor_effort) then
-      error("Advisor role, model, or effort does not match the requested consultation")
-    elif $advisor_effort != "" and
+    elif $expected_role != "" and
+      ($agent_role != $expected_role or $models[0] != $expected_model
+       or $efforts[0] != $expected_effort) then
+      error("role, model, or effort does not match the requested contract")
+    elif $expected_role != "" and
       (any($sandbox_types[]; . == null or . == "") or
        any($permission_types[]; . == null or . == "")) then
-      error("Advisor permission evidence is missing")
+      error("permission evidence is missing")
     else
       {
         thread_id: $session_thread_id,
@@ -161,5 +224,5 @@ if ! jq -ce -s --arg expected_thread_id "$thread_id" --arg advisor_effort "$advi
     end
   end
 ' "$rollout_file" 2>/dev/null; then
-  fail "missing, ambiguous, invalid, or conflicting routing/permission evidence, or Advisor settings mismatch."
+  fail "missing, ambiguous, invalid, or conflicting routing/permission evidence, or role settings mismatch."
 fi

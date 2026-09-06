@@ -1,4 +1,6 @@
-# Native Advisor contract
+# Native role contracts
+
+## Advisor
 
 Use the installed `codex_advisor_astra_advisor` role in a fresh native thread.
 The primary agent owns implementation and the decision. The Advisor owns judgment
@@ -40,3 +42,80 @@ evidence independently of the Advisor's response.
 After the response, the primary agent checks the cited evidence and states its
 decision. If it disagrees, it explains why. Missing evidence keeps a required
 consultation pending. Readiness advice does not constitute independent final review.
+
+## Luna Implementer
+
+The Astra architect supplies this complete specification to
+`codex_advisor_luna_implementer`. Resolve material ambiguity before dispatch.
+
+~~~text
+OBJECTIVE
+<Observable outcome and acceptance conditions for this bounded task.>
+
+FILES AND OWNERSHIP
+<Absolute workspace path, exact files or modules the Implementer owns, changes to
+preserve, and excluded files. You are not alone in the codebase; preserve concurrent
+edits and adapt to others' changes. Surface conflicts instead of overwriting them.>
+
+INTERFACES
+<Inputs, outputs, behavior, immediate callers, and shared utilities to retain.>
+
+CONSTRAINTS
+<Settled decisions, user authorization, project gates, and scope limits.
+Perform implementation yourself; return scheduling to the architect and do not
+delegate implementation further. Report material ambiguity before dependent edits.>
+
+VERIFICATION
+<Exact meaningful checks, expected outcomes, and failure conditions. Inspect the
+complete resulting diff and report every failed, skipped, or unavailable check.>
+
+RETURN
+COMPLETION: <complete, partial, or blocked, with reason>
+CHANGES: <actual files and behavior changed>
+VERIFICATION: <commands, exit status, and relevant observed output>
+JUDGMENT CALLS: <decisions made within the specification>
+GAPS: <ambiguity, conflicts, risks, and unverified results>
+~~~
+
+Corrections use the same ownership and verification requirements. The architect
+checks actual changes and reruns key verification even when the report says
+complete. Verify routing independently using [operations.md](operations.md).
+
+## Independent reviewer
+
+After the architect's actual-diff inspection and key reruns, send this packet to a
+fresh `codex_advisor_astra_reviewer`. This is the fork's final-review contract;
+an upstream Sol reviewer or an Advisor consultation does not satisfy it.
+
+~~~text
+REVIEW SCOPE
+<Absolute workspace path, objective, acceptance conditions, and the high-risk or
+explicit-user-request trigger. Identify the exact baseline and current deliverable.>
+
+ACTUAL CHANGES
+<All changed and new files, reproducible diff command or complete before/after
+contents, ownership boundaries, and unrelated changes to preserve. Inspect the
+actual files and complete diff, including untracked files, before judging readiness.>
+
+ARCHITECT VERIFICATION
+<Checks the architect reran, exit status, output, and evidence location. Separate
+worker claims from independently checked results; include failures and gaps.>
+
+SETTINGS AND PERMISSIONS
+<Resolved primary effort and its host evidence, selected reviewer effort, requested
+isolation, and the scoped state captured by the architect before review.>
+Remain read-only. Do not create, modify, delete, format, implement, or delegate
+implementation. Return suggested corrections as findings. Use checks that preserve
+the scoped state; disclose any unavailable check rather than changing files.
+
+RETURN
+READINESS: <ready, changes required, or unverified, with reason>
+FINDINGS: <severity, exact file references, observed evidence, and impact>
+VERIFICATION: <checks inspected or run, commands, exit status, and relevant output>
+GAPS: <missing evidence, unchecked conditions, and residual risks>
+~~~
+
+The architect verifies routing and before/after state independently of this report,
+checks cited findings, and owns acceptance. Missing evidence keeps required review
+pending. Send corrections to an Implementer and review the revised deliverable in
+a new context after the architect's repeat checks.
