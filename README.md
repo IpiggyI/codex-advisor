@@ -11,7 +11,8 @@ does not authorize delegation-only work.
 
 This release delivers independent installation, Advisor mode, and explicitly
 authorized Astra Architect work with Luna or Sol implementation and independent
-Astra review when required.
+Astra review when required. A Luna Explorer provides read-only source investigation
+for any primary model, with reasoning effort selected by the primary for each call.
 
 ## Install from this checkout
 
@@ -80,6 +81,23 @@ Missing, conflicting, or unavailable review evidence pauses completion. Reviewer
 provide findings; Implementers make corrections and the architect owns acceptance.
 Read-only behavior under broader host permissions is reported separately from
 enforced isolation.
+
+### Explore with Luna
+
+The installed `codex_advisor_luna_explorer` is available to every primary model,
+including all non-Astra models, without loading the skill or entering Architect
+mode. Outside the skill, your primary can choose it from available roles. When
+`codex-advisor:orchestration` applies and the primary decides to delegate exploration,
+it selects the Luna Explorer by default. The skill's trigger scope is unchanged;
+installation does not create a global default exploration route.
+
+The Explorer uses `gpt-5.6-luna`. The primary explicitly chooses a supported effort
+for every call, with no `max` minimum, and checks actual routing evidence. The
+Luna Implementer's `max` requirement is unchanged. The Explorer returns source
+references, evidence-based explanations, and gaps without implementing or reviewing
+changes. If it is unavailable or findings are insufficient, the primary may
+investigate directly; a more expensive delegated substitute requires your explicit
+authorization. A requested read-only sandbox is not proof of enforced isolation.
 
 ## Check and update
 

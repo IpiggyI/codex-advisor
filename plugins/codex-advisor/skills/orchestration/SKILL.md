@@ -5,6 +5,26 @@ description: "Use for authorized Astra Architect work with delegated implementat
 
 # Codex Advisor orchestration
 
+## Delegate exploration
+
+When this skill applies, use `codex_advisor_luna_explorer` by default for exploration
+you decide to delegate. This applies to every primary model, including all non-Astra
+models, and does not require Architect mode. Preserve existing rules and user
+authorization for whether to delegate. The installed role is also callable without
+this skill; outside the skill, the primary chooses from available role descriptions.
+
+Before invoking the Explorer, read the investigation packet in
+[role-contracts.md](references/role-contracts.md) and the Explorer installation,
+invocation, effort selection, and validation procedure in
+[operations.md](references/operations.md). Explicitly choose a supported reasoning
+effort for each call. Exploration has no `max` minimum; the Luna Implementer's
+fixed `max` requirement remains unchanged.
+
+Check the returned source evidence and actual call settings. The Explorer supplies
+read-only findings; the primary owns decisions. If the role is unavailable or its
+findings are insufficient, report the gap and investigate directly as needed.
+A more expensive delegated substitute requires explicit user authorization.
+
 ## Establish the work mode
 
 Use the primary model identity exposed by the host. Preserve the user's primary

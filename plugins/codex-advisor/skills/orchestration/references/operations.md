@@ -4,6 +4,7 @@
 
 The plugin supplies `codex-advisor:orchestration`. Its companion installer supplies
 `codex_advisor_astra_advisor`, `codex_advisor_luna_implementer`,
+`codex_advisor_luna_explorer`,
 `codex_advisor_sol_implementer`, and
 `codex_advisor_astra_reviewer`.
 Resolve scripts from the installed skill directory:
@@ -31,9 +32,54 @@ The installer performs preflight checks before writing files. Exact destinations
 remain unchanged. Modified, conflicting, nonregular, and symlinked destinations or
 ancestors are refused. Dot path segments and the filesystem root are refused.
 Use `--check` for all shipped roles or repeat `--check-role advisor`,
-`--check-role luna`, `--check-role sol`, and `--check-role reviewer` for the required calls.
+`--check-role luna`, `--check-role explorer`, `--check-role sol`, and
+`--check-role reviewer` for the required calls.
 Neither check creates directories or changes files. The installer does not migrate,
 delete, or rewrite an upstream installation or primary-session configuration.
+
+## Invoke and accept exploration
+
+Once the host discovers the installed role, any primary model may call the Luna
+Explorer without loading the orchestration skill or entering Architect mode.
+When the skill applies, it supplies the default exploration selection rule;
+installation alone does not establish a global routing default.
+
+Check `--check-role explorer` before the first exploration call. Recheck after
+installation or configuration changes. If this selective check fails, report the
+unavailable role and investigate directly as needed; do not certify an Explorer
+call or substitute a more expensive delegated model without user authorization.
+
+Use native spawn with a fresh context and an explicit effort supported by the
+current host and Luna. For example, use `low` for a simple source lookup when
+supported; choose a higher supported effort when the investigation needs it:
+
+~~~text
+agent_type: codex_advisor_luna_explorer
+fork_turns: none
+reasoning_effort: <primary-selected supported effort>
+message: <scoped investigation packet from role-contracts.md>
+~~~
+
+The role pins `gpt-5.6-luna` and leaves `model_reasoning_effort` unset so it does
+not override the caller's selection. Always pass effort; leaving it unspecified
+accepts host inheritance or defaults rather than making a deliberate selection.
+Keep the primary session's model and effort unchanged. Verify the returned role,
+actual model, requested effort, parent linkage, and permissions using public
+metadata, supplemented by the inspector when needed:
+
+~~~sh
+sh "$runtime_inspector" --explorer-effort <requested-effort> <native-thread-id>
+~~~
+
+Recognized inspector values do not establish host or model support. A failed call,
+unsupported effort, or missing or conflicting evidence cannot certify exploration;
+report the gap. The primary may gather evidence directly. A more expensive
+delegated substitute requires explicit user authorization.
+
+Check cited source locations and distinguish facts from inference. Apply the
+permission checks below to actual tool activity and before/after scoped state.
+Read-only findings do not constitute implementation, design ownership, or an
+independent review.
 
 ## Invoke Astra with an adjustable effort
 
@@ -234,7 +280,7 @@ judgment. Consultation and upstream Sol review cannot substitute for this contra
 
 ## Observe permissions
 
-The Advisor and Independent reviewer request a read-only sandbox. The host can
+The Explorer, Advisor, and Independent reviewer request a read-only sandbox. The host can
 reapply broader parent permissions. Capture the actual sandbox policy and permission
 profile, and inspect tool activity and exact before/after scoped file and artifact state.
 
@@ -244,7 +290,7 @@ profile, and inspect tool activity and exact before/after scoped file and artifa
   the prompt prohibits edits, and before/after state confirms no scoped mutation.
   Report behavioral read-only operation under those broader permissions.
 - Missing or conflicting permission evidence, required but unavailable isolation,
-  or an observed mutation pauses the consultation or review. Do not hide a mutation
+  or an observed mutation prevents acceptance of the affected role's work. Do not hide a mutation
   or claim enforced isolation from the TOML request alone.
 
 Unchanged files establish only the observed scope. They do not prove that a
@@ -265,6 +311,13 @@ The focused groups cover installer behavior and runtime evidence respectively.
 The full entry point also validates shell syntax. JSON and TOML parsing replace
 typechecking for this shell-and-metadata project; no typed application is shipped.
 Documentation consistency checks are not evidence of model behavior.
+
+For exploration, use a disposable installed host to cover native calls outside the
+skill from Astra and non-Astra primaries, and default selection within the existing
+skill scope. Observe at least two supported non-max efforts, correct source evidence,
+no scoped mutations, unchanged primary settings, and unavailable-role handling.
+Keep discovery, requested sandbox policy, observed permissions, and actual call
+settings distinct in the acceptance record.
 
 Use the ticket acceptance matrix in a disposable installed host for live discovery,
 primary-effort freedom, ordinary Astra solo work, consultation triggers, explicit

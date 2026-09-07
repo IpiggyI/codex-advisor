@@ -24,6 +24,7 @@ assert market['plugins'][0]['source']['path'] == './plugins/codex-advisor'
 templates = {p.name: p.read_bytes() for p in (plugin / 'agents').glob('*.toml')}
 role_files = {'advisor': 'codex-advisor-astra-advisor.toml',
               'luna': 'codex-advisor-luna-implementer.toml',
+              'explorer': 'codex-advisor-luna-explorer.toml',
               'sol': 'codex-advisor-sol-implementer.toml',
               'reviewer': 'codex-advisor-astra-reviewer.toml'}
 assert set(templates) == set(role_files.values())
@@ -269,6 +270,53 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     inspect('--luna', ok=False)
     write([luna_session, luna_turn, turn])
     inspect('--luna', ok=False)
+    explorer_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-luna-explorer.toml').read_text())
+    assert explorer_role['name'] == 'codex_advisor_luna_explorer'
+    assert explorer_role['model'] == 'gpt-5.6-luna'
+    assert 'model_reasoning_effort' not in explorer_role, 'Explorer effort belongs to the caller'
+    assert explorer_role['sandbox_mode'] == 'read-only'
+    explorer_session = json.loads(json.dumps(session))
+    explorer_session['payload']['agent_role'] = 'codex_advisor_luna_explorer'
+    explorer_turn = json.loads(json.dumps(turn))
+    explorer_turn['payload']['model'] = 'gpt-5.6-luna'
+    for effort in ('low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+        explorer_turn['payload']['effort'] = effort
+        write([explorer_session, explorer_turn])
+        evidence = inspect('--explorer-effort', effort)
+        assert evidence['model'] == 'gpt-5.6-luna' and evidence['effort'] == effort
+        assert evidence['agent_role'] == 'codex_advisor_luna_explorer'
+        assert evidence['sandbox_policy_type'] == 'danger-full-access'
+        assert evidence['permission_profile_type'] == 'disabled'
+        assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
+                                 'model_provider', 'model', 'effort', 'sandbox_policy_type',
+                                 'permission_profile_type', 'cwd'}
+    explorer_turn['payload']['effort'] = 'low'
+    write([explorer_session, explorer_turn])
+    for args in [('--explorer-effort', 'max'), ('--explorer-effort', 'unsupported'),
+                 ('--explorer-effort', ''), ('--explorer-effort',),
+                 ('--explorer-effort', 'low', '--luna'),
+                 ('--explorer-effort', 'low', '--sol-effort', 'low'),
+                 ('--advisor-effort', 'low', '--explorer-effort', 'low'),
+                 ('--explorer-effort', 'low', '--review-primary-effort', 'low')]:
+        inspect(*args, ok=False)
+    for other_session in (session, luna_session, wrong_role):
+        write([other_session, explorer_turn])
+        inspect('--explorer-effort', 'low', ok=False)
+    for field, wrong in [('model', 'gpt-6-astra'), ('effort', 'max'),
+                         ('sandbox_policy', {'type': 'read-only'}),
+                         ('permission_profile', {'type': 'legacy'})]:
+        missing = json.loads(json.dumps(explorer_turn))
+        del missing['payload'][field]
+        write([explorer_session, missing])
+        inspect('--explorer-effort', 'low', ok=False)
+        conflicting = json.loads(json.dumps(explorer_turn))
+        conflicting['payload'][field] = wrong
+        write([explorer_session, explorer_turn, conflicting])
+        inspect('--explorer-effort', 'low', ok=False)
+    invalid_explorer = json.loads(json.dumps(explorer_turn))
+    invalid_explorer['payload']['model'] = 'gpt-6-astra'
+    write([explorer_session, invalid_explorer])
+    inspect('--explorer-effort', 'low', ok=False)
     sol_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-sol-implementer.toml').read_text())
     assert sol_role['name'] == 'codex_advisor_sol_implementer'
     assert sol_role['model'] == 'gpt-5.6-sol'
@@ -360,7 +408,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     bad = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'), '../invalid'],
                          capture_output=True, text=True)
     assert bad.returncode != 0 and not bad.stdout
-print('PASS: native role evidence, Luna max, Sol adjustments, review floors and overrides, refusals, permissions and payload filtering')
+print('PASS: native role evidence, Luna max, Explorer and Sol adjustments, review floors and overrides, refusals, permissions and payload filtering')
 PY
 fi
 for script in "$script_dir"/*.sh; do sh -n "$script"; done

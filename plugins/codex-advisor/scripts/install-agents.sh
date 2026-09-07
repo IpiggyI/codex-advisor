@@ -11,7 +11,7 @@ Install Codex Advisor's native templates without overwriting existing files.
 The default target is "$CODEX_HOME/agents", or "$HOME/.codex/agents".
   --target-dir PATH  Use an explicit destination directory.
   --check            Check all shipped roles without modifying the destination.
-  --check-role ROLE  Check advisor, luna, sol, or reviewer; repeatable; implies --check.
+  --check-role ROLE  Check advisor, luna, explorer, sol, or reviewer; repeatable; implies --check.
   --help            Show this help text.
 EOF
 }
@@ -21,7 +21,7 @@ template_dir=$script_dir/../agents
 target_dir=${CODEX_HOME:-${HOME:?HOME or CODEX_HOME is required}/.codex}/agents
 check_only=0
 selected=''
-all_roles='advisor luna sol reviewer'
+all_roles='advisor luna explorer sol reviewer'
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --target-dir)
@@ -32,7 +32,7 @@ while [ "$#" -gt 0 ]; do
     --check) check_only=1; shift ;;
     --check-role)
       [ "$#" -ge 2 ] || fail "--check-role requires a role."
-      case "$2" in advisor|luna|sol|reviewer) ;; *) fail "unknown role: $2 (expected advisor, luna, sol, or reviewer)" ;; esac
+      case "$2" in advisor|luna|explorer|sol|reviewer) ;; *) fail "unknown role: $2 (expected advisor, luna, explorer, sol, or reviewer)" ;; esac
       selected="$selected $2"
       check_only=1
       shift 2 ;;
@@ -62,6 +62,7 @@ role_file() {
   case "$1" in
     advisor) printf '%s\n' codex-advisor-astra-advisor.toml ;;
     luna) printf '%s\n' codex-advisor-luna-implementer.toml ;;
+    explorer) printf '%s\n' codex-advisor-luna-explorer.toml ;;
     sol) printf '%s\n' codex-advisor-sol-implementer.toml ;;
     reviewer) printf '%s\n' codex-advisor-astra-reviewer.toml ;;
   esac

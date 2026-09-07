@@ -1,5 +1,33 @@
 # Native role contracts
 
+## Explorer
+
+Any primary agent may invoke `codex_advisor_luna_explorer` for scoped read-only
+investigation. Supply the question, source boundary, and expected evidence in a
+fresh native thread, using the Explorer procedure in [operations.md](operations.md).
+
+~~~text
+QUESTION
+<Specific source question, such as definitions, callers, or behavior to trace.>
+
+SCOPE
+<Absolute workspace path, relevant sources, exclusions, and known constraints.>
+
+PERMISSIONS
+Inspect read-only. Do not create, modify, delete, format, implement, or delegate.
+The primary agent owns design decisions and use of the findings.
+
+RETURN
+FINDINGS: <observed facts with precise file and line references>
+EXPLANATION: <reasoning grounded in the evidence; label any inference>
+GAPS: <unavailable sources, failed checks, uncertainty, and unresolved questions>
+~~~
+
+The primary checks source evidence and actual role/model/effort/permissions
+independently of the report. Exploration does not satisfy implementation or an
+independent review. Failed or insufficient investigation may be continued directly
+by the primary; a more expensive delegated substitute requires user authorization.
+
 ## Advisor
 
 Use the installed `codex_advisor_astra_advisor` role in a fresh native thread.
