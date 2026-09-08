@@ -4,7 +4,7 @@
 
 The plugin supplies `codex-advisor:orchestration`. Its companion installer supplies
 `codex_advisor_astra_advisor`, `codex_advisor_luna_implementer`,
-`codex_advisor_luna_explorer`,
+`codex_advisor_luna_explorer`, `codex_advisor_astra_implementer`,
 `codex_advisor_sol_implementer`, and
 `codex_advisor_astra_reviewer`.
 Resolve scripts from the installed skill directory:
@@ -32,10 +32,13 @@ The installer performs preflight checks before writing files. Exact destinations
 remain unchanged. Modified, conflicting, nonregular, and symlinked destinations or
 ancestors are refused. Dot path segments and the filesystem root are refused.
 Use `--check` for all shipped roles or repeat `--check-role advisor`,
-`--check-role luna`, `--check-role explorer`, `--check-role sol`, and
+`--check-role luna`, `--check-role explorer`, `--check-role astra`, `--check-role sol`, and
 `--check-role reviewer` for the required calls.
 Neither check creates directories or changes files. The installer does not migrate,
 delete, or rewrite an upstream installation or primary-session configuration.
+An updated description, including the Sol role's explicit-selection description,
+still counts as a changed destination. Inspect and explicitly reconcile the installed
+copy before retrying an upgrade; adding Astra does not bypass this refusal.
 
 ## Invoke and accept exploration
 
@@ -160,9 +163,43 @@ implementation. Inspect all actual changes and rerun the specification's key che
 Use a new or resumed Implementer for corrections; the architect remains responsible
 for the verification after each correction. A worker's report is a claim to check.
 
+## Invoke and accept Astra implementation
+
+Use the orchestration skill's selection rule and the complete implementation packet.
+Check `--check-role astra` before the first Astra implementation call. Use native spawn:
+
+~~~text
+agent_type: codex_advisor_astra_implementer
+fork_turns: none
+reasoning_effort: medium
+message: <complete implementation specification from role-contracts.md>
+~~~
+
+Always pass `medium` or the user's explicitly requested supported effort. The role
+pins `gpt-6-astra` and leaves `model_reasoning_effort` unset so adjustments can take
+effect. This default is independent of the primary session's effort. Confirm accepted
+native invocation and actual settings; recognized inspector values alone do not
+establish host support.
+
+~~~sh
+sh "$runtime_inspector" --astra-effort medium <native-thread-id>
+~~~
+
+Pass the actual requested effort. Validate the exact implementation role, Astra
+model, effort, parent linkage, and permissions against public metadata. Astra Advisor
+and Independent reviewer records do not satisfy the implementation contract. The
+inspector emits parent linkage; the caller compares it with the expected parent.
+Failed calls and missing or conflicting evidence leave affected acceptance pending.
+Report the reason and retain the specified route until resolved or explicitly changed;
+Sol requires the user's selection. Inspect actual changes and rerun key checks.
+Independent review follows the orchestration skill's risk and user-request triggers,
+with effort determined from the primary session rather than the Implementer.
+
 ## Invoke and accept Sol implementation
 
-Use the orchestration skill's selection rule and the shared implementation packet.
+Confirm the user's explicit Sol selection and use the shared implementation packet.
+The runtime inspector checks routing metadata, not authorization; do not read prompts
+through the inspector to infer that selection.
 Check `--check-role sol` before the first Sol call. Use native spawn:
 
 ~~~text
@@ -212,6 +249,12 @@ and its actual changes are available; update the next packet to preserve that st
 Do not split a shared file into nominally independent owners to evade this rule.
 Release finished agents through the host lifecycle interface when needed for slots,
 after obtaining their reports and retaining task evidence.
+
+When reassigning failed work, finish the previous worker's conflicting activity and
+obtain its report before dispatching a replacement. Inspect its actual changes and
+mark verified results, unverified edits, and remaining gaps in the next specification.
+The architect decides which work to preserve or correct within the existing ownership
+boundary; keep unrelated edits intact and rerun affected checks after reassignment.
 
 Collect each worker's changes, checks, judgment calls, and gaps. A failure, blocked
 task, absent report, or incomplete output leaves that task and its dependents pending.
@@ -325,8 +368,13 @@ Advisor effort adjustment, disagreement, and unavailable or unobservable consult
 For Architect work, cover authorization lifetimes, Luna edits and corrections,
 worker-evidence rejection, ordinary completion, required review, effort floors and
 overrides, required-review failure, and the observed judgment permission boundary.
-Cover direct Sol selection, default and adjusted effort, and higher-risk completion
-through review. For scheduling, exercise two independent Luna tasks with observed
+Cover direct Astra selection at default `medium` with a higher-effort primary, an
+explicit supported effort adjustment, ordinary completion, and higher-risk completion
+through review. Cover explicit Sol selection at default and adjusted effort. Validate
+cause-based Luna correction or reassignment with actual-state handoff, rejection of
+false completion evidence, and absence of automatic Sol substitution. Missing-role
+and invocation-failure scenarios are distinct; record which path was exercised.
+For scheduling, exercise two independent Luna tasks with observed
 overlap, dependencies, conflicting ownership, limited capacity, and incomplete output;
 inspect each result and the meaningful combined check independently of worker claims.
 Record actual model, effort, permission evidence, primary response, and unrun cases

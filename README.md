@@ -10,8 +10,8 @@ Astra primary sessions can work solo. Selecting Astra or proposing Architect mod
 does not authorize delegation-only work.
 
 This release delivers independent installation, Advisor mode, and explicitly
-authorized Astra Architect work with Luna or Sol implementation and independent
-Astra review when required. A Luna Explorer provides read-only source investigation
+authorized Astra Architect work with Luna or Astra implementation, explicitly selected
+Sol implementation, and independent Astra review when required. A Luna Explorer provides read-only source investigation
 for any primary model, with reasoning effort selected by the primary for each call.
 
 ## Install from this checkout
@@ -62,11 +62,19 @@ The primary session must already use Astra. Authorization covers the task and it
 follow-ups; an unrelated task needs new authorization unless you explicitly chose
 Architect mode for the whole session. The plugin preserves your primary effort.
 The architect specifies work and delegates every implementation edit, including
-one-line changes and corrections. Bounded, fully specified work goes to Luna at
-`max`; judgment-heavy, context-heavy, or higher-risk work goes directly to Sol at
-`high`, with explicit supported effort adjustments allowed. A Luna attempt is not
-required first. It inspects all actual changes and reruns key checks before
-acceptance. Missing or incorrect routing evidence keeps acceptance pending.
+one-line changes and corrections. Bounded, fully specified work with little
+implementation judgment and clear acceptance checks goes to Luna at `max`. Work
+requiring substantial judgment, cross-module understanding, or higher risk goes
+directly to Astra at `medium`. Sol is available only when you explicitly select it,
+defaulting to `high`. Astra and Sol allow explicit supported effort adjustments;
+implementation effort does not automatically follow the primary. A Luna attempt is
+not required before Astra. The architect inspects all actual changes and reruns key
+checks before acceptance. Missing or incorrect routing evidence keeps acceptance pending.
+
+After failed Luna acceptance, the architect diagnoses the cause and chooses
+specification clarification, a Luna correction, or Astra reassignment. There is no
+fixed retry count or automatic Sol fallback. Specification gaps must be resolved
+before dependent implementation.
 
 Independent tasks with disjoint ownership run concurrently within the host's
 available capacity. Dependencies, conflicting ownership, and capacity limits cause
@@ -75,8 +83,9 @@ result; incomplete work remains pending even when another worker succeeds.
 
 High-risk work and explicit review requests receive a fresh Astra Independent
 reviewer after the architect's own checks. Ordinary work does not automatically
-add this reviewer. Default review effort is the higher of `high` and the resolved
-primary effort; an explicit supported adjustment must stay at or above the primary.
+add this reviewer, including work implemented by Astra. Default review effort is the
+higher of `high` and the resolved primary effort; an explicit supported adjustment
+must stay at or above the primary.
 Missing, conflicting, or unavailable review evidence pauses completion. Reviewers
 provide findings; Implementers make corrections and the architect owns acceptance.
 Read-only behavior under broader host permissions is reported separately from
@@ -109,7 +118,8 @@ sh "$plugin_dir/scripts/install-agents.sh" --check
 
 After updating this checkout, repeat plugin installation and the companion installer,
 then start a fresh task. The installer refuses changed role destinations; inspect
-and reconcile them explicitly before retrying. It never deletes another installation.
+and reconcile them explicitly before retrying, including the updated Sol description.
+It never deletes another installation.
 
 For selective checks, disposable development installs, runtime evidence, permissions,
 and verification, read [native operations](plugins/codex-advisor/skills/orchestration/references/operations.md).

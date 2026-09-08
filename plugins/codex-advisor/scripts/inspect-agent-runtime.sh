@@ -5,7 +5,7 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT | --luna | --explorer-effort EFFORT | --sol-effort EFFORT] THREAD_ID
+Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT | --luna | --explorer-effort EFFORT | --astra-effort EFFORT | --sol-effort EFFORT] THREAD_ID
        inspect-agent-runtime.sh [--sessions-dir DIR] --review-primary-effort EFFORT [--reviewer-effort EFFORT] THREAD_ID
        inspect-agent-runtime.sh --select-review-effort --review-primary-effort EFFORT [--reviewer-effort EFFORT]
 
@@ -20,6 +20,8 @@ or enforced isolation. --luna requires the native Luna Implementer at max with
 observable permission metadata. Without a role option, emit generic routing evidence.
 --explorer-effort requires the native Luna Explorer at the requested effort, with
 observable permission metadata. It does not certify enforced read-only isolation.
+--astra-effort requires the native Astra Implementer at the requested effort (pass
+medium for the default delegated call), with observable permission metadata.
 --sol-effort requires the native Sol Implementer at the requested effort (pass high
 for the default delegated call), with observable permission metadata.
 --review-primary-effort requires the native Astra Independent reviewer at the
@@ -53,7 +55,7 @@ select_review=0
 thread_id=''
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --sessions-dir|--advisor-effort|--explorer-effort|--sol-effort|--review-primary-effort|--reviewer-effort)
+    --sessions-dir|--advisor-effort|--explorer-effort|--astra-effort|--sol-effort|--review-primary-effort|--reviewer-effort)
       [ "$#" -ge 2 ] && [ -n "$2" ] || fail "option requires a value."
       case "$2" in --*) fail "option requires an explicit value." ;; esac ;;
   esac
@@ -77,6 +79,12 @@ while [ "$#" -gt 0 ]; do
       case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Explorer effort." ;; esac
       expected_role=codex_advisor_luna_explorer
       expected_model=gpt-5.6-luna
+      expected_effort=$2; shift 2 ;;
+    --astra-effort)
+      [ -z "$expected_role" ] || fail "select exactly one role contract."
+      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Astra implementation effort." ;; esac
+      expected_role=codex_advisor_astra_implementer
+      expected_model=gpt-6-astra
       expected_effort=$2; shift 2 ;;
     --sol-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."

@@ -73,9 +73,11 @@ consultation pending. Readiness advice does not constitute independent final rev
 
 ## Implementers
 
-The Astra architect selects Luna or Sol using the orchestration skill and supplies
-the same complete specification to `codex_advisor_luna_implementer` or
-`codex_advisor_sol_implementer`. Resolve material ambiguity before dispatch.
+The Astra architect uses the orchestration skill to select
+`codex_advisor_luna_implementer`, `codex_advisor_astra_implementer`, or the explicitly
+user-selected `codex_advisor_sol_implementer`. Supply the same complete specification
+to each role. Resolve material ambiguity before dispatch; choosing Astra does not
+transfer architecture or final acceptance to the Implementer.
 
 ~~~text
 OBJECTIVE

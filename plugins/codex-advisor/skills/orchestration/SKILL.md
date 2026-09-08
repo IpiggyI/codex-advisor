@@ -56,16 +56,26 @@ corrections. The architect may write design and task-specification artifacts.
 Before implementation, read the shared implementation packet in
 [role-contracts.md](references/role-contracts.md) and the installation, invocation,
 and evidence checks in [operations.md](references/operations.md). Select the native
-Luna Implementer at `max` for bounded, fully specified work. Select the native Sol
-Implementer directly for judgment-heavy, context-heavy, or higher-risk work; a
-failed Luna attempt is not a prerequisite. Sol defaults to `high`; explicitly pass
-that effort or the user's supported adjustment. These are the two implementation
-roles; there is no additional Terra lane.
+Luna Implementer at `max` for bounded, fully specified work with little implementation
+judgment and clear acceptance checks. Select the native Astra Implementer directly
+for substantial implementation judgment, cross-module understanding, or higher risk;
+a failed Luna attempt is not a prerequisite. Astra defaults to `medium`; explicitly
+pass that effort or the user's supported adjustment. Keep implementation effort
+independent of the primary effort and do not automatically raise it after failure.
+Select the native Sol Implementer only when the user explicitly requests Sol, passing
+`high` or the user's supported adjustment. Luna and Astra are the default choices;
+Sol is not an automatic fallback for failures, unavailability, cost, or waiting time.
 
 Validate the observed role, model, requested effort, and permissions for every call.
 An invalid or unavailable model or effort, or missing or conflicting evidence,
 leaves affected acceptance pending. Report the reason without silently substituting
 a role or setting. Delegated settings never restrict a directly used primary session.
+
+When Luna fails acceptance, diagnose the cause before choosing specification
+clarification, a Luna correction, or Astra reassignment. There is no fixed retry
+count; environment failures and specification gaps alone do not establish insufficient
+model capability. Resolve material specification gaps before dependent edits. For
+reassignment, follow the actual-state handoff in [operations.md](references/operations.md).
 
 When a task has multiple implementation parts, read the scheduling procedure in
 [operations.md](references/operations.md). Dispatch independent parts with disjoint
@@ -82,7 +92,8 @@ against the combined deliverable before acceptance. A failed, blocked, or incomp
 worker leaves its affected work pending; another worker's success cannot complete
 the whole task. A report alone never completes this step.
 
-After these checks, ordinary bounded work may complete without adding a reviewer.
+After these checks, ordinary work may complete without adding a reviewer, including
+work implemented by Astra. The implementation model alone is not a review trigger.
 High-risk work and explicit user requests for independent review require a fresh
 Astra Independent reviewer after the architect's checks. Read the review packet in
 [role-contracts.md](references/role-contracts.md) and the floor selection, invocation,

@@ -25,6 +25,7 @@ templates = {p.name: p.read_bytes() for p in (plugin / 'agents').glob('*.toml')}
 role_files = {'advisor': 'codex-advisor-astra-advisor.toml',
               'luna': 'codex-advisor-luna-implementer.toml',
               'explorer': 'codex-advisor-luna-explorer.toml',
+              'astra': 'codex-advisor-astra-implementer.toml',
               'sol': 'codex-advisor-sol-implementer.toml',
               'reviewer': 'codex-advisor-astra-reviewer.toml'}
 assert set(templates) == set(role_files.values())
@@ -59,6 +60,8 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     (target / 'unrelated.toml').write_text('unrelated agent\n')
     preserved = snapshot(root)
     install(target)
+    assert (target / 'codex-advisor-astra-implementer.toml').is_file(), 'full installation must include Astra implementation'
+    install(target, '--check-role', 'astra')
     for filename, content in templates.items():
         assert (target / filename).read_bytes() == content
     installed = snapshot(root)
@@ -85,12 +88,13 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
         install(target, ok=False)
         assert snapshot(root) == before
         (target / filename).write_bytes(templates[filename])
-    filename = role_files['advisor']
-    (target / filename).unlink()
-    before = snapshot(root)
-    install(target, '--check-role', 'advisor', ok=False)
-    assert snapshot(root) == before
-    install(target)
+    for role in ('advisor', 'astra'):
+        filename = role_files[role]
+        (target / filename).unlink()
+        before = snapshot(root)
+        install(target, '--check-role', role, ok=False)
+        assert snapshot(root) == before
+        install(target)
     default_home = root / 'default-home'
     default_home.mkdir()
     (default_home / 'config.toml').write_text('model = "user-choice"\n')
@@ -126,6 +130,20 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
         before = snapshot(root)
         install(partial, ok=False)
         assert snapshot(root) == before, 'preflight must precede every role write'
+    previous_install = root / 'previous-sol-install'
+    previous_install.mkdir()
+    previous_description = ('description = "Direct implementation of judgment-heavy, '
+                            'context-heavy, or higher-risk work from an Astra architect\'s complete specification."')
+    sol_filename = role_files['sol']
+    previous_sol = '\n'.join(previous_description if line.startswith('description = ')
+                             else line for line in templates[sol_filename].decode().splitlines()) + '\n'
+    assert tomllib.loads(previous_sol)['model'] == 'gpt-5.6-sol'
+    (previous_install / sol_filename).write_text(previous_sol)
+    before = snapshot(root)
+    refusal = install(previous_install, ok=False)
+    assert 'modified or conflicting destination:' in refusal.stderr
+    assert sol_filename in refusal.stderr
+    assert snapshot(root) == before, 'old Sol must block upgrade before Astra or any other role is installed'
     link = root / 'linked-target'
     link.symlink_to(target, target_is_directory=True)
     before = snapshot(root)
@@ -393,6 +411,51 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
         inspect('--review-primary-effort', 'low', ok=False)
     write([review_session, wrong_model])
     inspect('--review-primary-effort', 'low', ok=False)
+    astra_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-astra-implementer.toml').read_text())
+    assert astra_role['name'] == 'codex_advisor_astra_implementer'
+    assert astra_role['model'] == 'gpt-6-astra'
+    assert 'model_reasoning_effort' not in astra_role, 'Astra implementation effort belongs to the caller'
+    astra_session = json.loads(json.dumps(session))
+    astra_session['payload']['agent_role'] = 'codex_advisor_astra_implementer'
+    astra_turn = json.loads(json.dumps(turn))
+    for effort in ('low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+        astra_turn['payload']['effort'] = effort
+        write([astra_session, astra_turn])
+        evidence = inspect('--astra-effort', effort)
+        assert evidence['agent_role'] == 'codex_advisor_astra_implementer'
+        assert evidence['model'] == 'gpt-6-astra' and evidence['effort'] == effort
+        assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
+                                 'model_provider', 'model', 'effort', 'sandbox_policy_type',
+                                 'permission_profile_type', 'cwd'}
+    astra_turn['payload']['effort'] = 'medium'
+    write([astra_session, astra_turn])
+    for args in [('--astra-effort', 'high'), ('--astra-effort', 'unsupported'),
+                 ('--astra-effort', ''), ('--astra-effort',),
+                 ('--astra-effort', 'medium', '--luna'),
+                 ('--astra-effort', 'medium', '--sol-effort', 'high'),
+                 ('--explorer-effort', 'medium', '--astra-effort', 'medium'),
+                 ('--advisor-effort', 'medium', '--astra-effort', 'medium'),
+                 ('--astra-effort', 'medium', '--review-primary-effort', 'low')]:
+        inspect(*args, ok=False)
+    for other_session in (session, review_session, luna_session, sol_session, wrong_role):
+        write([other_session, astra_turn])
+        inspect('--astra-effort', 'medium', ok=False)
+    for model in ('gpt-5.6-luna', 'gpt-5.6-sol'):
+        invalid = json.loads(json.dumps(astra_turn))
+        invalid['payload']['model'] = model
+        write([astra_session, invalid])
+        inspect('--astra-effort', 'medium', ok=False)
+    for field, wrong in [('model', 'gpt-5.6-sol'), ('effort', 'high'),
+                         ('sandbox_policy', {'type': 'read-only'}),
+                         ('permission_profile', {'type': 'legacy'})]:
+        missing = json.loads(json.dumps(astra_turn))
+        del missing['payload'][field]
+        write([astra_session, missing])
+        inspect('--astra-effort', 'medium', ok=False)
+        conflicting = json.loads(json.dumps(astra_turn))
+        conflicting['payload'][field] = wrong
+        write([astra_session, astra_turn, conflicting])
+        inspect('--astra-effort', 'medium', ok=False)
     for records in ([], [session], [turn], [session, session, turn]):
         write(records)
         inspect('--advisor-effort', 'high', ok=False)
@@ -408,7 +471,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     bad = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'), '../invalid'],
                          capture_output=True, text=True)
     assert bad.returncode != 0 and not bad.stdout
-print('PASS: native role evidence, Luna max, Explorer and Sol adjustments, review floors and overrides, refusals, permissions and payload filtering')
+print('PASS: native role evidence, Luna max, Explorer/Astra/Sol adjustments, review floors and overrides, refusals, permissions and payload filtering')
 PY
 fi
 for script in "$script_dir"/*.sh; do sh -n "$script"; done

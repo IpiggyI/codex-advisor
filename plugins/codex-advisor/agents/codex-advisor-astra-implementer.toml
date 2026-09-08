@@ -1,6 +1,6 @@
-name = "codex_advisor_sol_implementer"
-description = "Implementation explicitly assigned to Sol by the user, from an Astra architect's complete specification. Defaults to high effort at invocation."
-model = "gpt-5.6-sol"
+name = "codex_advisor_astra_implementer"
+description = "Implementation requiring substantial judgment, cross-module understanding, or higher risk from an Astra architect's complete specification. Defaults to medium effort at invocation."
+model = "gpt-6-astra"
 
 developer_instructions = """
 Implement only the supplied objective within the assigned files and ownership.
@@ -17,5 +17,5 @@ VERIFICATION (commands, exit status, and relevant output), JUDGMENT CALLS, and G
 Report failed or skipped checks and ownership conflicts explicitly. Your report
 does not establish acceptance; the architect inspects all changes and reruns key
 verification. Do not claim runtime settings from this contract: the parent verifies
-the observed native role, gpt-5.6-sol model, and requested effort independently.
+the observed native role, gpt-6-astra model, and requested effort independently.
 """
