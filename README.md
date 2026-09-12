@@ -2,17 +2,13 @@
 
 Codex Advisor is a Codex-only fork of
 [Sol Advisor](https://github.com/DannyMac180/sol-advisor).
+Any primary model can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Sol, Luna, and other non-Astra primary sessions do their own work and consult an
-independent Astra Advisor at consequential decisions and before multi-step delivery.
-Astra primary sessions can work solo. Selecting Astra or proposing Architect mode
-does not authorize delegation-only work.
-
-This release delivers independent installation, Advisor mode, and explicitly
-authorized Astra Architect work with Luna or Astra implementation, explicitly selected
-Sol implementation, and independent Astra review when required. A Luna Explorer provides read-only source investigation
-for any primary model, with reasoning effort selected by the primary for each call.
+The primary chooses scoped worker and Explorer allocations, owns scheduling,
+checks actual changes, and seeks Astra advice where judgment is needed.
+An explicit Architect-mode request makes all implementation delegated for its
+authorized scope, regardless of primary model.
 
 ## Install from this checkout
 
@@ -26,14 +22,14 @@ plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId 
 test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
 ~~~
 
-The companion installer adds the fork's native roles under `$CODEX_HOME/agents`,
-or `~/.codex/agents` when `CODEX_HOME` is unset. It preserves existing Sol Advisor
-files, unrelated agents, and primary-session configuration. Modified or unsafe
-destinations are refused. Repeating installation leaves exact files unchanged.
+The companion installer adds eight native entries under `$CODEX_HOME/agents`,
+or `~/.codex/agents` when `CODEX_HOME` is unset. It preserves unrelated agents,
+existing Sol Advisor files, and primary configuration. Modified or unsafe
+destinations are refused before installation; exact files remain unchanged.
 
-Start a fresh Codex task after installation. Confirm that it exposes
-`codex-advisor:orchestration` and the native roles listed by the installer.
-A listed plugin alone does not establish native-agent discovery.
+Start a fresh task after installation. Confirm that it exposes
+`codex-advisor:orchestration` and the native entries listed by the installer.
+Plugin installation and native-agent discovery are separate checks.
 
 ## Use
 
@@ -41,89 +37,104 @@ A listed plugin alone does not establish native-agent discovery.
 Use $codex-advisor:orchestration to implement and verify this feature.
 ~~~
 
-In Advisor mode, the primary agent consults Astra before architecture decisions,
-data migrations, API designs, and refactors touching at least three files; after
-two distinct unsuccessful attempts at the same problem; and before declaring a
-multi-step deliverable complete. It explains its decision and any disagreement
-with the Advisor. Existing user authorization and project approval gates apply.
+The primary adjusts decomposition and division of work within your goals, scope,
+reserved decisions, acceptance conditions, and resource limits. It chooses allowed
+delegated settings without a permission question for each routine call. Workers
+receive outcomes, ownership, retained interfaces, constraints, and meaningful
+verification; they own local implementation choices and debugging.
 
-Astra consultation defaults to `high`. You can request another supported effort
-in normal conversation. The workflow checks the actual model and effort; an
-unavailable Astra or missing or conflicting evidence pauses the affected step.
-Consultation does not establish independent final review of the actual changes.
+| Role | Tier | Model and reasoning effort |
+|---|---|---|
+| Explorer | light | Luna `high` |
+| Explorer | standard / senior | Usually Luna `max`; direct Sol or Astra `medium` / `high` |
+| worker (Implementer) | light | Luna `max` |
+| worker (Implementer) | standard | Sol `high` / `xhigh`, including the first attempt |
+| worker (Implementer) | senior | Astra `medium` / `high`; eligible `xhigh` after complete worker failure |
+| Advisor, including independent acceptance | senior | Astra `medium` / `high`; eligible `xhigh` after complete advisory failure |
 
-Request Architect mode in normal conversation, for example:
+Luna is preferred for most substantial exploration, not required before direct
+Sol or Astra selection. Explorers return source locations, supporting observations,
+examined scope, and gaps. They do not implement or perform final acceptance.
+Installed Explorers are available to any primary without Architect mode or the
+skill; installation alone does not impose a global exploration default.
+
+Request delegation-only work explicitly:
 
 ~~~text
 Use $codex-advisor:orchestration in Architect mode for this task.
 ~~~
 
-The primary session must already use Astra. Authorization covers the task and its
-follow-ups; an unrelated task needs new authorization unless you explicitly chose
-Architect mode for the whole session. The plugin preserves your primary effort.
-The architect specifies work and delegates every implementation edit, including
-one-line changes and corrections. Bounded, fully specified work with little
-implementation judgment and clear acceptance checks goes to Luna at `max`. Work
-requiring substantial judgment, cross-module understanding, or higher risk goes
-directly to Astra at `medium`. Sol is available only when you explicitly select it,
-defaulting to `high`. Astra and Sol allow explicit supported effort adjustments;
-implementation effort does not automatically follow the primary. A Luna attempt is
-not required before Astra. The architect inspects all actual changes and reruns key
-checks before acceptance. Missing or incorrect routing evidence keeps acceptance pending.
+Any primary can use this mode. Authorization covers the task and follow-ups;
+unrelated tasks need new authorization unless you explicitly grant session-wide
+scope. Every implementation edit and correction is delegated. A selected model,
+ticket, specification, or unaccepted proposal does not activate the mode.
 
-After failed Luna acceptance, the architect diagnoses the cause and chooses
-specification clarification, a Luna correction, or Astra reassignment. There is no
-fixed retry count or automatic Sol fallback. Specification gaps must be resolved
-before dependent implementation.
+The primary retains scheduling. Independent delegated tasks can run within
+available capacity; dependencies and conflicting ownership are sequenced. Workers
+preserve concurrent edits and do not delegate implementation further. The primary
+inspects all actual changes, including new files and worker-authored tests, reruns
+key checks, and verifies the combined result.
 
-Independent tasks with disjoint ownership run concurrently within the host's
-available capacity. Dependencies, conflicting ownership, and capacity limits cause
-sequencing. The architect obtains every worker's report and checks the combined
-result; incomplete work remains pending even when another worker succeeds.
+## Recover failed work
 
-High-risk work and explicit review requests receive a fresh Astra Independent
-reviewer after the architect's own checks. Ordinary work does not automatically
-add this reviewer, including work implemented by Astra. Default review effort is the
-higher of `high` and the resolved primary effort; an explicit supported adjustment
-must stay at or above the primary.
-Missing, conflicting, or unavailable review evidence pauses completion. Reviewers
-provide findings; Implementers make corrections and the architect owns acceptance.
-Read-only behavior under broader host permissions is reported separately from
-enforced isolation.
+A complete worker attempt includes implementation, debugging, and verification,
+then failed acceptance or concrete inability to finish. Intermediate test failures
+and tool errors do not count. Diagnose environment, facts, contracts, reasoning,
+and executor suitability before choosing repair, clarification, rework, changed
+effort, or takeover. Escalation is an option, not a fixed ladder.
 
-### Explore with Luna
+Relevant complete worker failure can make Astra worker `xhigh` eligible for
+the same work. It does not unlock Advisor `xhigh`: that requires a relevant
+complete failure to answer the advisory question or a materially invalidated
+conclusion. Disagreement alone is insufficient.
 
-The installed `codex_advisor_luna_explorer` is available to every primary model,
-including all non-Astra models, without loading the skill or entering Architect
-mode. Outside the skill, your primary can choose it from available roles. When
-`codex-advisor:orchestration` applies and the primary decides to delegate exploration,
-it selects the Luna Explorer by default. The skill's trigger scope is unchanged;
-installation does not create a global default exploration route.
+Every delegated effort change, up or down, requires a new native thread.
+Model changes and role reassignments also start fresh. Same-model, same-effort
+worker corrections may reuse the thread; independent acceptance always starts
+fresh. Stop conflicting previous writers and hand off actual changes, decisions,
+checks, failure evidence, and remaining work. This is an explicit session policy,
+not a guarantee about cache behavior or savings.
 
-The Explorer uses `gpt-5.6-luna`. The primary explicitly chooses a supported effort
-for every call, with no `max` minimum, and checks actual routing evidence. The
-Luna Implementer's `max` requirement is unchanged. The Explorer returns source
-references, evidence-based explanations, and gaps without implementing or reviewing
-changes. If it is unavailable or findings are insufficient, the primary may
-investigate directly; a more expensive delegated substitute requires your explicit
-authorization. A requested read-only sandbox is not proof of enforced isolation.
+## Advice and acceptance
+
+The primary may seek advice proactively. Advice is required for key decisions
+uncovered by an applicable plan, evidence invalidating a key plan assumption,
+or failure causes still unclear after initial diagnosis. Applicable advice can
+be reused while its premises hold. The primary checks sources and explains
+material disagreement; advice grants no authorization or veto.
+
+Ordinary direct, delegated, and mixed multi-step work can complete after primary
+inspection and verification. High-risk work or an explicit independent-review
+request requires a fresh Astra Independent reviewer after those checks.
+Risk follows consequences, reversibility, and difficulty checking correctness;
+step count, file count, and model identity alone do not trigger review.
+
+Decision advice and independent acceptance use separate native entries and
+contracts within the Advisor role. Initial effort is `medium` or `high`,
+independently of primary effort. Material review findings require corrections,
+primary re-verification, and a new review thread even at unchanged effort.
+Unavailable required calls, unsupported settings, missing/conflicting evidence,
+or unresolved material findings leave affected completion pending.
+
+Read-only roles request isolation, but the host may apply broader permissions.
+Observed read-only behavior under broader permissions is reported separately
+from enforced isolation.
 
 ## Check and update
-
-Check without changing installed files:
 
 ~~~sh
 sh "$plugin_dir/scripts/install-agents.sh" --check
 ~~~
 
-After updating this checkout, repeat plugin installation and the companion installer,
-then start a fresh task. The installer refuses changed role destinations; inspect
-and reconcile them explicitly before retrying, including the updated Sol description.
-It never deletes another installation.
+After updating the checkout, repeat plugin installation and the companion installer,
+then start a fresh task. Updated role templates count as conflicting installed
+copies: inspect and explicitly reconcile them before retrying. The installer
+does not overwrite them or delete another installation.
 
-For selective checks, disposable development installs, runtime evidence, permissions,
-and verification, read [native operations](plugins/codex-advisor/skills/orchestration/references/operations.md).
-Installation, discovery, and live model routing are separate checks.
+See [native operations](plugins/codex-advisor/skills/orchestration/references/operations.md)
+for selective checks, exact entry names, calls, runtime metadata, and disposable
+verification. Simple route checks establish observed dispatch and session behavior;
+quality, stability, and savings need later experience with real tasks.
 
 ## Attribution
 

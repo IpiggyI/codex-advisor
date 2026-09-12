@@ -2,153 +2,144 @@
 
 ## Explorer
 
-Any primary agent may invoke `codex_advisor_luna_explorer` for scoped read-only
-investigation. Supply the question, source boundary, and expected evidence in a
-fresh native thread, using the Explorer procedure in [operations.md](operations.md).
+Any primary may use a model-pinned Explorer with a fresh thread and explicit effort.
+Use [operations.md](operations.md) to install, invoke, and validate the selected route.
 
 ~~~text
 QUESTION
-<Specific source question, such as definitions, callers, or behavior to trace.>
+<Specific source question, definitions, callers, or behavior to trace.>
 
 SCOPE
-<Absolute workspace path, relevant sources, exclusions, and known constraints.>
+<Absolute workspace path, source boundary, exclusions, and known constraints.>
 
 PERMISSIONS
-Inspect read-only. Do not create, modify, delete, format, implement, or delegate.
-The primary agent owns design decisions and use of the findings.
+Inspect read-only. Do not write, format, implement, or delegate.
+The primary owns design decisions and acceptance.
 
 RETURN
-FINDINGS: <observed facts with precise file and line references>
-EXPLANATION: <reasoning grounded in the evidence; label any inference>
-GAPS: <unavailable sources, failed checks, uncertainty, and unresolved questions>
+FINDINGS: <observations, precise per-file source locations, and examined scope>
+EXPLANATION: <evidence-based reasoning; label inferences>
+GAPS: <unavailable sources, failed checks, and unresolved questions>
 ~~~
 
-The primary checks source evidence and actual role/model/effort/permissions
-independently of the report. Exploration does not satisfy implementation or an
-independent review. Failed or insufficient investigation may be continued directly
-by the primary; a more expensive delegated substitute requires user authorization.
+Check citations and actual routing independently. A negative search establishes
+absence only in the examined scope. Insufficient findings may lead to direct
+primary investigation or another authorized allocation; disclose any unverified call.
+Exploration is neither implementation nor independent final acceptance.
 
-## Advisor
+## Worker (Implementer)
 
-Use the installed `codex_advisor_astra_advisor` role in a fresh native thread.
-The primary agent owns implementation and the decision. The Advisor owns judgment
-on the supplied question. Use [operations.md](operations.md) before invoking it.
-
-Supply this complete, scoped packet:
-
-~~~text
-DECISION
-<Question to resolve and consultation trigger: design, persistent failure, or readiness.>
-
-CONSTRAINTS
-<User intent, authorization boundaries, relevant interfaces, excluded scope, and risk.>
-
-EVIDENCE
-<Exact files, observed results, and alternatives. For persistent failure, include both
-distinct unsuccessful attempts. For readiness, include actual changes, verification
-output, and remaining gaps. Identify claims that have not been independently checked.>
-
-REQUESTED JUDGMENT
-<Proposed decision and the tradeoff the primary agent needs assessed.>
-
-PERMISSIONS
-Remain read-only. Do not create, modify, delete, format, or implement files.
-Inspect only the supplied scope. Your advice grants no authorization.
-
-RETURN
-RECOMMENDATION: <proposed decision>
-EVIDENCE: <supporting observations and exact references>
-ASSUMPTIONS: <unverified premises and how to check them>
-TRADEOFFS: <costs and alternatives>
-GAPS: <unresolved risks or missing evidence>
-~~~
-
-Do not ask the Advisor to infer its actual model or effort. The parent obtains
-runtime evidence through host metadata and the narrow inspector. Validate that
-evidence independently of the Advisor's response.
-
-After the response, the primary agent checks the cited evidence and states its
-decision. If it disagrees, it explains why. Missing evidence keeps a required
-consultation pending. Readiness advice does not constitute independent final review.
-
-## Implementers
-
-The Astra architect uses the orchestration skill to select
-`codex_advisor_luna_implementer`, `codex_advisor_astra_implementer`, or the explicitly
-user-selected `codex_advisor_sol_implementer`. Supply the same complete specification
-to each role. Resolve material ambiguity before dispatch; choosing Astra does not
-transfer architecture or final acceptance to the Implementer.
+All worker models use the same five-part outcome contract. Role responsibility is
+independent of tier. The primary retains decomposition, scheduling, and acceptance;
+unspecified local implementation choices belong to the worker.
 
 ~~~text
 OBJECTIVE
-<Observable outcome and acceptance conditions for this bounded task.>
+<Observable outcome, acceptance conditions, original task reference, and sources.>
 
 FILES AND OWNERSHIP
-<Absolute workspace path, exact files or modules the Implementer owns, changes to
-preserve, and excluded files. You are not alone in the codebase; preserve concurrent
-edits and adapt to others' changes. Surface conflicts instead of overwriting them.>
+<Absolute workspace path, exact owned files/modules, excluded scope, and current
+changes. You are not alone in the codebase; preserve concurrent and unrelated
+edits and adapt to others' work. Surface conflicts instead of overwriting them.>
 
 INTERFACES
-<Inputs, outputs, behavior, immediate callers, and shared utilities to retain.>
+<Inputs, outputs, behavior, callers, and shared interfaces that must be retained.>
 
 CONSTRAINTS
-<Settled decisions, user authorization, project gates, and scope limits.
-Perform implementation yourself; return scheduling to the architect and do not
-delegate implementation further. Surface material ambiguity and scope conflicts
-before dependent edits; architecture and ownership changes require the architect's
-resolution within the user's authorization.>
+<Binding decisions, user boundaries, resources, and reserved choices. Inspect the
+original task and relevant sources. Perform implementation yourself; do not delegate
+implementation further. Resolve unclear expected behavior, conflicting requirements,
+and changes to reserved interfaces with the primary before dependent edits.>
 
 VERIFICATION
-<Exact meaningful checks, expected outcomes, and failure conditions. Inspect the
-complete resulting diff and report every failed, skipped, or unavailable check.>
+<Meaningful checks, expected results, and failure conditions. Inspect the full
+resulting diff and report failed, skipped, or unavailable checks.>
 
 RETURN
 COMPLETION: <complete, partial, or blocked, with reason>
 CHANGES: <actual files and behavior changed>
 VERIFICATION: <commands, exit status, and relevant observed output>
-JUDGMENT CALLS: <decisions made within the specification>
+JUDGMENT CALLS: <local decisions within the contract>
 GAPS: <ambiguity, conflicts, risks, and unverified results>
 ~~~
 
-Corrections use the same ownership and verification requirements. The architect
-checks actual changes and reruns key verification even when the report says
-complete. Verify routing independently using [operations.md](operations.md).
+For rework, identify the violated requirement, reproducible failure, expected
+behavior, and verification. Structural preference alone does not justify rework.
+The worker owns ordinary debugging. Use the operations handoff for reassignment;
+the primary checks actual changes and reruns key verification after any correction.
 
-## Independent reviewer
+## Decision advice
 
-After the architect's actual-diff inspection and key reruns, send this packet to a
-fresh `codex_advisor_astra_reviewer`. This is the fork's final-review contract;
-an upstream Sol reviewer or an Advisor consultation does not satisfy it.
+Use a fresh `codex_advisor_astra_advisor` for a scoped judgment request. Applicable
+advice may be reused while its premises hold; it is not a fresh final review.
+
+~~~text
+DECISION
+<Specific question and trigger: proactive advice, uncovered key decision,
+invalidated premise, or unclear failure cause after initial diagnosis.>
+
+CONSTRAINTS
+<User intent, authorization, retained interfaces, excluded scope, and resources.>
+
+EVIDENCE
+<Exact sources, observations, options, and uncertainties. For failure, include
+the completed attempt, checks, diagnosis, and remaining question.>
+
+REQUESTED JUDGMENT
+<Proposed decision and the tradeoff or uncertainty to resolve.>
+
+PERMISSIONS
+Remain read-only. Do not write, format, implement, or delegate implementation.
+Advice grants no authorization and adds no binding requirement.
+
+RETURN
+RECOMMENDATION: <proposed decision answering the question>
+EVIDENCE: <supporting observations and exact source references>
+ASSUMPTIONS: <premises, unverified claims, and how to check them>
+TRADEOFFS: <costs and alternatives>
+GAPS: <missing evidence and unresolved risks>
+~~~
+
+The primary validates routing without asking the Advisor to infer its settings,
+checks the cited evidence, and explains material disagreement. A relevant complete
+failure to answer, or a materially invalidated conclusion, can make `xhigh`
+eligible. Disagreement or worker failure alone cannot.
+
+## Independent acceptance
+
+After primary inspection and key checks, use a fresh
+`codex_advisor_astra_reviewer`. It is a distinct native entry for the semantic
+Advisor role; an earlier consultation or worker report cannot satisfy it.
 
 ~~~text
 REVIEW SCOPE
-<Absolute workspace path, objective, acceptance conditions, and the high-risk or
-explicit-user-request trigger. Identify the exact baseline and current deliverable.>
+<Absolute workspace, binding task contract, acceptance conditions, and high-risk
+or explicit-review trigger. Identify the exact baseline and current deliverable.>
 
 ACTUAL CHANGES
-<All changed and new files, reproducible diff command or complete before/after
-contents, ownership boundaries, and unrelated changes to preserve. Inspect the
-actual files and complete diff, including untracked files, before judging readiness.>
+<All changed and new files, reproducible diff command or before/after contents,
+ownership boundaries, and unrelated changes to preserve. Inspect the actual
+complete diff, including untracked files, before judging readiness.>
 
-ARCHITECT VERIFICATION
-<Checks the architect reran, exit status, output, and evidence location. Separate
-worker claims from independently checked results; include failures and gaps.>
+PRIMARY VERIFICATION
+<Checks rerun by the primary, exit status, relevant output, evidence location,
+and unresolved gaps. Separate worker claims from independently checked results.>
 
 SETTINGS AND PERMISSIONS
-<Resolved primary effort and its host evidence, selected reviewer effort, requested
-isolation, and the scoped state captured by the architect before review.>
-Remain read-only. Do not create, modify, delete, format, implement, or delegate
-implementation. Return suggested corrections as findings. Use checks that preserve
-the scoped state; disclose any unavailable check rather than changing files.
+<Explicit reviewer effort, relevant failed advisory evidence if selecting xhigh,
+requested isolation, and scoped state captured before review.>
+Remain read-only. Do not write, format, implement, or delegate implementation.
+Use checks that preserve scoped state; disclose unavailable checks.
 
 RETURN
 READINESS: <ready, changes required, or unverified, with reason>
-FINDINGS: <severity, exact file references, observed evidence, and impact>
-VERIFICATION: <checks inspected or run, commands, exit status, and relevant output>
+FINDINGS: <severity, exact source references, evidence, and impact>
+VERIFICATION: <checks inspected or run, commands, status, and relevant output>
 GAPS: <missing evidence, unchecked conditions, and residual risks>
 ~~~
 
-The architect verifies routing and before/after state independently of this report,
-checks cited findings, and owns acceptance. Missing evidence keeps required review
-pending. Send corrections to an Implementer and review the revised deliverable in
-a new context after the architect's repeat checks.
+Reviewer effort is independent of primary effort. The primary verifies fresh
+invocation, routing, cited findings, tool activity, and before/after state.
+Missing evidence or material findings leave required acceptance pending.
+After corrections and primary re-verification, review the revised deliverable
+in a new thread even if model and effort remain unchanged.

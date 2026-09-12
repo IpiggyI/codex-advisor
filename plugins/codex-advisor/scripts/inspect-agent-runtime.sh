@@ -5,30 +5,28 @@ set -eu
 
 usage() {
   cat <<'EOF'
-Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--advisor-effort EFFORT | --luna | --explorer-effort EFFORT | --astra-effort EFFORT | --sol-effort EFFORT] THREAD_ID
-       inspect-agent-runtime.sh [--sessions-dir DIR] --review-primary-effort EFFORT [--reviewer-effort EFFORT] THREAD_ID
-       inspect-agent-runtime.sh --select-review-effort --review-primary-effort EFFORT [--reviewer-effort EFFORT]
+Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [ROLE_OPTION] THREAD_ID
 
 Read the one rollout file whose filename ends with THREAD_ID and emit a compact JSON
 object containing only safe routing metadata. Without --sessions-dir, the sessions
 root is "$CODEX_HOME/sessions" when CODEX_HOME is already set, otherwise
 "$HOME/.codex/sessions".
 
---advisor-effort requires the native Astra Advisor, the requested effort, and
-observable permission metadata. It validates routing evidence, not task completion
-or enforced isolation. --luna requires the native Luna Implementer at max with
-observable permission metadata. Without a role option, emit generic routing evidence.
---explorer-effort requires the native Luna Explorer at the requested effort, with
-observable permission metadata. It does not certify enforced read-only isolation.
---astra-effort requires the native Astra Implementer at the requested effort (pass
-medium for the default delegated call), with observable permission metadata.
---sol-effort requires the native Sol Implementer at the requested effort (pass high
-for the default delegated call), with observable permission metadata.
---review-primary-effort requires the native Astra Independent reviewer at the
-default floor, or the explicit --reviewer-effort at or above the primary effort.
---select-review-effort prints that selection without reading runtime records.
-The caller must establish the primary effort from host evidence and confirm host
-support. Selection alone proves neither actual invocation nor primary settings.
+ROLE_OPTION selects exactly one native contract:
+  --luna                         Luna Implementer at max
+  --sol-effort high|xhigh         Sol Implementer
+  --astra-effort medium|high|xhigh Astra Implementer
+  --explorer-effort high|max      Luna Explorer
+  --sol-explorer-effort medium|high
+  --astra-explorer-effort medium|high
+  --advisor-effort medium|high|xhigh
+  --reviewer-effort medium|high|xhigh
+
+Role checks require observed model, effort, parent linkage, working directory, and
+permissions. Without a role option, emit generic routing evidence. This inspector
+does not certify host support, failure eligibility for Astra xhigh, authorization,
+fresh invocation, task completion, or enforced read-only isolation. Compare thread
+IDs and invocation evidence separately. Primary-derived review selection is retired.
 EOF
 }
 
@@ -37,25 +35,14 @@ fail() {
   exit 1
 }
 
-effort_rank() {
-  case "$1" in
-    low) printf '1\n' ;; medium) printf '2\n' ;; high) printf '3\n' ;;
-    xhigh) printf '4\n' ;; max) printf '5\n' ;;
-    *) fail "unsupported or unestablished review effort order." ;;
-  esac
-}
-
 sessions_dir=''
 expected_role=''
 expected_model=''
 expected_effort=''
-primary_effort=''
-reviewer_effort=''
-select_review=0
 thread_id=''
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --sessions-dir|--advisor-effort|--explorer-effort|--astra-effort|--sol-effort|--review-primary-effort|--reviewer-effort)
+    --sessions-dir|--advisor-effort|--explorer-effort|--sol-explorer-effort|--astra-explorer-effort|--astra-effort|--sol-effort|--reviewer-effort)
       [ "$#" -ge 2 ] && [ -n "$2" ] || fail "option requires a value."
       case "$2" in --*) fail "option requires an explicit value." ;; esac ;;
   esac
@@ -64,7 +51,7 @@ while [ "$#" -gt 0 ]; do
       sessions_dir=$2; shift 2 ;;
     --advisor-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Advisor effort." ;; esac
+      case "$2" in medium|high|xhigh) ;; *) fail "unsupported Advisor effort (expected medium, high, or eligible xhigh)." ;; esac
       expected_role=codex_advisor_astra_advisor
       expected_model=gpt-6-astra
       expected_effort=$2; shift 2 ;;
@@ -76,54 +63,44 @@ while [ "$#" -gt 0 ]; do
       shift ;;
     --explorer-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Explorer effort." ;; esac
+      case "$2" in high|max) ;; *) fail "unsupported Luna Explorer effort (expected high or max)." ;; esac
       expected_role=codex_advisor_luna_explorer
       expected_model=gpt-5.6-luna
       expected_effort=$2; shift 2 ;;
+    --sol-explorer-effort|--astra-explorer-effort)
+      [ -z "$expected_role" ] || fail "select exactly one role contract."
+      case "$2" in medium|high) ;; *) fail "unsupported Explorer effort (expected medium or high)." ;; esac
+      case "$1" in
+        --sol-explorer-effort) expected_role=codex_advisor_sol_explorer; expected_model=gpt-5.6-sol ;;
+        --astra-explorer-effort) expected_role=codex_advisor_astra_explorer; expected_model=gpt-6-astra ;;
+      esac
+      expected_effort=$2; shift 2 ;;
     --astra-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Astra implementation effort." ;; esac
+      case "$2" in medium|high|xhigh) ;; *) fail "unsupported Astra implementation effort (expected medium, high, or eligible xhigh)." ;; esac
       expected_role=codex_advisor_astra_implementer
       expected_model=gpt-6-astra
       expected_effort=$2; shift 2 ;;
     --sol-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in low|medium|high|xhigh|max|ultra) ;; *) fail "unsupported Sol effort." ;; esac
+      case "$2" in high|xhigh) ;; *) fail "unsupported Sol effort (expected high or xhigh)." ;; esac
       expected_role=codex_advisor_sol_implementer
       expected_model=gpt-5.6-sol
       expected_effort=$2; shift 2 ;;
-    --review-primary-effort)
+    --reviewer-effort)
       [ -z "$expected_role" ] || fail "select exactly one role contract."
+      case "$2" in medium|high|xhigh) ;; *) fail "unsupported reviewer effort (expected medium, high, or eligible xhigh)." ;; esac
       expected_role=codex_advisor_astra_reviewer
       expected_model=gpt-6-astra
-      primary_effort=$2; shift 2 ;;
-    --reviewer-effort)
-      [ -z "$reviewer_effort" ] || fail "supply reviewer effort only once."
-      reviewer_effort=$2; shift 2 ;;
-    --select-review-effort) select_review=1; shift ;;
+      expected_effort=$2; shift 2 ;;
+    --review-primary-effort|--select-review-effort)
+      fail "primary-derived review selection is retired; use --reviewer-effort EFFORT THREAD_ID." ;;
     --help|-h) usage; exit 0 ;;
     --*) fail "unknown argument." ;;
     *) [ "$#" -eq 1 ] || fail "exactly one trailing THREAD_ID is required."
        thread_id=$1; shift ;;
   esac
 done
-if [ -n "$primary_effort" ]; then
-  primary_rank=$(effort_rank "$primary_effort")
-  expected_effort=high
-  [ "$primary_rank" -le 3 ] || expected_effort=$primary_effort
-  if [ -n "$reviewer_effort" ]; then
-    reviewer_rank=$(effort_rank "$reviewer_effort")
-    [ "$reviewer_rank" -ge "$primary_rank" ] || fail "reviewer effort is below the primary session effort."
-    expected_effort=$reviewer_effort
-  fi
-elif [ -n "$reviewer_effort" ] || [ "$select_review" -eq 1 ]; then
-  fail "review selection requires the resolved primary effort."
-fi
-if [ "$select_review" -eq 1 ]; then
-  [ -z "$thread_id$sessions_dir" ] || fail "selection does not accept a thread or sessions directory."
-  printf '%s\n' "$expected_effort"
-  exit 0
-fi
 [ -n "$thread_id" ] || fail "exactly one THREAD_ID is required."
 
 if ! printf '%s\n' "$thread_id" | LC_ALL=C grep -Eq '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
@@ -224,6 +201,10 @@ if ! jq -ce -s --arg expected_thread_id "$thread_id" --arg expected_role "$expec
       error("conflicting permission profile types")
     elif ($cwds | unique | length) != 1 then
       error("conflicting working directories")
+    elif $expected_role != "" and
+      (($parent_thread_id // "" | test("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$") | not) or
+       any($cwds[]; . == null or . == "")) then
+      error("parent or working directory evidence is missing or invalid")
     elif $expected_role != "" and
       ($agent_role != $expected_role or $models[0] != $expected_model
        or $efforts[0] != $expected_effort) then

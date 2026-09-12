@@ -4,6 +4,8 @@ status: accepted
 
 # Luna and Astra implementation routing
 
+The implementation selection and failure policy in this record are superseded by [Autonomous primary and tiered role pool](0003-autonomous-primary-and-tiered-role-pool.md). The original decision and evidence below remain historical.
+
 Architect mode will use Luna and Astra as its default implementation choices, with Sol available when explicitly selected by the user. This decision supersedes the implementation routing and implementation-effort decisions in [ADR-0001](0001-codex-native-dual-mode-orchestration.md). It records the target design; implementation and installation require separate work.
 
 ## Roles and selection

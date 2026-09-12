@@ -25,6 +25,8 @@ templates = {p.name: p.read_bytes() for p in (plugin / 'agents').glob('*.toml')}
 role_files = {'advisor': 'codex-advisor-astra-advisor.toml',
               'luna': 'codex-advisor-luna-implementer.toml',
               'explorer': 'codex-advisor-luna-explorer.toml',
+              'sol-explorer': 'codex-advisor-sol-explorer.toml',
+              'astra-explorer': 'codex-advisor-astra-explorer.toml',
               'astra': 'codex-advisor-astra-implementer.toml',
               'sol': 'codex-advisor-sol-implementer.toml',
               'reviewer': 'codex-advisor-astra-reviewer.toml'}
@@ -176,33 +178,15 @@ assert data['sandbox_mode'] == 'read-only'
 reviewer = tomllib.loads((scripts.parent / 'agents/codex-advisor-astra-reviewer.toml').read_text())
 assert reviewer['name'] == 'codex_advisor_astra_reviewer'
 assert reviewer['model'] == 'gpt-6-astra'
-assert 'model_reasoning_effort' not in reviewer, 'a fixed effort would defeat the review floor'
+assert 'model_reasoning_effort' not in reviewer, 'a fixed effort would override caller selection'
 assert reviewer['sandbox_mode'] == 'read-only'
-def select_review(*args, expected=None):
+def obsolete_review(*args):
     result = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'),
                              '--select-review-effort', *args], capture_output=True, text=True)
-    if expected is None:
-        assert result.returncode != 0 and not result.stdout and 'ERROR:' in result.stderr
-    else:
-        assert result.returncode == 0 and result.stdout == expected + '\n', result
-review_defaults = {'low': 'high', 'medium': 'high', 'high': 'high',
-                   'xhigh': 'xhigh', 'max': 'max'}
-allowed_overrides = {'low': ('low', 'medium', 'high', 'xhigh', 'max'),
-                     'medium': ('medium', 'high', 'xhigh', 'max'),
-                     'high': ('high', 'xhigh', 'max'), 'xhigh': ('xhigh', 'max'),
-                     'max': ('max',)}
-for primary, default in review_defaults.items():
-    select_review('--review-primary-effort', primary, expected=default)
-    for override in review_defaults:
-        select_review('--review-primary-effort', primary, '--reviewer-effort', override,
-                      expected=override if override in allowed_overrides[primary] else None)
-for unknown in ('unsupported', 'ultra', 'MAX', ''):
-    select_review('--review-primary-effort', unknown)
-    select_review('--review-primary-effort', 'low', '--reviewer-effort', unknown)
-select_review()
-select_review('--reviewer-effort', 'high')
-select_review('--review-primary-effort', 'high', '--luna')
-select_review('--review-primary-effort', 'high', '--advisor-effort', 'high')
+    assert result.returncode != 0 and not result.stdout
+    assert 'retired' in result.stderr and '--reviewer-effort' in result.stderr, result
+obsolete_review('--review-primary-effort', 'max')
+obsolete_review('--reviewer-effort', 'medium')
 thread = '11111111-1111-7111-8111-111111111111'
 secret = 'DO_NOT_LEAK_PROMPT_OR_CREDENTIAL'
 session = {'type': 'session_meta', 'payload': {
@@ -227,7 +211,12 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
         if not ok:
             assert not result.stdout and 'ERROR:' in result.stderr
         return json.loads(result.stdout) if ok else None
-    for effort in ('low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+    def reject_efforts(session_record, turn_record, option, efforts):
+        for effort in efforts:
+            turn_record['payload']['effort'] = effort
+            write([session_record, turn_record])
+            inspect(option, effort, ok=False)
+    for effort in ('medium', 'high', 'xhigh'):
         turn['payload']['effort'] = effort
         write([session, turn, {'type': 'response_item', 'payload': {'text': secret}}])
         evidence = inspect('--advisor-effort', effort)
@@ -237,6 +226,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
         assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
                                  'model_provider', 'model', 'effort', 'sandbox_policy_type',
                                  'permission_profile_type', 'cwd'}
+    reject_efforts(session, turn, '--advisor-effort', ('low', 'max', 'ultra'))
     turn['payload']['effort'] = 'high'
     turn['payload']['sandbox_policy']['type'] = 'danger-full-access'
     turn['payload']['permission_profile']['type'] = 'disabled'
@@ -246,10 +236,15 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     assert evidence['permission_profile_type'] == 'disabled'
     inspect('--advisor-effort', 'medium', ok=False)
     inspect('--advisor-effort', 'unsupported', ok=False)
-    for field in ('model', 'effort', 'sandbox_policy', 'permission_profile'):
+    for field in ('model', 'effort', 'sandbox_policy', 'permission_profile', 'cwd'):
         missing = json.loads(json.dumps(turn))
         del missing['payload'][field]
         write([session, missing])
+        inspect('--advisor-effort', 'high', ok=False)
+    for value in (None, '', 'not-a-thread'):
+        missing_parent = json.loads(json.dumps(session))
+        missing_parent['payload']['parent_thread_id'] = value
+        write([missing_parent, turn])
         inspect('--advisor-effort', 'high', ok=False)
     for field, wrong in [('model', 'gpt-5.6-sol'), ('effort', 'low'),
                          ('sandbox_policy', {'type': 'read-only'}),
@@ -297,7 +292,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     explorer_session['payload']['agent_role'] = 'codex_advisor_luna_explorer'
     explorer_turn = json.loads(json.dumps(turn))
     explorer_turn['payload']['model'] = 'gpt-5.6-luna'
-    for effort in ('low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+    for effort in ('high', 'max'):
         explorer_turn['payload']['effort'] = effort
         write([explorer_session, explorer_turn])
         evidence = inspect('--explorer-effort', effort)
@@ -308,33 +303,63 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
         assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
                                  'model_provider', 'model', 'effort', 'sandbox_policy_type',
                                  'permission_profile_type', 'cwd'}
-    explorer_turn['payload']['effort'] = 'low'
+    reject_efforts(explorer_session, explorer_turn, '--explorer-effort', ('low', 'medium', 'xhigh', 'ultra'))
+    explorer_turn['payload']['effort'] = 'high'
     write([explorer_session, explorer_turn])
     for args in [('--explorer-effort', 'max'), ('--explorer-effort', 'unsupported'),
                  ('--explorer-effort', ''), ('--explorer-effort',),
-                 ('--explorer-effort', 'low', '--luna'),
-                 ('--explorer-effort', 'low', '--sol-effort', 'low'),
-                 ('--advisor-effort', 'low', '--explorer-effort', 'low'),
-                 ('--explorer-effort', 'low', '--review-primary-effort', 'low')]:
+                 ('--explorer-effort', 'high', '--luna'),
+                 ('--explorer-effort', 'high', '--sol-effort', 'high'),
+                 ('--advisor-effort', 'high', '--explorer-effort', 'high'),
+                 ('--explorer-effort', 'high', '--review-primary-effort', 'low')]:
         inspect(*args, ok=False)
     for other_session in (session, luna_session, wrong_role):
         write([other_session, explorer_turn])
-        inspect('--explorer-effort', 'low', ok=False)
+        inspect('--explorer-effort', 'high', ok=False)
     for field, wrong in [('model', 'gpt-6-astra'), ('effort', 'max'),
                          ('sandbox_policy', {'type': 'read-only'}),
                          ('permission_profile', {'type': 'legacy'})]:
         missing = json.loads(json.dumps(explorer_turn))
         del missing['payload'][field]
         write([explorer_session, missing])
-        inspect('--explorer-effort', 'low', ok=False)
+        inspect('--explorer-effort', 'high', ok=False)
         conflicting = json.loads(json.dumps(explorer_turn))
         conflicting['payload'][field] = wrong
         write([explorer_session, explorer_turn, conflicting])
-        inspect('--explorer-effort', 'low', ok=False)
+        inspect('--explorer-effort', 'high', ok=False)
     invalid_explorer = json.loads(json.dumps(explorer_turn))
     invalid_explorer['payload']['model'] = 'gpt-6-astra'
     write([explorer_session, invalid_explorer])
-    inspect('--explorer-effort', 'low', ok=False)
+    inspect('--explorer-effort', 'high', ok=False)
+    for model_name, model in (('sol', 'gpt-5.6-sol'), ('astra', 'gpt-6-astra')):
+        native_role = f'codex_advisor_{model_name}_explorer'
+        config = tomllib.loads((scripts.parent / f'agents/codex-advisor-{model_name}-explorer.toml').read_text())
+        assert config['name'] == native_role and config['model'] == model
+        assert config['sandbox_mode'] == 'read-only' and 'model_reasoning_effort' not in config
+        allocated_session = json.loads(json.dumps(session))
+        allocated_session['payload']['agent_role'] = native_role
+        allocated_turn = json.loads(json.dumps(turn))
+        allocated_turn['payload']['model'] = model
+        option = f'--{model_name}-explorer-effort'
+        for effort in ('medium', 'high', 'low', 'xhigh', 'max', 'ultra'):
+            allocated_turn['payload']['effort'] = effort
+            write([allocated_session, allocated_turn])
+            evidence = inspect(option, effort, ok=effort in ('medium', 'high'))
+            if evidence:
+                assert evidence['agent_role'] == native_role and evidence['model'] == model
+                assert evidence['effort'] == effort
+        allocated_turn['payload']['effort'] = 'medium'
+        worker_session = json.loads(json.dumps(allocated_session))
+        worker_session['payload']['agent_role'] = f'codex_advisor_{model_name}_implementer'
+        write([worker_session, allocated_turn])
+        inspect(option, 'medium', ok=False)
+        for field in ('model', 'effort', 'sandbox_policy', 'permission_profile'):
+            missing = json.loads(json.dumps(allocated_turn))
+            del missing['payload'][field]
+            write([allocated_session, missing])
+            inspect(option, 'medium', ok=False)
+        write([allocated_session, allocated_turn])
+        inspect(option, 'medium', '--luna', ok=False)
     sol_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-sol-implementer.toml').read_text())
     assert sol_role['name'] == 'codex_advisor_sol_implementer'
     assert sol_role['model'] == 'gpt-5.6-sol'
@@ -343,12 +368,13 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     sol_session['payload']['agent_role'] = 'codex_advisor_sol_implementer'
     sol_turn = json.loads(json.dumps(turn))
     sol_turn['payload']['model'] = 'gpt-5.6-sol'
-    for effort in ('low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+    for effort in ('high', 'xhigh'):
         sol_turn['payload']['effort'] = effort
         write([sol_session, sol_turn])
         evidence = inspect('--sol-effort', effort)
         assert evidence['model'] == 'gpt-5.6-sol' and evidence['effort'] == effort
         assert evidence['agent_role'] == 'codex_advisor_sol_implementer'
+    reject_efforts(sol_session, sol_turn, '--sol-effort', ('low', 'medium', 'max', 'ultra'))
     sol_turn['payload']['effort'] = 'high'
     write([sol_session, sol_turn])
     for args in [('--sol-effort', 'medium'), ('--sol-effort', 'unsupported'),
@@ -378,39 +404,39 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     review_session = json.loads(json.dumps(session))
     review_session['payload']['agent_role'] = 'codex_advisor_astra_reviewer'
     review_turn = json.loads(json.dumps(turn))
-    for primary, default in review_defaults.items():
-        review_turn['payload']['effort'] = default
+    for effort in ('medium', 'high', 'xhigh', 'low', 'max', 'ultra'):
+        review_turn['payload']['effort'] = effort
         write([review_session, review_turn])
-        evidence = inspect('--review-primary-effort', primary)
-        assert evidence['agent_role'] == 'codex_advisor_astra_reviewer'
-        assert evidence['model'] == 'gpt-6-astra' and evidence['effort'] == default
-        for override in review_defaults:
-            review_turn['payload']['effort'] = override
-            write([review_session, review_turn])
-            inspect('--review-primary-effort', primary, '--reviewer-effort', override,
-                    ok=override in allowed_overrides[primary])
+        evidence = inspect('--reviewer-effort', effort, ok=effort in ('medium', 'high', 'xhigh'))
+        if evidence:
+            assert evidence['agent_role'] == 'codex_advisor_astra_reviewer'
+            assert evidence['model'] == 'gpt-6-astra' and evidence['effort'] == effort
     review_turn['payload']['effort'] = 'high'
     write([review_session, review_turn])
     inspect('--review-primary-effort', 'max', ok=False)
     inspect('--review-primary-effort', 'low', '--reviewer-effort', 'medium', ok=False)
-    inspect('--reviewer-effort', 'high', ok=False)
+    inspect('--reviewer-effort', 'high')
+    inspect('--reviewer-effort', 'high', '--reviewer-effort', 'high', ok=False)
+    inspect('--reviewer-effort', 'high', '--advisor-effort', 'high', ok=False)
+    inspect('--reviewer-effort', 'high', '--luna', ok=False)
+    inspect('--reviewer-effort', 'medium', ok=False)
     inspect('--luna', '--review-primary-effort', 'low', ok=False)
     for other_session in (session, luna_session, wrong_role):
         write([other_session, review_turn])
-        inspect('--review-primary-effort', 'low', ok=False)
+        inspect('--reviewer-effort', 'high', ok=False)
     for field, wrong in [('model', 'gpt-5.6-sol'), ('effort', 'medium'),
                          ('sandbox_policy', {'type': 'read-only'}),
                          ('permission_profile', {'type': 'legacy'})]:
         missing = json.loads(json.dumps(review_turn))
         del missing['payload'][field]
         write([review_session, missing])
-        inspect('--review-primary-effort', 'low', ok=False)
+        inspect('--reviewer-effort', 'high', ok=False)
         conflicting = json.loads(json.dumps(review_turn))
         conflicting['payload'][field] = wrong
         write([review_session, review_turn, conflicting])
-        inspect('--review-primary-effort', 'low', ok=False)
+        inspect('--reviewer-effort', 'high', ok=False)
     write([review_session, wrong_model])
-    inspect('--review-primary-effort', 'low', ok=False)
+    inspect('--reviewer-effort', 'high', ok=False)
     astra_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-astra-implementer.toml').read_text())
     assert astra_role['name'] == 'codex_advisor_astra_implementer'
     assert astra_role['model'] == 'gpt-6-astra'
@@ -418,7 +444,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     astra_session = json.loads(json.dumps(session))
     astra_session['payload']['agent_role'] = 'codex_advisor_astra_implementer'
     astra_turn = json.loads(json.dumps(turn))
-    for effort in ('low', 'medium', 'high', 'xhigh', 'max', 'ultra'):
+    for effort in ('medium', 'high', 'xhigh'):
         astra_turn['payload']['effort'] = effort
         write([astra_session, astra_turn])
         evidence = inspect('--astra-effort', effort)
@@ -427,6 +453,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
         assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
                                  'model_provider', 'model', 'effort', 'sandbox_policy_type',
                                  'permission_profile_type', 'cwd'}
+    reject_efforts(astra_session, astra_turn, '--astra-effort', ('low', 'max', 'ultra'))
     astra_turn['payload']['effort'] = 'medium'
     write([astra_session, astra_turn])
     for args in [('--astra-effort', 'high'), ('--astra-effort', 'unsupported'),
@@ -471,7 +498,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     bad = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'), '../invalid'],
                          capture_output=True, text=True)
     assert bad.returncode != 0 and not bad.stdout
-print('PASS: native role evidence, Luna max, Explorer/Astra/Sol adjustments, review floors and overrides, refusals, permissions and payload filtering')
+print('PASS: native role allocations, explicit independent review, retired-floor refusal, evidence consistency, permissions and payload filtering')
 PY
 fi
 for script in "$script_dir"/*.sh; do sh -n "$script"; done

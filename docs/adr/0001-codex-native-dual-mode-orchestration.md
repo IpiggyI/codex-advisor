@@ -4,7 +4,7 @@ status: accepted
 
 # Codex-native dual-mode orchestration
 
-The implementation routing and implementation-effort decisions in this record are superseded by [Luna and Astra implementation routing](0002-luna-astra-implementation-routing.md). Its other decisions remain in effect.
+The mode eligibility, consultation triggers, Explorer selection, delegated effort, and review-floor decisions in this record are superseded by [Autonomous primary and tiered role pool](0003-autonomous-primary-and-tiered-role-pool.md). Historical implementation routing was first amended by [ADR-0002](0002-luna-astra-implementation-routing.md). See ADR-0003 for current policy.
 
 The fork will be named `codex-advisor` and support Codex only. It will use the existing native-agent foundation and adopt two session work modes: architect mode and advisor mode. These responsibility rules replace the upstream task routes `solo`, `delegate`, `audit`, and `full`, including the `SELECTIVE ROUTE` declaration protocol. No compatibility layer for that protocol is retained. Worker specifications, risk-based review, and runtime verification remain part of the new workflow.
 

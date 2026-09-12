@@ -1,161 +1,141 @@
 ---
 name: orchestration
-description: "Use for authorized Astra Architect work with delegated implementation, or primary implementation with Astra advice at design decisions, persistent failures, and multi-step completion."
+description: "Use when a primary agent implements or delegates work, selects tiered exploration, recovers failed attempts, or needs Astra decision advice and independent acceptance."
 ---
 
 # Codex Advisor orchestration
 
-## Delegate exploration
+## Own the task
 
-When this skill applies, use `codex_advisor_luna_explorer` by default for exploration
-you decide to delegate. This applies to every primary model, including all non-Astra
-models, and does not require Architect mode. Preserve existing rules and user
-authorization for whether to delegate. The installed role is also callable without
-this skill; outside the skill, the primary chooses from available role descriptions.
+Any primary model may implement directly, delegate bounded work, or combine both.
+Preserve the user's primary model and reasoning effort. A midrange primary such
+as Sol is a preference, not a plugin requirement. Choose decomposition, order,
+and division of work within the user's authorized goals, scope, reserved decisions,
+acceptance conditions, and resource limits. Do not change those boundaries to
+make the task easier. Investigate mismatches with current code, seek resolution
+for user-owned changes, and continue independent unaffected work.
 
-Before invoking the Explorer, read the investigation packet in
-[role-contracts.md](references/role-contracts.md) and the Explorer installation,
-invocation, effort selection, and validation procedure in
-[operations.md](references/operations.md). Explicitly choose a supported reasoning
-effort for each call. Exploration has no `max` minimum; the Luna Implementer's
-fixed `max` requirement remains unchanged.
+Explicit Architect-mode authorization makes every implementation edit and correction
+delegated for its scope, for any primary model. The primary owns design, contracts,
+scheduling, and acceptance and may write design and task artifacts. Model identity,
+a ticket, a specification, or an unaccepted proposal does not activate this mode.
+Record the authorizing request. It lasts for this task and follow-ups; unrelated
+tasks need new authorization unless the user explicitly granted session-wide scope.
 
-Check the returned source evidence and actual call settings. The Explorer supplies
-read-only findings; the primary owns decisions. If the role is unavailable or its
-findings are insufficient, report the gap and investigate directly as needed.
-A more expensive delegated substitute requires explicit user authorization.
+## Allocate by responsibility and capability
 
-## Establish the work mode
-
-Use the primary model identity exposed by the host. Preserve the user's primary
-model and reasoning effort; this plugin imposes no primary-session effort floor.
-If identity is unknown, resolve it from host evidence before selecting a mode.
-Do not infer it from the installed plugin or a model's self-description.
-
-- Non-Astra primary sessions, including Sol and Luna, use Advisor mode. The primary
-  agent implements and verifies the work, consulting Astra at the boundaries below.
-- An Astra primary session without an explicit user request or accepted proposal for
-  Architect mode continues ordinary solo work. A suggestion alone and a generic
-  request to implement do not authorize delegation-only Architect mode.
-- Architect mode requires both Astra and an explicit user request or accepted
-  proposal. Record the authorizing request and its scope in task context. By default
-  it covers the current task, its follow-up turns, and implementation subtasks;
-  expire it for an unrelated new task. Only explicit session-wide authorization
-  carries into subsequent tasks, and Astra remains a prerequisite. Recheck scope
-  at task boundaries and identity when the host model changes.
-- If a non-Astra primary receives an Architect-mode request, explain the unmet
-  prerequisite without claiming activation or changing the primary model. A
-  dedicated mode-switch command is not required.
-
-## Carry out authorized Architect-mode work
-
-The architect owns design, task specifications, scheduling, and acceptance. Every
-implementation edit belongs to an Implementer, including one-line changes and
-corrections. The architect may write design and task-specification artifacts.
-
-Before implementation, read the shared implementation packet in
+Before a delegated call, read the relevant packet in
 [role-contracts.md](references/role-contracts.md) and the installation, invocation,
-and evidence checks in [operations.md](references/operations.md). Select the native
-Luna Implementer at `max` for bounded, fully specified work with little implementation
-judgment and clear acceptance checks. Select the native Astra Implementer directly
-for substantial implementation judgment, cross-module understanding, or higher risk;
-a failed Luna attempt is not a prerequisite. Astra defaults to `medium`; explicitly
-pass that effort or the user's supported adjustment. Keep implementation effort
-independent of the primary effort and do not automatically raise it after failure.
-Select the native Sol Implementer only when the user explicitly requests Sol, passing
-`high` or the user's supported adjustment. Luna and Astra are the default choices;
-Sol is not an automatic fallback for failures, unavailability, cost, or waiting time.
+evidence, and permission procedures in [operations.md](references/operations.md).
+Respect host capacity and explicit user exclusions and resource limits. Select an
+allowed effort explicitly without asking permission for each routine allocation.
 
-Validate the observed role, model, requested effort, and permissions for every call.
-An invalid or unavailable model or effort, or missing or conflicting evidence,
-leaves affected acceptance pending. Report the reason without silently substituting
-a role or setting. Delegated settings never restrict a directly used primary session.
+| Responsibility | Tier | Model and effort |
+|---|---|---|
+| Explorer | light | Luna `high` |
+| Explorer | standard / senior | Usually Luna `max`; direct Sol or Astra `medium` / `high` allowed |
+| worker (Implementer) | light | Luna `max` |
+| worker (Implementer) | standard | Sol `high` / `xhigh`, including the first attempt |
+| worker (Implementer) | senior | Astra `medium` / `high`; `xhigh` after a relevant complete failed worker attempt |
+| Advisor, including independent acceptance | senior | Astra `medium` / `high`; `xhigh` after a relevant complete failed advisory attempt |
 
-When Luna fails acceptance, diagnose the cause before choosing specification
-clarification, a Luna correction, or Astra reassignment. There is no fixed retry
-count; environment failures and specification gaps alone do not establish insufficient
-model capability. Resolve material specification gaps before dependent edits. For
-reassignment, follow the actual-state handoff in [operations.md](references/operations.md).
+Luna is the usual exploration preference, not a prerequisite. Complexity, judgment
+needs, or existing evidence can justify direct Sol or Astra exploration. Model-specific
+native names are entry points, not extra capability tiers. Where allowed, use
+`medium` for a focused question with sufficient evidence; alternatives, conflicting
+evidence, or cross-module constraints can justify `high` initially. Eligibility
+does not force escalation. No Explorer `xhigh` route exists.
 
-When a task has multiple implementation parts, read the scheduling procedure in
-[operations.md](references/operations.md). Dispatch independent parts with disjoint
-ownership concurrently when host capacity permits. Sequence dependencies, conflicting
-ownership, and work exceeding available capacity. Scheduling stays with the primary;
-Implementers perform their assigned work without further implementation delegation.
+## Delegate outcomes and retain scheduling
 
-Inspect every actual change, including new files and corrections, against the
-ownership boundary and specification. Rerun key verification yourself. Check the
-worker's report against those observations; missing, false, failed, or skipped
-evidence cannot establish acceptance. Send any correction to an Implementer and
-repeat the affected checks. Obtain every required worker report and rerun key checks
-against the combined deliverable before acceptance. A failed, blocked, or incomplete
-worker leaves its affected work pending; another worker's success cannot complete
-the whole task. A report alone never completes this step.
+Give every worker an objective, owned scope, retained interfaces, reserved constraints,
+and meaningful verification. Include the original task and source references so
+the worker can inspect them. Unspecified local implementation choices belong to
+the worker. Expected-behavior ambiguity, conflicting requirements, or required
+changes to reserved interfaces are contract gaps to resolve before dependent edits.
 
-After these checks, ordinary work may complete without adding a reviewer, including
-work implemented by Astra. The implementation model alone is not a review trigger.
-High-risk work and explicit user requests for independent review require a fresh
-Astra Independent reviewer after the architect's checks. Read the review packet in
-[role-contracts.md](references/role-contracts.md) and the floor selection, invocation,
-and permission safeguards in [operations.md](references/operations.md).
-Apply these obligations to the combined deliverable, including parallel work.
+Workers do their own debugging and implementation without further implementation
+delegation. They preserve concurrent and unrelated edits and report actual changes,
+checks, judgment calls, and gaps. Rework identifies the violated requirement,
+reproducible failure, expected behavior, and verification; structural preference
+alone is insufficient.
 
-Resolve the current Astra primary effort from actual host evidence. Select the
-default review effort as the higher of `high` and that effort using the inspector's
-deterministic selector. Explicit supported adjustments may be below `high` only
-when they remain at or above the primary effort. This rule never restricts the
-primary session. Unknown ordering or unavailable primary evidence leaves the
-review floor unestablished and the required review pending.
+Check dependencies, ownership (including generated files and check side effects),
+and actual available slots before dispatch. Independent delegated tasks may run
+concurrently; sequence dependencies, conflicting ownership, and excess capacity.
+Do not split a shared file into nominally independent owners or nest workers to
+evade capacity. Collect each report and inspect the combined result. A successful
+sibling does not complete failed or missing work.
 
-Validate the actual reviewer role, Astra model, selected effort, fresh context,
-permissions, and unchanged scoped state before accepting its judgment. If the
-required call is unavailable, fails, or has missing or conflicting evidence, pause
-the affected review/completion step with the reason. No substitute or successful
-review claim is permitted. Advisor consultation does not satisfy this contract.
-The Independent reviewer supplies findings, while the architect owns acceptance.
-Assign corrections to an Implementer, inspect them, rerun affected checks, and
-obtain a fresh review of the revised deliverable before required-review completion.
+## Recover from evidence
 
-## Carry out Advisor-mode work
+A complete worker attempt includes implementation, ordinary debugging, and verification,
+then failed acceptance or a concrete inability to finish the objective. Intermediate
+failing tests and individual tool errors are not complete failed attempts.
 
-Consult an independent Astra Advisor:
+Diagnose environment problems, missing facts, contract gaps, reasoning failures,
+and executor suitability. Repair environment problems and clarify contracts first.
+Choose unchanged-allocation rework, a different effort, a more suitable worker, or
+primary takeover from the observed cause; there is no mandatory ladder. Primary
+takeover is available in ordinary work; Architect mode keeps edits delegated.
 
-- Before committing to an architecture decision, data migration, API design, or
-  refactor touching at least three files.
-- After two distinct unsuccessful attempts at the same problem, before another
-  attempt. State both attempted approaches and their observed failures.
-- Before declaring a multi-step deliverable complete, after inspecting actual
-  changes and running the relevant verification.
+Relevant complete worker failure makes Astra worker `xhigh` eligible for the same
+work, including takeover carrying that evidence. Unrelated task or role failures
+do not qualify. Sol worker `xhigh` needs no prior failure. Stop the previous
+conflicting writer, inspect actual state, and preserve useful changes before
+reassignment. Follow the current-state handoff in the operations reference.
 
-Additional useful consultations are allowed. Each consultation addresses its current
-boundary; an earlier design discussion does not satisfy a later readiness check.
+Every delegated effort change, upward or downward, requires a new native thread.
+Model changes and role reassignments also require new matching entry points.
+Same-model, same-effort worker rework may reuse its thread. Independent acceptance
+always starts fresh, including review after corrections. Never report a resume
+with a changed prompt as a new session. Compare actual IDs and settings; this is
+an explicit lifecycle policy, not a universal claim about cache behavior or savings.
 
-Before a consultation, read [role-contracts.md](references/role-contracts.md) for
-the decision packet and [operations.md](references/operations.md) for selective
-installation checks, exact native invocation, runtime validation, and permissions.
-Use a fresh context and supply only the relevant evidence and constraints.
-The Advisor provides judgment and does not implement changes.
+## Seek judgment when it changes a decision
 
-The consultation defaults to `high`; explicitly pass that effort on the native
-call unless the user requested another supported setting. The native role pins
-`gpt-6-astra` while leaving effort open to the call. Verify the actual role, model,
-effort, and permission evidence before relying on the recommendation.
+Proactive advice is allowed. Advice is required for:
 
-If Astra is unavailable, invocation fails, or required actual model or effort
-evidence is missing or conflicting, pause the affected decision or completion
-step. Report the reason and the evidence gap. Do not silently substitute a model,
-skip a required consultation, or claim it occurred. Independent unaffected work
-may continue while the affected step remains explicitly pending.
+- Key decisions not covered by an applicable plan.
+- New evidence invalidating a key plan assumption.
+- Failure causes still unclear after initial diagnosis.
 
-## Own the Advisor-mode decision and delivery
+Reuse applicable advice while its relevant premises hold. Material new evidence
+requires renewed judgment; repeated failures require reassessment rather than an
+unconditional counter-driven call. Check cited evidence and explain material
+disagreement. Advice grants no authorization, veto, new requirement, or ownership
+of user goals.
 
-Check the Advisor's cited evidence against the scoped sources. Explain the
-recommendation, your resulting decision, and the reasons for any disagreement.
-Advice does not replace user authorization or project approval requirements.
-Implement and verify any resulting change in the primary session.
+A complete advisory attempt fails when it does not answer the specified question
+or source/verification evidence invalidates its material conclusion. Mere disagreement,
+intermediate tool errors, and worker failure alone do not unlock Advisor `xhigh`.
+Diagnose a relevant advisory failure and choose fact gathering, clarification, or
+adjusted effort for that question. An effort change starts a new thread.
 
-Before reporting multi-step completion, inspect the final changes, report actual
-verification and gaps, and obtain the readiness consultation required above.
-Reassess readiness if subsequent changes invalidate its evidence.
-An ordinary consultation, including readiness advice, is not proof of an independent
-final review of the actual changes. Do not report it as that separate review.
+## Accept the actual deliverable
+
+Inspect all actual changes, including new files, corrections, and worker-authored
+acceptance tests. Check that tests can fail for the intended requirement and rerun
+key verification yourself. A report, false completion claim, skipped required
+check, or missing runtime evidence cannot establish success.
+
+Ordinary direct, delegated, and mixed multi-step work may complete after primary
+checks. Step count, file count, primary identity, or Astra implementation alone
+does not require delivery advice or independent acceptance.
+
+High-risk delivery and explicit independent-review requests each require a fresh
+Astra Independent reviewer after primary checks, for any primary model. Assess
+risk by failure consequences, reversibility, and difficulty establishing correctness.
+Decision advice and independent acceptance are both the semantic Advisor role,
+but use distinct native entries and contracts. Earlier advice or worker self-review
+does not satisfy independent final acceptance.
+
+Choose reviewer `medium` or `high` initially, independently of primary effort;
+a primary at `max` may receive either. Only a relevant complete advisory failure
+makes reviewer `xhigh` eligible. Check routing, fresh invocation, tool activity,
+and scoped before/after state. Resolve material findings, reverify corrections,
+and obtain a fresh review of the revised deliverable even at unchanged effort.
+
+Unavailable required execution, unsupported settings, absent or conflicting evidence,
+or unresolved material findings leave affected acceptance explicitly pending.
+Report the gap without silent substitution; independent unaffected work can continue.

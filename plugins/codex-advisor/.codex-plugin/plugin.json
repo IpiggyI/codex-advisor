@@ -1,18 +1,18 @@
 {
   "name": "codex-advisor",
   "version": "0.1.0",
-  "description": "Codex-native Astra advice and authorized Architect work with Luna or Astra implementation, explicit Sol selection, and independent Astra review.",
+  "description": "Autonomous primary work with tiered native workers and Explorers, Astra decision advice, and independent acceptance.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
   "license": "MIT",
   "keywords": ["codex", "orchestration", "advisor", "gpt-6-astra"],
   "skills": "./skills/",
   "interface": {
     "displayName": "Codex Advisor",
-    "shortDescription": "Use Astra advice or authorize Architect work with delegated implementation.",
-    "longDescription": "Codex Advisor lets non-Astra primary agents implement work with Astra advice at consequential decisions and multi-step completion. Explicitly authorized Astra architects delegate bounded implementation to Luna at max and demanding or higher-risk implementation to Astra at medium. Sol is available when explicitly selected by the user, defaulting to high. Architects inspect actual changes and rerun key checks. High-risk work and user review requests add a fresh Astra Independent reviewer at the required effort floor. Astra remains available for ordinary solo work. Primary model and effort remain user-owned; missing or conflicting required routing evidence pauses the affected step.",
+    "shortDescription": "Implement or delegate autonomously with tiered roles and Astra judgment.",
+    "longDescription": "Any primary can implement, delegate, or combine both within user goals and resources. Workers use Luna max, Sol high/xhigh, or Astra medium/high with eligible xhigh after complete worker failure. Exploration usually uses Luna high/max, with direct Sol or Astra medium/high available. Astra decision advice and independent acceptance use medium/high initially, independently of primary effort; relevant complete advisory failure can qualify xhigh. Every effort change starts a new thread. Ordinary delivery follows primary checks; high-risk work or explicit review requires fresh independent acceptance. Explicit Architect mode delegates every implementation edit for any primary. Primary settings remain user-owned; missing required evidence leaves affected acceptance pending.",
     "developerName": "Daniel McAteer",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],
-    "defaultPrompt": ["Use $codex-advisor:orchestration to implement and verify this feature.", "Consult the Astra Advisor at the required boundaries while preserving my primary model and reasoning effort."]
+    "defaultPrompt": ["Use $codex-advisor:orchestration to implement and verify this feature.", "Choose direct work or suitable delegates within my scope and resources, preserving my primary model and reasoning effort."]
   }
 }

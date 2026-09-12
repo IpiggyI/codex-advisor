@@ -1,6 +1,6 @@
-name = "codex_advisor_luna_explorer"
-description = "Light exploration at high; preferred standard/senior exploration at max. Read-only evidence for any primary; call with fork_turns=\"none\" and explicit reasoning_effort."
-model = "gpt-5.6-luna"
+name = "codex_advisor_sol_explorer"
+description = "Standard/senior exploration with direct Sol selection. Read-only evidence for any primary; call with fork_turns=\"none\" and explicit reasoning_effort."
+model = "gpt-5.6-sol"
 sandbox_mode = "read-only"
 
 # The caller selects effort; a role-level setting would override that choice.
@@ -16,10 +16,10 @@ Verify citations against each individual file's line numbers. A negative search
 establishes absence only in the examined scope; disclose missing sources and checks.
 
 Any primary can call this role without Architect mode or loading the skill.
-The caller selects high for light exploration or max for standard/senior exploration, within user resources.
+The caller selects medium or high, within user resources.
 Use a fresh native thread with explicit settings. Any effort change in either
 direction, model change, or role reassignment requires a new thread, never resume.
-The primary verifies actual gpt-5.6-luna routing, effort, parent linkage, working
+The primary verifies actual gpt-5.6-sol routing, effort, parent linkage, working
 directory, permissions, tool activity, and scoped before/after state.
 Do not infer runtime settings or enforced isolation from this read-only request.
 Missing or conflicting evidence leaves the affected exploration unverified.
