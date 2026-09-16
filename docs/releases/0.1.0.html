@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codex Advisor 0.1.0 说明书</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f3eadc;
+      --sheet: #fbf6ec;
+      --ink: #2c241c;
+      --quiet: #6d6256;
+      --rule: #d8cdb8;
+      --zhu: #b42318;
+      --zhu-soft: #f3ddd6;
+      --moss: #2f5d3a;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 20% 0%, #f7f0e4, var(--paper) 55%);
+      font: 16.5px/1.75 "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 28px 96px;
+      border-left: 3px solid var(--zhu);
+    }
+    @media (max-width: 640px) {
+      .page { padding: 0 18px 72px; border-left-width: 2px; }
+    }
+
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 64px 0 48px;
+    }
+    .seal {
+      align-self: flex-start;
+      width: 76px; height: 76px;
+      border: 2px solid var(--zhu);
+      color: var(--zhu);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: .12em;
+      transform: rotate(-8deg);
+      margin-bottom: 36px;
+    }
+    .cover .series {
+      color: var(--zhu);
+      letter-spacing: .22em;
+      font-size: 13px;
+      margin: 0 0 12px;
+    }
+    .cover h1 {
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      font-size: clamp(2.4rem, 7vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin: 0 0 8px;
+      letter-spacing: .06em;
+    }
+    .cover .product {
+      font-size: 1.15rem;
+      letter-spacing: .18em;
+      margin: 0 0 28px;
+    }
+    .cover .lede {
+      max-width: 38em;
+      color: var(--quiet);
+      margin: 0 0 40px;
+    }
+    .toc {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 22em;
+    }
+    .toc li { display: flex; align-items: baseline; gap: 10px; margin: 0; }
+    .toc a {
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      flex: 1;
+      align-items: baseline;
+      gap: 10px;
+      padding: 5px 0;
+      border-bottom: 1px dotted transparent;
+    }
+    .toc a:hover { border-bottom-color: var(--rule); }
+    .toc .n {
+      color: var(--zhu);
+      font-family: "Noto Serif SC", serif;
+      width: 1.6em;
+      flex: none;
+    }
+    .toc .dots {
+      flex: 1;
+      border-bottom: 1px dotted var(--rule);
+      height: 0.7em;
+    }
+
+    nav.mini {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: color-mix(in srgb, var(--paper) 88%, white);
+      backdrop-filter: blur(10px);
+      margin: 0 -28px;
+      padding: 10px 28px;
+      border-bottom: 1px solid var(--rule);
+      font-size: 13px;
+      letter-spacing: .08em;
+      color: var(--quiet);
+    }
+    nav.mini a { color: var(--quiet); text-decoration: none; margin-right: 1.1em; }
+    nav.mini a:hover { color: var(--zhu); }
+    @media (max-width: 640px) {
+      nav.mini { margin: 0 -18px; padding: 10px 18px; overflow-x: auto; white-space: nowrap; }
+    }
+
+    chapter-block, section {
+      display: block;
+      padding: 56px 0 8px;
+      border-top: 1px solid var(--rule);
+    }
+    .part-label {
+      font-family: "Noto Serif SC", serif;
+      color: var(--zhu);
+      font-size: 15px;
+      letter-spacing: .48em;
+      margin: 40px 0 -8px;
+    }
+    .chap-no {
+      font-family: "Noto Serif SC", serif;
+      color: var(--zhu);
+      font-size: 13px;
+      letter-spacing: .4em;
+      margin: 0 0 8px;
+    }
+    h2 {
+      font-family: "Noto Serif SC", "Songti SC", serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      margin: 0 0 22px;
+    }
+    h3 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.12rem;
+      font-weight: 700;
+      margin: 28px 0 10px;
+    }
+    p { margin: 0 0 14px; }
+    .quiet { color: var(--quiet); }
+    ul { margin: 0 0 14px; padding-left: 1.2em; }
+    li { margin: 6px 0; }
+
+    pre {
+      overflow-x: auto;
+      background: var(--sheet);
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--ink);
+      padding: 14px 16px;
+      font: 13px/1.55 ui-monospace, "Cascadia Code", "IBM Plex Mono", monospace;
+      color: var(--ink);
+      margin: 16px 0 18px;
+    }
+    code {
+      font-family: ui-monospace, "Cascadia Code", "IBM Plex Mono", monospace;
+      font-size: .88em;
+      background: color-mix(in srgb, var(--sheet) 70%, white);
+      padding: .05em .28em;
+    }
+    pre code { background: none; padding: 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14.5px;
+      line-height: 1.5;
+      margin: 8px 0 20px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px 10px 0;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+    }
+    th {
+      font-weight: 500;
+      color: var(--quiet);
+      font-size: 12px;
+      letter-spacing: .12em;
+    }
+    td:first-child { font-weight: 600; }
+
+    .split {
+      display: grid;
+      gap: 28px;
+      margin: 8px 0 18px;
+    }
+    @media (min-width: 700px) {
+      .split { grid-template-columns: 1fr 1fr; }
+    }
+    .panel {
+      padding-top: 4px;
+      border-top: 2px solid var(--ink);
+    }
+    .panel h3 { margin-top: 12px; }
+
+    .matrix {
+      display: grid;
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin: 16px 0 20px;
+    }
+    @media (min-width: 700px) {
+      .matrix { grid-template-columns: 1fr 1fr; }
+    }
+    .cell {
+      background: var(--sheet);
+      padding: 16px 18px;
+    }
+    .cell .who {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.05rem;
+    }
+    .cell .tier { color: var(--zhu); font-size: 12px; letter-spacing: .16em; margin: 4px 0 8px; }
+    .cell p { margin: 0; font-size: 14.5px; color: var(--quiet); }
+
+    .native {
+      display: grid;
+      gap: 0;
+      margin: 12px 0 20px;
+    }
+    .native article {
+      display: grid;
+      grid-template-columns: 7.5em 1fr auto;
+      gap: 12px;
+      align-items: baseline;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .native .job { font-weight: 600; }
+    .native .id { font-family: ui-monospace, "Cascadia Code", monospace; font-size: 12.5px; color: var(--quiet); overflow-wrap: anywhere; }
+    .native .effort { font-size: 13px; color: var(--ink); text-align: right; }
+    @media (max-width: 700px) {
+      .native article { grid-template-columns: 1fr; gap: 2px; padding: 14px 0; }
+      .native .effort { text-align: left; color: var(--quiet); }
+    }
+
+    .delta { list-style: none; padding: 0; margin: 16px 0 0; }
+    .delta li {
+      display: grid;
+      grid-template-columns: 2.2em 1fr;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rule);
+      margin: 0;
+    }
+    .delta b {
+      font-family: "Noto Serif SC", serif;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .delta .cut b { color: var(--zhu); }
+    .delta .add b { color: var(--moss); }
+    .delta .chg b { color: var(--ink); }
+
+    footer.colophon {
+      margin-top: 56px;
+      padding-top: 18px;
+      border-top: 1px solid var(--rule);
+      color: var(--quiet);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="cover" id="cover">
+      <div class="seal">Codex<br>专用</div>
+      <p class="series">第〇一点〇版</p>
+      <h1>说明书</h1>
+      <p class="product">Codex Advisor</p>
+      <p class="lede">任意主会话可以自己改代码、把活派给原生角色，或两者并用。主会话的模型和推理强度仍由使用者选择。插件不把某种主模型当成使用前提。</p>
+      <ol class="toc">
+        <li><a href="#install"><span class="n">一</span>安装<span class="dots"></span></a></li>
+        <li><a href="#use"><span class="n">二</span>使用<span class="dots"></span></a></li>
+        <li><a href="#roles"><span class="n">三</span>角色与档位<span class="dots"></span></a></li>
+        <li><a href="#architect"><span class="n">四</span>Architect 模式<span class="dots"></span></a></li>
+        <li><a href="#accept"><span class="n">五</span>判断与验收<span class="dots"></span></a></li>
+        <li><a href="#recover"><span class="n">六</span>失败与交接<span class="dots"></span></a></li>
+        <li><a href="#native"><span class="n">七</span>八个原生条目<span class="dots"></span></a></li>
+        <li><a href="#docs"><span class="n">八</span>核对<span class="dots"></span></a></li>
+        <li><a href="#limits"><span class="n">九</span>本版边界<span class="dots"></span></a></li>
+        <li><a href="#delta"><span class="n">十</span>相对上一版<span class="dots"></span></a></li>
+      </ol>
+    </header>
+
+    <nav class="mini" aria-label="章节">
+      <a href="#cover">封面</a>
+      <a href="#install">安装</a>
+      <a href="#use">使用</a>
+      <a href="#roles">角色</a>
+      <a href="#architect">Architect</a>
+      <a href="#accept">验收</a>
+      <a href="#recover">交接</a>
+      <a href="#native">条目</a>
+      <a href="#limits">边界</a>
+      <a href="#delta">改动</a>
+    </nav>
+
+    <p class="part-label" id="current">本版说明</p>
+    <section id="install">
+      <p class="chap-no">第一章</p>
+      <h2>安装</h2>
+      <p>需要带插件和原生自定义 agent 的 Codex 宿主，以及 <code>jq</code>。已安装的 marketplace 指向 GitHub 仓库 <code>IpiggyI/codex-advisor</code>，不是本地工作树。未推送的提交到不了已安装插件。</p>
+      <pre>codex plugin marketplace add /absolute/path/to/codex-advisor
+codex plugin add codex-advisor@codex-advisor
+plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "codex-advisor@codex-advisor") | .source.path')"
+test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"</pre>
+      <p>配套安装器把八个原生条目写到 <code>$CODEX_HOME/agents</code>；未设置时写到 <code>~/.codex/agents</code>。保留无关 agent、已有 Sol Advisor 文件、以及主会话配置。目标已被改过、冲突、不是普通文件、或是符号链接时，写入前拒绝。内容完全相同的文件保持不动。</p>
+      <p>安装后开一个新任务。确认宿主暴露 <code>codex-advisor:orchestration</code>，以及安装器列出的原生条目。插件安装和原生 agent 发现是两件分开的事，都要查。</p>
+      <pre>sh "$plugin_dir/scripts/install-agents.sh" --check</pre>
+      <p class="quiet">检出更新之后，重新安装插件，再跑配套安装器，然后开新任务。模板有更新时，已安装副本算冲突：先核对，再显式处理。安装器不会覆盖它们，也不会删除另一套安装。开发用临时 <code>CODEX_HOME</code>；空的临时 <code>--target-dir</code> 只检查、不改正在用的配置。</p>
+    </section>
+
+    <section id="use">
+      <p class="chap-no">第二章</p>
+      <h2>使用</h2>
+      <pre>Use $codex-advisor:orchestration to implement and verify this feature.</pre>
+      <p>主会话在使用者给出的目标、范围、保留决策、验收条件和资源限制之内，决定怎么拆、怎么排、哪些自己做、哪些派出去。常规分配不必每次问准许。不要为了省事去改这些边界。</p>
+    </section>
+
+    <section id="roles">
+      <p class="chap-no">第三章</p>
+      <h2>角色与档位</h2>
+      <p>职责和档位分开。原生条目的名字区分模型和职责，不是额外档位。Luna 是多数实质探查的优先选择，不是先决步骤。本版没有 Explorer 的 <code>xhigh</code> 路线。</p>
+      <div class="matrix">
+        <div class="cell">
+          <div class="who">Explorer</div>
+          <div class="tier">LIGHT · LUNA HIGH</div>
+          <p>standard / senior 通常 Luna <code>max</code>；也可直接用 Sol 或 Astra 的 <code>medium</code> / <code>high</code>。</p>
+        </div>
+        <div class="cell">
+          <div class="who">worker · light</div>
+          <div class="tier">LUNA MAX</div>
+          <p>钉死强度。局部实现选择归 worker，不再往下派实现。</p>
+        </div>
+        <div class="cell">
+          <div class="who">worker · standard</div>
+          <div class="tier">SOL HIGH / XHIGH</div>
+          <p>第一次就可以用 <code>xhigh</code>，不必先失败。</p>
+        </div>
+        <div class="cell">
+          <div class="who">worker · senior<br>Advisor</div>
+          <div class="tier">ASTRA MEDIUM / HIGH</div>
+          <p>同一次工作或咨询完整失败之后，才有资格用 <code>xhigh</code>。独立验收同属 Advisor。</p>
+        </div>
+      </div>
+      <p>派 worker 时给出结果、所属范围、必须保留的接口、约束和有意义的核对。未写明的局部实现选择归 worker。预期行为不清、需求冲突、或必须改保留接口，是合同缺口，先补合同再改依赖它的代码。</p>
+      <p>主会话保留拆分、调度和最终验收。共享文件不要拆成名义上互不相关的所有者。容量不够时不要靠嵌套 worker 绕过。独立且文件不冲突的派活可以并行；有依赖或所有权冲突的要串行。</p>
+    </section>
+
+    <section id="architect">
+      <p class="chap-no">第四章</p>
+      <h2>Architect 模式</h2>
+      <p>需要使用者明确授权。任意主模型都可以用。授权覆盖当前任务及其后续；无关任务要重新授权，除非使用者明确给了整段会话的范围。工单、规格、未接受的方案、或模型身份本身，都不会打开这个模式。把授权请求记下来。</p>
+      <p>打开之后，范围内的每一处实现编辑和修正都要派出去。主会话仍负责设计、合同、调度和验收，可以写设计和任务文件。</p>
+      <pre>Use $codex-advisor:orchestration in Architect mode for this task.</pre>
+    </section>
+
+    <section id="accept">
+      <p class="chap-no">第五章</p>
+      <h2>判断与验收</h2>
+      <div class="split">
+        <div class="panel">
+          <h3>必须问 Advisor</h3>
+          <ul>
+            <li>现行计划盖不住的关键决策</li>
+            <li>新证据推翻了计划里的关键前提</li>
+            <li>初步诊断之后，失败原因仍不清楚</li>
+          </ul>
+          <p>前提仍成立时可以复用已有建议。建议不授予权限、不构成否决、不新增约束、也不接管使用者目标。</p>
+        </div>
+        <div class="panel">
+          <h3>独立验收</h3>
+          <p>高风险交付，或使用者明确要求独立审查时，主会话检查之后必须再开一个全新的 Astra Independent reviewer。</p>
+          <p>风险看失败后果、可否挽回、以及正确性是否难确认。先前的咨询或 worker 自评都不能代替独立终验。</p>
+        </div>
+      </div>
+      <p>普通的直接做、派出去做、或两者混合的多步工作，主会话检查实际改动并重跑关键核对之后即可结束。步数、文件数、主模型身份、或只是 Astra 去做实现，都不单独触发交付咨询或独立验收。</p>
+      <p>审查强度一开始用 <code>medium</code> 或 <code>high</code>，不跟主会话强度挂钩。主会话即使是 <code>max</code>，审查也可以是 <code>medium</code>。有实质发现时先改、主会话再核、再开新线程审查改后的交付。</p>
+      <p class="quiet">必需的执行跑不了、设置不受支持、证据缺失或互相打架、或实质发现未解决时，受影响的验收明确标为未完成。只读请求、观察到的只读行为、宿主强制隔离，三者分开报告。</p>
+    </section>
+
+    <section id="recover">
+      <p class="chap-no">第六章</p>
+      <h2>失败与交接</h2>
+      <p>一次完整的 worker 尝试包含实现、普通排错和核对，然后验收失败，或明确做不完目标。中途测试失败和单次工具报错，不算完整失败。</p>
+      <p>先分清环境问题、缺事实、合同缺口、推理失败、以及执行者是否合适。先修环境和补合同。之后可以原分配返工、换强度、换更合适的 worker，或由主会话接手。没有固定升级梯子。普通工作允许主会话接手；Architect 模式里修正仍要派出去。</p>
+      <div class="split">
+        <div class="panel">
+          <h3>xhigh 资格</h3>
+          <ul>
+            <li>Astra worker：同一次工作的 worker 完整失败之后</li>
+            <li>Sol worker：第一次就可以用，不必先失败</li>
+            <li>Advisor：咨询没有答出所问，或结论被证据推翻。worker 失败不能解锁</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>新线程</h3>
+          <ul>
+            <li>换强度、换模型、换职责：开新线程</li>
+            <li>同一模型同一强度的 worker 返工：可沿用</li>
+            <li>独立验收：永远开新线程</li>
+          </ul>
+        </div>
+      </div>
+      <p>换写者之前，停掉仍在冲突写入的前任，看实际改动，保留有用的部分。交接包含：目标与已绑定决策、当前实际状态、尝试与诊断、剩下的工作。验收条件不因此降低。</p>
+    </section>
+
+    <section id="native">
+      <p class="chap-no">第七章</p>
+      <h2>八个原生条目</h2>
+      <p>Luna 钉死 <code>gpt-5.6-luna</code>，Sol 钉死 <code>gpt-5.6-sol</code>，Astra 钉死 <code>gpt-6-astra</code>。只有 Luna worker 把强度钉成 <code>max</code>；其余由调用方每次显式传入。不要改角色文件或主会话配置来调强度。</p>
+      <div class="native">
+        <article>
+          <div class="job">light worker</div>
+          <div class="id">codex_advisor_luna_implementer · luna</div>
+          <div class="effort">max</div>
+        </article>
+        <article>
+          <div class="job">standard worker</div>
+          <div class="id">codex_advisor_sol_implementer · sol</div>
+          <div class="effort">high，xhigh（第一次即可）</div>
+        </article>
+        <article>
+          <div class="job">senior worker</div>
+          <div class="id">codex_advisor_astra_implementer · astra</div>
+          <div class="effort">medium，high；符合条件后 xhigh</div>
+        </article>
+        <article>
+          <div class="job">优先探查</div>
+          <div class="id">codex_advisor_luna_explorer · explorer</div>
+          <div class="effort">light 用 high，其余 max</div>
+        </article>
+        <article>
+          <div class="job">直接探查</div>
+          <div class="id">codex_advisor_sol_explorer · sol-explorer</div>
+          <div class="effort">medium，high</div>
+        </article>
+        <article>
+          <div class="job">直接探查</div>
+          <div class="id">codex_advisor_astra_explorer · astra-explorer</div>
+          <div class="effort">medium，high</div>
+        </article>
+        <article>
+          <div class="job">决策咨询</div>
+          <div class="id">codex_advisor_astra_advisor · advisor</div>
+          <div class="effort">medium，high；符合条件后 xhigh</div>
+        </article>
+        <article>
+          <div class="job">独立验收</div>
+          <div class="id">codex_advisor_astra_reviewer · reviewer</div>
+          <div class="effort">medium，high；符合条件后 xhigh</div>
+        </article>
+      </div>
+      <p>已安装的 Explorer 和判断条目，不加载本技能也可以调用。只安装它们，并不会变成全局默认探查路线。每次调用都要带上强度。用 <code>fork_turns: none</code> 发送完整合同。角色自称的设置不能当实际设置。</p>
+    </section>
+
+    <section id="docs">
+      <p class="chap-no">第八章</p>
+      <h2>核对</h2>
+      <p>运行时英文文档在 <code>plugins/codex-advisor/**/*.md</code>。每个文件在 <code>docs/zh/</code> 下有一份中文镜像，一对一存在，不核内容。镜像只在仓库里，不随插件下发。当前编排政策以 ADR-0003 为准。</p>
+      <pre>sh plugins/codex-advisor/scripts/verify.sh --installation
+sh plugins/codex-advisor/scripts/verify.sh --runtime
+sh plugins/codex-advisor/scripts/verify.sh
+git diff --check
+python3 tests/test_zh_mirror.py</pre>
+      <p class="quiet">这些检查证明安装、分配和证据一致性。小规模原生冒烟不证明普遍质量、稳定或省钱。</p>
+    </section>
+
+    <section id="limits">
+      <p class="chap-no">第九章</p>
+      <h2>本版边界</h2>
+      <ul>
+        <li>只支持 Codex，没有其他宿主适配。</li>
+        <li>没有调度器、提供方桥、预算服务或配置档案模式。</li>
+        <li>安装器不改主会话配置，不覆盖已改过的角色文件，不自动迁移或删除另一套安装。</li>
+        <li>只读请求、观察到的只读行为、宿主强制隔离，三者分开记录。</li>
+        <li>路线核对和验收记录是一次性证据，不是发布资产。</li>
+      </ul>
+    </section>
+
+    <section id="delta">
+      <p class="chap-no">第十章</p>
+      <h2>相对上一版</h2>
+      <p>这是第一份按版本冻结的说明书。<code>codex-advisor</code> 此前没有带版本号的说明书，历史提交不补写。下面是相对上游 Sol Advisor 的差。</p>
+      <ul class="delta">
+        <li class="chg"><b>改</b><span>插件改名为 <code>codex-advisor</code>，只面向 Codex。</span></li>
+        <li class="cut"><b>删</b><span>去掉 <code>solo</code> / <code>delegate</code> / <code>audit</code> / <code>full</code> 任务路由，以及 <code>SELECTIVE ROUTE</code> 声明协议，不保留兼容层。</span></li>
+        <li class="chg"><b>改</b><span>任意主模型都可以自己做、派活、或混合；Architect 改为使用者明确授权，不再绑定 Astra 主会话。</span></li>
+        <li class="add"><b>增</b><span>角色按 light / standard / senior 分档，配齐八个钉死模型的原生条目，含 Luna / Sol / Astra Explorer，以及分开的 Advisor 与 Independent reviewer。</span></li>
+        <li class="add"><b>增</b><span>worker 合同固定为结果、范围、保留接口、约束、核对五段；局部实现选择归 worker。</span></li>
+        <li class="chg"><b>改</b><span>独立验收只在高风险或使用者明确要求时触发。审查强度不跟主会话强度挂钩。</span></li>
+        <li class="chg"><b>改</b><span>Astra worker 的 <code>xhigh</code> 要先完整失败；Sol worker 的 <code>xhigh</code> 第一次就可以用；Advisor 的 <code>xhigh</code> 只在咨询完整失败后解锁。</span></li>
+        <li class="add"><b>增</b><span>换强度、换模型、换职责都开新线程；独立验收永远开新线程。</span></li>
+        <li class="add"><b>增</b><span>仓库增加运行时中文镜像（<code>docs/zh/</code>）和按版本冻结的说明书页面。镜像和说明书都不随插件下发。</span></li>
+      </ul>
+    </section>
+
+    <footer class="colophon">
+      对应 <code>plugin.json</code> 版本 <code>0.1.0</code>
+      · <code>docs/releases/0.1.0.html</code>
+    </footer>
+  </div>
+</body>
+</html>
