@@ -8,6 +8,8 @@ python3 - "$script_dir" <<'PY'
 import json
 import os
 from pathlib import Path
+import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -22,20 +24,60 @@ assert manifest['name'] == market['name'] == 'codex-advisor'
 assert market['plugins'][0]['name'] == 'codex-advisor'
 assert market['plugins'][0]['source']['path'] == './plugins/codex-advisor'
 templates = {p.name: p.read_bytes() for p in (plugin / 'agents').glob('*.toml')}
-role_files = {'advisor': 'codex-advisor-astra-advisor.toml',
-              'luna': 'codex-advisor-luna-implementer.toml',
-              'explorer': 'codex-advisor-luna-explorer.toml',
-              'sol-explorer': 'codex-advisor-sol-explorer.toml',
-              'astra-explorer': 'codex-advisor-astra-explorer.toml',
-              'astra': 'codex-advisor-astra-implementer.toml',
-              'sol': 'codex-advisor-sol-implementer.toml',
-              'reviewer': 'codex-advisor-astra-reviewer.toml'}
-assert set(templates) == set(role_files.values())
+assert templates
 for filename, content in templates.items():
     data = tomllib.loads(content.decode())
-    assert filename.startswith('codex-advisor-')
-    assert data['name'].startswith('codex_advisor_')
+    assert filename.startswith('ca-'), filename
+    assert data['name'].startswith('ca_'), data['name']
     assert data['description'] and data['developer_instructions']
+stems = {name[3:-5]: name for name in templates}
+assert stems
+sample_name = sorted(stems.values())[0]
+sample_stem = sample_name[3:-5]
+other_name = sorted(stems.values())[1]
+other_stem = other_name[3:-5]
+worker_name = next(name for name in sorted(templates) if name.startswith('ca-worker-'))
+# Same-role developer_instructions must be byte-identical (role = second
+# segment of name).
+by_role = {}
+for filename, content in templates.items():
+    data = tomllib.loads(content.decode())
+    role = data['name'].split('_')[1]
+    by_role.setdefault(role, []).append(data['developer_instructions'])
+for role, bodies in by_role.items():
+    assert bodies and all(b == bodies[0] for b in bodies), role
+# Pin model_reasoning_effort exactly when the routing profile marks a single
+# bare effort. Source: plugins/codex-advisor/skills/orchestration/references/routing-profile.md
+profile = (plugin / 'skills/orchestration/references/routing-profile.md').read_text()
+name_re = re.compile(r'`(ca_[a-z0-9_]+)`')
+dial_re = re.compile(r'`(ca_[a-z0-9_]+)`\s+(gpt-[^\s\[]+)\[([^\]]+)\]')
+table_names = []
+table_dials = {}
+for line in profile.splitlines():
+    if not line.lstrip().startswith('|'):
+        continue
+    table_names.extend(name_re.findall(line))
+    for match in dial_re.finditer(line):
+        table_dials[match.group(1)] = (match.group(2), match.group(3).strip())
+profile_set = set(table_names)
+expected_entries = len(profile_set)
+shipped = {}
+for filename, content in templates.items():
+    data = tomllib.loads(content.decode())
+    shipped[data['name']] = data
+assert len(shipped) == expected_entries, sorted(shipped)
+shipped_set = set(shipped)
+mismatch = profile_set ^ shipped_set
+assert not mismatch, ', '.join(sorted(mismatch))
+assert set(table_dials) == shipped_set, ', '.join(sorted(set(table_dials) ^ shipped_set))
+for name, (model, inner) in table_dials.items():
+    data = shipped[name]
+    assert data['model'] == model, name
+    is_pinned = '*' not in inner and ',' not in inner
+    assert ('model_reasoning_effort' in data) == is_pinned, name
+    if is_pinned:
+        assert data['model_reasoning_effort'] == inner, name
+installer = scripts / 'install-agents.sh'
 
 def snapshot(root):
     return sorted((str(p.relative_to(root)), 'link', str(p.readlink())) if p.is_symlink()
@@ -43,13 +85,16 @@ def snapshot(root):
                   else (str(p.relative_to(root)), 'other', '')
                   for p in root.rglob('*'))
 
-def install(target, *args, ok=True):
-    result = subprocess.run(['sh', str(scripts / 'install-agents.sh'),
-                             '--target-dir', str(target), *args], capture_output=True, text=True)
+def run_install(script, target, *args, ok=True, env=None, cwd=None):
+    cmd = ['sh', str(script), '--target-dir', str(target), *args]
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env, cwd=cwd)
     assert (result.returncode == 0) == ok, (args, result.stdout, result.stderr)
     if not ok:
         assert 'ERROR:' in result.stderr, result.stderr
     return result
+
+def install(target, *args, ok=True):
+    return run_install(installer, target, *args, ok=ok)
 
 with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     root = Path(tmp)
@@ -58,65 +103,115 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     assert not target.exists()
     target.mkdir()
     (root / 'config.toml').write_text('model = "user-choice"\n')
-    (target / 'sol-advisor-luna-implementer.toml').write_text('upstream installation\n')
+    (target / 'sol-advisor-luna.toml').write_text('upstream installation\n')
     (target / 'unrelated.toml').write_text('unrelated agent\n')
     preserved = snapshot(root)
-    install(target)
-    assert (target / 'codex-advisor-astra-implementer.toml').is_file(), 'full installation must include Astra implementation'
-    install(target, '--check-role', 'astra')
+    missing_check = install(target, '--check', ok=False)
+    assert snapshot(root) == preserved
+    for filename in templates:
+        assert str(target / filename) in missing_check.stderr
+    first = install(target)
+    assert first.stdout.count('INSTALLED:') == len(templates)
+    assert 'UNCHANGED:' not in first.stdout
     for filename, content in templates.items():
+        assert f'INSTALLED: {target / filename}' in first.stdout
         assert (target / filename).read_bytes() == content
+    assert not list(target.glob('*.bak'))
     installed = snapshot(root)
     for state in preserved:
         assert state in installed
-    install(target)
-    install(target, '--check')
-    install(target, '--check-role', 'advisor', '--check-role', 'advisor')
+    repeat = install(target)
+    assert repeat.stdout.count('UNCHANGED:') == len(templates)
+    assert 'INSTALLED:' not in repeat.stdout
+    assert 'REMOVED:' not in repeat.stdout
+    matched = install(target, '--check')
+    assert 'CHECK PASSED' in matched.stdout
     assert snapshot(root) == installed
-    roles = list(role_files)
-    for role in roles:
-        install(target, '--check-role', role)
+    (target / sample_name).write_bytes(templates[sample_name] + b'changed\n')
+    before = snapshot(root)
+    drift = install(target, '--check', ok=False)
+    assert str(target / sample_name) in drift.stderr
+    assert snapshot(root) == before
+    over = install(target)
+    assert f'INSTALLED: {target / sample_name}' in over.stdout
+    assert (target / sample_name).read_bytes() == templates[sample_name]
+    for filename in templates:
+        if filename != sample_name:
+            assert f'UNCHANGED: {target / filename}' in over.stdout
+    install(target, '--check')
+    (target / sample_name).write_bytes(templates[sample_name] + b'x\n')
+    (target / other_name).unlink()
+    before = snapshot(root)
+    listed = install(target, '--check', ok=False)
+    assert str(target / sample_name) in listed.stderr
+    assert str(target / other_name) in listed.stderr
+    assert snapshot(root) == before
+    install(target)
+    (target / sample_name).write_bytes(templates[sample_name] + b'x\n')
+    before = snapshot(root)
+    install(target, '--check-role', other_stem)
+    install(target, '--check-role', sample_stem, ok=False)
+    install(target, '--check-role', sample_stem, '--check-role', sample_stem, ok=False)
+    assert snapshot(root) == before
+    install(target)
+    installed = snapshot(root)
+    for stem in stems:
+        install(target, '--check-role', stem)
     for args in [('--check-role',), ('--check-role', 'unknown')]:
         install(target, *args, ok=False)
         assert snapshot(root) == installed
-    for role, filename in role_files.items():
-        (target / filename).write_bytes(templates[filename] + b'changed\n')
-        before = snapshot(root)
-        install(target, '--check-role', role, ok=False)
-        for other in roles:
-            if other != role:
-                install(target, '--check-role', other)
-        install(target, '--check', ok=False)
-        install(target, ok=False)
-        assert snapshot(root) == before
-        (target / filename).write_bytes(templates[filename])
-    for role in ('advisor', 'astra'):
-        filename = role_files[role]
-        (target / filename).unlink()
-        before = snapshot(root)
-        install(target, '--check-role', role, ok=False)
-        assert snapshot(root) == before
-        install(target)
+    copy = root / 'plugin-copy'
+    (copy / 'scripts').mkdir(parents=True)
+    (copy / 'agents').mkdir()
+    shutil.copy2(installer, copy / 'scripts')
+    for path in (plugin / 'agents').iterdir():
+        if path.is_file() and not path.is_symlink():
+            shutil.copy2(path, copy / 'agents')
+    extra_name = 'codex-advisor-extra.toml'
+    (copy / 'agents' / extra_name).write_text('name = "extra"\n')
+    (copy / 'agents' / 'retire.txt').write_text('retired-agent.toml\nlegacy-extra.toml\n')
+    copied = copy / 'scripts' / 'install-agents.sh'
+    residue_target = root / 'residue-agents'
+    residue_target.mkdir()
+    copied_first = run_install(copied, residue_target)
+    assert f'INSTALLED: {residue_target / extra_name}' in copied_first.stdout
+    (residue_target / 'retired-agent.toml').write_text('old\n')
+    (residue_target / 'legacy-extra.toml').write_text('old2\n')
+    (residue_target / 'unrelated.toml').write_text('keep\n')
+    before = snapshot(residue_target)
+    residue_check = run_install(copied, residue_target, '--check', ok=False)
+    assert str(residue_target / 'retired-agent.toml') in residue_check.stderr
+    assert str(residue_target / 'legacy-extra.toml') in residue_check.stderr
+    assert snapshot(residue_target) == before
+    selective = run_install(copied, residue_target, '--check-role', sample_stem)
+    assert 'CHECK PASSED' in selective.stdout
+    assert snapshot(residue_target) == before
+    removed = run_install(copied, residue_target)
+    assert f'REMOVED: {residue_target / "retired-agent.toml"}' in removed.stdout
+    assert f'REMOVED: {residue_target / "legacy-extra.toml"}' in removed.stdout
+    assert not (residue_target / 'retired-agent.toml').exists()
+    assert not (residue_target / 'legacy-extra.toml').exists()
+    assert (residue_target / 'unrelated.toml').read_text() == 'keep\n'
+    assert (residue_target / extra_name).read_text() == 'name = "extra"\n'
+    run_install(copied, residue_target, '--check')
     default_home = root / 'default-home'
     default_home.mkdir()
     (default_home / 'config.toml').write_text('model = "user-choice"\n')
-    result = subprocess.run(['sh', str(scripts / 'install-agents.sh')],
+    result = subprocess.run(['sh', str(installer)],
                             env=dict(os.environ, CODEX_HOME=str(default_home)),
                             capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    assert (default_home / 'agents' / filename).read_bytes() == templates[filename]
+    assert (default_home / 'agents' / sample_name).read_bytes() == templates[sample_name]
     assert (default_home / 'config.toml').read_text() == 'model = "user-choice"\n'
-    result = subprocess.run(['sh', str(scripts / 'install-agents.sh'), '--target-dir', 'relative'],
+    result = subprocess.run(['sh', str(installer), '--target-dir', 'relative'],
                             cwd=root, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    assert (root / 'relative' / filename).read_bytes() == templates[filename]
-    for kind in ('modified', 'symlink', 'directory', 'fifo'):
+    assert (root / 'relative' / sample_name).read_bytes() == templates[sample_name]
+    for kind in ('symlink', 'directory', 'fifo'):
         unsafe = root / kind
         unsafe.mkdir()
-        destination = unsafe / filename
-        if kind == 'modified':
-            destination.write_text('conflict\n')
-        elif kind == 'symlink':
+        destination = unsafe / sample_name
+        if kind == 'symlink':
             destination.symlink_to(root / 'absent')
         elif kind == 'directory':
             destination.mkdir()
@@ -125,27 +220,56 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
         before = snapshot(root)
         install(unsafe, ok=False)
         assert snapshot(root) == before
-    for role, filename in role_files.items():
-        partial = root / ('partial-' + role)
-        partial.mkdir()
-        (partial / filename).write_text('conflict\n')
-        before = snapshot(root)
-        install(partial, ok=False)
-        assert snapshot(root) == before, 'preflight must precede every role write'
-    previous_install = root / 'previous-sol-install'
-    previous_install.mkdir()
-    previous_description = ('description = "Direct implementation of judgment-heavy, '
-                            'context-heavy, or higher-risk work from an Astra architect\'s complete specification."')
-    sol_filename = role_files['sol']
-    previous_sol = '\n'.join(previous_description if line.startswith('description = ')
-                             else line for line in templates[sol_filename].decode().splitlines()) + '\n'
-    assert tomllib.loads(previous_sol)['model'] == 'gpt-5.6-sol'
-    (previous_install / sol_filename).write_text(previous_sol)
+    mixed = root / 'mixed'
+    mixed.mkdir()
+    os.mkfifo(mixed / sample_name)
     before = snapshot(root)
-    refusal = install(previous_install, ok=False)
-    assert 'modified or conflicting destination:' in refusal.stderr
-    assert sol_filename in refusal.stderr
-    assert snapshot(root) == before, 'old Sol must block upgrade before Astra or any other role is installed'
+    install(mixed, ok=False)
+    assert snapshot(root) == before
+    previous_install = root / 'previous-worker-install'
+    previous_install.mkdir()
+    (previous_install / worker_name).write_text('old worker\n')
+    upgraded = install(previous_install)
+    assert f'INSTALLED: {previous_install / worker_name}' in upgraded.stdout
+    assert (previous_install / worker_name).read_bytes() == templates[worker_name]
+    retire_names = [
+        line.strip()
+        for line in (plugin / 'agents' / 'retire.txt').read_text().splitlines()
+        if line.strip() and not line.startswith('#')
+    ]
+    new_entries = sorted(templates)
+    assert len(retire_names) == 8, retire_names
+    assert len(new_entries) == expected_entries, new_entries
+    assert all(name.startswith('ca-') and name.endswith('.toml') for name in new_entries)
+    legacy_target = root / 'legacy-010'
+    legacy_target.mkdir()
+    for name in retire_names:
+        (legacy_target / name).write_text('old\n')
+    (legacy_target / 'unrelated-legacy.toml').write_text('keep\n')
+    legacy_run = install(legacy_target)
+    assert legacy_run.stdout.count('INSTALLED:') == expected_entries
+    assert legacy_run.stdout.count('REMOVED:') == 8
+    for name in new_entries:
+        assert f'INSTALLED: {legacy_target / name}' in legacy_run.stdout
+        assert (legacy_target / name).read_bytes() == templates[name]
+    for name in retire_names:
+        assert f'REMOVED: {legacy_target / name}' in legacy_run.stdout
+        assert not (legacy_target / name).exists()
+    leftover = sorted(p.name for p in legacy_target.iterdir())
+    assert leftover == sorted(new_entries + ['unrelated-legacy.toml'])
+    assert (legacy_target / 'unrelated-legacy.toml').read_text() == 'keep\n'
+    install(legacy_target, '--check')
+    retired_link_target = root / 'retired-symlink'
+    retired_link_target.mkdir()
+    retired_link_name = retire_names[0]
+    (retired_link_target / retired_link_name).symlink_to(root / 'absent')
+    before = snapshot(retired_link_target)
+    retired_link = install(retired_link_target, ok=False)
+    assert f'unsafe destination: {retired_link_target / retired_link_name}' in retired_link.stderr
+    assert snapshot(retired_link_target) == before
+    retired_link_check = install(retired_link_target, '--check', ok=False)
+    assert f'residue: {retired_link_target / retired_link_name}' in retired_link_check.stderr
+    assert snapshot(retired_link_target) == before
     link = root / 'linked-target'
     link.symlink_to(target, target_is_directory=True)
     before = snapshot(root)
@@ -155,8 +279,13 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     install('/', ok=False)
     install('//', ok=False)
     install('///', ok=False)
+    install(str(target) + '/./', ok=False)
+    install(str(target) + '/../agents', ok=False)
     assert snapshot(root) == before
-print('PASS: fork metadata, clean/repeat install, non-mutating selective checks, refusal and preservation')
+    missing_flag = subprocess.run(['sh', str(installer), '--target-dir'],
+                                  capture_output=True, text=True)
+    assert missing_flag.returncode != 0 and 'ERROR:' in missing_flag.stderr
+print('PASS: fork metadata, overwrite, unchanged, retire, check drift/residue, preservation, refusals')
 PY
 fi
 if [ "${1-}" != --installation ]; then
@@ -169,336 +298,206 @@ import tempfile
 import tomllib
 
 scripts = Path(sys.argv[1])
-role = scripts.parent / 'agents/codex-advisor-astra-advisor.toml'
-data = tomllib.loads(role.read_text())
-assert data['name'] == 'codex_advisor_astra_advisor'
-assert data['model'] == 'gpt-6-astra'
-assert 'model_reasoning_effort' not in data, 'role defaults would override explicit spawn effort'
-assert data['sandbox_mode'] == 'read-only'
-reviewer = tomllib.loads((scripts.parent / 'agents/codex-advisor-astra-reviewer.toml').read_text())
-assert reviewer['name'] == 'codex_advisor_astra_reviewer'
-assert reviewer['model'] == 'gpt-6-astra'
-assert 'model_reasoning_effort' not in reviewer, 'a fixed effort would override caller selection'
-assert reviewer['sandbox_mode'] == 'read-only'
-def obsolete_review(*args):
-    result = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'),
-                             '--select-review-effort', *args], capture_output=True, text=True)
-    assert result.returncode != 0 and not result.stdout
-    assert 'retired' in result.stderr and '--reviewer-effort' in result.stderr, result
-obsolete_review('--review-primary-effort', 'max')
-obsolete_review('--reviewer-effort', 'medium')
+plugin = scripts.parent
+manifest = json.loads((plugin / '.codex-plugin/plugin.json').read_text())
+inspector = scripts / 'inspect-agent-runtime.sh'
 thread = '11111111-1111-7111-8111-111111111111'
+parent = '00000000-0000-7000-8000-000000000000'
 secret = 'DO_NOT_LEAK_PROMPT_OR_CREDENTIAL'
-session = {'type': 'session_meta', 'payload': {
-    'id': thread, 'agent_role': 'codex_advisor_astra_advisor',
-    'parent_thread_id': '00000000-0000-7000-8000-000000000000',
-    'model_provider': 'openai', 'agent_path': '/root/advisor', 'secret': secret}}
-turn = {'type': 'turn_context', 'payload': {
-    'model': 'gpt-6-astra', 'effort': 'high', 'sandbox_policy': {'type': 'read-only'},
-    'permission_profile': {'type': 'legacy'}, 'cwd': '/fixture', 'prompt': secret}}
+ALLOWLIST = {
+    'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
+    'model_provider', 'model', 'effort', 'sandbox_policy_type',
+    'permission_profile_type', 'cwd',
+}
+RETIRED_AGENT_OPTIONS = (
+    '--luna', '--sol-effort', '--astra-effort', '--explorer-effort',
+    '--sol-explorer-effort', '--astra-explorer-effort', '--advisor-effort',
+    '--reviewer-effort',
+)
+READONLY_TOKENS = ('explorer', 'advisor')
+
+file_prefix = manifest['name'] + '-'
+templates = []
+for path in sorted((plugin / 'agents').glob('*.toml')):
+    data = tomllib.loads(path.read_text())
+    assert data['name'].startswith('ca_'), path.name
+    role_part = path.name
+    if role_part.startswith(file_prefix) and role_part.endswith('.toml'):
+        role_part = role_part[len(file_prefix):-len('.toml')]
+    if any(token in role_part for token in READONLY_TOKENS):
+        assert data.get('sandbox_mode') == 'read-only', path.name
+    templates.append((path, data))
+assert templates
+
+def dump(obj):
+    return json.loads(json.dumps(obj))
+
+def session_for(name):
+    return {'type': 'session_meta', 'payload': {
+        'id': thread, 'agent_role': name,
+        'parent_thread_id': parent, 'model_provider': 'openai',
+        'agent_path': '/root/agent', 'secret': secret}}
+
+def turn_for(model, effort, sandbox='read-only', permission='legacy', cwd='/fixture'):
+    return {'type': 'turn_context', 'payload': {
+        'model': model, 'effort': effort,
+        'sandbox_policy': {'type': sandbox},
+        'permission_profile': {'type': permission},
+        'cwd': cwd, 'prompt': secret}}
+
+def role_args(name, effort=None):
+    args = ['--agent', name]
+    if effort is not None:
+        args.extend(['--effort', effort])
+    return args
 
 with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     root = Path(tmp)
     rollout = root / f'rollout-fixture-{thread}.jsonl'
+
     def write(records):
         rollout.write_text('\n'.join(json.dumps(r) for r in records) + '\n')
-    def inspect(*args, ok=True):
-        result = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'),
-                                 '--sessions-dir', str(root), *args, thread],
-                                capture_output=True, text=True)
-        assert (result.returncode == 0) == ok, (args, result.stdout, result.stderr)
-        assert secret not in result.stdout + result.stderr
+
+    def run_inspect(*args, thread_id=thread, sessions=True):
+        cmd = ['sh', str(inspector)]
+        if sessions:
+            cmd.extend(['--sessions-dir', str(root)])
+        cmd.extend(args)
+        if thread_id is not None:
+            cmd.append(thread_id)
+        return subprocess.run(cmd, capture_output=True, text=True)
+
+    def inspect(*args, ok=True, reason=''):
+        result = run_inspect(*args)
+        blob = result.stdout + result.stderr
+        assert secret not in blob, (reason, blob)
+        assert (result.returncode == 0) == ok, (reason or args, result.stdout, result.stderr)
         if not ok:
-            assert not result.stdout and 'ERROR:' in result.stderr
-        return json.loads(result.stdout) if ok else None
-    def reject_efforts(session_record, turn_record, option, efforts):
-        for effort in efforts:
-            turn_record['payload']['effort'] = effort
-            write([session_record, turn_record])
-            inspect(option, effort, ok=False)
-    for effort in ('medium', 'high', 'xhigh'):
-        turn['payload']['effort'] = effort
+            assert not result.stdout and 'ERROR:' in result.stderr, (reason, result.stdout, result.stderr)
+            return result
+        evidence = json.loads(result.stdout)
+        assert set(evidence) == ALLOWLIST, (reason, evidence)
+        return evidence
+
+    for option in RETIRED_AGENT_OPTIONS:
+        result = run_inspect(option)
+        assert result.returncode != 0 and not result.stdout
+        assert 'ERROR:' in result.stderr and '--agent' in result.stderr, result.stderr
+        assert secret not in result.stdout + result.stderr
+    for option in ('--review-primary-effort', '--select-review-effort'):
+        result = run_inspect(option)
+        assert result.returncode != 0 and not result.stdout
+        assert 'retired' in result.stderr and '--agent' in result.stderr, result.stderr
+
+    names = [data['name'] for _, data in templates]
+    for path, data in templates:
+        name = data['name']
+        model = data['model']
+        pinned = data.get('model_reasoning_effort')
+        expected_effort = pinned if pinned else 'high'
+        cli_effort = None if pinned else expected_effort
+        other = next(n for n in names if n != name)
+        session = session_for(name)
+        turn = turn_for(model, expected_effort)
         write([session, turn, {'type': 'response_item', 'payload': {'text': secret}}])
-        evidence = inspect('--advisor-effort', effort)
-        assert evidence['model'] == 'gpt-6-astra' and evidence['effort'] == effort
-        assert evidence['agent_role'] == 'codex_advisor_astra_advisor'
+        evidence = inspect(*role_args(name, cli_effort), reason=f'accepted {name}')
+        assert evidence['model'] == model and evidence['effort'] == expected_effort
+        assert evidence['agent_role'] == name
         assert evidence['sandbox_policy_type'] == 'read-only'
-        assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
-                                 'model_provider', 'model', 'effort', 'sandbox_policy_type',
-                                 'permission_profile_type', 'cwd'}
-    reject_efforts(session, turn, '--advisor-effort', ('low', 'max', 'ultra'))
-    turn['payload']['effort'] = 'high'
-    turn['payload']['sandbox_policy']['type'] = 'danger-full-access'
-    turn['payload']['permission_profile']['type'] = 'disabled'
-    write([session, turn])
-    evidence = inspect('--advisor-effort', 'high')
-    assert evidence['sandbox_policy_type'] == 'danger-full-access'
-    assert evidence['permission_profile_type'] == 'disabled'
-    inspect('--advisor-effort', 'medium', ok=False)
-    inspect('--advisor-effort', 'unsupported', ok=False)
-    for field in ('model', 'effort', 'sandbox_policy', 'permission_profile', 'cwd'):
-        missing = json.loads(json.dumps(turn))
-        del missing['payload'][field]
+        if pinned:
+            evidence = inspect(*role_args(name, pinned), reason=f'equal pin {name}')
+            assert evidence['effort'] == pinned
+            pin_mismatch = 'high' if pinned != 'high' else 'low'
+            inspect(*role_args(name, pin_mismatch), ok=False, reason=f'effort pin mismatch {name}')
+        else:
+            inspect(*role_args(name), ok=False, reason=f'missing effort {name}')
+            write([session, turn_for(model, 'ultra')])
+            evidence = inspect(*role_args(name, 'ultra'), reason=f'any effort {name}')
+            assert evidence['effort'] == 'ultra'
+        bad = dump(turn)
+        bad['payload']['model'] = 'not-the-expected-model'
+        write([session, bad])
+        inspect(*role_args(name, cli_effort), ok=False,
+                reason=f'mismatched model must be rejected for {name}')
+        bad = dump(turn)
+        bad['payload']['effort'] = 'not-the-expected-effort'
+        write([session, bad])
+        inspect(*role_args(name, cli_effort), ok=False,
+                reason=f'mismatched effort must be rejected for {name}')
+        bad_session = dump(session)
+        bad_session['payload']['agent_role'] = other
+        write([bad_session, turn])
+        inspect(*role_args(name, cli_effort), ok=False,
+                reason=f'mismatched agent role must be rejected for {name}')
+        missing = dump(turn)
+        del missing['payload']['sandbox_policy']
         write([session, missing])
-        inspect('--advisor-effort', 'high', ok=False)
-    for value in (None, '', 'not-a-thread'):
-        missing_parent = json.loads(json.dumps(session))
-        missing_parent['payload']['parent_thread_id'] = value
-        write([missing_parent, turn])
-        inspect('--advisor-effort', 'high', ok=False)
-    for field, wrong in [('model', 'gpt-5.6-sol'), ('effort', 'low'),
-                         ('sandbox_policy', {'type': 'read-only'}),
-                         ('permission_profile', {'type': 'legacy'}), ('cwd', '/other')]:
-        conflicting = json.loads(json.dumps(turn))
-        conflicting['payload'][field] = wrong
-        write([session, turn, conflicting])
-        inspect('--advisor-effort', 'high', ok=False)
-    wrong_role = json.loads(json.dumps(session))
-    wrong_role['payload']['agent_role'] = 'unrelated'
-    write([wrong_role, turn])
-    inspect('--advisor-effort', 'high', ok=False)
-    wrong_model = json.loads(json.dumps(turn))
-    wrong_model['payload']['model'] = 'gpt-5.6-sol'
-    write([session, wrong_model])
-    inspect('--advisor-effort', 'high', ok=False)
-    luna_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-luna-implementer.toml').read_text())
-    assert luna_role['name'] == 'codex_advisor_luna_implementer'
-    assert luna_role['model'] == 'gpt-5.6-luna'
-    assert luna_role['model_reasoning_effort'] == 'max'
-    luna_session = json.loads(json.dumps(session))
-    luna_session['payload']['agent_role'] = 'codex_advisor_luna_implementer'
-    luna_turn = json.loads(json.dumps(turn))
-    luna_turn['payload'].update(model='gpt-5.6-luna', effort='max')
-    write([luna_session, luna_turn])
-    evidence = inspect('--luna')
-    assert evidence['model'] == 'gpt-5.6-luna' and evidence['effort'] == 'max'
-    inspect('--luna', '--advisor-effort', 'high', ok=False)
-    for field, wrong in [('model', 'gpt-6-astra'), ('effort', 'high'),
-                         ('sandbox_policy', None), ('permission_profile', None)]:
-        invalid = json.loads(json.dumps(luna_turn))
-        invalid['payload'][field] = wrong
-        write([luna_session, invalid])
-        inspect('--luna', ok=False)
-    write([session, luna_turn])
-    inspect('--luna', ok=False)
-    write([luna_session, luna_turn, turn])
-    inspect('--luna', ok=False)
-    explorer_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-luna-explorer.toml').read_text())
-    assert explorer_role['name'] == 'codex_advisor_luna_explorer'
-    assert explorer_role['model'] == 'gpt-5.6-luna'
-    assert 'model_reasoning_effort' not in explorer_role, 'Explorer effort belongs to the caller'
-    assert explorer_role['sandbox_mode'] == 'read-only'
-    explorer_session = json.loads(json.dumps(session))
-    explorer_session['payload']['agent_role'] = 'codex_advisor_luna_explorer'
-    explorer_turn = json.loads(json.dumps(turn))
-    explorer_turn['payload']['model'] = 'gpt-5.6-luna'
-    for effort in ('high', 'max'):
-        explorer_turn['payload']['effort'] = effort
-        write([explorer_session, explorer_turn])
-        evidence = inspect('--explorer-effort', effort)
-        assert evidence['model'] == 'gpt-5.6-luna' and evidence['effort'] == effort
-        assert evidence['agent_role'] == 'codex_advisor_luna_explorer'
+        inspect(*role_args(name, cli_effort), ok=False, reason=f'missing sandbox {name}')
+        conflict = dump(turn)
+        conflict['payload']['sandbox_policy'] = {'type': 'workspace-write'}
+        write([session, turn, conflict])
+        inspect(*role_args(name, cli_effort), ok=False, reason=f'conflicting sandbox {name}')
+        missing = dump(turn)
+        del missing['payload']['permission_profile']
+        write([session, missing])
+        inspect(*role_args(name, cli_effort), ok=False, reason=f'missing permission {name}')
+        conflict = dump(turn)
+        conflict['payload']['permission_profile'] = {'type': 'disabled'}
+        write([session, turn, conflict])
+        inspect(*role_args(name, cli_effort), ok=False, reason=f'conflicting permission {name}')
+        for value in (None, '', 'not-a-thread'):
+            missing_parent = dump(session)
+            missing_parent['payload']['parent_thread_id'] = value
+            write([missing_parent, turn])
+            inspect(*role_args(name, cli_effort), ok=False,
+                    reason=f'invalid parent {name} {value!r}')
+        missing = dump(turn)
+        del missing['payload']['cwd']
+        write([session, missing])
+        inspect(*role_args(name, cli_effort), ok=False, reason=f'missing cwd {name}')
+        observed = dump(turn)
+        observed['payload']['sandbox_policy'] = {'type': 'danger-full-access'}
+        observed['payload']['permission_profile'] = {'type': 'disabled'}
+        write([session, observed])
+        evidence = inspect(*role_args(name, cli_effort), reason=f'echo sandbox {name}')
         assert evidence['sandbox_policy_type'] == 'danger-full-access'
         assert evidence['permission_profile_type'] == 'disabled'
-        assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
-                                 'model_provider', 'model', 'effort', 'sandbox_policy_type',
-                                 'permission_profile_type', 'cwd'}
-    reject_efforts(explorer_session, explorer_turn, '--explorer-effort', ('low', 'medium', 'xhigh', 'ultra'))
-    explorer_turn['payload']['effort'] = 'high'
-    write([explorer_session, explorer_turn])
-    for args in [('--explorer-effort', 'max'), ('--explorer-effort', 'unsupported'),
-                 ('--explorer-effort', ''), ('--explorer-effort',),
-                 ('--explorer-effort', 'high', '--luna'),
-                 ('--explorer-effort', 'high', '--sol-effort', 'high'),
-                 ('--advisor-effort', 'high', '--explorer-effort', 'high'),
-                 ('--explorer-effort', 'high', '--review-primary-effort', 'low')]:
-        inspect(*args, ok=False)
-    for other_session in (session, luna_session, wrong_role):
-        write([other_session, explorer_turn])
-        inspect('--explorer-effort', 'high', ok=False)
-    for field, wrong in [('model', 'gpt-6-astra'), ('effort', 'max'),
-                         ('sandbox_policy', {'type': 'read-only'}),
-                         ('permission_profile', {'type': 'legacy'})]:
-        missing = json.loads(json.dumps(explorer_turn))
-        del missing['payload'][field]
-        write([explorer_session, missing])
-        inspect('--explorer-effort', 'high', ok=False)
-        conflicting = json.loads(json.dumps(explorer_turn))
-        conflicting['payload'][field] = wrong
-        write([explorer_session, explorer_turn, conflicting])
-        inspect('--explorer-effort', 'high', ok=False)
-    invalid_explorer = json.loads(json.dumps(explorer_turn))
-    invalid_explorer['payload']['model'] = 'gpt-6-astra'
-    write([explorer_session, invalid_explorer])
-    inspect('--explorer-effort', 'high', ok=False)
-    for model_name, model in (('sol', 'gpt-5.6-sol'), ('astra', 'gpt-6-astra')):
-        native_role = f'codex_advisor_{model_name}_explorer'
-        config = tomllib.loads((scripts.parent / f'agents/codex-advisor-{model_name}-explorer.toml').read_text())
-        assert config['name'] == native_role and config['model'] == model
-        assert config['sandbox_mode'] == 'read-only' and 'model_reasoning_effort' not in config
-        allocated_session = json.loads(json.dumps(session))
-        allocated_session['payload']['agent_role'] = native_role
-        allocated_turn = json.loads(json.dumps(turn))
-        allocated_turn['payload']['model'] = model
-        option = f'--{model_name}-explorer-effort'
-        for effort in ('medium', 'high', 'low', 'xhigh', 'max', 'ultra'):
-            allocated_turn['payload']['effort'] = effort
-            write([allocated_session, allocated_turn])
-            evidence = inspect(option, effort, ok=effort in ('medium', 'high'))
-            if evidence:
-                assert evidence['agent_role'] == native_role and evidence['model'] == model
-                assert evidence['effort'] == effort
-        allocated_turn['payload']['effort'] = 'medium'
-        worker_session = json.loads(json.dumps(allocated_session))
-        worker_session['payload']['agent_role'] = f'codex_advisor_{model_name}_implementer'
-        write([worker_session, allocated_turn])
-        inspect(option, 'medium', ok=False)
-        for field in ('model', 'effort', 'sandbox_policy', 'permission_profile'):
-            missing = json.loads(json.dumps(allocated_turn))
-            del missing['payload'][field]
-            write([allocated_session, missing])
-            inspect(option, 'medium', ok=False)
-        write([allocated_session, allocated_turn])
-        inspect(option, 'medium', '--luna', ok=False)
-    sol_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-sol-implementer.toml').read_text())
-    assert sol_role['name'] == 'codex_advisor_sol_implementer'
-    assert sol_role['model'] == 'gpt-5.6-sol'
-    assert 'model_reasoning_effort' not in sol_role, 'Sol effort must remain adjustable at invocation'
-    sol_session = json.loads(json.dumps(session))
-    sol_session['payload']['agent_role'] = 'codex_advisor_sol_implementer'
-    sol_turn = json.loads(json.dumps(turn))
-    sol_turn['payload']['model'] = 'gpt-5.6-sol'
-    for effort in ('high', 'xhigh'):
-        sol_turn['payload']['effort'] = effort
-        write([sol_session, sol_turn])
-        evidence = inspect('--sol-effort', effort)
-        assert evidence['model'] == 'gpt-5.6-sol' and evidence['effort'] == effort
-        assert evidence['agent_role'] == 'codex_advisor_sol_implementer'
-    reject_efforts(sol_session, sol_turn, '--sol-effort', ('low', 'medium', 'max', 'ultra'))
-    sol_turn['payload']['effort'] = 'high'
-    write([sol_session, sol_turn])
-    for args in [('--sol-effort', 'medium'), ('--sol-effort', 'unsupported'),
-                 ('--sol-effort', ''), ('--sol-effort',),
-                 ('--sol-effort', 'high', '--luna'),
-                 ('--advisor-effort', 'high', '--sol-effort', 'high'),
-                 ('--sol-effort', 'high', '--review-primary-effort', 'low')]:
-        inspect(*args, ok=False)
-    for other_session in (session, luna_session, wrong_role):
-        write([other_session, sol_turn])
-        inspect('--sol-effort', 'high', ok=False)
-    for field, wrong in [('model', 'gpt-5.6-luna'), ('effort', 'low'),
-                         ('sandbox_policy', {'type': 'read-only'}),
-                         ('permission_profile', {'type': 'legacy'})]:
-        missing = json.loads(json.dumps(sol_turn))
-        del missing['payload'][field]
-        write([sol_session, missing])
-        inspect('--sol-effort', 'high', ok=False)
-        conflicting = json.loads(json.dumps(sol_turn))
-        conflicting['payload'][field] = wrong
-        write([sol_session, sol_turn, conflicting])
-        inspect('--sol-effort', 'high', ok=False)
-    invalid_sol = json.loads(json.dumps(sol_turn))
-    invalid_sol['payload']['model'] = 'gpt-5.6-luna'
-    write([sol_session, invalid_sol])
-    inspect('--sol-effort', 'high', ok=False)
-    review_session = json.loads(json.dumps(session))
-    review_session['payload']['agent_role'] = 'codex_advisor_astra_reviewer'
-    review_turn = json.loads(json.dumps(turn))
-    for effort in ('medium', 'high', 'xhigh', 'low', 'max', 'ultra'):
-        review_turn['payload']['effort'] = effort
-        write([review_session, review_turn])
-        evidence = inspect('--reviewer-effort', effort, ok=effort in ('medium', 'high', 'xhigh'))
-        if evidence:
-            assert evidence['agent_role'] == 'codex_advisor_astra_reviewer'
-            assert evidence['model'] == 'gpt-6-astra' and evidence['effort'] == effort
-    review_turn['payload']['effort'] = 'high'
-    write([review_session, review_turn])
-    inspect('--review-primary-effort', 'max', ok=False)
-    inspect('--review-primary-effort', 'low', '--reviewer-effort', 'medium', ok=False)
-    inspect('--reviewer-effort', 'high')
-    inspect('--reviewer-effort', 'high', '--reviewer-effort', 'high', ok=False)
-    inspect('--reviewer-effort', 'high', '--advisor-effort', 'high', ok=False)
-    inspect('--reviewer-effort', 'high', '--luna', ok=False)
-    inspect('--reviewer-effort', 'medium', ok=False)
-    inspect('--luna', '--review-primary-effort', 'low', ok=False)
-    for other_session in (session, luna_session, wrong_role):
-        write([other_session, review_turn])
-        inspect('--reviewer-effort', 'high', ok=False)
-    for field, wrong in [('model', 'gpt-5.6-sol'), ('effort', 'medium'),
-                         ('sandbox_policy', {'type': 'read-only'}),
-                         ('permission_profile', {'type': 'legacy'})]:
-        missing = json.loads(json.dumps(review_turn))
-        del missing['payload'][field]
-        write([review_session, missing])
-        inspect('--reviewer-effort', 'high', ok=False)
-        conflicting = json.loads(json.dumps(review_turn))
-        conflicting['payload'][field] = wrong
-        write([review_session, review_turn, conflicting])
-        inspect('--reviewer-effort', 'high', ok=False)
-    write([review_session, wrong_model])
-    inspect('--reviewer-effort', 'high', ok=False)
-    astra_role = tomllib.loads((scripts.parent / 'agents/codex-advisor-astra-implementer.toml').read_text())
-    assert astra_role['name'] == 'codex_advisor_astra_implementer'
-    assert astra_role['model'] == 'gpt-6-astra'
-    assert 'model_reasoning_effort' not in astra_role, 'Astra implementation effort belongs to the caller'
-    astra_session = json.loads(json.dumps(session))
-    astra_session['payload']['agent_role'] = 'codex_advisor_astra_implementer'
-    astra_turn = json.loads(json.dumps(turn))
-    for effort in ('medium', 'high', 'xhigh'):
-        astra_turn['payload']['effort'] = effort
-        write([astra_session, astra_turn])
-        evidence = inspect('--astra-effort', effort)
-        assert evidence['agent_role'] == 'codex_advisor_astra_implementer'
-        assert evidence['model'] == 'gpt-6-astra' and evidence['effort'] == effort
-        assert set(evidence) == {'thread_id', 'parent_thread_id', 'agent_role', 'agent_path',
-                                 'model_provider', 'model', 'effort', 'sandbox_policy_type',
-                                 'permission_profile_type', 'cwd'}
-    reject_efforts(astra_session, astra_turn, '--astra-effort', ('low', 'max', 'ultra'))
-    astra_turn['payload']['effort'] = 'medium'
-    write([astra_session, astra_turn])
-    for args in [('--astra-effort', 'high'), ('--astra-effort', 'unsupported'),
-                 ('--astra-effort', ''), ('--astra-effort',),
-                 ('--astra-effort', 'medium', '--luna'),
-                 ('--astra-effort', 'medium', '--sol-effort', 'high'),
-                 ('--explorer-effort', 'medium', '--astra-effort', 'medium'),
-                 ('--advisor-effort', 'medium', '--astra-effort', 'medium'),
-                 ('--astra-effort', 'medium', '--review-primary-effort', 'low')]:
-        inspect(*args, ok=False)
-    for other_session in (session, review_session, luna_session, sol_session, wrong_role):
-        write([other_session, astra_turn])
-        inspect('--astra-effort', 'medium', ok=False)
-    for model in ('gpt-5.6-luna', 'gpt-5.6-sol'):
-        invalid = json.loads(json.dumps(astra_turn))
-        invalid['payload']['model'] = model
-        write([astra_session, invalid])
-        inspect('--astra-effort', 'medium', ok=False)
-    for field, wrong in [('model', 'gpt-5.6-sol'), ('effort', 'high'),
-                         ('sandbox_policy', {'type': 'read-only'}),
-                         ('permission_profile', {'type': 'legacy'})]:
-        missing = json.loads(json.dumps(astra_turn))
-        del missing['payload'][field]
-        write([astra_session, missing])
-        inspect('--astra-effort', 'medium', ok=False)
-        conflicting = json.loads(json.dumps(astra_turn))
-        conflicting['payload'][field] = wrong
-        write([astra_session, astra_turn, conflicting])
-        inspect('--astra-effort', 'medium', ok=False)
+
+    generic_session = session_for('unrelated-role')
+    generic_turn = turn_for('some-model', 'low')
+    write([generic_session, generic_turn])
+    evidence = inspect(reason='generic evidence')
+    assert evidence['agent_role'] == 'unrelated-role'
+    assert evidence['model'] == 'some-model' and evidence['effort'] == 'low'
+    inspect('--effort', 'high', ok=False, reason='effort without agent')
+    sample = templates[0][1]
+    inspect('--agent', sample['name'], '--effort', '', ok=False, reason='empty effort')
+    inspect('--agent', sample['name'], '--effort', '--high', ok=False, reason='effort starts with --')
+    inspect('--agent', 'nonexistent', ok=False, reason='unknown agent')
+
+    sample = templates[0][1]
+    sample_name = sample['name']
+    pinned = sample.get('model_reasoning_effort')
+    sample_effort = pinned if pinned else 'high'
+    sample_args = role_args(sample_name, None if pinned else sample_effort)
+    session = session_for(sample_name)
+    turn = turn_for(sample['model'], sample_effort)
     for records in ([], [session], [turn], [session, session, turn]):
         write(records)
-        inspect('--advisor-effort', 'high', ok=False)
+        inspect(*sample_args, ok=False, reason='malformed records')
     rollout.write_text('{"prompt":"' + secret + '",broken')
-    inspect(ok=False)
+    inspect(ok=False, reason='malformed json')
     write([session, turn])
     duplicate = root / f'rollout-other-{thread}.jsonl'
     duplicate.write_bytes(rollout.read_bytes())
-    inspect(ok=False)
+    inspect(ok=False, reason='two rollouts')
     duplicate.unlink()
     rollout.unlink()
-    inspect(ok=False)
-    bad = subprocess.run(['sh', str(scripts / 'inspect-agent-runtime.sh'), '../invalid'],
+    inspect(ok=False, reason='missing rollout')
+    bad = subprocess.run(['sh', str(inspector), '../invalid'],
                          capture_output=True, text=True)
     assert bad.returncode != 0 and not bad.stdout
-print('PASS: native role allocations, explicit independent review, retired-floor refusal, evidence consistency, permissions and payload filtering')
+print('PASS: generic inspector, table-driven templates, retired options, payload filtering')
 PY
 fi
 for script in "$script_dir"/*.sh; do sh -n "$script"; done

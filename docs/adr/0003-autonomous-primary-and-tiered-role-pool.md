@@ -4,6 +4,8 @@ status: accepted
 
 # Autonomous primary and tiered role pool
 
+The no-fixed-ladder rule, the distinct native entry for independent acceptance, and the routing table in this record are superseded by [Tier-named native entries, first-round pool with a gated senior tier, and a self-updating installer](0004-tier-named-entries-first-round-pool.md). The complete-attempt definition, the fresh-thread policy, Architect mode, the required-advice triggers, and the acceptance rules stand.
+
 ## Decision
 
 Any primary model may implement, delegate, or combine both within user authorization.

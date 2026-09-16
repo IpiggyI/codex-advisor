@@ -1,4 +1,4 @@
 interface:
   display_name: "Codex Advisor Orchestration"
-  short_description: "Autonomous work, tiered delegates, and Astra judgment"
+  short_description: "Autonomous work, tiered entries, and Advisor judgment"
   default_prompt: "Use $codex-advisor:orchestration to implement and verify this feature under the authorized work mode, preserving my primary model and effort."

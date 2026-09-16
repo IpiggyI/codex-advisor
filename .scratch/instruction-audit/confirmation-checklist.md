@@ -26,9 +26,9 @@ The suggestions to reduce verification in R07, change logging coverage in R10, a
 
 ### R01: Deployment line endings and exact-template checks
 
-- [ ] Review R01 and record the decision.
+- [x] Review R01 and record the decision.
 
-**Decision:** Pending.
+**Decision:** update — decided 2026-09-16 in the tier-role-pool spec; `.gitattributes` pins LF for text files and the installer now overwrites this plugin's own files (ticket 01, ADR-0004).
 
 **Classification:** Further verification required.
 
@@ -44,9 +44,9 @@ The suggestions to reduce verification in R07, change logging coverage in R10, a
 
 ### R02: Chinese mirror changes the failure-reassessment rule
 
-- [ ] Review R02 and record the decision.
+- [x] Review R02 and record the decision.
 
-**Decision:** Pending.
+**Decision:** update — the Chinese twin of the skill was re-translated with the failure-count meaning in the tier-role-pool batch (ticket 03).
 
 **Classification:** Correct and simplify.
 
@@ -98,9 +98,9 @@ The suggestions to reduce verification in R07, change logging coverage in R10, a
 
 ### R05: Keep caller scheduling duties out of delegate instructions
 
-- [ ] Review R05 and record the decision.
+- [x] Review R05 and record the decision.
 
-**Decision:** Pending.
+**Decision:** simplify — decided 2026-09-16; every native entry's `developer_instructions` now carries only delegate duties, caller duties live in the skill and references (tickets 04–06, ADR-0004).
 
 **Classification:** Simplify.
 
@@ -154,9 +154,9 @@ The suggestions to reduce verification in R07, change logging coverage in R10, a
 
 ### R08: Distinguish defaults, allowed efforts, and escalation eligibility
 
-- [ ] Review R08 and record the decision.
+- [x] Review R08 and record the decision.
 
-**Decision:** Pending; introducing a unique Sol worker default is a behavioral choice.
+**Decision:** update — decided 2026-09-16; efforts, defaults (`*`), and candidate order are written in `routing-profile.md` with the `model[a*, b, c]` notation; the skill carries no values (ticket 03, ADR-0004). The Sol default question is settled as `gpt-5.6-sol[high*, xhigh]`.
 
 **Classification:** Clarify; any new default is a behavior change.
 

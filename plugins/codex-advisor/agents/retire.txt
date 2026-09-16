@@ -1,0 +1,9 @@
+# Exact installed filenames to delete if present. One basename per line.
+codex-advisor-luna-explorer.toml
+codex-advisor-sol-explorer.toml
+codex-advisor-astra-explorer.toml
+codex-advisor-luna-implementer.toml
+codex-advisor-sol-implementer.toml
+codex-advisor-astra-implementer.toml
+codex-advisor-astra-advisor.toml
+codex-advisor-astra-reviewer.toml

@@ -2,8 +2,9 @@
 
 ## Explorer
 
-Any primary may use a model-pinned Explorer with a fresh thread and explicit effort.
-Use [operations.md](operations.md) to install, invoke, and validate the selected route.
+Any primary may use an Explorer entry with a fresh thread and, unless the entry
+pins its effort, an explicit effort. Use [operations.md](operations.md) to install,
+invoke, and validate the selected route.
 
 ~~~text
 QUESTION
@@ -27,9 +28,9 @@ absence only in the examined scope. Insufficient findings may lead to direct
 primary investigation or another authorized allocation; disclose any unverified call.
 Exploration is neither implementation nor independent final acceptance.
 
-## Worker (Implementer)
+## Worker
 
-All worker models use the same five-part outcome contract. Role responsibility is
+All Worker entries use the same five-part outcome contract. Role responsibility is
 independent of tier. The primary retains decomposition, scheduling, and acceptance;
 unspecified local implementation choices belong to the worker.
 
@@ -68,15 +69,24 @@ behavior, and verification. Structural preference alone does not justify rework.
 The worker owns ordinary debugging. Use the operations handoff for reassignment;
 the primary checks actual changes and reruns key verification after any correction.
 
-## Decision advice
+## Advisor
 
-Use a fresh `codex_advisor_astra_advisor` for a scoped judgment request. Applicable
-advice may be reused while its premises hold; it is not a fresh final review.
+One Advisor entry per tier (`ca_advisor_light`, `ca_advisor_standard`,
+`ca_advisor_senior`) answers two request shapes: the decision packet and the
+acceptance packet. Both run read-only in a fresh thread. The routing profile names
+the default entry for each shape; the senior entry is reached only through a verdict
+that reports low confidence or a user declaration.
+
+### Decision advice
+
+Use a fresh Advisor thread for a scoped judgment request. Applicable advice may
+be reused while its premises hold; it is not a fresh final review.
 
 ~~~text
 DECISION
 <Specific question and trigger: proactive advice, uncovered key decision,
-invalidated premise, or unclear failure cause after initial diagnosis.>
+invalidated premise, unclear failure cause after initial diagnosis, or the
+senior gate after two complete failures.>
 
 CONSTRAINTS
 <User intent, authorization, retained interfaces, excluded scope, and resources.>
@@ -101,15 +111,16 @@ GAPS: <missing evidence and unresolved risks>
 ~~~
 
 The primary validates routing without asking the Advisor to infer its settings,
-checks the cited evidence, and explains material disagreement. A relevant complete
-failure to answer, or a materially invalidated conclusion, can make `xhigh`
-eligible. Disagreement or worker failure alone cannot.
+checks the cited evidence, and explains material disagreement. A complete advisory
+attempt fails when it does not answer its question or its conclusion is materially
+invalidated; disagreement or worker failure alone is neither and does not move
+the Advisor to its senior entry.
 
-## Independent acceptance
+### Independent acceptance
 
-After primary inspection and key checks, use a fresh
-`codex_advisor_astra_reviewer`. It is a distinct native entry for the semantic
-Advisor role; an earlier consultation or worker report cannot satisfy it.
+After primary inspection and key checks, send the acceptance packet to a fresh
+Advisor thread. It is the second request shape of the same entries, not a separate
+reviewer; an earlier consultation, decision advice, or worker report cannot satisfy it.
 
 ~~~text
 REVIEW SCOPE
@@ -126,7 +137,8 @@ PRIMARY VERIFICATION
 and unresolved gaps. Separate worker claims from independently checked results.>
 
 SETTINGS AND PERMISSIONS
-<Explicit reviewer effort, relevant failed advisory evidence if selecting xhigh,
+<Selected Advisor entry and, where the entry leaves it open, the explicit effort;
+the low-confidence verdict or user declaration if selecting the senior entry;
 requested isolation, and scoped state captured before review.>
 Remain read-only. Do not write, format, implement, or delegate implementation.
 Use checks that preserve scoped state; disclose unavailable checks.
@@ -138,8 +150,8 @@ VERIFICATION: <checks inspected or run, commands, status, and relevant output>
 GAPS: <missing evidence, unchecked conditions, and residual risks>
 ~~~
 
-Reviewer effort is independent of primary effort. The primary verifies fresh
+The acceptance dial is independent of primary effort. The primary verifies fresh
 invocation, routing, cited findings, tool activity, and before/after state.
 Missing evidence or material findings leave required acceptance pending.
 After corrections and primary re-verification, review the revised deliverable
-in a new thread even if model and effort remain unchanged.
+in a new thread even if entry and effort remain unchanged.

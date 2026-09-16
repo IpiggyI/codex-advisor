@@ -14,7 +14,7 @@ Single-context: one `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/ag
 
 ### Chinese mirror of runtime docs
 
-Every `plugins/codex-advisor/**/*.md` has a Chinese twin at the same relative path under `docs/zh/` (`docs/zh/skills/orchestration/…`). A change to a runtime `.md` updates its twin in the same commit. `python3 tests/test_zh_mirror.py` checks the one-to-one existence (not content). The mirror is repo-only and does not ship.
+Every `plugins/codex-advisor/**/*.md` and every native entry `plugins/codex-advisor/agents/*.toml` has a Chinese twin at the same relative path under `docs/zh/` (`docs/zh/skills/orchestration/…`, `docs/zh/agents/…`). A change to a runtime file updates its twin in the same commit. `python3 tests/test_zh_mirror.py` checks the one-to-one existence for both types and, for a TOML twin, that `name`, `model`, `model_reasoning_effort`, and `sandbox_mode` equal the template while the two prose keys are Chinese. The mirror is repo-only and does not ship.
 
 ### Version manual
 

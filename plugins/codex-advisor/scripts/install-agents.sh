@@ -2,26 +2,33 @@
 # Install only this fork's exact templates; never edit primary-session configuration.
 set -eu
 
+plugin_prefix=ca-
+
 fail() { printf '%s\n' "ERROR: $*" >&2; exit 1; }
 usage() {
   cat <<'EOF'
 Usage: install-agents.sh [--target-dir PATH] [--check] [--check-role ROLE ...]
 
-Install Codex Advisor's native templates without overwriting existing files.
+Install Codex Advisor's native templates: overwrite this plugin's own files,
+remove retired names, and leave everything else untouched.
 The default target is "$CODEX_HOME/agents", or "$HOME/.codex/agents".
   --target-dir PATH  Use an explicit destination directory.
-  --check            Check all shipped roles without modifying the destination.
-  --check-role ROLE  Check advisor, luna, explorer, sol-explorer, astra-explorer, astra, sol, or reviewer; repeatable; implies --check.
+  --check            Report drift (differing or missing manifest files) and
+                     residue (present retire files) without writing.
+  --check-role ROLE  Check a template by filename stem minus the plugin prefix
+                     (for example explorer-light, explorer-standard-m);
+                     repeatable; implies --check. Retire files are not part of
+                     a selective check.
   --help            Show this help text.
 EOF
 }
 
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
 template_dir=$script_dir/../agents
+retire_list=$template_dir/retire.txt
 target_dir=${CODEX_HOME:-${HOME:?HOME or CODEX_HOME is required}/.codex}/agents
 check_only=0
 selected=''
-all_roles='advisor luna explorer sol-explorer astra-explorer astra sol reviewer'
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --target-dir)
@@ -31,8 +38,9 @@ while [ "$#" -gt 0 ]; do
       shift 2 ;;
     --check) check_only=1; shift ;;
     --check-role)
-      [ "$#" -ge 2 ] || fail "--check-role requires a role."
-      case "$2" in advisor|luna|explorer|sol-explorer|astra-explorer|astra|sol|reviewer) ;; *) fail "unknown role (expected advisor, luna, explorer, sol-explorer, astra-explorer, astra, sol, or reviewer)." ;; esac
+      [ "$#" -ge 2 ] && [ -n "$2" ] || fail "--check-role requires a role."
+      case "$2" in --*) fail "--check-role requires a role." ;; esac
+      case "$2" in *[!A-Za-z0-9_-]*|'') fail "unknown role: $2" ;; esac
       selected="$selected $2"
       check_only=1
       shift 2 ;;
@@ -40,7 +48,27 @@ while [ "$#" -gt 0 ]; do
     *) fail "unknown argument: $1" ;;
   esac
 done
-[ -n "$selected" ] || selected=$all_roles
+
+# Exact basenames to delete if present. Later tickets edit retire.txt.
+retired_files=''
+if [ -L "$retire_list" ]; then
+  fail "unsafe retire list: $retire_list"
+fi
+if [ -f "$retire_list" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in ''|'#'*) continue ;; esac
+    case "$line" in */*|*..*) fail "invalid retire name: $line" ;; esac
+    retired_files="$retired_files $line"
+  done < "$retire_list"
+fi
+
+if [ -n "$selected" ]; then
+  for role in $selected; do
+    template=$template_dir/${plugin_prefix}${role}.toml
+    [ -f "$template" ] && [ ! -L "$template" ] || fail "unknown role: $role"
+  done
+fi
+
 case "$target_dir" in /*) ;; *) target_dir=$(pwd -P)/$target_dir ;; esac
 # Reject unsafe ancestors too; lexical dot segments must not bypass this check.
 case "$target_dir/" in *'/../'*|*'/./'*) fail "dot path segments are not supported." ;; esac
@@ -58,62 +86,103 @@ check_directory() {
   done
 }
 
-role_file() {
-  case "$1" in
-    advisor) printf '%s\n' codex-advisor-astra-advisor.toml ;;
-    luna) printf '%s\n' codex-advisor-luna-implementer.toml ;;
-    explorer) printf '%s\n' codex-advisor-luna-explorer.toml ;;
-    sol-explorer) printf '%s\n' codex-advisor-sol-explorer.toml ;;
-    astra-explorer) printf '%s\n' codex-advisor-astra-explorer.toml ;;
-    astra) printf '%s\n' codex-advisor-astra-implementer.toml ;;
-    sol) printf '%s\n' codex-advisor-sol-implementer.toml ;;
-    reviewer) printf '%s\n' codex-advisor-astra-reviewer.toml ;;
-  esac
+note_problem() {
+  printf '%s\n' "ERROR: $*" >&2
+  check_problems=1
 }
 
-check_file() {
-  template=$template_dir/$(role_file "$1")
-  destination=$target_dir/$(role_file "$1")
-  [ -f "$template" ] && [ ! -L "$template" ] || fail "shipped template missing or unsafe: $template"
+preflight_dest() {
+  destination=$target_dir/$1
   if [ -L "$destination" ] || { [ -e "$destination" ] && [ ! -f "$destination" ]; }; then
     fail "unsafe destination: $destination"
   fi
-  if [ -f "$destination" ]; then
-    cmp -s "$template" "$destination" || fail "modified or conflicting destination: $destination"
-  elif [ "$check_only" -eq 1 ]; then
-    fail "missing role: $destination"
+}
+
+want_name() {
+  stem=${1#"$plugin_prefix"}
+  stem=${stem%.toml}
+  if [ -z "$selected" ]; then
+    return 0
   fi
+  for role in $selected; do
+    [ "$role" = "$stem" ] && return 0
+  done
+  return 1
 }
 
 check_directory
-for role in $selected; do check_file "$role"; done
+check_problems=0
+for path in "$template_dir"/*.toml; do
+  [ -f "$path" ] && [ ! -L "$path" ] || fail "shipped template missing or unsafe: $path"
+  name=${path##*/}
+  if want_name "$name"; then
+    preflight_dest "$name"
+    if [ "$check_only" -eq 1 ]; then
+      destination=$target_dir/$name
+      if [ ! -f "$destination" ]; then
+        note_problem "missing: $destination"
+      elif ! cmp -s "$path" "$destination"; then
+        note_problem "differs: $destination"
+      fi
+    fi
+  fi
+done
+
 if [ "$check_only" -eq 1 ]; then
+  if [ -z "$selected" ] && [ -n "$retired_files" ]; then
+    for name in $retired_files; do
+      destination=$target_dir/$name
+      if [ -e "$destination" ] || [ -L "$destination" ]; then
+        note_problem "residue: $destination"
+      fi
+    done
+  fi
+  [ "$check_problems" -eq 0 ] || exit 1
   printf '%s\n' "CHECK PASSED: selected templates match exactly."
   exit 0
 fi
 
 mkdir -p "$target_dir" || fail "could not create target directory."
 check_directory
-for role in $selected; do check_file "$role"; done
-for role in $selected; do
-  check_directory
-  check_file "$role"
-  if [ -f "$destination" ]; then
-    printf '%s\n' "ALREADY CURRENT: $destination"
+for path in "$template_dir"/*.toml; do
+  [ -f "$path" ] && [ ! -L "$path" ] || fail "shipped template missing or unsafe: $path"
+  name=${path##*/}
+  preflight_dest "$name"
+done
+if [ -n "$retired_files" ]; then
+  for name in $retired_files; do
+    preflight_dest "$name"
+  done
+fi
+
+for path in "$template_dir"/*.toml; do
+  name=${path##*/}
+  destination=$target_dir/$name
+  preflight_dest "$name"
+  if [ -f "$destination" ] && cmp -s "$path" "$destination"; then
+    printf '%s\n' "UNCHANGED: $destination"
     continue
   fi
   staged=$(mktemp "$target_dir/.codex-advisor-agent.XXXXXX") || fail "could not stage template."
-  if ! cp "$template" "$staged"; then
+  if ! cp "$path" "$staged"; then
     rm -f "$staged"
     fail "could not copy template."
   fi
-  if ! ln "$staged" "$destination"; then
+  if ! mv -f "$staged" "$destination"; then
     rm -f "$staged"
-    fail "destination changed after preflight; existing files were not overwritten."
+    fail "could not install $destination"
   fi
-  rm -f "$staged"
   printf '%s\n' "INSTALLED: $destination"
 done
-check_only=1
-for role in $selected; do check_file "$role"; done
+
+if [ -n "$retired_files" ]; then
+  for name in $retired_files; do
+    destination=$target_dir/$name
+    if [ -f "$destination" ] && [ ! -L "$destination" ]; then
+      rm -f "$destination" || fail "could not remove $destination"
+      printf '%s\n' "REMOVED: $destination"
+    fi
+  done
+fi
+
 printf '%s\n' "INSTALL PASSED: shipped templates match exactly."

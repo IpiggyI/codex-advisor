@@ -2,7 +2,7 @@
 
 ## Explorer
 
-任一 primary 都可以使用钉死模型的 Explorer，配合新线程和显式 effort。
+任一 primary 都可以使用 Explorer 入口，配合新线程，并在入口未钉死 effort 时给出显式 effort。
 用 [operations.md](operations.md) 安装、调用并核验所选路径。
 
 ~~~text
@@ -25,9 +25,9 @@ GAPS: <unavailable sources, failed checks, and unresolved questions>
 独立核对其引用与实际路由。否定性搜索只在已检查范围内确立缺失。发现不足时，可以转为 primary 直接调查，或改用另一项已授权分配；披露任何未核验的调用。
 探索既不是实现，也不是独立最终验收。
 
-## Worker（Implementer）
+## Worker
 
-所有 worker 模型使用同一份五部结果契约。角色职责与档位无关。primary 保留拆解、调度和验收；未规定的局部实现选择归 worker。
+所有 Worker 入口使用同一份五部结果契约。角色职责与档位无关。primary 保留拆解、调度和验收；未规定的局部实现选择归 worker。
 
 ~~~text
 OBJECTIVE
@@ -62,14 +62,19 @@ GAPS: <ambiguity, conflicts, risks, and unverified results>
 返工须指出被违反的要求、可复现失败、期望行为和核验。仅有结构偏好不能构成返工理由。
 worker 负责常规调试。改派使用 operations 中的 handoff；任何修正之后，primary 检查实际变更并重跑关键核验。
 
-## 决策建议
+## Advisor
 
-使用全新的 `codex_advisor_astra_advisor` 提出有界判断请求。在前提仍成立时可以复用适用建议；它不是一次新的最终评审。
+每个档位一个 Advisor 入口（`ca_advisor_light`、`ca_advisor_standard`、`ca_advisor_senior`），回答两种请求形态：决策数据包和验收数据包。两者都在新线程中只读运行。routing profile 指定每种形态的默认入口；senior 入口只能经报告低置信度的裁定或用户声明到达。
+
+### 决策建议
+
+用全新的 Advisor 线程提出有界判断请求。在前提仍成立时可以复用适用建议；它不是一次新的最终评审。
 
 ~~~text
 DECISION
 <Specific question and trigger: proactive advice, uncovered key decision,
-invalidated premise, or unclear failure cause after initial diagnosis.>
+invalidated premise, unclear failure cause after initial diagnosis, or the
+senior gate after two complete failures.>
 
 CONSTRAINTS
 <User intent, authorization, retained interfaces, excluded scope, and resources.>
@@ -93,12 +98,11 @@ TRADEOFFS: <costs and alternatives>
 GAPS: <missing evidence and unresolved risks>
 ~~~
 
-primary 核验路由，不要让 Advisor 推断自己的设置；核对引用的证据，并解释实质性分歧。未回答问题的相关 complete failure，或被实质性推翻的结论，可以使 `xhigh` 具备资格。仅有分歧或 worker 失败不能。
+primary 核验路由，不要让 Advisor 推断自己的设置；核对引用的证据，并解释实质性分歧。一次 complete advisory attempt 在未回答其问题或结论被实质性推翻时失败；仅有分歧或 worker 失败两者都不算，也不能把 Advisor 推到其 senior 入口。
 
-## Independent acceptance
+### Independent acceptance
 
-在 primary 检查和关键核验之后，使用全新的
-`codex_advisor_astra_reviewer`。它是语义 Advisor 角色的独立 native 入口；先前的咨询或 worker 报告不能满足它。
+在 primary 检查和关键核验之后，把验收数据包发给全新的 Advisor 线程。它是同一组入口的第二种请求形态，不是单独的评审人；先前的咨询、决策建议或 worker 报告不能满足它。
 
 ~~~text
 REVIEW SCOPE
@@ -115,7 +119,8 @@ PRIMARY VERIFICATION
 and unresolved gaps. Separate worker claims from independently checked results.>
 
 SETTINGS AND PERMISSIONS
-<Explicit reviewer effort, relevant failed advisory evidence if selecting xhigh,
+<Selected Advisor entry and, where the entry leaves it open, the explicit effort;
+the low-confidence verdict or user declaration if selecting the senior entry;
 requested isolation, and scoped state captured before review.>
 Remain read-only. Do not write, format, implement, or delegate implementation.
 Use checks that preserve scoped state; disclose unavailable checks.
@@ -127,6 +132,6 @@ VERIFICATION: <checks inspected or run, commands, status, and relevant output>
 GAPS: <missing evidence, unchecked conditions, and residual risks>
 ~~~
 
-评审人 effort 与 primary effort 无关。primary 核验全新调用、路由、引用的发现、工具活动，以及前后状态。
+验收 dial 与 primary effort 无关。primary 核验全新调用、路由、引用的发现、工具活动，以及前后状态。
 缺失证据或实质性发现会使必要验收保持待定。
-在修正并由 primary 再核验之后，即使模型和 effort 未变，也要在新线程中评审修订后的交付物。
+在修正并由 primary 再核验之后，即使入口和 effort 未变，也要在新线程中评审修订后的交付物。

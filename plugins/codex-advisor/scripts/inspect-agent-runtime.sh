@@ -3,30 +3,29 @@
 
 set -eu
 
+script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
+
 usage() {
   cat <<'EOF'
-Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [ROLE_OPTION] THREAD_ID
+Usage: inspect-agent-runtime.sh [--sessions-dir DIR] [--agent NAME [--effort EFFORT]] THREAD_ID
 
 Read the one rollout file whose filename ends with THREAD_ID and emit a compact JSON
 object containing only safe routing metadata. Without --sessions-dir, the sessions
 root is "$CODEX_HOME/sessions" when CODEX_HOME is already set, otherwise
 "$HOME/.codex/sessions".
 
-ROLE_OPTION selects exactly one native contract:
-  --luna                         Luna Implementer at max
-  --sol-effort high|xhigh         Sol Implementer
-  --astra-effort medium|high|xhigh Astra Implementer
-  --explorer-effort high|max      Luna Explorer
-  --sol-explorer-effort medium|high
-  --astra-explorer-effort medium|high
-  --advisor-effort medium|high|xhigh
-  --reviewer-effort medium|high|xhigh
+--agent NAME selects the shipped template whose name field equals NAME. Expected
+model and any pinned effort come from that template. When the template pins an
+effort, that is the expected effort; an omitted --effort is accepted and a given
+--effort must equal the pin. When the template does not pin an effort, --effort
+EFFORT is required and is the expected effort. Allowed efforts are not judged
+here; the routing profile does.
 
 Role checks require observed model, effort, parent linkage, working directory, and
-permissions. Without a role option, emit generic routing evidence. This inspector
-does not certify host support, failure eligibility for Astra xhigh, authorization,
-fresh invocation, task completion, or enforced read-only isolation. Compare thread
-IDs and invocation evidence separately. Primary-derived review selection is retired.
+permissions. Without --agent, emit generic routing evidence. This inspector
+does not certify host support, authorization, fresh invocation, task completion,
+or enforced isolation. Compare thread IDs and invocation evidence separately.
+Primary-derived review selection is retired.
 EOF
 }
 
@@ -35,66 +34,78 @@ fail() {
   exit 1
 }
 
+# Shipped templates keep name, model, and model_reasoning_effort as single-line
+# top-level keys before any developer_instructions block. Stop scanning a file
+# at the first line that opens a multi-line string (""").
+toml_top_level() {
+  awk -v key="$2" '
+    index($0, "\"\"\"") { exit }
+    index($0, key " = \"") == 1 {
+      rest = substr($0, length(key) + 5)
+      sub(/"[[:space:]]*$/, "", rest)
+      print rest
+      exit
+    }
+  ' "$1"
+}
+
+resolve_agent() {
+  requested=$1
+  agents_dir=$script_dir/../agents
+  [ -d "$agents_dir" ] || fail "templates directory is unavailable."
+  hits=0
+  resolved_model=''
+  pinned_effort=''
+  for tmpl in "$agents_dir"/*.toml; do
+    [ -f "$tmpl" ] || continue
+    tmpl_name=$(toml_top_level "$tmpl" name)
+    [ "$tmpl_name" = "$requested" ] || continue
+    hits=$((hits + 1))
+    [ "$hits" -eq 1 ] || fail "multiple templates named $requested."
+    resolved_model=$(toml_top_level "$tmpl" model)
+    pinned_effort=$(toml_top_level "$tmpl" model_reasoning_effort)
+  done
+  [ "$hits" -eq 1 ] || fail "unknown agent: $requested."
+  [ -n "$resolved_model" ] || fail "template is missing model."
+  expected_role=$requested
+  expected_model=$resolved_model
+  if [ -n "$pinned_effort" ]; then
+    if [ -n "$requested_effort" ] && [ "$requested_effort" != "$pinned_effort" ]; then
+      fail "requested effort does not match the pinned effort."
+    fi
+    expected_effort=$pinned_effort
+  else
+    [ -n "$requested_effort" ] || fail "this agent requires --effort."
+    expected_effort=$requested_effort
+  fi
+}
+
 sessions_dir=''
+requested_agent=''
+requested_effort=''
 expected_role=''
 expected_model=''
 expected_effort=''
 thread_id=''
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --sessions-dir|--advisor-effort|--explorer-effort|--sol-explorer-effort|--astra-explorer-effort|--astra-effort|--sol-effort|--reviewer-effort)
+    --sessions-dir|--agent|--effort)
       [ "$#" -ge 2 ] && [ -n "$2" ] || fail "option requires a value."
       case "$2" in --*) fail "option requires an explicit value." ;; esac ;;
   esac
   case "$1" in
     --sessions-dir)
       sessions_dir=$2; shift 2 ;;
-    --advisor-effort)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in medium|high|xhigh) ;; *) fail "unsupported Advisor effort (expected medium, high, or eligible xhigh)." ;; esac
-      expected_role=codex_advisor_astra_advisor
-      expected_model=gpt-6-astra
-      expected_effort=$2; shift 2 ;;
-    --luna)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      expected_role=codex_advisor_luna_implementer
-      expected_model=gpt-5.6-luna
-      expected_effort=max
-      shift ;;
-    --explorer-effort)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in high|max) ;; *) fail "unsupported Luna Explorer effort (expected high or max)." ;; esac
-      expected_role=codex_advisor_luna_explorer
-      expected_model=gpt-5.6-luna
-      expected_effort=$2; shift 2 ;;
-    --sol-explorer-effort|--astra-explorer-effort)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in medium|high) ;; *) fail "unsupported Explorer effort (expected medium or high)." ;; esac
-      case "$1" in
-        --sol-explorer-effort) expected_role=codex_advisor_sol_explorer; expected_model=gpt-5.6-sol ;;
-        --astra-explorer-effort) expected_role=codex_advisor_astra_explorer; expected_model=gpt-6-astra ;;
-      esac
-      expected_effort=$2; shift 2 ;;
-    --astra-effort)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in medium|high|xhigh) ;; *) fail "unsupported Astra implementation effort (expected medium, high, or eligible xhigh)." ;; esac
-      expected_role=codex_advisor_astra_implementer
-      expected_model=gpt-6-astra
-      expected_effort=$2; shift 2 ;;
-    --sol-effort)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in high|xhigh) ;; *) fail "unsupported Sol effort (expected high or xhigh)." ;; esac
-      expected_role=codex_advisor_sol_implementer
-      expected_model=gpt-5.6-sol
-      expected_effort=$2; shift 2 ;;
-    --reviewer-effort)
-      [ -z "$expected_role" ] || fail "select exactly one role contract."
-      case "$2" in medium|high|xhigh) ;; *) fail "unsupported reviewer effort (expected medium, high, or eligible xhigh)." ;; esac
-      expected_role=codex_advisor_astra_reviewer
-      expected_model=gpt-6-astra
-      expected_effort=$2; shift 2 ;;
+    --agent)
+      [ -z "$requested_agent" ] || fail "select exactly one --agent."
+      requested_agent=$2; shift 2 ;;
+    --effort)
+      [ -z "$requested_effort" ] || fail "select exactly one --effort."
+      requested_effort=$2; shift 2 ;;
+    --luna|--sol-effort|--astra-effort|--explorer-effort|--sol-explorer-effort|--astra-explorer-effort|--advisor-effort|--reviewer-effort)
+      fail "per-role options are retired; use --agent NAME [--effort EFFORT] THREAD_ID." ;;
     --review-primary-effort|--select-review-effort)
-      fail "primary-derived review selection is retired; use --reviewer-effort EFFORT THREAD_ID." ;;
+      fail "primary-derived review selection is retired; use --agent NAME [--effort EFFORT] THREAD_ID." ;;
     --help|-h) usage; exit 0 ;;
     --*) fail "unknown argument." ;;
     *) [ "$#" -eq 1 ] || fail "exactly one trailing THREAD_ID is required."
@@ -105,6 +116,13 @@ done
 
 if ! printf '%s\n' "$thread_id" | LC_ALL=C grep -Eq '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
   fail "THREAD_ID must be a lowercase UUID."
+fi
+
+if [ -n "$requested_effort" ] && [ -z "$requested_agent" ]; then
+  fail "use --effort only with --agent."
+fi
+if [ -n "$requested_agent" ]; then
+  resolve_agent "$requested_agent"
 fi
 
 if [ -z "$sessions_dir" ]; then
