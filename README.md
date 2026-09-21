@@ -73,8 +73,10 @@ ticket, specification, or unaccepted proposal does not activate the mode.
 The primary retains scheduling. Independent delegated tasks can run within
 available capacity; dependencies and conflicting ownership are sequenced. Workers
 preserve concurrent edits and do not delegate implementation further. The primary
-inspects all actual changes, including new files and worker-authored tests, reruns
-key checks, and verifies the combined result.
+inspects all actual changes itself, including new files and worker-authored tests,
+and owns the checks: it runs them or assigns an executor that receives the complete
+batch requirements and reports executor, scope, command, status, and output. A
+valid result is reused; a changed executor or session alone does not repeat it.
 
 ## Recover failed work
 

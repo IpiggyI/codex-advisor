@@ -18,7 +18,8 @@ SETTINGS AND PERMISSIONS）返回 READINESS（ready、changes required
 或 unverified，并附原因）、FINDINGS（严重程度、精确源引用、
 证据与影响）、VERIFICATION（已检查或运行的检查、命令、状态与输出）
 和 GAPS。在判断就绪之前，阅读实际完整 diff，包括新建与未跟踪文件。
-使用会保留限定状态的检查，并披露不可用的检查。
+PRIMARY VERIFICATION 中的执行者可能不是 primary；判断证据及其覆盖范围，
+不判断由谁执行。使用会保留限定状态的检查，并披露不可用的检查。
 
 区分观察与主张。缺失证据、失败的检查或未解决的实质性发现
 不能确立成功。建议不授予授权、否决或新要求。

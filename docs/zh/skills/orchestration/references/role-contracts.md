@@ -48,8 +48,10 @@ implementation further. Resolve unclear expected behavior, conflicting requireme
 and changes to reserved interfaces with the primary before dependent edits.>
 
 VERIFICATION
-<Meaningful checks, expected results, and failure conditions. Inspect the full
-resulting diff and report failed, skipped, or unavailable checks.>
+<The checks this contract requires, expected results, and failure conditions.
+Run them, plus whatever your own debugging needs; checks that span other work
+packages or the whole delivery belong to the primary's schedule. Inspect the
+full resulting diff and report failed, skipped, or unavailable checks.>
 
 RETURN
 COMPLETION: <complete, partial, or blocked, with reason>
@@ -60,7 +62,7 @@ GAPS: <ambiguity, conflicts, risks, and unverified results>
 ~~~
 
 返工须指出被违反的要求、可复现失败、期望行为和核验。仅有结构偏好不能构成返工理由。
-worker 负责常规调试。改派使用 operations 中的 handoff；任何修正之后，primary 检查实际变更并重跑关键核验。
+worker 负责常规调试。改派使用 operations 中的 handoff；任何修正之后，primary 检查实际变更，并核验失败场景及其影响范围，复用该修正未触及的有效证据。
 
 ## Advisor
 
@@ -102,7 +104,7 @@ primary 核验路由，不要让 Advisor 推断自己的设置；核对引用的
 
 ### Independent acceptance
 
-在 primary 检查和关键核验之后，把验收数据包发给全新的 Advisor 线程。它是同一组入口的第二种请求形态，不是单独的评审人；先前的咨询、决策建议或 worker 报告不能满足它。
+在 primary 亲自检查交付物、并完成自己负责的检查之后，把验收数据包发给全新的 Advisor 线程。它是同一组入口的第二种请求形态，不是单独的评审人；先前的咨询、决策建议、worker 报告或委派的检查执行，都不能满足它。
 
 ~~~text
 REVIEW SCOPE
@@ -115,8 +117,9 @@ ownership boundaries, and unrelated changes to preserve. Inspect the actual
 complete diff, including untracked files, before judging readiness.>
 
 PRIMARY VERIFICATION
-<Checks rerun by the primary, exit status, relevant output, evidence location,
-and unresolved gaps. Separate worker claims from independently checked results.>
+<Checks the primary owns for this acceptance: executor, scope, command, exit
+status, relevant output, evidence location, and unverified items. Separate worker
+claims from results the primary organized and confirmed.>
 
 SETTINGS AND PERMISSIONS
 <Selected Advisor entry and, where the entry leaves it open, the explicit effort;

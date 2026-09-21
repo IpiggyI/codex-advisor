@@ -60,9 +60,17 @@ _Avoid_: Assigning implementation or counting exploration as independent final a
 An executor's attempt through its assigned work and ordinary checks, ending in accepted completion, failed acceptance, or concrete inability. An advisory attempt must answer its specified question with a supportable conclusion.
 _Avoid_: Counting intermediate test/tool failures, or mere disagreement with advice, as complete failed attempts.
 
+**Primary checks**:
+The checks the primary owns and confirms for acceptance. It runs them itself or assigns one executor that receives the complete batch requirements and reports executor, scope, command, exit status, output location, and unverified items. Inspecting the actual complete diff and confirming that a test can fail for the intended requirement stay with the primary.
+_Avoid_: Treating a delegated run as the acceptance decision; repeating a valid result because the executor or the session changed.
+
+**Verification batch**:
+A group of acceptance checks with one named executor, formed separately from ticket and dispatch boundaries so that work sharing costly setup is checked together while the scope stays understandable and a failure stays locatable.
+_Avoid_: Accumulating unverified premises that dependent work rests on in order to lower the number of runs; moving a worker's own debugging into the batch.
+
 **Independent acceptance**:
 The Advisor's acceptance request shape: a fresh thread examines the actual complete deliverable after primary checks, required for high-risk work or an explicit review request. It defaults to the light tier; decision advice defaults to standard.
-_Avoid_: Reusing decision consultation, worker self-review, or an earlier review thread after corrections; a dedicated reviewer entry.
+_Avoid_: Reusing decision consultation, worker self-review, a delegated check run, or an earlier review thread after corrections; a dedicated reviewer entry.
 
 **Current-state handoff**:
 A transfer of the objective, binding decisions, ownership, actual changes, checks, failure evidence, and remaining work after conflicting predecessor activity stops.

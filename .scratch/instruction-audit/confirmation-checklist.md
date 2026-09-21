@@ -134,9 +134,9 @@ The suggestions to reduce verification in R07, change logging coverage in R10, a
 
 ### R07: Remove duplicate checks without dropping final verification
 
-- [ ] Review R07 and record the decision.
+- [x] Review R07 and record the decision.
 
-**Decision:** Pending; explicit approval required for the reduced verification schedule.
+**Decision:** simplify — decided 2026-09-20. The operations reference selects checks by the behavior a change touches: the installation group covers the installer, the entry templates, the manifest, and the routing profile's dials against those templates, the runtime group covers the inspector and the metadata it emits, a template change reaches both, and documentation changes are checked for structure, links, and agreement with actual behavior. The unqualified verifier runs once on the final state and replaces the focused runs instead of following them; `git diff --check` stays. The native scenario list becomes the candidate set: the scenarios a change can break are selected and the rest are recorded as not exercised. After a correction, only the affected checks repeat. Acceptance responsibility is settled separately by [ADR-0005](../../docs/adr/0005-acceptance-ownership-and-verification-batches.md), which replaces the rerun rule quoted in the retained-responsibility paragraph below.
 
 **Classification:** Simplify; safeguard-related change.
 

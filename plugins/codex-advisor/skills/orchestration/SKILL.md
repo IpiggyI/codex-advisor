@@ -55,16 +55,21 @@ changes to reserved interfaces are contract gaps to resolve before dependent edi
 
 Workers do their own debugging and implementation without further implementation
 delegation. They preserve concurrent and unrelated edits and report actual changes,
-checks, judgment calls, and gaps. Rework identifies the violated requirement,
-reproducible failure, expected behavior, and verification; structural preference
-alone is insufficient.
+checks, judgment calls, and gaps. A worker runs the verification its packet
+specifies and whatever its own debugging needs; acceptance checks that span
+other work packages or the whole delivery stay in your plan. Rework identifies
+the violated requirement, reproducible failure, expected behavior, and
+verification; structural preference alone is insufficient.
 
 Check dependencies, ownership (including generated files and check side effects),
-and actual available slots before dispatch. Independent delegated tasks may run
-concurrently; sequence dependencies, conflicting ownership, and excess capacity.
-Do not split a shared file into nominally independent owners or nest workers to
-evade capacity. Collect each report and inspect the combined result. A successful
-sibling does not complete failed or missing work.
+and actual available slots before dispatch. Decide ticket boundaries, dispatch
+count, and verification batches separately: combine checks that share costly
+setup while the scope stays understandable and a failure stays locatable, and
+keep a real check where dependent work rests on its result. Independent delegated
+tasks may run concurrently; sequence dependencies, conflicting ownership, and
+excess capacity. Do not split a shared file into nominally independent owners or
+nest workers to evade capacity. Collect each report and inspect the combined
+result. A successful sibling does not complete failed or missing work.
 
 ## Recover from evidence
 
@@ -126,10 +131,20 @@ or another dial for that question. A dial change starts a new thread.
 
 ## Accept the actual deliverable
 
-Inspect all actual changes, including new files, corrections, and worker-authored
-acceptance tests. Check that tests can fail for the intended requirement and rerun
-key verification yourself. A report, false completion claim, skipped required
-check, or missing runtime evidence cannot establish success.
+Inspect all actual changes yourself, including new files, corrections, and
+worker-authored acceptance tests. Check that tests can fail for the intended
+requirement and that the evidence describes the current deliverable. A report,
+false completion claim, skipped required check, or missing runtime evidence
+cannot establish success.
+
+Primary checks are the checks you own and confirm. Run them yourself or assign
+them to an executor that receives the complete batch requirements and reports
+executor, scope, command, exit status, output location, and unverified items;
+a delegated run never moves the acceptance decision. Reuse a result while the
+relevant code, artifacts, checks, inputs, and environment still support it. A
+changed executor or a new session is not by itself a reason to run a check again;
+a changed dependency, an evidence gap, an unexplained failure, or an identified
+risk is, and rework covers the failed scenario and the scope it affects.
 
 Ordinary direct, delegated, and mixed multi-step work may complete after primary
 checks. Step count, file count, primary identity, or a senior implementation alone
@@ -140,7 +155,8 @@ acceptance after primary checks, for any primary model: the Advisor's acceptance
 packet on an Advisor entry in a fresh thread. Assess risk by failure consequences,
 reversibility, and difficulty establishing correctness. Decision advice and independent
 acceptance are the two request shapes of one Advisor role and its entries. Earlier
-advice or worker self-review does not satisfy independent final acceptance.
+advice, a worker's self-review, and a delegated check run do not satisfy
+independent final acceptance.
 
 Choose the acceptance dial independently of primary effort; a primary at a high
 effort may receive acceptance at the light tier. Only a low-confidence verdict or

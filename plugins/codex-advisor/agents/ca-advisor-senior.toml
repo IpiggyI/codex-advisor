@@ -17,8 +17,10 @@ SETTINGS AND PERMISSIONS) returns READINESS (ready, changes required, or
 unverified, with reason), FINDINGS (severity, exact source references,
 evidence, and impact), VERIFICATION (checks inspected or run, commands,
 status, and output), and GAPS. Read the actual complete diff, including new
-and untracked files, before judging readiness. Use checks that preserve
-scoped state and disclose unavailable checks.
+and untracked files, before judging readiness. PRIMARY VERIFICATION may name
+an executor other than the primary; judge the evidence and its coverage, not
+who ran it. Use checks that preserve scoped state and disclose unavailable
+checks.
 
 Distinguish observations from claims. Missing evidence, failed checks, or
 unresolved material findings cannot establish success. Advice grants no

@@ -69,20 +69,26 @@ Keep primary settings unchanged and respect explicit model exclusions.
 ## Invoke and validate
 
 Use the native spawn interface with fresh context. Pass `reasoning_effort` when
-the entry leaves effort to the caller; a pinned entry takes none:
+the entry leaves effort to the caller; a pinned entry takes none. On every fresh
+spawn, set `task_name` to a short name that distinguishes this thread from its
+siblings. The first line of `message` is that same name, verbatim plain text with
+no Markdown marker, then a blank line, then the role packet:
 
 ~~~text
 agent_type: ca_worker_standard_m
 fork_turns: none
 reasoning_effort: xhigh
-message: <five-part worker packet from role-contracts.md>
+task_name: wire_http_checks
+message: <short name, blank line, five-part worker packet from role-contracts.md>
 ~~~
 
-Replace entry, effort, and packet for the selected role. Use `fork_turns: none`
-for an explicit packet without copied conversation; per-spawn `model` and
-`reasoning_effort` are honoured only with it. For a caller-selected entry, always
-pass an effort listed in the routing profile, even the default; otherwise host
-inheritance may select it. Never edit entry files or primary settings to adjust effort.
+Replace entry, effort, short name, and packet for the selected role. Use
+`fork_turns: none` for an explicit packet without copied conversation; per-spawn
+`model` and `reasoning_effort` are honoured only with it. For a caller-selected
+entry, always pass an effort listed in the routing profile, even the default;
+otherwise host inheritance may select it. Never edit entry files or primary
+settings to adjust effort. Follow-up on the same thread keeps that name; a new
+thread gets its own.
 
 Require an accepted native call and actual routing evidence. Recognized inspector
 inputs do not prove host/account support. Public spawn/details metadata is authoritative;
@@ -188,17 +194,29 @@ do not create nested workers to evade them. If capacity is unknown, use one work
 until established; if none is available, retain work as pending and report the wait.
 
 Dispatch independent delegated tasks with disjoint ownership within capacity.
-Sequence dependent tasks after inspecting prerequisite results and rerunning key
-checks. Sequence shared ownership after the earlier writer finishes, updating the
-next packet with actual state. Release finished agents through the host lifecycle
-when needed after retaining their reports and evidence.
+Sequence dependent tasks after inspecting prerequisite results and checking the
+premise the dependent work rests on; do not accumulate unverified premises to
+lower the number of runs. Sequence shared ownership after the earlier writer
+finishes, updating the next packet with actual state. Release finished agents
+through the host lifecycle when needed after retaining their reports and evidence.
+
+Form verification batches separately from ticket and dispatch boundaries. Combine
+checks that share costly setup while the scope stays understandable and a failure
+stays locatable. Name one executor per batch: the primary, or a delegate that
+receives the complete batch requirements, the merged changes, and the evidence
+already collected. A delegated check run uses a Worker entry; the read-only
+Explorer and Advisor entries take only checks that write nothing.
 
 Collect changes, checks, judgment calls, and gaps from every worker. Failed,
 blocked, absent, or incomplete work and its dependents stay pending; independent
-work may continue. Inspect the complete combined diff, including new files and
-worker-authored tests. Rerun meaningful checks and reconcile evidence before
-acceptance. Claim parallel execution only when native events or activity show
-overlapping worker lifetimes; requests alone establish intent.
+work may continue. Inspect the complete combined diff yourself, including new
+files and worker-authored tests. Run each verification batch once through its
+executor, then reconcile coverage, actual output, and the current combined state
+before acceptance. Reuse a result while the relevant code, artifacts, checks,
+inputs, and environment still support it; check again for a changed dependency,
+an evidence gap, an unexplained failure, or an identified risk. Claim parallel
+execution only when native events or activity show overlapping worker lifetimes;
+requests alone establish intent.
 
 ## Advice and independent acceptance
 
@@ -218,11 +236,11 @@ and difficulty checking correctness, not step/file count or model.
 
 Capture scoped state, spawn a fresh Advisor thread, validate settings and tool
 activity, and check its actual complete-diff inspection and findings. Advice,
-exploration, and worker self-review cannot substitute. Resolve material findings,
-inspect and reverify corrections, then obtain fresh independent acceptance of the
-revised deliverable even at an unchanged dial. Ordinary mode allows primary
-corrections; Architect mode delegates them. Missing required review or unresolved
-material findings leaves completion pending.
+exploration, a worker's self-review, and a delegated check run cannot substitute.
+Resolve material findings, inspect and reverify corrections, then obtain fresh
+independent acceptance of the revised deliverable even at an unchanged dial.
+Ordinary mode allows primary corrections; Architect mode delegates them. Missing
+required review or unresolved material findings leaves completion pending.
 
 ## Observe permissions
 
@@ -241,11 +259,25 @@ Unchanged scoped files do not establish absence of writes outside that scope.
 
 ## Verify changes
 
-From the repository root, use focused checks while editing, then the full suite:
+From the repository root, select checks by the behavior the change touches. While
+editing one area, run its focused group:
 
 ~~~sh
 sh plugins/codex-advisor/scripts/verify.sh --installation
 sh plugins/codex-advisor/scripts/verify.sh --runtime
+~~~
+
+The installation group covers the installer, the entry templates, the manifest,
+and the routing profile's dials against those templates. The runtime group covers
+the inspector: its options, the expectations it reads from a template, and the
+metadata it emits. A template change reaches both groups, so it takes the
+unqualified run. Documentation changes have no group here: check structure,
+links, and whether the text still matches actual behavior.
+
+Run the unqualified verifier once on the final state. It contains both groups,
+so it replaces the focused runs instead of following them:
+
+~~~sh
 sh plugins/codex-advisor/scripts/verify.sh
 git diff --check
 ~~~
@@ -255,12 +287,14 @@ and evidence consistency. Shell syntax and JSON/TOML parsing are the applicable
 static checks; this project has no typed application. Fixtures establish parser
 and refusal behavior, not model behavior.
 
-Use tiny disposable native scenarios for advertised routes and critical branches:
+Tiny disposable native scenarios cover the advertised routes and critical branches:
 ordinary direct/delegated/mixed completion, explicit Architect delegation,
 tiered exploration, complete versus intermediate failure, repair/clarification,
 same-allocation rework, effort changes both ways, and independent acceptance.
 Use short advisory questions for reused/invalidated advice, disagreement, and
-eligible advisory escalation. Reuse actual calls and metadata across checks.
-Record expected/observed behavior, native settings, IDs, sources, permissions,
-tested revision/host, and unexercised paths in the feature acceptance record.
-These smoke checks do not establish general quality, cost, or stability gains.
+eligible advisory escalation. Select from this set the scenarios the change can
+break and record the rest as not exercised. Reuse actual calls and metadata
+across checks; after a correction, repeat the affected checks rather than the
+whole set. Record expected/observed behavior, native settings, IDs, sources,
+permissions, tested revision/host, and unexercised paths in the feature acceptance
+record. These smoke checks do not establish general quality, cost, or stability gains.

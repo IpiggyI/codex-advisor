@@ -53,8 +53,10 @@ implementation further. Resolve unclear expected behavior, conflicting requireme
 and changes to reserved interfaces with the primary before dependent edits.>
 
 VERIFICATION
-<Meaningful checks, expected results, and failure conditions. Inspect the full
-resulting diff and report failed, skipped, or unavailable checks.>
+<The checks this contract requires, expected results, and failure conditions.
+Run them, plus whatever your own debugging needs; checks that span other work
+packages or the whole delivery belong to the primary's schedule. Inspect the
+full resulting diff and report failed, skipped, or unavailable checks.>
 
 RETURN
 COMPLETION: <complete, partial, or blocked, with reason>
@@ -67,7 +69,9 @@ GAPS: <ambiguity, conflicts, risks, and unverified results>
 For rework, identify the violated requirement, reproducible failure, expected
 behavior, and verification. Structural preference alone does not justify rework.
 The worker owns ordinary debugging. Use the operations handoff for reassignment;
-the primary checks actual changes and reruns key verification after any correction.
+after any correction the primary inspects the actual changes and verifies the
+failed scenario and the scope it affects, reusing evidence the correction leaves
+valid.
 
 ## Advisor
 
@@ -118,9 +122,10 @@ the Advisor to its senior entry.
 
 ### Independent acceptance
 
-After primary inspection and key checks, send the acceptance packet to a fresh
-Advisor thread. It is the second request shape of the same entries, not a separate
-reviewer; an earlier consultation, decision advice, or worker report cannot satisfy it.
+After inspecting the deliverable and completing the checks you own, send the
+acceptance packet to a fresh Advisor thread. It is the second request shape of the same entries, not a
+separate reviewer; an earlier consultation, decision advice, worker report, or
+delegated check run cannot satisfy it.
 
 ~~~text
 REVIEW SCOPE
@@ -133,8 +138,9 @@ ownership boundaries, and unrelated changes to preserve. Inspect the actual
 complete diff, including untracked files, before judging readiness.>
 
 PRIMARY VERIFICATION
-<Checks rerun by the primary, exit status, relevant output, evidence location,
-and unresolved gaps. Separate worker claims from independently checked results.>
+<Checks the primary owns for this acceptance: executor, scope, command, exit
+status, relevant output, evidence location, and unverified items. Separate worker
+claims from results the primary organized and confirmed.>
 
 SETTINGS AND PERMISSIONS
 <Selected Advisor entry and, where the entry leaves it open, the explicit effort;
