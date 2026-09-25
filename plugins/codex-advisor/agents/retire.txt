@@ -7,3 +7,14 @@ codex-advisor-sol-implementer.toml
 codex-advisor-astra-implementer.toml
 codex-advisor-astra-advisor.toml
 codex-advisor-astra-reviewer.toml
+ca-explorer-light.toml
+ca-explorer-standard-m.toml
+ca-explorer-standard-h.toml
+ca-explorer-senior.toml
+ca-worker-light.toml
+ca-worker-standard-m.toml
+ca-worker-standard-h.toml
+ca-worker-senior.toml
+ca-advisor-light.toml
+ca-advisor-standard.toml
+ca-advisor-senior.toml

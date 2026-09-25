@@ -16,7 +16,7 @@ The default target is "$CODEX_HOME/agents", or "$HOME/.codex/agents".
   --check            Report drift (differing or missing manifest files) and
                      residue (present retire files) without writing.
   --check-role ROLE  Check a template by filename stem minus the plugin prefix
-                     (for example explorer-light, explorer-standard-m);
+                     (for example explorer-mainstay-m, advisor-rescue);
                      repeatable; implies --check. Retire files are not part of
                      a selective check.
   --help            Show this help text.

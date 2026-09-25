@@ -1,24 +1,23 @@
 ---
 name: orchestration
-description: "主代理自行实现或委派工作、按 routing profile 选择角色与 capability tier、经 escalation ladder 从失败尝试中恢复，或需要 Advisor 决策建议与 independent acceptance 时使用。"
+description: "主代理自行实现或委派工作、按 routing profile 选择角色与 capability tier、经 escalation ladder 从失败尝试中恢复、使用过程咨询，或需要 independent acceptance 时使用。"
 ---
 
 # Codex Advisor 编排
 
 ## 负责任务
 
-任一 primary 模型都可以直接实现、委派有界工作，或两者并用。
-保留用户的 primary 模型与 reasoning effort。中档 primary 是偏好，不是插件要求。在用户已授权的目标、范围、保留决定、验收条件和资源限额内，选择拆解、顺序和分工。不要为了让任务更容易而改动这些边界。调查与当前代码的不符之处，为用户拥有的变更寻求决议，并继续处理不受影响的独立工作。
+任一 primary 模型都可以直接实现、委派有界工作，或两者并用。保留用户的 primary 模型与 reasoning effort。中档 primary 是偏好，不是插件要求。在用户已授权的目标、范围、保留决定、验收条件和资源限额内，选择拆解、顺序和分工。不要为了让任务更容易而改动这些边界。调查与当前代码的不符之处，为用户拥有的变更寻求决议，并继续处理不受影响的独立工作。
 
 明确的 Architect mode 授权会使其范围内的每一处实现编辑与修正都改为委派，对任一 primary 模型都成立。primary 拥有设计、契约、调度和验收，可以写设计和任务件。模型身份、工单、规格或未被接受的提议，都不会激活该模式。记录授权请求。它覆盖本任务及其后续；无关任务需要新的授权，除非用户明确授予会话级范围。
 
 ## 按角色与 capability tier 分配
 
-委派调用前，阅读 [role-contracts.md](references/role-contracts.md) 中的对应数据包、[operations.md](references/operations.md) 中的安装、调用、证据和权限程序，以及 [routing-profile.md](references/routing-profile.md) 中的 dial 表。每一个模型名、effort 选项、默认值和候选顺序都写在 routing profile 里，不写在这里。尊重宿主容量，以及用户明确排除项和资源限额。显式选择 dial，不要为每次例行分配再问一次许可。
+委派调用前，阅读 [role-contracts.md](references/role-contracts.md) 中的对应数据包、[operations.md](references/operations.md) 中的安装、调用、证据和权限程序，以及 [routing-profile.md](references/routing-profile.md) 中的 dial 表。每一个模型名、effort 选项、默认值、候选顺序、咨询映射和验收映射都写在 routing profile 中。尊重宿主容量、用户明确排除项和资源限额。显式选择 dial，不要为每次例行分配再问一次许可。
 
-按你需要的产出选择角色：要证据用 Explorer，要变更用 worker，要判断或验收用 Advisor。在 first-round pool（light 与 standard）内选择档位，依据是结果对数据包无法承载的判断依赖多深。light 与 standard 之间没有前置条件；从 light 到 standard 不是升级。取最便宜且够用的 dial，用其默认值。具备资格并不强制升级。
+按所需产出选择角色：证据使用 Explorer，变更使用 worker，independent acceptance 使用 Advisor。新工作从 `mainstay` 开始。已经识别出关键难点或必须处理相互作用的约束时，可以从 `crux` 开始。使用次数没有配额。除非用户声明，否则 `rescue` 不能作为首轮选择。记录中为未来保留的收窄准入规则没有启用。
 
-senior 只能经 senior gate 到达：同一工作在 pool 内两次归因于能力的 complete failed attempt，或用户声明。对 Advisor，gate 只有报告低置信度的裁定或用户声明两种；worker 失败不能打开它。Advisor 的决策数据包默认 standard 档，验收数据包默认 light 档。
+在一个角色与档位单元中，采用第一个候选及其默认值。结果越依赖数据包无法承载的判断，越可以采用后面的候选。capability tier 由模型决定，effort 是档位内部的细分等级。
 
 ## 委派结果并保留调度
 
@@ -34,39 +33,36 @@ worker 自行调试与实现，不再向下委派实现。它们保留并发和�
 
 诊断环境问题、缺失事实、契约缺口、推理失败和执行者是否合适。先修复环境问题。契约缺口（预期行为不明、要求冲突、涉及保留接口）在同一线程上以修正后的契约解决；它不是 ladder 的一步，也不是能力失败。普通工作允许 primary 接管；Architect mode 仍把编辑委派出去。
 
-验收失败之后，遵循 escalation ladder：
+验收失败后，执行 R1：在同一线程、同一 dial 上发一张返工工单。返工指出被违反的要求、可复现失败、期望行为和核验；工单里不含修法。返工也失败，且诊断把原因归为能力时，原尝试和返工合计为一次能力失败。
 
-- R1：在同一线程、同一 dial 上发一张返工工单。返工指出被违反的要求、可复现失败、期望行为和核验；工单里不含修法。
-- R2：返工也失败且原因是能力时，在新线程中提档，并携带 current-state handoff：同一模型的更高 effort，或另一个模型。
-- R3：同一模型最多提档一次。
-- R4：重大执行问题（工具反复失败、失控、触碰保留项）可以跳过返工工单直接换模型，计为一次失败。
+发生能力失败后，把工作移到下一个档位，并在新线程中携带 current-state handoff。除非没有其他选择，否则不要切换到失败档位中的另一个模型。除非没有其他选择，下一个 dial 的模型等级不能低于失败的 dial；模型不变时使用更高 effort。在此下限之上，根据失败暴露出的难点选择。
 
-pool 内的第二次 complete failure 是否值得上 senior，是一项必须征求建议的关键决定，因此 senior gate 与这次咨询重合，Advisor 的裁定同时决定 senior 是否成立。在改派之前，停止先前冲突的写入者，检查实际状态，并保留有用变更。遵循 operations 参考中的 current-state handoff。
+路径为 `mainstay` -> `crux` -> `rescue` -> 用户。`rescue` 只能经 `crux` 或用户声明到达；从 `crux` 开始的工作在一次 `crux` 能力失败后到达 `rescue`。R3 继续作为约束：同一模型最多提档一次。按 R4，工具反复失败、执行失控或触碰保留项等重大执行问题可以跳过返工，并计为一次能力失败。
+
+改派之前，停止先前冲突的写入者，检查实际状态，并保留有用变更。遵循 operations 参考中的 current-state handoff。环境问题和契约缺口不会让工作沿该路径移动。
 
 每一次委派 effort 变更，无论升高或降低，都需要新的 native 线程。模型变更和角色改派也需要新的匹配入口。同模型、同 effort 的 worker 返工可以复用其线程。independent acceptance 一律重新开始，含修正之后的评审。不要把改了提示词的 resume 报告成新会话。比较实际标识和设置；这是明确的生命周期策略，不是对缓存行为或节省的普遍主张。
 
-## 会改变决定时再寻求判断
+## 在决策点咨询
 
-允许主动征求建议。在以下情况必须征求建议：
+过程咨询不使用数据包，primary、任一 worker 和任一 Explorer 都可以无参数调用。它自动携带调用者当前有效的上下文，包括未完成的当前轮次和压缩后的有效历史。Advisor 不使用工具，并返回且只返回一个 plan、correction 或 stop signal，同时给出实际模型与 effort。不支持的重建或失败的咨询会返回明确失败，绝不编造建议。
 
-- 适用计划未覆盖的关键决定。
-- 新证据使计划的关键假设失效。
-- 初步诊断之后，失败原因仍不清楚。
+一次 complete consultation attempt 会返回一种允许的结果，以可支持的结论回答上下文中的决定。没有返回允许的结果，或来源与核验证据实质性推翻其结论时，该尝试失败。仅有分歧、中间工具错误或 worker 失败，不构成这种失败。
 
-在相关前提仍成立时，可以复用适用建议。实质性新证据需要重新判断；反复失败需要重新评估，而不是按失败次数无条件触发的调用。核对其引用的证据，并解释实质性分歧。建议不授予授权、否决权、新要求，也不接管用户目标。
-
-一次 complete advisory attempt 在未回答指定问题，或来源/核验证据推翻其实质性结论时失败。仅有分歧、中间工具错误，以及仅有 worker 失败，都不能打开 Advisor 的 senior gate。诊断相关的 advisory 失败，并为该问题选择收集事实、澄清或另一个 dial。dial 变更会开启新线程。
+使用咨询之前，阅读 routing profile 中的咨询映射和 [consult-posture.md](references/consult-posture.md)。比较调用者与所分配 Advisor 的精确模型标识，以选择 full 或 reduced 姿态。严格遵循所选姿态块和 adoption 块。Advisor 没有自己的升级路径。咨询不授予授权，也不能代替事实核对或 independent acceptance。
 
 ## 验收实际交付物
+
+一次 complete advisory attempt 在未回答其指定问题，或来源与核验证据实质性推翻其结论时失败。仅有分歧、中间工具错误或 worker 失败，不构成 complete advisory failure。
 
 亲自检查全部实际变更，含新文件、修正和 worker 撰写的验收测试。确认测试会在意图要求被破坏时失败，并确认证据描述的是当前交付物。报告、虚假的完成主张、跳过的必要检查或缺失的运行时证据，都不能确立成功。
 
 primary checks 指由你负责并确认的检查。你可以自己运行，也可以指派执行者：该执行者获得完整批次需求，并报告执行者、范围、命令、退出状态、输出位置和未核实项；委派执行不转移验收决定。相关代码、产物、检查、输入和环境仍支持原结论时，复用该结果。换执行者或换会话本身不构成重跑理由；依赖变化、证据缺口、未解释的失败或已识别的风险才构成，返工则覆盖失败场景及其影响范围。
 
-普通的直接、委派或混合多步工作，可在 primary checks 之后完成。步数、文件数、primary 身份或由 senior 档实现本身，都不要求交付建议或 independent acceptance。
+普通的直接、委派或混合多步工作，可在 primary checks 之后完成。步数、文件数、primary 身份或使用某一特定档位本身，都不要求 independent acceptance。
 
-高风险交付和明确的独立评审请求，都要求在 primary checks 之后做 independent acceptance，对任一 primary 模型都成立：在新线程中把 Advisor 的验收数据包发给一个 Advisor 入口。按失败后果、可逆性和确立正确性的难度评估风险。决策建议与 independent acceptance 是同一 Advisor 角色及其入口的两种请求形态。先前的建议、worker 自评和委派的检查执行，都不能满足独立最终验收。
+高风险交付和明确的独立评审请求，都要求在 primary checks 之后做 independent acceptance，对任一 primary 模型都成立：在新线程中把 Advisor 验收数据包发给匹配的 Advisor 入口。咨询、worker 自评和委派的检查执行都不能满足 independent acceptance。
 
-验收 dial 的选择与 primary effort 无关；高 effort 的 primary 也可以接受 light 档的验收。只有低置信度裁定或用户声明才能打开 Advisor 的 senior gate。检查路由、全新调用、工具活动，以及范围内的前后状态。处理实质性发现，再核验修正，即使 dial 未变，也要对修订后的交付物做一次新的评审。
+按 routing profile 选择验收 dial。单一档位产出的工作使用该档位的 Advisor 入口；多个档位共同产出的工作使用其中最高档位。primary 自行产出的工作使用不弱于 primary dial 的最低 Advisor dial；没有合格 dial 时，使用最强 Advisor dial。若 routing profile 中没有 primary 的精确模型标识，也使用最强 Advisor dial。低置信度裁定会使验收保持待定并交给用户，不会自动触发另一个 dial 的复审。
 
-必要执行不可用、设置不受支持、证据缺失或冲突，或实质性发现未解决时，受影响的验收明确保持待定。报告缺口，不要静默替换；不受影响的独立工作可以继续。
+检查路由、全新调用、工具活动，以及范围内的前后状态。处理实质性发现，再核验修正，即使 dial 未变，也要对修订后的交付物做一次新的评审。必要执行不可用、设置不受支持、证据缺失或冲突，或实质性发现未解决时，受影响的验收明确保持待定。报告缺口，不要静默替换；不受影响的独立工作可以继续。

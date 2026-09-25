@@ -1,0 +1,132 @@
+[
+  {
+    "scene": "V1",
+    "version": "0.2.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V1",
+    "version": "0.3.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V2",
+    "version": "0.2.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V2",
+    "version": "0.3.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V3",
+    "version": "0.2.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V3",
+    "version": "0.3.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V4",
+    "version": "0.2.0",
+    "result": {
+      "width": 390,
+      "docWidth": 390,
+      "rail": "sticky",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V4",
+    "version": "0.3.0",
+    "result": {
+      "width": 390,
+      "docWidth": 390,
+      "rail": "sticky",
+      "brokenAnchors": [],
+      "theme": "light"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V5",
+    "version": "0.2.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "dark"
+    },
+    "errors": [],
+    "external": []
+  },
+  {
+    "scene": "V5",
+    "version": "0.3.0",
+    "result": {
+      "width": 1440,
+      "docWidth": 1440,
+      "rail": "fixed",
+      "brokenAnchors": [],
+      "theme": "dark"
+    },
+    "errors": [],
+    "external": []
+  }
+]

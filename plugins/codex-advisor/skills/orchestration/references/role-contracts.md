@@ -75,57 +75,23 @@ valid.
 
 ## Advisor
 
-One Advisor entry per tier (`ca_advisor_light`, `ca_advisor_standard`,
-`ca_advisor_senior`) answers two request shapes: the decision packet and the
-acceptance packet. Both run read-only in a fresh thread. The routing profile names
-the default entry for each shape; the senior entry is reached only through a verdict
-that reports low confidence or a user declaration.
+One Advisor entry per tier answers the acceptance packet. It runs read-only in a
+fresh thread. Select its dial by the accepted work: use the work's tier, the highest
+tier involved for work built by several tiers, or the lowest advisor dial not weaker
+than the primary's dial for primary-authored work. If no advisor dial qualifies,
+or the primary's exact model id is absent from the routing profile, use the strongest
+advisor dial. A low-confidence verdict leaves acceptance pending and goes to the
+user; it does not trigger an automatic review at another dial.
 
-### Decision advice
-
-Use a fresh Advisor thread for a scoped judgment request. Applicable advice may
-be reused while its premises hold; it is not a fresh final review.
-
-~~~text
-DECISION
-<Specific question and trigger: proactive advice, uncovered key decision,
-invalidated premise, unclear failure cause after initial diagnosis, or the
-senior gate after two complete failures.>
-
-CONSTRAINTS
-<User intent, authorization, retained interfaces, excluded scope, and resources.>
-
-EVIDENCE
-<Exact sources, observations, options, and uncertainties. For failure, include
-the completed attempt, checks, diagnosis, and remaining question.>
-
-REQUESTED JUDGMENT
-<Proposed decision and the tradeoff or uncertainty to resolve.>
-
-PERMISSIONS
-Remain read-only. Do not write, format, implement, or delegate implementation.
-Advice grants no authorization and adds no binding requirement.
-
-RETURN
-RECOMMENDATION: <proposed decision answering the question>
-EVIDENCE: <supporting observations and exact source references>
-ASSUMPTIONS: <premises, unverified claims, and how to check them>
-TRADEOFFS: <costs and alternatives>
-GAPS: <missing evidence and unresolved risks>
-~~~
-
-The primary validates routing without asking the Advisor to infer its settings,
-checks the cited evidence, and explains material disagreement. A complete advisory
-attempt fails when it does not answer its question or its conclusion is materially
-invalidated; disagreement or worker failure alone is neither and does not move
-the Advisor to its senior entry.
+Process consultation takes no packet. It is a separate zero-argument call governed
+by the routing profile and [consult-posture.md](consult-posture.md), and it never
+substitutes for independent acceptance.
 
 ### Independent acceptance
 
 After inspecting the deliverable and completing the checks you own, send the
-acceptance packet to a fresh Advisor thread. It is the second request shape of the same entries, not a
-separate reviewer; an earlier consultation, decision advice, worker report, or
-delegated check run cannot satisfy it.
+acceptance packet to a fresh Advisor thread. An earlier consultation, worker report,
+or delegated check run cannot satisfy it.
 
 ~~~text
 REVIEW SCOPE
@@ -144,8 +110,8 @@ claims from results the primary organized and confirmed.>
 
 SETTINGS AND PERMISSIONS
 <Selected Advisor entry and, where the entry leaves it open, the explicit effort;
-the low-confidence verdict or user declaration if selecting the senior entry;
-requested isolation, and scoped state captured before review.>
+the accepted work's tier or the primary-derived dial rule; requested isolation,
+and scoped state captured before review.>
 Remain read-only. Do not write, format, implement, or delegate implementation.
 Use checks that preserve scoped state; disclose unavailable checks.
 
@@ -156,8 +122,8 @@ VERIFICATION: <checks inspected or run, commands, status, and relevant output>
 GAPS: <missing evidence, unchecked conditions, and residual risks>
 ~~~
 
-The acceptance dial is independent of primary effort. The primary verifies fresh
-invocation, routing, cited findings, tool activity, and before/after state.
-Missing evidence or material findings leave required acceptance pending.
-After corrections and primary re-verification, review the revised deliverable
-in a new thread even if entry and effort remain unchanged.
+The primary verifies fresh invocation, routing, cited findings, tool activity, and
+before/after state. Missing evidence, a low-confidence verdict, or material findings
+leave required acceptance pending. After corrections and primary re-verification,
+review the revised deliverable in a new thread even if entry and effort remain
+unchanged.

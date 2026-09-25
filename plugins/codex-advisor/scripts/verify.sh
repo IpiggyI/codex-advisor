@@ -2,9 +2,9 @@
 # Exercise the public installer with disposable destinations.
 set -eu
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
-case "${1-}" in ''|--installation|--runtime) ;; *) printf '%s\n' 'Unknown verification group' >&2; exit 2 ;; esac
-if [ "${1-}" != --runtime ]; then
-python3 - "$script_dir" <<'PY'
+case "${1-}" in ''|--installation|--runtime|--consultation|--hooks) ;; *) printf '%s\n' 'Unknown verification group' >&2; exit 2 ;; esac
+if [ -z "${1-}" ] || [ "${1-}" = --installation ]; then
+sh "$script_dir/run-python.sh" - "$script_dir" <<'PY'
 import json
 import os
 from pathlib import Path
@@ -37,46 +37,109 @@ sample_stem = sample_name[3:-5]
 other_name = sorted(stems.values())[1]
 other_stem = other_name[3:-5]
 worker_name = next(name for name in sorted(templates) if name.startswith('ca-worker-'))
-# Same-role developer_instructions must be byte-identical (role = second
-# segment of name).
-by_role = {}
+shipped = {}
 for filename, content in templates.items():
     data = tomllib.loads(content.decode())
-    role = data['name'].split('_')[1]
-    by_role.setdefault(role, []).append(data['developer_instructions'])
-for role, bodies in by_role.items():
-    assert bodies and all(b == bodies[0] for b in bodies), role
+    shipped[data['name']] = data
+
 # Pin model_reasoning_effort exactly when the routing profile marks a single
 # bare effort. Source: plugins/codex-advisor/skills/orchestration/references/routing-profile.md
 profile = (plugin / 'skills/orchestration/references/routing-profile.md').read_text()
 name_re = re.compile(r'`(ca_[a-z0-9_]+)`')
 dial_re = re.compile(r'`(ca_[a-z0-9_]+)`\s+(gpt-[^\s\[]+)\[([^\]]+)\]')
-table_names = []
-table_dials = {}
-for line in profile.splitlines():
-    if not line.lstrip().startswith('|'):
-        continue
-    table_names.extend(name_re.findall(line))
-    for match in dial_re.finditer(line):
-        table_dials[match.group(1)] = (match.group(2), match.group(3).strip())
-profile_set = set(table_names)
+
+def parse_profile(text):
+    table_names = []
+    table_dials = {}
+    for line in text.splitlines():
+        if not line.lstrip().startswith('|'):
+            continue
+        table_names.extend(name_re.findall(line))
+        for match in dial_re.finditer(line):
+            name = match.group(1)
+            assert name not in table_dials, name
+            table_dials[name] = (match.group(2), match.group(3).strip())
+    assert len(table_names) == len(set(table_names)), table_names
+    return set(table_names), table_dials
+
+def require_profile_templates(profile_text, template_data):
+    profile_set, table_dials = parse_profile(profile_text)
+    shipped_set = set(template_data)
+    assert len(profile_set) == 13, sorted(profile_set)
+    assert profile_set == shipped_set, sorted(profile_set ^ shipped_set)
+    assert set(table_dials) == shipped_set, sorted(set(table_dials) ^ shipped_set)
+    for name, (model, inner) in table_dials.items():
+        data = template_data[name]
+        assert data['model'] == model, name
+        is_pinned = '*' not in inner and ',' not in inner
+        assert ('model_reasoning_effort' in data) == is_pinned, name
+        if is_pinned:
+            assert data['model_reasoning_effort'] == inner, name
+
+require_profile_templates(profile, shipped)
+profile_set, table_dials = parse_profile(profile)
 expected_entries = len(profile_set)
-shipped = {}
-for filename, content in templates.items():
-    data = tomllib.loads(content.decode())
-    shipped[data['name']] = data
-assert len(shipped) == expected_entries, sorted(shipped)
-shipped_set = set(shipped)
-mismatch = profile_set ^ shipped_set
-assert not mismatch, ', '.join(sorted(mismatch))
-assert set(table_dials) == shipped_set, ', '.join(sorted(set(table_dials) ^ shipped_set))
-for name, (model, inner) in table_dials.items():
-    data = shipped[name]
-    assert data['model'] == model, name
-    is_pinned = '*' not in inner and ',' not in inner
-    assert ('model_reasoning_effort' in data) == is_pinned, name
-    if is_pinned:
-        assert data['model_reasoning_effort'] == inner, name
+
+canonical = (plugin / 'skills/orchestration/references/consult-posture.md').read_text()
+section_re = re.compile(r'\n<!-- process-consultation:start -->\n.*?\n<!-- process-consultation:end -->\n', re.S)
+
+def posture_block(variant):
+    return re.search(r'<!-- consult-posture:' + variant + r':start -->.*?<!-- consult-posture:' + variant + r':end -->', canonical, re.S)[0]
+
+def require_postures(entries):
+    by_role = {}
+    for name, data in entries.items():
+        role = name.split('_')[1]
+        body = data['developer_instructions']
+        sections = section_re.findall(body)
+        if role == 'advisor':
+            assert not sections and 'consult-posture:' not in body, name
+        else:
+            advisor_model = table_dials['ca_advisor_' + name.split('_')[2]][0]
+            variant = 'reduced' if data['model'] == advisor_model else 'full'
+            expected = ('\n<!-- process-consultation:start -->\n' + posture_block(variant) +
+                        '\n\n' + posture_block('adoption') + '\n<!-- process-consultation:end -->\n')
+            assert sections == [expected], name
+        outside = section_re.sub('', body)
+        assert 'consult-posture:' not in outside and 'process-consultation:' not in outside, name
+        by_role.setdefault(role, []).append(outside)
+    for role, bodies in by_role.items():
+        assert all(body == bodies[0] for body in bodies), role
+
+require_postures(shipped)
+full_name = next(name for name, data in shipped.items() if name.startswith('ca_worker_') and
+                 data['model'] != table_dials['ca_advisor_' + name.split('_')[2]][0])
+advisor_name = next(name for name in shipped if name.startswith('ca_advisor_'))
+for mutation in ('one-character', 'wrong-variant', 'advisor-section'):
+    changed = {name: dict(data) for name, data in shipped.items()}
+    body = changed[full_name]['developer_instructions']
+    if mutation == 'one-character':
+        changed[full_name]['developer_instructions'] = body.replace(posture_block('full'), posture_block('full') + 'x')
+    elif mutation == 'wrong-variant':
+        changed[full_name]['developer_instructions'] = body.replace(posture_block('full'), posture_block('reduced'))
+    else:
+        changed[advisor_name]['developer_instructions'] += section_re.findall(body)[0]
+    try:
+        require_postures(changed)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('posture check accepted ' + mutation)
+print('PASS: canonical posture, advisor exclusion, outside-section identity, three negative posture fixtures')
+canonical = (repo / 'docs/zh/skills/orchestration/references/consult-posture.md').read_text()
+twins = {data['name']: data for path in (repo / 'docs/zh/agents').glob('*.toml')
+         for data in [tomllib.loads(path.read_text())]}
+require_postures(twins)
+
+mutated_shipped = {name: dict(data) for name, data in shipped.items()}
+mutated_name = sorted(mutated_shipped)[0]
+mutated_shipped[mutated_name]['model'] = 'fixture-wrong-model'
+try:
+    require_profile_templates(profile, mutated_shipped)
+except AssertionError:
+    pass
+else:
+    raise AssertionError('profile check accepted a template with the wrong model')
 installer = scripts / 'install-agents.sh'
 
 def snapshot(root):
@@ -238,7 +301,39 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
         if line.strip() and not line.startswith('#')
     ]
     new_entries = sorted(templates)
-    assert len(retire_names) == 8, retire_names
+    historical_adr = (repo / 'docs/adr/0004-tier-named-entries-first-round-pool.md').read_text()
+    historical_names = set(re.findall(
+        r'`(ca_(?:explorer|worker|advisor)_[a-z0-9_]+)`',
+        historical_adr,
+    ))
+    expected_previous_entries = {
+        name.replace('_', '-') + '.toml' for name in historical_names
+    }
+    assert len(expected_previous_entries) == 11, sorted(expected_previous_entries)
+
+    def require_retire_set(names):
+        assert len(names) == len(set(names)) == 19, names
+        assert sum(name.startswith('codex-advisor-') for name in names) == 8, names
+        previous_entries = {name for name in names if name.startswith('ca-')}
+        assert previous_entries == expected_previous_entries, sorted(
+            previous_entries ^ expected_previous_entries
+        )
+        assert not (set(names) & set(new_entries)), sorted(set(names) & set(new_entries))
+
+    require_retire_set(retire_names)
+    try:
+        require_retire_set(retire_names[:-1])
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('retire check accepted a fixture missing one previous entry')
+    wrong_retire_names = retire_names[:-1] + ['ca-fixture-typo.toml']
+    try:
+        require_retire_set(wrong_retire_names)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('retire check accepted a wrong previous entry')
     assert len(new_entries) == expected_entries, new_entries
     assert all(name.startswith('ca-') and name.endswith('.toml') for name in new_entries)
     legacy_target = root / 'legacy-010'
@@ -248,7 +343,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     (legacy_target / 'unrelated-legacy.toml').write_text('keep\n')
     legacy_run = install(legacy_target)
     assert legacy_run.stdout.count('INSTALLED:') == expected_entries
-    assert legacy_run.stdout.count('REMOVED:') == 8
+    assert legacy_run.stdout.count('REMOVED:') == len(retire_names)
     for name in new_entries:
         assert f'INSTALLED: {legacy_target / name}' in legacy_run.stdout
         assert (legacy_target / name).read_bytes() == templates[name]
@@ -285,11 +380,12 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     missing_flag = subprocess.run(['sh', str(installer), '--target-dir'],
                                   capture_output=True, text=True)
     assert missing_flag.returncode != 0 and 'ERROR:' in missing_flag.stderr
+print('PASS: profile/template equality, negative model fixture, exact retire set, negative retire fixtures')
 print('PASS: fork metadata, overwrite, unchanged, retire, check drift/residue, preservation, refusals')
 PY
 fi
-if [ "${1-}" != --installation ]; then
-python3 - "$script_dir" <<'PY'
+if [ -z "${1-}" ] || [ "${1-}" = --runtime ]; then
+sh "$script_dir/run-python.sh" - "$script_dir" <<'PY'
 import json
 from pathlib import Path
 import subprocess
@@ -501,4 +597,10 @@ print('PASS: generic inspector, table-driven templates, retired options, payload
 PY
 fi
 for script in "$script_dir"/*.sh; do sh -n "$script"; done
+if [ -z "${1-}" ] || [ "${1-}" = --consultation ]; then
+    sh "$script_dir/run-python.sh" "$script_dir/verify-consultation.py"
+fi
+if [ -z "${1-}" ] || [ "${1-}" = --hooks ]; then
+    sh "$script_dir/run-python.sh" "$script_dir/verify-hooks.py"
+fi
 printf '%s\n' 'VERIFY PASSED: selected deterministic checks (no live routing claim)'

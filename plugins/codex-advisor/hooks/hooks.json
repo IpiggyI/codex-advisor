@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "SessionStart": [{
+      "hooks": [{
+        "type": "command",
+        "command": "sh \"$PLUGIN_ROOT/scripts/run-python.sh\" \"$PLUGIN_ROOT/scripts/advisor-hooks.py\"",
+        "timeout": 10,
+        "additionalContextLimit": 12000
+      }]
+    }],
+    "PostToolUse": [{
+      "matcher": "collaborationspawn_agent",
+      "hooks": [{
+        "type": "command",
+        "command": "sh \"$PLUGIN_ROOT/scripts/run-python.sh\" \"$PLUGIN_ROOT/scripts/advisor-hooks.py\"",
+        "timeout": 10,
+        "additionalContextLimit": 4000
+      }]
+    }]
+  }
+}

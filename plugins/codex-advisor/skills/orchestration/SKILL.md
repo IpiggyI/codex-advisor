@@ -1,6 +1,6 @@
 ---
 name: orchestration
-description: "Use when a primary agent implements or delegates work, selects a role and capability tier from the routing profile, recovers failed attempts through the escalation ladder, or needs Advisor decision advice and independent acceptance."
+description: "Use when a primary agent implements or delegates work, selects a role and capability tier from the routing profile, recovers failed attempts through the escalation ladder, uses process consultation, or needs independent acceptance."
 ---
 
 # Codex Advisor orchestration
@@ -28,22 +28,21 @@ Before a delegated call, read the relevant packet in
 [role-contracts.md](references/role-contracts.md), the installation, invocation,
 evidence, and permission procedures in [operations.md](references/operations.md),
 and the dial table in [routing-profile.md](references/routing-profile.md). Every
-model name, effort option, default, and candidate order lives in the routing
-profile, not here. Respect host capacity and explicit user exclusions and resource
-limits. Select a dial explicitly without asking permission for each routine allocation.
+model name, effort option, default, candidate order, consultation mapping, and
+acceptance mapping lives in the routing profile. Respect host capacity, explicit
+user exclusions, and resource limits. Select a dial explicitly without asking
+permission for each routine allocation.
 
 Choose the role by the output you need: evidence is an Explorer, a change is a
-worker, judgment or acceptance is an Advisor. Choose the tier inside the first-round
-pool, light or standard, by how much the outcome depends on judgment the packet
-cannot capture. There is no precondition between light and standard; light to
-standard is not an escalation. Take the cheapest adequate dial at its default.
-Eligibility does not force escalation.
+worker, and independent acceptance is an Advisor. New work starts in `mainstay`.
+It may start in `crux` when a key difficulty is already identified or interacting
+constraints must be handled. There is no usage quota. `rescue` is never a first-round
+choice unless the user declares it. The narrower admission rule recorded for possible
+future use is not enabled.
 
-Senior is reached only through the senior gate: two capability-attributed complete
-failed attempts inside the pool on the same work, or a user declaration. For the
-Advisor the gate is only a verdict that reports low confidence or a user declaration;
-worker failures do not open it. The Advisor's decision packet defaults to the
-standard tier and its acceptance packet to the light tier.
+Inside a role-and-tier cell, take the first candidate at its default. Take a later
+candidate when the outcome depends more on judgment the packet cannot capture.
+A capability tier is set by its models; effort is a finer grade inside the tier.
 
 ## Delegate outcomes and retain scheduling
 
@@ -84,23 +83,28 @@ a corrected contract on the same thread, not a ladder step and not a capability
 failure. Primary takeover is available in ordinary work; Architect mode keeps
 edits delegated.
 
-After a failed acceptance, follow the escalation ladder:
+After a failed acceptance, issue R1: a rework ticket in the same thread at the
+same dial. Rework names the violated requirement, reproducible failure, expected
+behavior, and verification; it contains no fix. When rework also fails and the
+diagnosis attributes the cause to capability, the attempt and rework together
+count as one capability failure.
 
-- R1: a rework ticket in the same thread at the same dial. Rework names the violated
-  requirement, reproducible failure, expected behavior, and verification; it
-  contains no fix.
-- R2: when rework also fails and the cause is capability, a raise in a fresh thread
-  carrying the current-state handoff: either a higher effort of the same model or
-  another model.
-- R3: the same model is raised at most once.
-- R4: a major execution problem (tools failing repeatedly, runaway, touching reserved
-  items) may skip the rework ticket and change model directly; it counts as one failure.
+After a capability failure, move the work to the next tier in a fresh thread with
+the current-state handoff. Do not switch to another model in the same tier unless
+no other choice exists. The next dial's model level cannot be lower than the failed
+dial's unless no other choice exists; if the model stays the same, use a higher
+effort. Above that floor, choose by the difficulty the failure exposed.
 
-Whether the second complete failure inside the pool warrants senior is a key decision
-requiring advice, so the senior gate coincides with that consultation and the
-Advisor's verdict also settles whether senior is warranted. Stop the previous
-conflicting writer, inspect actual state, and preserve useful changes before
-reassignment. Follow the current-state handoff in the operations reference.
+The path is `mainstay` -> `crux` -> `rescue` -> the user. `rescue` is reached only
+through `crux` or a user declaration; work that starts in `crux` reaches `rescue`
+after one `crux` capability failure. R3 remains a guard: raise the same model at
+most once. Under R4, a major execution problem such as repeated tool failures,
+runaway execution, or touching a reserved item may skip rework and counts as one
+capability failure.
+
+Stop the previous conflicting writer, inspect actual state, and preserve useful
+changes before reassignment. Follow the current-state handoff in the operations
+reference. Environment problems and contract gaps do not move work along the path.
 
 Every delegated effort change, upward or downward, requires a new native thread.
 Model changes and role reassignments also require new matching entries.
@@ -109,27 +113,34 @@ always starts fresh, including review after corrections. Never report a resume
 with a changed prompt as a new session. Compare actual IDs and settings; this is
 an explicit lifecycle policy, not a universal claim about cache behavior or savings.
 
-## Seek judgment when it changes a decision
+## Consult at decision points
 
-Proactive advice is allowed. Advice is required for:
+Process consultation takes no packet and is callable with zero arguments by the
+primary, any worker, and any Explorer. It carries the caller's current effective
+context automatically, including the unfinished turn and the effective history
+after compaction. The advisor runs without tools and returns exactly one plan,
+correction, or stop signal with its actual model and effort. An unsupported
+reconstruction or failed consultation returns an explicit failure, never fabricated
+advice.
 
-- Key decisions not covered by an applicable plan.
-- New evidence invalidating a key plan assumption.
-- Failure causes still unclear after initial diagnosis.
+A complete consultation attempt returns one allowed result that answers the decision
+in context with a supportable conclusion. It fails when it returns no allowed result
+or source and verification evidence materially invalidate its conclusion. Mere
+disagreement, an intermediate tool error, or worker failure is not such a failure.
 
-Reuse applicable advice while its relevant premises hold. Material new evidence
-requires renewed judgment; repeated failures require reassessment rather than an
-unconditional counter-driven call. Check cited evidence and explain material
-disagreement. Advice grants no authorization, veto, new requirement, or ownership
-of user goals.
-
-A complete advisory attempt fails when it does not answer the specified question
-or source/verification evidence invalidates its material conclusion. Mere disagreement,
-intermediate tool errors, and worker failure alone do not open the Advisor's senior
-gate. Diagnose a relevant advisory failure and choose fact gathering, clarification,
-or another dial for that question. A dial change starts a new thread.
+Before using consultation, read the consultation mapping in the routing profile
+and [consult-posture.md](references/consult-posture.md). Compare the caller's exact
+model identity with the assigned advisor model to select the full or reduced posture.
+Follow the selected posture block and the adoption block exactly. The advisor has
+no escalation path of its own. Consultation does not grant authorization and does
+not replace fact checking or independent acceptance.
 
 ## Accept the actual deliverable
+
+A complete advisory attempt fails when it does not answer its specified question
+or source and verification evidence materially invalidate its conclusion. Mere
+disagreement, intermediate tool errors, and worker failure alone are not complete
+advisory failures.
 
 Inspect all actual changes yourself, including new files, corrections, and
 worker-authored acceptance tests. Check that tests can fail for the intended
@@ -147,24 +158,25 @@ a changed dependency, an evidence gap, an unexplained failure, or an identified
 risk is, and rework covers the failed scenario and the scope it affects.
 
 Ordinary direct, delegated, and mixed multi-step work may complete after primary
-checks. Step count, file count, primary identity, or a senior implementation alone
-does not require delivery advice or independent acceptance.
+checks. Step count, file count, primary identity, or use of a particular tier alone
+does not require independent acceptance.
 
 High-risk delivery and explicit independent-review requests each require independent
-acceptance after primary checks, for any primary model: the Advisor's acceptance
-packet on an Advisor entry in a fresh thread. Assess risk by failure consequences,
-reversibility, and difficulty establishing correctness. Decision advice and independent
-acceptance are the two request shapes of one Advisor role and its entries. Earlier
-advice, a worker's self-review, and a delegated check run do not satisfy
-independent final acceptance.
+acceptance after primary checks, for any primary model: send the Advisor acceptance
+packet to a matching Advisor entry in a fresh thread. A consultation, a worker's
+self-review, and a delegated check run cannot satisfy independent acceptance.
 
-Choose the acceptance dial independently of primary effort; a primary at a high
-effort may receive acceptance at the light tier. Only a low-confidence verdict or
-a user declaration opens the Advisor's senior gate. Check routing, fresh invocation,
-tool activity, and scoped before/after state. Resolve material findings, reverify
-corrections, and obtain a fresh review of the revised deliverable even at an
-unchanged dial.
+Choose the acceptance dial from the routing profile. Work produced in one tier
+uses that tier's Advisor entry; work produced by several tiers uses the highest
+tier involved. For primary-authored work, use the lowest advisor dial that is not
+weaker than the primary's dial; if none qualifies, use the strongest advisor dial.
+A primary whose exact model identity is absent from the routing profile also uses
+the strongest advisor dial. A low-confidence verdict leaves acceptance pending
+and goes to the user; it does not trigger an automatic review at another dial.
 
-Unavailable required execution, unsupported settings, absent or conflicting evidence,
-or unresolved material findings leave affected acceptance explicitly pending.
-Report the gap without silent substitution; independent unaffected work can continue.
+Check routing, fresh invocation, tool activity, and scoped before/after state.
+Resolve material findings, reverify corrections, and obtain a fresh review of the
+revised deliverable even at an unchanged dial. Unavailable required execution,
+unsupported settings, absent or conflicting evidence, or unresolved material
+findings leave affected acceptance explicitly pending. Report the gap without
+silent substitution; independent unaffected work can continue.

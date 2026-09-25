@@ -3,13 +3,13 @@
 ## Install and discover
 
 The plugin supplies `codex-advisor:orchestration`; the companion installer supplies
-eleven tier-named native entries. Resolve scripts from the installed skill:
+thirteen tier-named native entries. Resolve scripts from the installed skill:
 
 ~~~sh
 skill_dir=<directory-containing-SKILL.md>
 installer="$skill_dir/../../scripts/install-agents.sh"
 runtime_inspector="$skill_dir/../../scripts/inspect-agent-runtime.sh"
-sh "$installer" --check-role advisor-standard
+sh "$installer" --check-role advisor-mainstay
 ~~~
 
 Run a non-mutating selective check before the first use of each required entry.
@@ -49,17 +49,19 @@ does not create a global routing default.
 
 | Responsibility | Native entry | Install selector | Effort |
 |---|---|---|---|
-| Explorer, light | `ca_explorer_light` | `explorer-light` | caller |
-| Explorer, standard, default candidate | `ca_explorer_standard_m` | `explorer-standard-m` | `max` |
-| Explorer, standard, stronger alternative | `ca_explorer_standard_h` | `explorer-standard-h` | caller |
-| Explorer, senior | `ca_explorer_senior` | `explorer-senior` | caller |
-| Worker, light | `ca_worker_light` | `worker-light` | `max` |
-| Worker, standard, default candidate | `ca_worker_standard_m` | `worker-standard-m` | caller |
-| Worker, standard, stronger alternative | `ca_worker_standard_h` | `worker-standard-h` | `low` |
-| Worker, senior | `ca_worker_senior` | `worker-senior` | caller |
-| Advisor, light (acceptance default) | `ca_advisor_light` | `advisor-light` | `low` |
-| Advisor, standard (decision default) | `ca_advisor_standard` | `advisor-standard` | `medium` |
-| Advisor, senior | `ca_advisor_senior` | `advisor-senior` | caller |
+| Explorer, `mainstay`, default candidate | `ca_explorer_mainstay_m` | `explorer-mainstay-m` | caller |
+| Explorer, `mainstay`, stronger alternative | `ca_explorer_mainstay_h` | `explorer-mainstay-h` | caller |
+| Explorer, `crux`, default candidate | `ca_explorer_crux_m` | `explorer-crux-m` | `max` |
+| Explorer, `crux`, stronger alternative | `ca_explorer_crux_h` | `explorer-crux-h` | `xhigh` |
+| Explorer, `rescue` | `ca_explorer_rescue` | `explorer-rescue` | caller |
+| Worker, `mainstay`, default candidate | `ca_worker_mainstay_m` | `worker-mainstay-m` | `max` |
+| Worker, `mainstay`, stronger alternative | `ca_worker_mainstay_h` | `worker-mainstay-h` | `high` |
+| Worker, `crux`, default candidate | `ca_worker_crux_m` | `worker-crux-m` | caller |
+| Worker, `crux`, stronger alternative | `ca_worker_crux_h` | `worker-crux-h` | caller |
+| Worker, `rescue` | `ca_worker_rescue` | `worker-rescue` | caller |
+| Advisor, `mainstay` | `ca_advisor_mainstay` | `advisor-mainstay` | caller |
+| Advisor, `crux` | `ca_advisor_crux` | `advisor-crux` | `high` |
+| Advisor, `rescue` | `ca_advisor_rescue` | `advisor-rescue` | `xhigh` |
 
 Every entry pins its model; a value in the Effort column is pinned in the template,
 "caller" means the caller passes it. The template's `model` and `model_reasoning_effort`
@@ -75,9 +77,9 @@ siblings. The first line of `message` is that same name, verbatim plain text wit
 no Markdown marker, then a blank line, then the role packet:
 
 ~~~text
-agent_type: ca_worker_standard_m
+agent_type: ca_worker_crux_m
 fork_turns: none
-reasoning_effort: xhigh
+reasoning_effort: <listed-effort>
 task_name: wire_http_checks
 message: <short name, blank line, five-part worker packet from role-contracts.md>
 ~~~
@@ -95,9 +97,9 @@ inputs do not prove host/account support. Public spawn/details metadata is autho
 use the narrow inspector for omitted fields without overriding contradictions:
 
 ~~~sh
-sh "$runtime_inspector" --agent ca_worker_standard_m --effort xhigh <native-thread-id>
-sh "$runtime_inspector" --sessions-dir /absolute/path/to/sessions --agent ca_explorer_senior --effort medium <native-thread-id>
-sh "$runtime_inspector" --agent ca_advisor_light <native-thread-id>
+sh "$runtime_inspector" --agent ca_worker_crux_m --effort <listed-effort> <native-thread-id>
+sh "$runtime_inspector" --sessions-dir /absolute/path/to/sessions --agent ca_explorer_rescue --effort <listed-effort> <native-thread-id>
+sh "$runtime_inspector" --agent ca_advisor_crux <native-thread-id>
 ~~~
 
 `--agent` names the entry. The inspector reads the expected model and any pinned
@@ -112,20 +114,16 @@ allowlisted metadata only, rejecting absent, ambiguous, malformed, or conflictin
 evidence. Generic inspection without `--agent` does not certify a role contract.
 
 The inspector does not certify user authorization, complete failed attempts,
-senior-gate eligibility, fresh invocation, quality, or enforced isolation. Check
+escalation eligibility, fresh invocation, quality, or enforced isolation. Check
 those against task evidence and native events. Never infer actual settings from
 role self-reports or dump prompts and credentials to establish them. Missing entries,
 unsupported settings, contradictions, or absent evidence leave affected work
 explicitly pending without a silent substitute. Direct independent investigation
 may continue.
 
-Primary-derived reviewer selection is retired. `--review-primary-effort` and
-`--select-review-effort` fail with a diagnostic; choose the acceptance dial without
-a primary floor. A primary at `max` can receive acceptance at the light tier. The
-eight per-role options of 0.1.0 (`--luna`, `--sol-effort`, `--astra-effort`,
-`--explorer-effort`, `--sol-explorer-effort`, `--astra-explorer-effort`,
-`--advisor-effort`, `--reviewer-effort`) are retired in favour of `--agent` and
-fail with a diagnostic naming it.
+The generic interface is `--agent NAME [--effort EFFORT] THREAD_ID`. Earlier
+review-selection and per-role options fail with a diagnostic that names `--agent`.
+Choose the acceptance entry through the routing profile.
 
 ## Recover and hand off actual state
 
@@ -137,14 +135,20 @@ choosing repair, clarification, or a ladder step. Do not infer weak capability
 from an environment or contract problem; a contract gap is a corrected contract
 on the same thread, not a ladder step.
 
-The skill's escalation ladder governs a failed acceptance: R1 a rework ticket in
-the same thread at the same dial; R2 when rework also fails and the cause is
-capability, a raise in a fresh thread with the handoff below, either a higher
-effort of the same model or another model from the routing profile; R3 the same
-model raised at most once; R4 a major execution problem may skip the rework ticket
-and change model, counted as one failure. Two capability-attributed complete
-failures inside the first-round pool are the senior gate and a required consultation;
-the Advisor's verdict settles whether the senior entry is warranted.
+The skill's escalation ladder governs a failed acceptance. R1 is a rework ticket
+in the same thread at the same dial. When rework also fails and the diagnosis
+attributes the cause to capability, the attempt and rework together count as one
+capability failure. Move the work to the next tier in a fresh thread with the
+handoff below. Do not switch models inside the failed tier unless no other choice
+exists. The next dial's model level cannot be lower than the failed dial's unless
+no other choice exists; if the model stays the same, use a higher effort. R3 keeps
+the same-model raise to at most once. Under R4, a major execution problem may skip
+rework and counts as one capability failure.
+
+The path is `mainstay` -> `crux` -> `rescue` -> the user. `rescue` is reached only
+through `crux` or a user declaration. Work that starts in `crux` reaches `rescue`
+after one `crux` capability failure. Environment problems and contract gaps do not
+move work along this path.
 
 Same-model, same-effort worker correction may use native follow-up/resume.
 Any effort change in either direction, model change, or role reassignment uses
@@ -174,11 +178,10 @@ REMAINING WORK
 <Corrections and verification still needed without lowering acceptance conditions.>
 ~~~
 
-Worker failure never by itself moves the Advisor to its senior entry. A complete
-advisory failure means failure to answer its question or a materially invalidated
-conclusion, not disagreement. Diagnose it and choose fact gathering, clarification,
-or another dial for the same question in a fresh thread; only a verdict that reports
-low confidence or a user declaration opens the Advisor's senior gate.
+The advisor used by process consultation has no escalation path of its own. A failed
+consultation returns an explicit failure and cannot count as advice or acceptance.
+A low-confidence independent-acceptance verdict leaves acceptance pending and goes
+to the user; it does not trigger an automatic review at another dial.
 
 Record predecessor/successor IDs, observed efforts, and new-spawn versus follow-up
 events. Compare real IDs, not labels or prose. Missing or contradictory transition
@@ -220,27 +223,139 @@ requests alone establish intent.
 
 ## Advice and independent acceptance
 
-Use the decision packet for proactive advice and mandatory judgment at uncovered
-key decisions, invalidated key premises, or unclear failure cause after diagnosis,
-and at the senior gate after two complete failures. Send it to the Advisor entry
-the routing profile names as the decision default. Reuse applicable advice while
-premises hold. Check sources and explain material disagreement; advice grants no
-authorization, veto, or changed user requirement.
+Process consultation takes no packet. Invoke it with zero arguments at the triggers
+in the full or reduced posture selected by exact caller/advisor model identity.
+Use the consultation mapping in the routing profile and the canonical posture and
+adoption rules in [consult-posture.md](consult-posture.md). Consultation returns a
+plan, correction, stop signal, or explicit failure. It grants no authorization and
+never substitutes for independent acceptance.
 
 After primary diff inspection and checks, ordinary work may complete without
-delivery advice. High-risk work or an explicit independent-review request requires
-the acceptance packet on an Advisor entry in a fresh thread; the routing profile
-names the acceptance default. Both packets are request shapes of the same Advisor
-entries; no separate reviewer entry exists. Risk follows consequences, reversibility,
-and difficulty checking correctness, not step/file count or model.
+independent acceptance. High-risk work or an explicit independent-review request
+requires the acceptance packet on an Advisor entry in a fresh thread. Work produced
+in one tier uses that tier's Advisor entry; work produced by several tiers uses the
+highest tier involved. Primary-authored work uses the lowest advisor dial not weaker
+than the primary's dial; if none qualifies, use the strongest advisor dial. A primary
+whose exact model id is absent from the routing profile also uses the strongest
+advisor dial. Risk follows consequences, reversibility, and difficulty checking
+correctness, not step/file count or model.
 
 Capture scoped state, spawn a fresh Advisor thread, validate settings and tool
-activity, and check its actual complete-diff inspection and findings. Advice,
+activity, and check its actual complete-diff inspection and findings. Consultation,
 exploration, a worker's self-review, and a delegated check run cannot substitute.
 Resolve material findings, inspect and reverify corrections, then obtain fresh
 independent acceptance of the revised deliverable even at an unchanged dial.
 Ordinary mode allows primary corrections; Architect mode delegates them. Missing
-required review or unresolved material findings leaves completion pending.
+required review, a low-confidence verdict, or unresolved material findings leaves
+completion pending and goes to the user.
+
+## Process consultation
+
+Call the `codex_advisor` MCP server's `process_consultation` tool with `{}`. The
+primary, workers, and explorers use the same call. There is no summary, prompt,
+path, or dial argument. The installed `.mcp.json` starts Python 3 from the plugin
+root through `scripts/run-python.sh`. The launcher requires a POSIX shell and
+selects a working Python 3.11 or later from `python3`, `python`, or `py -3`, with
+UTF-8 protocol output and bytecode writes disabled. An unusable interpreter is
+rejected before starting the component. The component requires the qualified versioned Codex plugin-cache layout;
+an unknown layout fails explicitly. Codex supplies caller thread, session, turn,
+and item identity in MCP metadata. The component reads exactly one matching
+rollout snapshot and stops before the unfinished consultation item, including
+when that item is the host's code-mode wrapper.
+
+The snapshot retains all effective raw messages, roles, images, opaque reasoning,
+and paired tool calls/results, including truncated output as the caller sees it.
+Compaction replaces earlier history with `replacement_history`; no turn window,
+summary fallback, or recovery of removed history is used. Unsupported rollback,
+content, incomplete pairings, missing replacement history, or inconsistent
+identity returns failure. The caller's tool inventory is not forwarded.
+
+The routing profile selects the caller tier's consultation dial. For a primary,
+it selects the lowest advisor dial not weaker than the actual caller dial, or
+the strongest advisor dial if none qualifies or the model is unknown. The
+component uses native Codex authentication and never reads, copies, or transmits
+credentials. It creates a fresh ephemeral App Server thread with source base
+instructions, injects the effective raw history and consultant guidance, and
+requests exactly one structured `plan`, `correction`, or `stop`.
+
+Before passing any caller context, a native discovery process enumerates every
+configured MCP server name through all inventory pages and then terminates with
+its child processes. Discovery can start configured servers but receives no
+caller context; tool/resource descriptions are discarded. A second native process
+disables every discovered name, verifies that MCP capabilities and hooks are empty,
+and disables built-in tools through a temporary model catalog and feature settings.
+Every actual inference request must prove the expected model and effort, an empty
+`additional_tools.tools` or explicit top-level `tools=[]`, and no nonempty tool
+inventory at either location. Every request must also retain the complete caller
+history in order; silent automatic compaction is a context failure. Missing trace evidence, a
+nonempty tool inventory, or any dial mismatch fails the consultation.
+
+Within the caller's existing session record, the tool-call event is **started**.
+A returned MCP `structuredContent.status` of `succeeded`, with `isError=false`,
+means the output has exactly one valid `kind` and nonempty `advice`, and every
+observed request matched `expected` and `actual` model/effort. A valid `stop` is
+success: the caller must halt and escalate as advised. The result includes
+`callerThreadId` and `advisorThreadId`. A returned `status=failed`, with
+`isError=true`, carries `code`, `message`, `expected`, and `actual` where observed;
+it contains no advice. The text content repeats that same structured object so
+the caller and session hooks can read the identical outcome. A call without a
+terminal result has started but has not succeeded. Only a successful result
+satisfies the caller's consultation requirement.
+
+Errors, aborts, cancellation, context overflow, empty or malformed output, and
+mismatches leave the work pending. The caller states the failure in its next
+visible reply; it must not present the failure as advice or declare consultation
+complete. No automatic retry is made. MCP cancellation terminates the native
+process tree and returns failure. The native execution deadline is 180 seconds.
+Catalogs, request traces, captured outputs, logs, and SQLite state stay in one
+temporary directory and are deleted when the call finishes or is cancelled.
+The component writes no session markers, repository files, or credential files.
+
+On Windows, consultation requires a native `codex.exe` on PATH or a unique native
+executable in the official npm package layout beside the discovered Codex shim.
+It does not execute `.cmd` wrappers with configuration arguments. Windows Job
+Objects contain the native process tree; unavailable or failed containment and
+cleanup APIs return an explicit failure.
+
+The two-stage isolation adds one native initialization per call. Normal caller
+startup must already have initialized its Codex home; consultation does not
+bootstrap a fresh home. Requalify after host rollout, metadata, catalog, trace,
+or cache-layout changes. Run `sh plugins/codex-advisor/scripts/verify.sh
+--consultation` for deterministic MCP-boundary checks with a substitute native
+executable. These checks do not establish live routing or installed-host behavior.
+
+## Hooks
+
+The plugin loads `hooks/hooks.json` from the default plugin location. After first
+installation, review and trust its hooks in `/hooks`. Review them again after an
+update changes a hook definition. Installation does not grant trust; the host skips
+untrusted hooks and prints a startup warning pointing to `/hooks`. The plugin does
+not modify trust state or add its own untrusted-hook detector.
+
+`SessionStart` injects the exact selected canonical posture block and adoption
+block, including on resume and compaction. It compares the session's exact model
+id with the advisor model read from the routing profile. The profile currently
+assigns one model to every advisor dial, so selection needs no inferred effort.
+If that ceases to hold, missing selection evidence leaves the work pending.
+Native delegate identity excludes a second posture injection; entries carry their
+own posture. Missing session identity also leaves the work pending.
+
+`PostToolUse` on native spawn automatically compares each `ca_*` dispatch with its
+shipped template model and pinned effort, or the explicitly passed caller effort.
+A pinned effort takes precedence over a spawn argument. Matching dispatches are
+silent. Missing caller effort, mismatches, or missing/conflicting evidence add a
+message to the spawning session that the affected work remains pending. No manual
+inspector run is needed for this comparison. The hook joins the native response's
+task path and the parent transcript identity to one child session header, then reads
+its actual turn model and effort. It waits at most two seconds for child evidence
+to appear. A later unobserved write is never treated as a successful verification.
+
+These hooks write no files or persistent state, including Python bytecode. They
+do not read configuration or credentials. The host-provided transcript directory
+must use the qualified `sessions` layout; changed host event or transcript schemas
+need renewed qualification. There is no primary `Stop` or worker `SubagentStop`
+hook. Callers follow their consultation posture without automatic finish blocking.
+Consultation result validation is provided by the consultation component.
 
 ## Observe permissions
 
@@ -265,16 +380,29 @@ editing one area, run its focused group:
 ~~~sh
 sh plugins/codex-advisor/scripts/verify.sh --installation
 sh plugins/codex-advisor/scripts/verify.sh --runtime
+sh plugins/codex-advisor/scripts/verify.sh --consultation
+sh plugins/codex-advisor/scripts/verify.sh --hooks
 ~~~
 
-The installation group covers the installer, the entry templates, the manifest,
-and the routing profile's dials against those templates. The runtime group covers
-the inspector: its options, the expectations it reads from a template, and the
-metadata it emits. A template change reaches both groups, so it takes the
+The installation group covers the installer, the thirteen entry templates, the
+manifest, the routing profile's names/models/pins against those templates, and
+the complete retire set. It also checks canonical posture equality, advisor
+exclusion, and same-role identity outside the posture section, with negative
+fixtures. It includes negative fixtures for a model mismatch and a missing retired
+entry. The runtime group drives the inspector from all thirteen
+templates and covers its options, template-derived expectations, rejection paths,
+and emitted metadata. The consultation group exercises the MCP boundary with a
+substitute native executable: complete context, routing, actual request validation,
+isolation, outcomes, explicit failures, cancellation, and temporary-state cleanup.
+The hooks group runs shipped commands with pinned JSON events, checking canonical
+injection, delegate exclusion, all entry dials, delayed child evidence, and explicit
+pending outcomes. Every surfacing case also rejects a disabled hook as a negative
+proof. It does not establish installed-host trust or live dispatch behavior.
+A template change reaches installation and runtime groups, so it takes the
 unqualified run. Documentation changes have no group here: check structure,
 links, and whether the text still matches actual behavior.
 
-Run the unqualified verifier once on the final state. It contains both groups,
+Run the unqualified verifier once on the final state. It contains all four groups,
 so it replaces the focused runs instead of following them:
 
 ~~~sh
@@ -287,14 +415,19 @@ and evidence consistency. Shell syntax and JSON/TOML parsing are the applicable
 static checks; this project has no typed application. Fixtures establish parser
 and refusal behavior, not model behavior.
 
-Tiny disposable native scenarios cover the advertised routes and critical branches:
-ordinary direct/delegated/mixed completion, explicit Architect delegation,
-tiered exploration, complete versus intermediate failure, repair/clarification,
-same-allocation rework, effort changes both ways, and independent acceptance.
-Use short advisory questions for reused/invalidated advice, disagreement, and
-eligible advisory escalation. Select from this set the scenarios the change can
-break and record the rest as not exercised. Reuse actual calls and metadata
-across checks; after a correction, repeat the affected checks rather than the
-whole set. Record expected/observed behavior, native settings, IDs, sources,
-permissions, tested revision/host, and unexercised paths in the feature acceptance
-record. These smoke checks do not establish general quality, cost, or stability gains.
+For a route change, use a temporary `CODEX_HOME`, install through the public
+installer, and spawn every affected entry once. Pass an effort only when the entry
+leaves it to the caller, then run the inspector for that child. Record the entry,
+effort passed, observed model and effort, sandbox and permission, child thread,
+inspector exit, and removal of seeded retired files. These live checks establish
+dispatch and wiring; they do not establish general quality, cost, or stability.
+
+Select tiny disposable native scenarios from ordinary direct/delegated/mixed
+completion, explicit Architect delegation, tiered exploration, complete versus
+intermediate failure, repair/clarification, same-allocation rework, effort changes
+both ways, process consultation, and independent acceptance. Exercise the scenarios
+the change can break and record the rest as not exercised. Reuse actual calls and
+metadata across checks; after a correction, repeat the affected checks rather than
+the whole set. Record expected and observed behavior, native settings, IDs, sources,
+permissions, tested revision and host, and unexercised paths in the feature
+acceptance record.

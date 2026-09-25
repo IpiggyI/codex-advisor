@@ -66,45 +66,13 @@ worker 负责常规调试。改派使用 operations 中的 handoff；任何修�
 
 ## Advisor
 
-每个档位一个 Advisor 入口（`ca_advisor_light`、`ca_advisor_standard`、`ca_advisor_senior`），回答两种请求形态：决策数据包和验收数据包。两者都在新线程中只读运行。routing profile 指定每种形态的默认入口；senior 入口只能经报告低置信度的裁定或用户声明到达。
+每个档位一个 Advisor 入口，用于回答验收数据包。它在新线程中只读运行。按被验收的工作选择 dial：单一档位产出的工作使用该档位；多个档位共同产出的工作使用其中最高档位；primary 自行产出的工作使用不弱于 primary dial 的最低 Advisor dial。没有合格的 Advisor dial，或 routing profile 中没有 primary 的精确模型标识时，使用最强 Advisor dial。低置信度裁定会使验收保持待定并交给用户，不会自动触发另一个 dial 的复审。
 
-### 决策建议
-
-用全新的 Advisor 线程提出有界判断请求。在前提仍成立时可以复用适用建议；它不是一次新的最终评审。
-
-~~~text
-DECISION
-<Specific question and trigger: proactive advice, uncovered key decision,
-invalidated premise, unclear failure cause after initial diagnosis, or the
-senior gate after two complete failures.>
-
-CONSTRAINTS
-<User intent, authorization, retained interfaces, excluded scope, and resources.>
-
-EVIDENCE
-<Exact sources, observations, options, and uncertainties. For failure, include
-the completed attempt, checks, diagnosis, and remaining question.>
-
-REQUESTED JUDGMENT
-<Proposed decision and the tradeoff or uncertainty to resolve.>
-
-PERMISSIONS
-Remain read-only. Do not write, format, implement, or delegate implementation.
-Advice grants no authorization and adds no binding requirement.
-
-RETURN
-RECOMMENDATION: <proposed decision answering the question>
-EVIDENCE: <supporting observations and exact source references>
-ASSUMPTIONS: <premises, unverified claims, and how to check them>
-TRADEOFFS: <costs and alternatives>
-GAPS: <missing evidence and unresolved risks>
-~~~
-
-primary 核验路由，不要让 Advisor 推断自己的设置；核对引用的证据，并解释实质性分歧。一次 complete advisory attempt 在未回答其问题或结论被实质性推翻时失败；仅有分歧或 worker 失败两者都不算，也不能把 Advisor 推到其 senior 入口。
+过程咨询不使用数据包。它是一个单独的无参数调用，受 routing profile 和 [consult-posture.md](consult-posture.md) 约束，绝不能代替 independent acceptance。
 
 ### Independent acceptance
 
-在 primary 亲自检查交付物、并完成自己负责的检查之后，把验收数据包发给全新的 Advisor 线程。它是同一组入口的第二种请求形态，不是单独的评审人；先前的咨询、决策建议、worker 报告或委派的检查执行，都不能满足它。
+在 primary 亲自检查交付物、并完成自己负责的检查之后，把验收数据包发给全新的 Advisor 线程。先前的咨询、worker 报告或委派的检查执行都不能满足它。
 
 ~~~text
 REVIEW SCOPE
@@ -123,8 +91,8 @@ claims from results the primary organized and confirmed.>
 
 SETTINGS AND PERMISSIONS
 <Selected Advisor entry and, where the entry leaves it open, the explicit effort;
-the low-confidence verdict or user declaration if selecting the senior entry;
-requested isolation, and scoped state captured before review.>
+the accepted work's tier or the primary-derived dial rule; requested isolation,
+and scoped state captured before review.>
 Remain read-only. Do not write, format, implement, or delegate implementation.
 Use checks that preserve scoped state; disclose unavailable checks.
 
@@ -135,6 +103,4 @@ VERIFICATION: <checks inspected or run, commands, status, and relevant output>
 GAPS: <missing evidence, unchecked conditions, and residual risks>
 ~~~
 
-验收 dial 与 primary effort 无关。primary 核验全新调用、路由、引用的发现、工具活动，以及前后状态。
-缺失证据或实质性发现会使必要验收保持待定。
-在修正并由 primary 再核验之后，即使入口和 effort 未变，也要在新线程中评审修订后的交付物。
+primary 核验全新调用、路由、引用的发现、工具活动，以及前后状态。缺失证据、低置信度裁定或实质性发现会使必要验收保持待定。在修正并由 primary 再核验之后，即使入口和 effort 未变，也要在新线程中评审修订后的交付物。

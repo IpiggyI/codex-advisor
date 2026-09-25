@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "codex_advisor": {
+      "command": "sh",
+      "args": ["./scripts/run-python.sh", "./scripts/process-consultation.py"],
+      "cwd": "."
+    }
+  }
+}
