@@ -1,152 +1,152 @@
-# Codex Advisor: Tier-Named Native Entries, First-Round Pool, and Self-Updating Installation
+# Codex Advisor：按档位命名的原生入口、第一轮池，以及自我更新的安装
 
 Status: ready-for-agent
 
-Date: 2026-09-16. Target plugin version `0.2.0` (breaking for callers of the eight retired entry names; `0.x` minor). Baseline: commit `f37830f` (the 0.1.0 version manual and audit checklist). Vocabulary: `CONTEXT.md` (this round added First-round pool, Senior gate, Escalation ladder, Dial, Native entry, Routing profile, Companion installer; retired Implementer). Decision record: ADR-0004.
+日期：2026-09-16。目标插件版本 `0.2.0`（对八个已退役入口名称的调用者构成破坏性变更；`0.x` 次版本）。基线：提交 `f37830f`（0.1.0 版本说明书与审计清单）。词汇：`CONTEXT.md`（本轮加入了第一轮池、senior 门禁、升级阶梯、拨档、原生入口、路由配置、配套安装器；退役了 Implementer）。决定记录：ADR-0004。
 
-## Problem Statement
+## 问题陈述
 
-The eight native entries are named by model: Luna, Sol, and Astra Explorers and workers, plus an Astra Advisor and an Astra reviewer. The user selects a tier, but the plugin makes them remember which model currently sits in that tier. When a model changes generation, the entry name, the skill's table, the inspector's role options, and the installer's selectors all change together.
+八个原生入口按模型命名：Luna、Sol 与 Astra 的 Explorer 和 worker，外加一个 Astra Advisor 与一个 Astra reviewer。用户选择一个档位，但插件让他们记住当前哪一个模型坐在那个档位里。当一个模型更换代际时，入口名称、技能的表、检查器的角色选项以及安装器的选择器一起改变。
 
-The dial values (which efforts a tier allows, which is the default, which model is preferred) live in the skill text. Adjusting one value means editing doctrine, and the doctrine still lets the primary agent choose a senior tier on its own first-round judgment. In the sibling plugin the user watched that freedom send routine work to the most expensive models, and does not want the plugin to leave that decision to the model.
+拨档值（一个档位允许哪些推理等级、哪一个是默认值、哪一个模型被优先）活在技能文本里。调整一个值就意味着编辑原则，而原则仍然让主代理凭它自己的第一轮判断选择 senior 档位。在同级插件中，用户看到那种自由把常规工作送到最贵的模型，并且不希望本插件把该决定留给模型。
 
-The companion installer refuses to overwrite a changed destination and never deletes anything. After a rename, the eight old files stay in `$CODEX_HOME/agents` on both machines and remain discoverable; after any template edit the user must delete files by hand before the installer will proceed. The user's rule is that every file this plugin depends on reaches its live location through installation or update, never through hand copying. The Windows plugin cache also checks out with CRLF line endings while the installed copies are LF, so the byte comparison fails for reasons unrelated to content.
+配套安装器拒绝覆盖一个已改变的目标，并且从不删除任何东西。重命名之后，八个旧文件留在两台机器的 `$CODEX_HOME/agents` 中并仍然可被发现；任何模板编辑之后，用户必须先手工删除文件，安装器才会继续。用户的规则是：本插件所依赖的每一个文件都通过安装或更新到达它的生效位置，从不通过手工复制。Windows 插件缓存还以 CRLF 行尾检出，而已安装副本是 LF，因此字节比较因与内容无关的原因失败。
 
-The eight TOML templates have no Chinese twin, unlike every runtime Markdown file. Independent acceptance is a separate native entry although it is one request shape of the Advisor role.
+八份 TOML 模板没有中文对照，与每一份运行时 Markdown 文件不同。独立验收是一个单独的原生入口，尽管它是 Advisor 角色的一种请求形态。
 
-## Solution
+## 解决方案
 
-Rename the native entries by role and capability tier. Eleven entries: `ca_explorer_light`, `ca_explorer_standard_m`, `ca_explorer_standard_h`, `ca_explorer_senior`, `ca_worker_light`, `ca_worker_standard_m`, `ca_worker_standard_h`, `ca_worker_senior`, `ca_advisor_light`, `ca_advisor_standard`, `ca_advisor_senior` (`ca` abbreviates codex-advisor). A tier with two models gets two entries: `_m` is the default candidate, `_h` the stronger alternative, `_l` would be a cheaper alternative. Every entry pins its model; an entry whose cell has a single effort also pins that effort, so a caller cannot reach the wrong dial by omission.
+按角色与能力档位重命名原生入口。十一个入口：`ca_explorer_light`、`ca_explorer_standard_m`、`ca_explorer_standard_h`、`ca_explorer_senior`、`ca_worker_light`、`ca_worker_standard_m`、`ca_worker_standard_h`、`ca_worker_senior`、`ca_advisor_light`、`ca_advisor_standard`、`ca_advisor_senior`（`ca` 是 codex-advisor 的缩写）。一个有两个模型的档位得到两个入口：`_m` 是默认候选，`_h` 是更强的备选，`_l` 则会是更便宜的备选。每一个入口都固定它的模型；单元格只有一个推理等级的入口也固定该推理等级，因此调用者不能因省略而到达错误的拨档。
 
-Move every dial value out of the skill text into a routing profile that ships as a reference beside the role contracts and operations references. The skill keeps only mechanism: light and standard are the first-round pool with free choice between them; senior is behind the senior gate; the escalation ladder R1 to R4 governs what happens after a failed acceptance. Changing a model or an effort touches the TOML and the routing profile, never the skill or the scripts.
+把每一个拨档值从技能文本移入一份路由配置，该配置作为参考，随角色契约与操作参考一起交付。技能只保留机制：light 与 standard 是第一轮池，二者之间可以自由选择；senior 位于 senior 门禁之后；升级阶梯 R1 到 R4 管辖一次失败的验收之后发生什么。更换一个模型或一个推理等级只触碰 TOML 与路由配置，从不触碰技能或脚本。
 
-Fold independent acceptance into the Advisor entries as a second request shape and retire the reviewer entry. Make the companion installer own its files: it overwrites the eleven shipped entries when they differ, deletes the eight retired names when present, and touches nothing else. Make the inspector generic: it reads the expected model and any pinned effort from the shipped TOML named on the command line. Give every TOML a parseable Chinese twin, pin LF line endings for distributed files, and release as `0.2.0` with its version manual.
+把独立验收折入 Advisor 入口，作为第二种请求形态，并退役 reviewer 入口。让配套安装器拥有它自己的文件：当十一份随附入口有差异时覆盖它们，当八个已退役名称在场时删除它们，并且不触碰其他任何东西。让检查器成为通用的：它从命令行上点名的随附 TOML 读取期望的模型以及任何被固定的推理等级。给每一份 TOML 一份可解析的中文对照，为分发的文件固定 LF 行尾，并以 `0.2.0` 连同它的版本说明书发布。
 
-## User Stories
+## 用户故事
 
-1. As a primary agent, I want to pick a native entry by role and tier, so that I do not have to know which model currently fills that tier.
-2. As a primary agent, I want a tier with two candidate models to expose both as separate entries with a fixed default, so that I can take the cheaper default and reach the stronger one deliberately.
-3. As a primary agent, I want every entry to pin its model, so that a delegated call never inherits my own session model.
-4. As a primary agent, I want an entry whose tier allows exactly one effort to pin that effort, so that forgetting to pass an effort cannot select a different dial.
-5. As a primary agent, I want an entry whose tier allows several efforts to leave the effort to me, so that I can choose within the allowed dials on the first attempt.
-6. As a primary agent, I want the allowed efforts, their default, and the candidate order for every tier in one routing profile, so that I read one table before the first allocation.
-7. As a primary agent, I want the skill to tell me that light and standard are one first-round pool with no precondition between them, so that I do not treat light to standard as an escalation.
-8. As a primary agent, I want the skill to tell me that senior is reached only through the senior gate or a user declaration, so that I do not send first-round work to the most expensive tier on my own judgment.
-9. As a primary agent, I want the escalation ladder written as four rules, so that the same problem does not climb three efforts on one model.
-10. As a primary agent, I want the senior gate to coincide with the decision-type consultation after two failed complete attempts, so that the Advisor's verdict also settles whether senior is warranted.
-11. As a primary agent, I want the Advisor's decision shape to default to the standard tier and its acceptance shape to the light tier, so that routine judgment and routine acceptance stay cheap.
-12. As a primary agent, I want the Advisor to reach senior only when its own verdict reports low confidence or the user declares it, so that Advisor escalation does not follow worker failures.
-13. As a primary agent, I want one Advisor entry per tier that answers both the decision packet and the acceptance packet, so that independent acceptance does not need a fourth role.
-14. As a primary agent, I want independent acceptance to still require a fresh thread after primary checks, so that folding it into the Advisor entries does not weaken the acceptance rule.
-15. As a primary agent, I want each entry's description to name its role, tier, model, and whether its effort is fixed, so that I can select it from the agent list without loading the skill.
-16. As a primary agent, I want the delegate's instructions to state only what the delegate itself must do, so that caller duties are not repeated into every entry.
-17. As a user, I want a model generation change to touch only the affected TOML and the routing profile, so that the skill text and the scripts stay unchanged.
-18. As a user, I want the routing profile to ship inside the plugin, so that a value change reaches both machines through the same plugin update as everything else.
-19. As a user, I want the companion installer to overwrite this plugin's own installed entries when they differ from the shipped templates, so that I never hand-reconcile after an update.
-20. As a user, I want the companion installer to delete the eight retired entry files when it finds them, so that old names do not linger as discoverable agents.
-21. As a user, I want the companion installer to leave every other file alone, so that upstream Sol Advisor files, unrelated agents, and my primary configuration are untouched.
-22. As a user, I want the installer's check mode to fail when an installed entry differs from its template or a retired file is still present, so that drift and residue are both visible.
-23. As a user, I want selective checks to accept the tier-based short names, so that I can check one role without typing model names.
-24. As a user, I want the installer to keep refusing symlinked, non-regular, root, and dot-segment destinations, so that a wrong target directory still cannot be damaged.
-25. As a user, I want distributed files to check out with LF line endings on Windows, so that the installer's byte comparison compares content, not line endings.
-26. As a user, I want the inspector to take an entry name and, where the entry leaves it open, the effort I passed, so that a table change never needs an inspector change.
-27. As a user, I want the inspector to read the expected model and any pinned effort from the shipped TOML, so that there is one source for what an entry should run.
-28. As a user, I want the inspector to stop judging whether an effort is allowed, so that policy stays in the routing profile and the inspector reports mechanism only.
-29. As a user, I want the inspector to keep requiring parent linkage, working directory, and permission evidence and to keep emitting only allowlisted metadata, so that the evidence contract does not weaken.
-30. As a repository maintainer, I want every TOML template to have a parseable Chinese twin with identical configuration keys, so that a translated entry cannot drift in model or effort.
-31. As a repository maintainer, I want the mirror check to cover TOML files and to compare keys, so that twin drift fails a test rather than a reader.
-32. As a repository maintainer, I want a check that every entry named in the routing profile has a shipped TOML with the same model, so that the two places a dial lives cannot disagree.
-33. As a repository maintainer, I want a check that all entries of one role carry identical delegate instructions, so that eleven copies of the same text cannot drift.
-34. As a repository maintainer, I want the verifier's runtime cases to be driven by the shipped TOMLs, so that adding or renaming an entry does not add hand-written cases.
-35. As a repository maintainer, I want the retirement of the eight old names and their replacements named in the upgrade notes, so that a user of 0.1.0 learns why `agent_type` calls fail.
-36. As a repository maintainer, I want the word Implementer retired everywhere in favor of Worker, so that one concept has one name.
-37. As a repository maintainer, I want the Chinese twins of the rewritten skill, references, and routing profile updated in the same change, so that the mirror test stays green and the known mistranslation of the failure-reassessment rule is corrected.
-38. As a repository maintainer, I want an ADR that records these decisions and names what it supersedes in ADR-0003 and the original fork spec, so that a future reader knows why the ladder, the gate, and the installer policy changed.
-39. As a user, I want a version manual for 0.2.0 that describes the whole version and the delta from 0.1.0, so that I can read what I installed without reading the ADR or the diff.
-40. As a user, I want the grok lane recorded as the next version with its mechanism decided, so that this version does not grow to cover it.
+1. 作为主代理，我希望按角色与档位挑选一个原生入口，以便我不必知道当前哪一个模型填在那个档位里。
+2. 作为主代理，我希望一个有两个候选模型的档位把两者都暴露为带有固定默认值的单独入口，以便我可以采用更便宜的默认值，并有意地到达更强的那一个。
+3. 作为主代理，我希望每一个入口都固定它的模型，以便一次委派调用从不继承我自己的会话模型。
+4. 作为主代理，我希望档位恰好允许一个推理等级的入口固定该推理等级，以便忘记传入推理等级不能选中另一个拨档。
+5. 作为主代理，我希望档位允许多个推理等级的入口把推理等级留给我，以便我可以在第一次尝试时在允许的拨档之内选择。
+6. 作为主代理，我希望每一个档位所允许的推理等级、它们的默认值以及候选顺序都在一份路由配置里，以便我在第一次分配之前读一张表。
+7. 作为主代理，我希望技能告诉我 light 与 standard 是一个第一轮池，二者之间没有前提条件，以便我不把从 light 到 standard 当作一次升级。
+8. 作为主代理，我希望技能告诉我 senior 只通过 senior 门禁或用户的一次声明到达，以便我不凭自己的判断把第一轮工作送到最贵的档位。
+9. 作为主代理，我希望升级阶梯写成四条规则，以便同一个问题不在一个模型上连爬三个推理等级。
+10. 作为主代理，我希望 senior 门禁与两次失败的完整尝试之后的决策型咨询重合，以便 Advisor 的裁定也确定 senior 是否有正当理由。
+11. 作为主代理，我希望 Advisor 的决策形态默认使用 standard 档位，其验收形态默认使用 light 档位，以便常规判断与常规验收保持便宜。
+12. 作为主代理，我希望 Advisor 只在它自己的裁定报告低置信度或用户声明时才到达 senior，以便 Advisor 的升级不跟随 worker 的失败。
+13. 作为主代理，我希望每个档位有一个 Advisor 入口，同时回答决策数据包与验收数据包，以便独立验收不需要第四个角色。
+14. 作为主代理，我希望独立验收在主代理检查之后仍然要求一个新线程，以便把它折入 Advisor 入口不会削弱验收规则。
+15. 作为主代理，我希望每个入口的描述点名它的角色、档位、模型，以及它的推理等级是否固定，以便我可以不加载技能就从代理列表中选择它。
+16. 作为主代理，我希望被委派者的指令只陈述被委派者自己必须做的事，以便调用者职责不被重复进每一个入口。
+17. 作为用户，我希望一次模型代际变更只触碰受影响的 TOML 与路由配置，以便技能文本与脚本保持不变。
+18. 作为用户，我希望路由配置随插件一起交付，以便一次值的变更通过与其他一切相同的插件更新到达两台机器。
+19. 作为用户，我希望配套安装器在本插件自己已安装的入口与随附模板有差异时覆盖它们，以便我在更新之后从不手工调和。
+20. 作为用户，我希望配套安装器在找到八个已退役入口文件时删除它们，以便旧名称不作为可发现的代理逗留。
+21. 作为用户，我希望配套安装器放过每一个其他文件，以便上游的 Sol Advisor 文件、无关的代理以及我的主配置不被触碰。
+22. 作为用户，我希望安装器的检查模式在已安装入口与其模板有差异、或退役文件仍然在场时失败，以便漂移与残留都可见。
+23. 作为用户，我希望选择性检查接受基于档位的短名称，以便我可以不输入模型名称就检查一个角色。
+24. 作为用户，我希望安装器继续拒绝符号链接的、非常规的、根目录的以及点段的目标，以便错误的目标目录仍然不能被损坏。
+25. 作为用户，我希望分发的文件在 Windows 上以 LF 行尾检出，以便安装器的字节比较比较的是内容，而不是行尾。
+26. 作为用户，我希望检查器接受一个入口名称，并在入口把它留开的地方接受我传入的推理等级，以便表的变更从不需要检查器的变更。
+27. 作为用户，我希望检查器从随附 TOML 读取期望的模型以及任何被固定的推理等级，以便一个入口应当以什么运行有一个来源。
+28. 作为用户，我希望检查器停止判断一个推理等级是否被允许，以便策略留在路由配置中，检查器只报告机制。
+29. 作为用户，我希望检查器继续要求父链接、工作目录与权限证据，并继续只发出允许列表中的元数据，以便证据契约不被削弱。
+30. 作为仓库维护者，我希望每一份 TOML 模板都有一份可解析的中文对照，配置键相同，以便一个被翻译的入口不能在模型或推理等级上漂移。
+31. 作为仓库维护者，我希望镜像检查覆盖 TOML 文件并比较键，以便对照漂移使测试失败，而不是使读者失败。
+32. 作为仓库维护者，我希望有一项检查：路由配置中点名的每一个入口都有一份随附 TOML，且模型相同，以便一个拨档所在的两个地方不能不一致。
+33. 作为仓库维护者，我希望有一项检查：一个角色的全部入口携带相同的被委派者指令，以便同一文本的十一份副本不能漂移。
+34. 作为仓库维护者，我希望验证器的运行时用例由随附 TOML 驱动，以便增加或重命名一个入口不必增加手写用例。
+35. 作为仓库维护者，我希望八个旧名称的退役及其替换者在升级说明中被点名，以便 0.1.0 的用户知道 `agent_type` 调用为何失败。
+36. 作为仓库维护者，我希望 Implementer 这个词在各处退役，改用 Worker，以便一个概念有一个名称。
+37. 作为仓库维护者，我希望被重写的技能、参考以及路由配置的中文对照在同一次变更中更新，以便镜像测试保持绿色，并且失败再评估规则那处已知的误译被纠正。
+38. 作为仓库维护者，我希望有一份 ADR 记录这些决定，并点名它在 ADR-0003 与最初的分叉规格中取代了什么，以便将来的读者知道阶梯、门禁以及安装器策略为何改变。
+39. 作为用户，我希望有一份 0.2.0 的版本说明书，描述整个版本以及相对 0.1.0 的增量，以便我可以不读 ADR 或差异就读到我所安装的内容。
+40. 作为用户，我希望 grok 通道被记录为下一个版本，且其机制已经决定，以便这个版本不增长到覆盖它。
 
-## Implementation Decisions
+## 实现决定
 
-### Native entries
+### 原生入口
 
-- Eleven TOML templates, filenames `ca-<role>-<tier>[-m|-h].toml`, `name` fields `ca_<role>_<tier>[_m|_h]`. The `ca_` prefix namespaces this plugin's files inside a directory shared with upstream Sol Advisor files; the filename mirrors the `name` with hyphens.
-- Model pins: Explorer light Luna; Explorer standard `_m` Luna, `_h` Terra; Explorer senior Sol; worker light Luna; worker standard `_m` Sol, `_h` Astra; worker senior Astra; Advisor light, standard, senior Astra. Model identifiers are `gpt-5.6-luna`, `gpt-5.6-terra`, `gpt-5.6-sol`, `gpt-6-astra`.
-- Effort pins, only where the cell has one effort: worker light `max`; Explorer standard `_m` `max`; worker standard `_h` `low`; Advisor light `low`; Advisor standard `medium`. The other six entries omit `model_reasoning_effort`; the caller passes it with `fork_turns` set to none, as the host requires for per-spawn overrides.
-- Explorer and Advisor entries keep `sandbox_mode = "read-only"`. Worker entries inherit the parent sandbox.
-- Retired entries, deleted by the installer when present: `codex-advisor-astra-advisor`, `codex-advisor-astra-explorer`, `codex-advisor-astra-implementer`, `codex-advisor-astra-reviewer`, `codex-advisor-luna-explorer`, `codex-advisor-luna-implementer`, `codex-advisor-sol-explorer`, `codex-advisor-sol-implementer` (each with the `.toml` suffix).
-- `description` states role, tier, model, and either the fixed effort or that the caller passes it. It does not list allowed efforts; the routing profile does.
-- `developer_instructions` per audit finding R05: the role's permissions, the packet it expects, its return shape, the fresh-thread and no-further-delegation rules, and the instruction not to infer its own runtime settings. Caller duties (consultation triggers, lifecycle transitions, metadata collection, primary verification) are removed. All entries of one role carry byte-identical instructions. Advisor instructions carry both return shapes: RECOMMENDATION / EVIDENCE / ASSUMPTIONS / TRADEOFFS / GAPS for the decision packet and READINESS / FINDINGS / VERIFICATION / GAPS for the acceptance packet.
+- 十一份 TOML 模板，文件名 `ca-<role>-<tier>[-m|-h].toml`，`name` 字段 `ca_<role>_<tier>[_m|_h]`。`ca_` 前缀把本插件的文件命名空间化到一个与上游 Sol Advisor 文件共享的目录里；文件名用连字符镜像 `name`。
+- 模型固定：Explorer light 为 Luna；Explorer standard 的 `_m` 为 Luna、`_h` 为 Terra；Explorer senior 为 Sol；worker light 为 Luna；worker standard 的 `_m` 为 Sol、`_h` 为 Astra；worker senior 为 Astra；Advisor light、standard、senior 为 Astra。模型标识符是 `gpt-5.6-luna`、`gpt-5.6-terra`、`gpt-5.6-sol`、`gpt-6-astra`。
+- 推理等级固定，只在单元格有一个推理等级的地方：worker light 为 `max`；Explorer standard 的 `_m` 为 `max`；worker standard 的 `_h` 为 `low`；Advisor light 为 `low`；Advisor standard 为 `medium`。另外六个入口省略 `model_reasoning_effort`；调用者在 `fork_turns` 设为 none 的情况下传入它，这是宿主对每次派发覆盖的要求。
+- Explorer 与 Advisor 入口保持 `sandbox_mode = "read-only"`。Worker 入口继承父沙箱。
+- 已退役入口，在场时由安装器删除：`codex-advisor-astra-advisor`、`codex-advisor-astra-explorer`、`codex-advisor-astra-implementer`、`codex-advisor-astra-reviewer`、`codex-advisor-luna-explorer`、`codex-advisor-luna-implementer`、`codex-advisor-sol-explorer`、`codex-advisor-sol-implementer`（每一个都带 `.toml` 后缀）。
+- `description` 陈述角色、档位、模型，以及固定的推理等级或调用者传入它。它不列出允许的推理等级；路由配置才列出。
+- `developer_instructions` 按审计发现 R05：该角色的权限、它期望的数据包、它的返回形态、新线程与不再进一步委派的规则，以及不推断它自己的运行时设置这条指令。调用者职责（咨询触发条件、生命周期转换、元数据收集、主代理验证）被移除。一个角色的全部入口携带逐字节相同的指令。Advisor 指令携带两种返回形态：决策数据包为 RECOMMENDATION / EVIDENCE / ASSUMPTIONS / TRADEOFFS / GAPS，验收数据包为 READINESS / FINDINGS / VERIFICATION / GAPS。
 
-### Routing profile
+### 路由配置
 
-- A new reference beside the role contracts and operations references, in the skill. Contents in order: declaration date and anchored models; a table from role and tier to entry names and dials in the notation `model[a*, b, c]` (every listed effort is a first-round option, `*` is the default, listed model order is candidate order); the Advisor defaults (decision shape standard, acceptance shape light); one sentence pointing to the skill for pool, gate, and ladder; the adjustment method (which places change and which checks to run).
-- Initial values: Explorer light `gpt-5.6-luna[high*, xhigh]`; Explorer standard `gpt-5.6-luna[max]` then `gpt-5.6-terra[medium*, high]`; Explorer senior `gpt-5.6-sol[medium*, high]`; worker light `gpt-5.6-luna[max]`; worker standard `gpt-5.6-sol[high*, xhigh]` then `gpt-6-astra[low]`; worker senior `gpt-6-astra[medium*, high]`; Advisor light `gpt-6-astra[low]`, standard `gpt-6-astra[medium]`, senior `gpt-6-astra[high*, xhigh]`.
-- The profile is the only place dial values are written. The skill text, the README, and the TOML descriptions do not repeat efforts or defaults. The version manual freezes the table for its version.
+- 技能中、角色契约与操作参考旁边的一份新参考。内容按顺序：声明日期与锚定的模型；一张从角色与档位到入口名称与拨档的表，记法为 `model[a*, b, c]`（每一个列出的推理等级都是第一轮选项，`*` 是默认值，列出的模型顺序是候选顺序）；Advisor 默认值（决策形态为 standard，验收形态为 light）；一句指向技能以说明池、门禁与阶梯的句子；调整方法（哪些地方改变，以及要运行哪些检查）。
+- 初始值：Explorer light 为 `gpt-5.6-luna[high*, xhigh]`；Explorer standard 为 `gpt-5.6-luna[max]`，然后是 `gpt-5.6-terra[medium*, high]`；Explorer senior 为 `gpt-5.6-sol[medium*, high]`；worker light 为 `gpt-5.6-luna[max]`；worker standard 为 `gpt-5.6-sol[high*, xhigh]`，然后是 `gpt-6-astra[low]`；worker senior 为 `gpt-6-astra[medium*, high]`；Advisor light 为 `gpt-6-astra[low]`，standard 为 `gpt-6-astra[medium]`，senior 为 `gpt-6-astra[high*, xhigh]`。
+- 这份配置是写下拨档值的唯一地方。技能文本、README 以及 TOML 描述不重复推理等级或默认值。版本说明书为它的版本冻结这张表。
 
-### Skill and references
+### 技能与参考
 
-- The allocation section states mechanism only: role by output (evidence, change, judgment); tier chosen inside the first-round pool by judgment dependence, cheapest adequate dial at its default; senior only through the senior gate (two capability-attributed complete failed attempts inside the pool, or a user declaration; for the Advisor, a low-confidence verdict or a user declaration); the escalation ladder R1 rework ticket same thread same dial, R2 raise in a fresh thread with the current-state handoff when rework fails and the cause is capability (higher effort of the same model or another model), R3 the same model raised at most once, R4 a major execution problem may skip the rework ticket and change model, counted as one failure. It points to the routing profile for every value.
-- The complete-attempt definition, the fresh-thread rule for every effort or model change, Architect mode, the required-advice triggers, and the acceptance rules stay as ADR-0003 wrote them. The sentence that no fixed ladder is imposed is replaced by the ladder.
-- The operations reference replaces the eight-row entry table with the eleven entries (entry name, install selector, pinned or caller-selected effort) and rewrites the invocation, inspector, and installer procedures for the new shapes. The role-contracts reference merges the independent-acceptance packet under the Advisor heading as its second request shape and drops the reviewer entry name.
-- Implementer is retired as a term; Worker is used throughout the skill, references, README, glossary, and entry names.
+- 分配小节只陈述机制：按产出决定角色（证据、变更、判断）；档位在第一轮池内按判断依赖来选择，采用其默认值上最便宜且足够的拨档；senior 只通过 senior 门禁到达（池内两次被归因于能力的、失败的完整尝试，或用户的一次声明；对 Advisor 而言，是低置信度裁定或用户的一次声明）；升级阶梯为 R1 返工工单、同一线程、同一拨档，R2 在返工失败且原因是能力时，在新线程中带着当前状态交接提升（同一模型的更高推理等级，或另一个模型），R3 同一模型至多提升一次，R4 一个重大执行问题可以跳过返工工单并更换模型，计为一次失败。它把每一个值都指向路由配置。
+- 完整尝试的定义、每一次推理等级或模型变更的新线程规则、Architect 模式、必需建议的触发条件，以及验收规则，保持 ADR-0003 所写的那样。那句不施加固定阶梯的句子被这条阶梯替换。
+- 操作参考用十一个入口替换八行的入口表（入口名称、安装选择器、固定的或由调用者选择的推理等级），并按新形态重写调用、检查器与安装器规程。角色契约参考把独立验收数据包合并到 Advisor 标题之下，作为它的第二种请求形态，并去掉 reviewer 入口名称。
+- Implementer 作为一个术语被退役；技能、参考、README、术语表以及入口名称通篇使用 Worker。
 
-### Companion installer
+### 配套安装器
 
-- Manifest: the eleven templates. For each, a missing or differing destination is written (reported as installed), an identical destination is reported as unchanged. No `.bak`, no old-versus-new judgment.
-- Retire list: the eight old filenames. A present file is deleted and reported as removed, by exact filename, without reading its content.
-- Everything outside the manifest and retire list is never read or written.
-- Check mode writes nothing and fails on any differing or missing manifest file and on any present retire file, listing each.
-- Selective check accepts the tier-based short names (`explorer-light`, `explorer-standard-m`, `explorer-standard-h`, `explorer-senior`, `worker-light`, `worker-standard-m`, `worker-standard-h`, `worker-senior`, `advisor-light`, `advisor-standard`, `advisor-senior`).
-- Existing refusals stay: symlinked destination or ancestor, non-regular destination, non-directory ancestor, filesystem root, dot path segments. The staged-copy-then-link write is replaced by an atomic write suited to overwriting.
-- A `.gitattributes` at the repository root pins LF for text files so the Windows plugin cache checks out byte-identical to the installed copies (audit finding R01).
+- 清单：十一份模板。对每一份，缺失或有差异的目标被写入（报告为已安装），相同的目标报告为未改变。没有 `.bak`，没有旧与新的判断。
+- 退役列表：八个旧文件名。在场的文件被删除并报告为已移除，按精确文件名，不读取它的内容。
+- 清单与退役列表之外的一切从不被读取或写入。
+- 检查模式不写入任何东西，并在任何有差异或缺失的清单文件上失败，也在任何在场的退役文件上失败，同时列出每一个。
+- 选择性检查接受基于档位的短名称（`explorer-light`、`explorer-standard-m`、`explorer-standard-h`、`explorer-senior`、`worker-light`、`worker-standard-m`、`worker-standard-h`、`worker-senior`、`advisor-light`、`advisor-standard`、`advisor-senior`）。
+- 现有的拒绝保持：符号链接的目标或祖先、非常规目标、非目录祖先、文件系统根、点路径段。先暂存副本再链接的写入被替换为适合覆盖的原子写入。
+- 仓库根目录的一份 `.gitattributes` 为文本文件固定 LF，因此 Windows 插件缓存检出后与已安装副本逐字节相同（审计发现 R01）。
 
-### Inspector
+### 检查器
 
-- Options become `--agent <entry name>` plus `--effort <effort>` when the named entry does not pin one. The expected model, and the expected effort when pinned, are read from the shipped TOML resolved beside the script; `--effort` given for a pinned entry must equal the pin or is rejected. Without `--agent`, generic evidence is emitted as today.
-- The inspector no longer validates that an effort belongs to an allowed set; the routing profile owns that policy.
-- Unchanged: exactly one UUID-matched rollout, required parent linkage and working directory for a role check, required sandbox and permission evidence, conflict rejection, allowlisted output only, no prompt or credential bytes.
-- The retired primary-derived review options keep failing with their diagnostic.
+- 选项变为 `--agent <entry name>`，外加当被点名的入口不固定推理等级时的 `--effort <effort>`。期望的模型，以及被固定时的期望推理等级，从解析到脚本旁边的随附 TOML 读取；对固定入口给出的 `--effort` 必须等于固定值，否则被拒绝。没有 `--agent` 时，像今天一样发出通用证据。
+- 检查器不再校验一个推理等级属于某个允许集合；路由配置拥有该策略。
+- 未改变的部分：恰好一条按 UUID 匹配的会话记录，角色检查所要求的父链接与工作目录，所要求的沙箱与权限证据，冲突拒绝，只输出允许列表中的内容，没有提示或凭据字节。
+- 已退役的、由主代理派生的评审选项继续以它们的诊断失败。
 
-### Chinese twins
+### 中文对照
 
-- Every shipped TOML has a twin at the same relative path under the Chinese mirror directory, as parseable TOML. `name`, `model`, `model_reasoning_effort` (presence and value), and `sandbox_mode` (presence and value) equal the template; `description` and `developer_instructions` are the translation and contain Chinese text.
-- The mirror test extends from Markdown-only to Markdown plus TOML: existence both ways for both types, key equality for TOML. The rewritten skill, both references, and the new routing profile get updated twins in the same change; the twin of the skill corrects the failure-reassessment sentence noted as audit finding R02.
+- 每一份随附 TOML 在中文镜像目录下的同一相对路径处有一份对照，作为可解析的 TOML。`name`、`model`、`model_reasoning_effort`（存在性与值）以及 `sandbox_mode`（存在性与值）等于模板；`description` 与 `developer_instructions` 是译文并包含中文文本。
+- 镜像测试从只覆盖 Markdown 扩展为 Markdown 加 TOML：两种类型都双向检查存在性，TOML 检查键相等。被重写的技能、两份参考以及新的路由配置在同一次变更中得到更新后的对照；技能的对照纠正被记为审计发现 R02 的失败再评估句子。
 
-### Records and release
+### 记录与发布
 
-- ADR-0004 records the decisions above, supersedes ADR-0003's no-fixed-ladder sentence and its reviewer-as-distinct-entry wording, revises the fork spec's user story 39 (installer refusal) into the overwrite-own-files policy, and records the 0.3.0 grok lane mechanism as a note.
-- Audit checklist: R01 recorded as update (this batch), R05 as simplify (this batch), R08 as clarified by the profile notation, R02 as corrected with the twin rewrite. The others stay pending.
-- README: install, use, roles (entry names and tiers, no dial values), check and update, and an upgrade section that names the eight retired entries and their replacements.
-- Version `0.2.0` in the plugin manifest; version manual for `0.2.0`; the marketplace manifest carries no version field and does not change.
+- ADR-0004 记录上面的决定，取代 ADR-0003 那句不施加固定阶梯的句子以及它把 reviewer 作为单独入口的措辞，把分叉规格的用户故事 39（安装器拒绝）修订为覆盖自有文件的策略，并把 0.3.0 grok 通道的机制记录为一则说明。
+- 审计清单：R01 记录为 update（本批次），R05 记录为 simplify（本批次），R08 由该配置记法澄清，R02 随对照重写被纠正。其余保持待定。
+- README：安装、使用、角色（入口名称与档位，没有拨档值）、检查与更新，以及一个点名八个已退役入口及其替换者的升级小节。
+- 插件清单中的版本 `0.2.0`；`0.2.0` 的版本说明书；市场清单不携带版本字段并且不改变。
 
-## Testing Decisions
+## 测试决定
 
-A good check observes behaviour at a boundary a caller uses: the installer and inspector at their command-line boundaries with temporary directories and synthetic rollouts, the mirror and manual checks over the working tree. No check reads internal function names or prompt wording.
+一项好的检查在调用者所使用的边界上观察行为：安装器与检查器在它们的命令行边界上，使用临时目录与合成的会话记录；镜像与手册检查覆盖工作区。没有一项检查去读内部函数名或提示措辞。
 
-- Existing seam, installer: the verifier's installation group already exercises a temporary target with unrelated files, repeat installs, selective checks, refusals, and preservation. It is rewritten for the new semantics: a differing own file is overwritten and reported; an identical one is unchanged; a present retire file is removed; check mode fails on drift and on residue and writes nothing; unrelated and upstream files survive byte-identical; every existing refusal still refuses without partial mutation. The case that an old Sol template blocks the upgrade is deleted; the reverse is now the requirement.
-- Existing seam, static template checks: the verifier's installation group already parses every TOML and asserts prefixes. It gains: the routing profile names exactly the shipped entries and each named entry's TOML pins the same model; all entries of one role carry identical `developer_instructions`; an entry pins `model_reasoning_effort` exactly when the spec says its cell has one effort; Explorer and Advisor entries are read-only.
-- Existing seam, inspector: the verifier's runtime group already writes synthetic rollouts and asserts accept or reject plus payload filtering. It becomes table-driven over the eleven TOMLs: for each entry, the pinned or a passed effort is accepted with matching metadata, a mismatched model, effort, role, sandbox, permission, parent, or working directory is rejected, `--effort` on a pinned entry must equal the pin, and the retired options keep failing.
-- Existing seam, mirror test: extended to TOML with key equality; a twin whose `model` differs from its template must fail.
-- Existing seam, version manual test: unchanged; it must pass for `0.2.0`.
-- Live route check after installation on this machine: one tiny spawn per entry in a fresh Codex task (eleven spawns), reading each thread's metadata through the inspector; recorded in the acceptance record with any unexercised entry named. This establishes dispatch, not quality.
-- Text checks: no occurrence of `Implementer`, `implementer`, `reviewer` as an entry, or any retired entry name in the plugin, the README, or the mirror, except the retire list and the upgrade notes.
+- 现有接缝，安装器：验证器的安装组已经在带有无关文件的临时目标上行使重复安装、选择性检查、拒绝以及保留。它按新语义重写：有差异的自有文件被覆盖并被报告；相同的一个未改变；在场的退役文件被移除；检查模式在漂移上失败，也在残留上失败，并且不写入任何东西；无关文件与上游文件逐字节幸存；每一个现有的拒绝仍然拒绝，且没有部分变更。旧 Sol 模板阻挡升级的那条用例被删除；反过来的情形现在是要求。
+- 现有接缝，静态模板检查：验证器的安装组已经解析每一份 TOML 并断言前缀。它增加：路由配置恰好点名随附的入口，并且每一个被点名入口的 TOML 固定相同的模型；一个角色的全部入口携带相同的 `developer_instructions`；入口恰好在规格说它的单元格有一个推理等级时固定 `model_reasoning_effort`；Explorer 与 Advisor 入口是只读的。
+- 现有接缝，检查器：验证器的运行时组已经写入合成的会话记录，并断言接受或拒绝外加载荷过滤。它变为在十一份 TOML 上由表驱动：对每一个入口，固定的或传入的推理等级在元数据匹配时被接受，不匹配的模型、推理等级、角色、沙箱、权限、父级或工作目录被拒绝，固定入口上的 `--effort` 必须等于固定值，并且已退役选项继续失败。
+- 现有接缝，镜像测试：扩展到带键相等的 TOML；`model` 与其模板不同的对照必须失败。
+- 现有接缝，版本说明书测试：未改变；它必须对 `0.2.0` 通过。
+- 在本机安装之后的实况路由检查：在一个新的 Codex 任务中每个入口一次微小派发（十一次派发），通过检查器读取每个线程的元数据；连同任何未被行使的入口一起记录在验收记录中。这确立的是派发，而不是质量。
+- 文本检查：插件、README 或镜像中不出现 `Implementer`、`implementer`、作为入口的 `reviewer`，或任何已退役的入口名称，退役列表与升级说明除外。
 
-Prior art: the verifier's two groups, the mirror test, the version manual test, and the acceptance records under the earlier feature directories.
+先前做法：验证器的两个组、镜像测试、版本说明书测试，以及较早功能目录下的验收记录。
 
-## Out of Scope
+## 范围之外
 
-- The grok lane (0.3.0). Mechanism decided: a Node runner wrapping the `grok` CLI with a spec and receipt flow through the shell, ported from the sibling plugin's runner. Design, naming, tests, and doctrine wording for it get their own spec.
-- A user-level routing profile file, a companion installer target for it, or reading the sibling plugin's profile.
-- Changes to the sibling plugin. Aligning its codex-lane cells to this table is a ticket in that repository; this spec only records the pointer.
-- Architect mode, the fresh-thread policy, the required-advice triggers, and the acceptance rules beyond folding the reviewer entry into the Advisor.
-- Audit findings R04, R06, R07, R09, R10, R11, R12.
-- Verifying that the Codex host shows custom-agent descriptions to the primary agent, or that `gpt-5.6-terra` and Luna `xhigh` are available on the user's plan; the live route check records what is observed.
-- Upstream sync.
+- grok 通道（0.3.0）。机制已决定：一个 Node 运行器，以规格与回执流经 shell 来包装 `grok` CLI，从同级插件的运行器移植。它的设计、命名、测试以及原则措辞另有自己的规格。
+- 用户级的路由配置文件、针对它的配套安装器目标，或读取同级插件的配置。
+- 对同级插件的变更。把它的 codex 通道单元格对齐到这张表，是那个仓库里的一份工单；本规格只记录这个指针。
+- Architect 模式、新线程策略、必需建议的触发条件，以及把 reviewer 入口折入 Advisor 之外的验收规则。
+- 审计发现 R04、R06、R07、R09、R10、R11、R12。
+- 验证 Codex 宿主是否向主代理展示自定义代理的描述，或 `gpt-5.6-terra` 与 Luna 的 `xhigh` 在用户的方案上是否可用；实况路由检查记录所观察到的内容。
+- 上游同步。
 
-## Further Notes
+## 补充说明
 
-- Posture: an upstream task artifact exists, so the orchestrating posture applies by default. Coordination artifacts (this directory, ADR-0004, `CONTEXT.md`, `AGENTS.md`, audit checklist, version field) are written by the primary agent; deliverables (plugin templates, skill and references, scripts, tests, README, mirror, version manual, `.gitattributes`) go through workers. The user may switch to the implementing posture by declaring it.
-- Tickets: 01 native entries and their Chinese twins (templates, slim instructions, retire of the reviewer, mirror test extension); 02 routing profile, skill allocation section, references, and their twins; 03 companion installer and `.gitattributes` with the installation verifier group; 04 inspector and the runtime verifier group; 05 README, glossary consistency, audit checklist entries; 06 version manual 0.2.0 and release. 01 and 02 are independent; 03 and 04 depend on 01 for the entry names; 05 depends on 01 and 02; 06 depends on all.
-- Assumptions with invalidation checks: the host's custom-agent precedence rules are as the official subagents documentation stated on 2026-09-16 (file values win; per-spawn `model` and `reasoning_effort` need `fork_turns` none) — recheck after a Codex CLI upgrade past 0.154.0; `gpt-5.6-terra` and Luna `xhigh` are callable on the user's plan — the live route check settles it; the eight retired filenames are the only files this installer ever wrote — recheck the installed directories before running the installer on a machine not listed here.
-- Sibling pointer: the sibling plugin's routing profile lists different codex-lane dials in four cells; the user chose this table as authoritative. A follow-up in that repository updates its canonical profile and runs its installer.
-- Sources: the grilling of 2026-09-16 (three rounds), the sibling plugin's ADR 0016 and ADR 0018, the official Codex subagents documentation read on 2026-09-16, the instruction audit checklist of 2026-09-13.
+- 姿态：存在一份上游任务产物，因此默认适用编排姿态。协调产物（本目录、ADR-0004、`CONTEXT.md`、`AGENTS.md`、审计清单、版本字段）由主代理书写；交付物（插件模板、技能与参考、脚本、测试、README、镜像、版本说明书、`.gitattributes`）经 worker 完成。用户可以通过声明切换到实现姿态。
+- 工单：01 原生入口及其中文对照（模板、收紧的指令、reviewer 的退役、镜像测试扩展）；02 路由配置、技能分配小节、参考及其对照；03 配套安装器与 `.gitattributes`，连同安装验证器组；04 检查器与运行时验证器组；05 README、术语表一致性、审计清单条目；06 版本说明书 0.2.0 与发布。01 与 02 相互独立；03 与 04 因入口名称而依赖 01；05 依赖 01 与 02；06 依赖全部。
+- 带有失效检查的假设：宿主的自定义代理优先级规则如官方子代理文档在 2026-09-16 所陈述的那样（文件值获胜；每次派发的 `model` 与 `reasoning_effort` 需要 `fork_turns` 为 none）——在 Codex CLI 升级越过 0.154.0 之后重新检查；`gpt-5.6-terra` 与 Luna 的 `xhigh` 在用户的方案上可以调用——由实况路由检查解决；八个已退役文件名是这个安装器曾经写过的仅有文件——在一台此处未列出的机器上运行安装器之前，重新检查已安装目录。
+- 同级指针：同级插件的路由配置在四个单元格中列出不同的 codex 通道拨档；用户选择这张表作为权威。那个仓库中的一项后续工作更新它的规范配置并运行它的安装器。
+- 来源：2026-09-16 的 grilling（三轮）、同级插件的 ADR 0016 与 ADR 0018、于 2026-09-16 阅读的官方 Codex 子代理文档、2026-09-13 的指令审计清单。

@@ -1,94 +1,94 @@
-# 04: Process consultation
+# 04：过程咨询
 
-**What to build:** A zero-parameter consultation that the primary, any worker, and any explorer can call, through the mechanism ticket 01 selected:
-- It carries the caller's current effective context automatically, including the unfinished turn and the post-compaction view.
-- It runs the advisor at the AC-4 dial for that caller, with no tools.
-- It returns exactly one of plan, correction, or stop, with the actual model and effort.
-- It flags a model or effort mismatch to the caller.
+**要构建的内容：** 一个零参数的咨询，主代理、任何 worker 以及任何 explorer 都可以通过工单 01 所选的机制调用：
+- 它自动携带调用者当前的有效上下文，包括未完成的轮次以及压缩之后的视图。
+- 它以该调用者的 AC-4 拨档运行 advisor，并且没有工具。
+- 它恰好返回 plan、correction 或 stop 之一，并带有实际的模型与推理等级。
+- 它向调用者标出模型或推理等级不匹配。
 
-In the same ticket, every explorer and worker entry gains its posture section (EN-5), so that no entry tells a delegate to call a consultation that does not exist yet.
+在同一工单中，每一个 explorer 与 worker 入口都获得它的姿态小节（EN-5），以便没有入口让被委派者去调用一个尚不存在的咨询。
 
-**Blocked by:** 01 (mechanism decision), 02 (canonical posture text and consultation doctrine), 03 (routing profile and installed entries).
+**Blocked by:** 01（机制决定）, 02（规范姿态文本与咨询原则）, 03（路由配置与已安装的入口）。
 
 **Status:** resolved
 
-## Required reading before starting
+## 开始前必读
 
-- `spec.md`: AC-3, AC-4, AC-5, AC-10 (the consultation part), AC-11, EN-1 (last bullet: extra entries, if the mechanism needs them), EN-5, EN-6, DR-5 (ticket 04 section), X-2, X-4, §Mechanism decision, §Decision Boundaries, §Open Decisions (O3), §Testing Decisions items 1 (posture checks), 4 and 6, §Goal-Drift Checks (the first three items and the posture-section item).
-- `sources.md` §2.4 rows D17, D18, D19, D20, D28, D33, D34, D41, D43, D44.
-- `plugins/codex-advisor/skills/orchestration/references/consult-posture.md` (from ticket 02; the only source of the posture sections, copied without rewording).
-- Current explorer and worker templates, their `docs/zh/agents/` twins, and the `verify.sh` installation group (from ticket 03).
-- `acceptance.md` §01 P4 (the selected configuration's evidence) and §03 (installed entries).
-- `plugins/codex-advisor/skills/orchestration/references/routing-profile.md` (AC-4 mapping as shipped).
-- rpiv-advisor at `d74b1c99`: `advisor/execute.ts`, `advisor/context.ts`, `advisor/inventory.ts`, `prompts/advisor-system.txt`, and the tests `advisor.execute.test.ts`, `advisor.strip.test.ts`, `advisor.errorresult.test.ts` (behaviour cases to mirror).
+- `spec.md`：AC-3、AC-4、AC-5、AC-10（咨询部分）、AC-11、EN-1（最后一条：额外入口，如果机制需要它们）、EN-5、EN-6、DR-5（工单 04 小节）、X-2、X-4、§Mechanism decision、§Decision Boundaries、§Open Decisions（O3）、§Testing Decisions 第 1 项（姿态检查）、第 4 项与第 6 项、§Goal-Drift Checks（前三项以及姿态小节那一项）。
+- `sources.md` §2.4 行 D17、D18、D19、D20、D28、D33、D34、D41、D43、D44。
+- `plugins/codex-advisor/skills/orchestration/references/consult-posture.md`（来自工单 02；姿态小节的唯一来源，复制时不改写）。
+- 当前的 explorer 与 worker 模板、它们的 `docs/zh/agents/` 对照，以及 `verify.sh` 安装组（来自工单 03）。
+- `acceptance.md` §01 P4（所选配置的证据）以及 §03（已安装的入口）。
+- `plugins/codex-advisor/skills/orchestration/references/routing-profile.md`（按交付时那样的 AC-4 映射）。
+- 处于 `d74b1c99` 的 rpiv-advisor：`advisor/execute.ts`、`advisor/context.ts`、`advisor/inventory.ts`、`prompts/advisor-system.txt`，以及测试 `advisor.execute.test.ts`、`advisor.strip.test.ts`、`advisor.errorresult.test.ts`（要镜像的行为用例）。
 
-## Owns
+## 拥有
 
-- The consultation component, at the location the mechanism requires, under `plugins/codex-advisor/`.
-- The `plugin.json` fields it needs, such as an MCP server entry. Not `version` and not descriptions.
-- A new `verify.sh` group for it (the unqualified run includes it).
-- The new §Process consultation in `references/operations.md` and its twin.
-- Any extra native entries, per EN-1's last bullet, with their twins, routing-profile rows, retire and manifest handling, and checks.
-- The posture section of every explorer and worker template (`plugins/codex-advisor/agents/ca-explorer-*.toml`, `ca-worker-*.toml`) and of their twins. Nothing else in those templates.
-- In the `verify.sh` installation group: the posture checks, and narrowing the same-role identical-instructions check to the text outside the posture section.
+- 咨询组件，位于机制所要求的位置，在 `plugins/codex-advisor/` 之下。
+- 它所需要的 `plugin.json` 字段，例如一个 MCP 服务器条目。不是 `version`，也不是描述。
+- 为它新增的一个 `verify.sh` 组（不加限定的运行包含它）。
+- `references/operations.md` 中新的 §Process consultation 及其对照。
+- 任何额外的原生入口，按 EN-1 的最后一条，连同它们的对照、路由配置行、退役与清单处理，以及检查。
+- 每一个 explorer 与 worker 模板（`plugins/codex-advisor/agents/ca-explorer-*.toml`、`ca-worker-*.toml`）及其对照的姿态小节。那些模板中的其他任何东西都不在内。
+- 在 `verify.sh` 安装组中：姿态检查，以及把同一角色指令相同检查收窄到姿态小节之外的文本。
 
-## Establishes and consumes
+## 所确立与所消费
 
-- **Establishes** AC-3, AC-4, EN-5, and the consultation part of AC-10.
-- **Consumes** the ticket 01 mechanism, the ticket 02 posture text, the ticket 03 routing profile and templates, and AC-11.
+- **所确立** AC-3、AC-4、EN-5，以及 AC-10 的咨询部分。
+- **所消费** 工单 01 的机制、工单 02 的姿态文本、工单 03 的路由配置与模板，以及 AC-11。
 
-Ticket 05's before-done hook needs to know that a consultation happened. Document in the §Process consultation section how a consultation is observable within a session (for example, the tool call name in the session record, or per-session state). Ticket 05 relies on that description.
+工单 05 的完成前钩子需要知道一次咨询发生过。在 §Process consultation 小节中写明，一次咨询在一个会话之内如何可被观察（例如，会话记录中的工具调用名称，或按会话的状态）。工单 05 依赖该描述。
 
-## Acceptance
+## 验收
 
-- [x] The consultation takes zero parameters. A caller cannot pass a summary in place of the automatic context.
-- [x] Context (D43): fixture tests show that these all reach the advisor call:
-  - [x] an unfinished turn's tool call and result;
-  - [x] a compaction summary with later messages;
-  - [x] a constraint from the earliest uncompacted turn of a session longer than any window the mechanism uses.
+- [x] 咨询接受零个参数。调用者不能传入一份摘要来代替自动上下文。
+- [x] 上下文（D43）：夹具测试表明下面这些全都到达 advisor 调用：
+  - [x] 一个未完成轮次的工具调用与结果；
+  - [x] 一份压缩摘要以及其后的消息；
+  - [x] 一条来自会话最早的未压缩轮次的约束，该会话长于机制所使用的任何窗口。
 
-  The live nonce, compaction, and earliest-context checks pass (`acceptance.md` §04).
-- [x] The advisor call has no tools (D44). The tests assert the tool set the component sends is empty. The live evidence is the actual tool set of the advisor request, as sent or as recorded by the host, shown empty; a refused attempt or the advisor's own statement is not evidence.
-- [x] Dial: for a `mainstay`, `crux`, and `rescue` caller, and for a primary on `gpt-6-astra[xhigh]`, `gpt-6-sol[high]`, and `gpt-5.6-terra` (fixture), the advisor dial equals AC-4. The result reports the actual model and effort; a mismatch between actual and expected is surfaced to the caller as a failure, not as advice.
-- [x] Output: exactly one of plan, correction, or stop. An executor error, abort, or empty output returns an explicit failure. Whether to retry is the implementer's choice, but any retry is bounded to one; no retry loop.
-- [x] No credential is read, copied, or sent by the component (D41). The only state kept is per-session, per AC-11.
-- [x] Callable live from the primary, from a spawned worker, and from a spawned explorer, each recorded with thread IDs and the observed advisor model and effort (`acceptance.md` §04).
-- [x] §Process consultation in `operations.md` (and its twin) says:
-  - [x] how to call it, what it returns, and how dial and mismatch work;
-  - [x] how, within one session, three outcomes are each observable and told apart: a consultation started, a consultation succeeded (a valid plan, correction, or stop at the expected dial), and a consultation failed (error, abort, empty, or mismatch);
-  - [x] how a failure is shown to the caller.
+  实况的随机数、压缩以及最早上下文检查通过（`acceptance.md` §04）。
+- [x] advisor 调用没有工具（D44）。测试断言该组件发送的工具集为空。实况证据是 advisor 请求的实际工具集，按发送时或按宿主所记录的那样，展示为空；一次被拒绝的尝试或 advisor 自己的陈述不是证据。
+- [x] 拨档：对 `mainstay`、`crux` 与 `rescue` 调用者，以及对位于 `gpt-6-astra[xhigh]`、`gpt-6-sol[high]` 与 `gpt-5.6-terra`（夹具）上的主代理，advisor 拨档等于 AC-4。结果报告实际的模型与推理等级；实际与期望之间的不匹配作为失败呈现给调用者，而不是作为建议。
+- [x] 输出：恰好是 plan、correction 或 stop 之一。执行器错误、中止或空输出返回一次明确的失败。是否重试是实现者的选择，但任何重试都以一次为界；没有重试循环。
+- [x] 该组件不读取、不复制、也不发送凭据（D41）。所保留的唯一状态是按会话的，按 AC-11。
+- [x] 可以从主代理、从被派发的 worker、从被派发的 explorer 实况调用，每一次都带有线程标识以及观察到的 advisor 模型与推理等级（`acceptance.md` §04）。
+- [x] `operations.md` 中的 §Process consultation（及其对照）说明：
+  - [x] 如何调用它、它返回什么，以及拨档与不匹配如何工作；
+  - [x] 在一个会话之内，三种结果各自如何可被观察并被区分：一次咨询已开始，一次咨询已成功（在期望拨档上的一份有效 plan、correction 或 stop），以及一次咨询已失败（错误、中止、空，或不匹配）；
+  - [x] 失败如何展示给调用者。
 
-  Ticket 05 relies on this. The distinction is required whichever way the user decides O3.
-- [x] **Posture sections (EN-5).**
-  - [x] Each explorer and worker template has one delimited posture section, byte-equal to the `consult-posture.md` variant AC-5 assigns: full for `gpt-6-luna` and `gpt-6-sol` entries, reduced for `gpt-6-astra` entries.
-  - [x] Advisor templates have no posture section.
-  - [x] Outside the section, same-role instructions stay byte-identical.
-  - [x] The section states the rule's outcome and never asks the delegate to infer its own model.
-  - [x] Twins translate the section and keep its delimiters character-exact.
-- [x] **Posture checks in the `verify.sh` installation group.**
-  - [x] Section equality. The variant is computed by comparing each entry's model id with its tier's advisor model id from the routing profile, never by a family-name list.
-  - [x] No section in advisor templates.
-  - [x] Same-role identity outside the section.
-  - [x] Record a negative proof for each: a section edited by one character, a `gpt-6-luna` entry given the reduced variant, and an advisor template given a section each make the group fail.
+  工单 05 依赖这一点。无论用户如何决定 O3，这一区分都是必需的。
+- [x] **姿态小节（EN-5）。**
+  - [x] 每一个 explorer 与 worker 模板都有一个带定界的姿态小节，逐字节等于 `consult-posture.md` 中 AC-5 所指定的变体：`gpt-6-luna` 与 `gpt-6-sol` 入口为完整变体，`gpt-6-astra` 入口为精简变体。
+  - [x] Advisor 模板没有姿态小节。
+  - [x] 在该小节之外，同一角色的指令保持逐字节相同。
+  - [x] 该小节陈述规则的结果，并且从不要求被委派者推断它自己的模型。
+  - [x] 对照翻译该小节，并保持它的定界符逐字符精确。
+- [x] **`verify.sh` 安装组中的姿态检查。**
+  - [x] 小节相等。变体通过把每个入口的模型标识与路由配置中该档位的 advisor 模型标识相比较来计算，从不通过一份家族名称列表。
+  - [x] advisor 模板中没有该小节。
+  - [x] 该小节之外的同一角色同一性。
+  - [x] 为每一种情形记录一条反证：被改动一个字符的小节、被给予精简变体的 `gpt-6-luna` 入口，以及被给予一个小节的 advisor 模板，各自使该组失败。
 
-## Verification
+## 验证
 
-- `sh plugins/codex-advisor/scripts/verify.sh` (all groups)
+- `sh plugins/codex-advisor/scripts/verify.sh`（全部组）
 - `python3 tests/test_zh_mirror.py`
 - `git diff --check`
-- The live table in `acceptance.md` §04
+- `acceptance.md` §04 中的实况表
 
-## Stop conditions
+## 停止条件
 
-S3 and S4 (if the live behaviour contradicts ticket 01), S8, S9.
+S3 与 S4（如果实况行为与工单 01 矛盾）、S8、S9。
 
-## Not in this ticket
+## 不在本工单内
 
-Hooks, posture injection, the before-done enforcement, README, the manual, and the version bump.
+钩子、姿态注入、完成前强制、README、手册以及版本提升。
 
-## Comments
+## 评论
 
-Resolved on 2026-09-26. The checked items record this ticket's acceptance
-checkpoint; later tickets extend the intermediate state where specified.
-See `../acceptance.md` section 04 for commands, evidence, authorized
-exceptions and the current result. Final delivery review is recorded separately.
+于 2026-09-26 解决。已勾选的条目记录本工单的验收
+检查点；后续工单在有规定的地方延伸中间状态。
+见 `../acceptance.md` 第 04 节，其中有命令、证据、已授权的
+例外以及当前结果。最终交付评审另行记录。

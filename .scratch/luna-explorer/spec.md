@@ -2,85 +2,85 @@
 
 Status: ready-for-agent
 
-## Problem Statement
+## 问题陈述
 
-Delegated exploration can inherit the primary session's model when no model is selected. Users who choose an expensive primary model need a separate exploration role with predictable model routing, without forcing every investigation to use maximum reasoning effort. The role must also be available to every non-Astra primary model, not just one named alternative.
+在没有选定模型时，委派的探索可以继承主代理会话的模型。选择了昂贵主代理模型的用户需要一个单独的探索角色，它具有可预期的模型路由，而又不强迫每一次调查都使用最大推理等级。该角色还必须对每一个非 Astra 的主代理模型可用，而不是只对一个被点名的替代模型可用。
 
-## Solution
+## 方案
 
-Provide the native Explorer role `codex_advisor_luna_explorer`, fixed to `gpt-5.6-luna`, with reasoning effort explicitly selected by the primary agent for each call. Once installed and discovered, any primary agent may select it without loading the orchestration skill or entering Architect mode. When the existing orchestration skill is applied and the primary decides to delegate exploration, it uses the Luna Explorer by default.
+提供原生 Explorer 角色 `codex_advisor_luna_explorer`，固定为 `gpt-5.6-luna`，并且每次调用的推理等级由主代理显式选择。一旦安装并被发现，任何主代理都可以选择它，而不必加载编排技能，也不必进入 Architect 模式。当既有的编排技能被应用，并且主代理决定委派探索时，它默认使用 Luna Explorer。
 
-The Explorer performs read-only fact finding and returns source locations, evidence-based explanations, and unresolved questions. The primary agent retains design decisions and may investigate directly when the role is unavailable or its findings are insufficient. Switching to a more expensive delegated model requires explicit user authorization.
+Explorer 执行只读的事实查找，并返回源位置、基于证据的说明，以及未解决的问题。主代理保留设计决定，并且可以在该角色不可用或其发现不充分时直接调查。切换到一个更昂贵的委派模型需要显式的用户授权。
 
-## User Stories
+## 用户故事
 
-1. As a Codex user, I want an exploration role fixed to Luna, so that delegated exploration does not inherit an expensive primary model.
-2. As a user of any primary model, I want access to the Explorer, so that exploration is independent of my primary model choice.
-3. As a non-Astra user, I want the same Explorer access, so that I do not need an Astra session.
-4. As a user, I want no primary-model whitelist, so that support is not limited to Sol or other enumerated examples.
-5. As a user outside Architect mode, I want to delegate exploration, so that fact finding does not require implementation delegation.
-6. As a user who has not loaded the orchestration skill, I want the installed role to remain callable, so that skill activation does not control role availability.
-7. As a primary agent, I want a clear role description, so that I can select the Explorer from the host's available roles.
-8. As a user outside the skill, I want the primary agent to decide whether to select the Explorer, so that installation does not add a global routing requirement.
-9. As a user applying the orchestration skill, I want delegated exploration to default to Luna, so that the workflow uses the intended exploration model.
-10. As a user, I want the existing skill trigger scope preserved, so that pure exploration does not introduce a new activation rule.
-11. As a user, I want existing delegation authorization respected, so that an available role does not itself authorize a new delegation.
-12. As a primary agent, I want to select supported reasoning effort for each call, so that effort matches the investigation.
-13. As a user, I want exploration to permit efforts below max, so that simple questions need not use maximum effort.
-14. As a user, I want my primary model and effort preserved, so that child settings do not change my session.
-15. As a user, I want the Luna Implementer to retain its max requirement, so that exploration does not alter implementation policy.
-16. As an Explorer, I want a scoped question and source boundary, so that I can gather relevant evidence.
-17. As a user, I want exploration to remain read-only, so that investigation does not change my files.
-18. As a primary agent, I want precise source locations and supporting facts, so that I can check the findings.
-19. As a primary agent, I want uncertainty and unresolved gaps reported, so that inference is not presented as fact.
-20. As a user, I want design decisions to remain with the primary agent, so that investigation does not silently assume decision authority.
-21. As a user, I want exploration distinguished from implementation and independent review, so that one role is not claimed to satisfy another.
-22. As a user, I want missing or failed Explorer calls reported, so that unsuccessful investigation is not claimed as complete.
-23. As a primary agent, I want to investigate directly when Luna is unavailable or findings are insufficient, so that independent work can continue.
-24. As a user, I want explicit authorization before a more expensive delegated model is substituted, so that model escalation remains my choice.
-25. As a user, I want the companion installer to install and selectively check the Explorer, so that role discovery follows the existing installation process.
-26. As a user, I want repeat installation and checks to preserve modified and unrelated files, so that adding the role does not damage my environment.
-27. As a primary agent, I want the actual role, model, requested effort, and permissions checked, so that configuration intent is distinguished from observed execution.
-28. As a user, I want runtime diagnostics to omit prompts and credentials, so that validation reveals only necessary routing evidence.
-29. As a user, I want observed read-only behavior distinguished from enforced isolation, so that permission guarantees match the host evidence.
-30. As a maintainer, I want the existing verification entry points extended, so that the feature does not create a parallel test framework.
+1. 作为 Codex 用户，我希望有一个固定为 Luna 的探索角色，以便委派的探索不继承一个昂贵的主代理模型。
+2. 作为任意主代理模型的用户，我希望能够使用 Explorer，以便探索独立于我的主代理模型选择。
+3. 作为非 Astra 用户，我希望有同样的 Explorer 访问，以便我不需要一个 Astra 会话。
+4. 作为用户，我希望没有主代理模型白名单，以便支持不限于 Sol 或其他被列举的例子。
+5. 作为 Architect 模式之外的用户，我希望委派探索，以便事实查找不要求实现委派。
+6. 作为没有加载编排技能的用户，我希望已安装的角色仍然可以调用，以便技能激活不控制角色可用性。
+7. 作为主代理，我希望有一份清楚的角色描述，以便我能从宿主的可用角色中选择 Explorer。
+8. 作为技能之外的用户，我希望由主代理决定是否选择 Explorer，以便安装不增加一条全局路由要求。
+9. 作为应用编排技能的用户，我希望委派的探索默认为 Luna，以便该工作流使用预期的探索模型。
+10. 作为用户，我希望既有的技能触发范围被保留，以便纯粹的探索不引入一条新的激活规则。
+11. 作为用户，我希望既有的委派授权受到尊重，以便一个可用的角色本身不授权一次新的委派。
+12. 作为主代理，我希望为每次调用选择受支持的推理等级，以便推理等级与调查相匹配。
+13. 作为用户，我希望探索允许低于 max 的推理等级，以便简单问题不必使用最大推理等级。
+14. 作为用户，我希望我的主代理模型和推理等级被保留，以便子级设置不改变我的会话。
+15. 作为用户，我希望 Luna Implementer 保留它的 max 要求，以便探索不改变实现策略。
+16. 作为 Explorer，我希望有一个限定范围的问题和源边界，以便我能收集相关证据。
+17. 作为用户，我希望探索保持只读，以便调查不改变我的文件。
+18. 作为主代理，我希望有精确的源位置和支持性事实，以便我能检查这些发现。
+19. 作为主代理，我希望不确定性和未解决的缺口被报告，以便推断不被呈现为事实。
+20. 作为用户，我希望设计决定仍留在主代理处，以便调查不静默地假定决定权。
+21. 作为用户，我希望探索与实现和独立评审被区分开，以便一个角色不被声称满足另一个角色。
+22. 作为用户，我希望缺失的或失败的 Explorer 调用被报告，以便不成功的调查不被声称已经完成。
+23. 作为主代理，我希望在 Luna 不可用或发现不充分时直接调查，以便独立的工作能够继续。
+24. 作为用户，我希望在替换为更昂贵的委派模型之前有显式授权，以便模型升级仍由我选择。
+25. 作为用户，我希望配套安装器安装并选择性检查 Explorer，以便角色发现遵循既有的安装过程。
+26. 作为用户，我希望重复安装和检查保留已修改的文件和无关文件，以便增加该角色不损坏我的环境。
+27. 作为主代理，我希望实际的角色、模型、所请求的推理等级和权限受到检查，以便配置意图与观察到的执行被区分开。
+28. 作为用户，我希望运行时诊断省略提示词和凭据，以便验证只揭示必要的路由证据。
+29. 作为用户，我希望观察到的只读行为与强制隔离被区分开，以便权限保证与宿主证据相符。
+30. 作为维护者，我希望既有的验证入口得到扩展，以便该功能不创建一套并行的测试框架。
 
-## Implementation Decisions
+## 实现决定
 
-- Add one native role named `codex_advisor_luna_explorer`, with model `gpt-5.6-luna` and a read-only sandbox request. Omit the role-level reasoning setting so the caller can choose effort. The description must express applicability to any primary model and availability without skill activation.
-- Extend the companion installer's existing role selection with `explorer`, including default installation, whole-install checks, and selective checks. Preserve preflight, refusal, and repeat-install behavior.
-- Extend the narrow runtime inspector with `--explorer-effort`. Reuse its exact-thread lookup, expected-role/model/effort checks, permission evidence validation, and restricted output. Recognized effort strings are not a claim of host or model support.
-- Put the exploration default in the existing orchestration skill without changing its trigger description or requiring Architect mode. Role availability outside the skill comes from native host discovery; no global routing rule is installed.
-- Document a fresh-context native call with explicit effort, a scoped investigation packet, and independent runtime validation. Fresh context allows call-specific settings and keeps the investigation bounded.
-- Keep the Explorer's responsibility limited to facts and evidence-based explanations. It neither changes files nor delegates work further. The primary agent owns decisions and validation of findings.
-- When role/model/effort or required evidence is unavailable, do not certify that call. Report the gap; the primary may gather evidence directly. A more expensive delegated substitute requires explicit user authorization.
-- Preserve the Luna Implementer's fixed max requirement and every existing Advisor, Implementer, and Independent reviewer contract.
-- Update installation and usage documentation to distinguish role availability, skill-driven selection, and observed runtime behavior. Keep primary-session configuration unchanged.
+- 增加一个名为 `codex_advisor_luna_explorer` 的原生角色，模型为 `gpt-5.6-luna`，并请求只读沙箱。省略角色级推理设置，以便调用方可以选择推理等级。描述必须表达：它适用于任何主代理模型，并且在没有技能激活时可用。
+- 用 `explorer` 扩展配套安装器既有的角色选择，包括默认安装、整体安装检查和选择性检查。保留预检、拒绝和重复安装行为。
+- 用 `--explorer-effort` 扩展窄运行时检查器。复用它的精确线程查找、预期角色、模型和推理等级检查、权限证据验证，以及受限制的输出。被识别的推理等级字符串并不是对宿主支持或模型支持的声称。
+- 把探索默认放进既有的编排技能，而不改变它的触发描述，也不要求 Architect 模式。技能之外的角色可用性来自原生宿主发现；不安装全局路由规则。
+- 记录一次带有显式推理等级的新上下文原生调用、一份限定范围的调查数据包，以及独立的运行时验证。新上下文允许特定于该调用的设置，并使调查保持有界。
+- 把 Explorer 的责任限制为事实和基于证据的说明。它既不改变文件，也不进一步委派工作。主代理拥有决定和对发现的验证。
+- 当角色、模型、推理等级或必需证据不可用时，不要认证那次调用。报告该缺口；主代理可以直接收集证据。更昂贵的委派替代需要显式的用户授权。
+- 保留 Luna Implementer 固定的 max 要求，以及每一份既有的 Advisor、Implementer 和独立 Reviewer 契约。
+- 更新安装文档和使用文档，以区分角色可用性、由技能驱动的选择，以及观察到的运行时行为。保持主代理会话配置不变。
 
-## Testing Decisions
+## 测试决定
 
-- Test through the existing installer and runtime-inspector command interfaces. A useful test fails when installation omits the role, selective checks inspect the wrong role, requested effort is ignored, or a wrong/missing runtime setting is accepted. Do not use prompt-string assertions as proof of agent behavior.
-- Extend existing disposable installer cases for clean and repeat installation, selective checks, missing or modified roles, unsafe destinations, refusal before partial writes, and preservation of unrelated files and primary configuration.
-- Extend the existing runtime fixtures for the Explorer's expected model and requested effort, invalid arguments, wrong roles/models/efforts, missing or conflicting permission evidence, and restricted output. Retain existing Luna Implementer max tests.
-- Use isolated installed Codex homes and disposable source workspaces for the main live acceptance boundary. Exercise native role discovery and calls from Astra and non-Astra primaries, including Sol and another available non-Astra model. Check role definitions for absence of a primary-model whitelist; finite live cases do not prove every model or prompt.
-- Outside the skill, demonstrate that a primary can select and call the discovered role. Do not require every exploration prompt to select it. Within the existing skill scope, demonstrate default Luna selection after the primary decides to delegate exploration.
-- Observe at least two supported non-max effort values on the same Luna role. Check actual child role, model, effort, parent linkage, and unchanged primary settings rather than agent self-description.
-- Use source questions with known answers to check precise references and evidence quality. Inspect tool activity and before/after scoped file state for mutations. Report actual permission metadata separately; no-write behavior alone does not establish enforced isolation.
-- Exercise unavailable-role handling in an isolated installation, including direct primary investigation and no unauthorized expensive substitute. A missing-role test does not establish provider-outage coverage.
-- Reuse prior installed-host acceptance and adjustable-effort tests. Run the complete deterministic suite after focused checks, and record unrun or inaccessible live scenarios explicitly.
+- 通过既有的安装器和运行时检查器命令接口进行测试。一个有用的测试会在下列情形失败：安装遗漏该角色，选择性检查检视了错误的角色，所请求的推理等级被忽略，或者一个错误的或缺失的运行时设置被接受。不要把提示词字符串断言用作代理行为的证明。
+- 扩展既有的一次性安装器情形，覆盖干净安装和重复安装、选择性检查、缺失的或已修改的角色、不安全的目标位置、在部分写入之前的拒绝，以及无关文件和主代理配置的保留。
+- 扩展既有的运行时夹具，覆盖 Explorer 的预期模型和所请求的推理等级、无效参数、错误的角色、模型和推理等级、缺失的或冲突的权限证据，以及受限制的输出。保留既有的 Luna Implementer max 测试。
+- 使用隔离的已安装 Codex 主目录和一次性源工作区，作为主要的实机验收边界。演练来自 Astra 主代理和非 Astra 主代理的原生角色发现和调用，包括 Sol 和另一个可用的非 Astra 模型。检查角色定义中没有主代理模型白名单；有限的实机情形并不能证明每一个模型或提示词。
+- 在技能之外，展示主代理能够选择并调用被发现的角色。不要要求每一个探索提示词都选择它。在既有的技能范围之内，展示在主代理决定委派探索之后默认选择 Luna。
+- 在同一个 Luna 角色上观察至少两个受支持的、非 max 的推理等级值。检查实际的子级角色、模型、推理等级、父级关联和未改变的主代理设置，而不是代理的自我描述。
+- 使用带有已知答案的源问题，来检查精确引用和证据质量。检视工具活动以及限定范围文件状态在之前与之后是否有改动。分开报告实际的权限元数据；仅有不写入的行为并不能确立强制隔离。
+- 在一套隔离安装中演练不可用角色的处理，包括主代理直接调查，以及没有未经授权的昂贵替代。缺失角色测试并不确立提供方中断的覆盖。
+- 复用先前的已安装宿主验收和可调整推理等级测试。在聚焦检查之后运行完整的确定性套件，并明确记录未运行的或不可达的实机场景。
 
-## Out of Scope
+## 范围之外
 
-- A global default exploration route, replacing Codex's built-in Explorer, or changing Codex itself.
-- A new exploration skill or broader orchestration trigger scope.
-- Primary-model restrictions, automatic Architect mode, or automatic primary-model changes.
-- A fixed Explorer effort, a max minimum, or relaxing the Luna Implementer's max requirement.
-- Explorer implementation, architectural decision ownership, formal review, or recursive delegation.
-- Automatic escalation to more expensive delegated models.
-- New providers, dependencies, routing services, or test frameworks.
-- Automatic reconciliation of conflicting installed roles or deployment to the user's active Codex home.
-- Quantified quota or latency savings and guarantees that every host enforces the requested sandbox.
+- 一条全局默认探索路由、替换 Codex 内置的 Explorer，或改变 Codex 本身。
+- 一个新的探索技能，或更宽的编排触发范围。
+- 主代理模型限制、自动的 Architect 模式，或自动的主代理模型变更。
+- 一个固定的 Explorer 推理等级、一个 max 最小值，或放宽 Luna Implementer 的 max 要求。
+- Explorer 的实现、架构决定的所有权、正式评审，或递归委派。
+- 自动升级到更昂贵的委派模型。
+- 新的提供方、依赖、路由服务或测试框架。
+- 对冲突的已安装角色做自动调和，或部署到用户当前使用中的 Codex 主目录。
+- 量化的配额节省或延迟节省，以及每一个宿主都强制执行所请求沙箱的保证。
 
-## Further Notes
+## 补充说明
 
-This specification uses the project's Explorer, Architect mode, Advisor mode, Implementer, and Independent reviewer vocabulary and the accepted exploration decision. Availability to every primary model is a role contract, not a promise that every primary will select the role on every prompt. The host must discover the installed role, and its current model support, permission policy, concurrency limits, and authorization rules remain applicable.
+本规格使用本项目的 Explorer、Architect 模式、Advisor 模式、Implementer 和独立 Reviewer 词汇，以及已被接受的探索决定。对每一个主代理模型可用是一份角色契约，不是每一个主代理都会在每一个提示词上选择该角色的承诺。宿主必须发现已安装的角色，并且它当前的模型支持、权限策略、并发限制和授权规则仍然适用。

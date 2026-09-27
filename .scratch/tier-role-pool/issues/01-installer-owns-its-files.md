@@ -1,22 +1,22 @@
-# 01: Companion installer owns its files
+# 01：配套安装器拥有它自己的文件
 
-**What to build:** After a plugin update the user runs the companion installer once and the installed entries equal the shipped templates: differing own files are overwritten, retired names are deleted, nothing else is touched, and `--check` reports drift and residue. The installer becomes manifest-driven so that later tickets only add or remove template files and retire names. This ticket still ships the current eight entries; the retire list starts empty.
+**要构建的内容：** 插件更新之后，用户把配套安装器运行一次，已安装的入口就等于随附的模板：有差异的自有文件被覆盖，退役名称被删除，其他任何东西都不被触碰，并且 `--check` 报告漂移与残留。安装器改为由清单驱动，以便后续工单只增加或删除模板文件与退役名称。本工单仍然交付当前的八个入口；退役列表从空开始。
 
-**Blocked by:** None (can start immediately).
+**Blocked by:** None（可以立即开始）。
 
 **Status:** resolved
 
-- [x] The manifest is the set of TOML templates shipped beside the installer; no per-role case table names files. A selective check names a template by its filename stem minus the plugin prefix (today `codex-advisor-`, later `ca-`), and the prefix is one variable.
-- [x] A missing or differing manifest destination is written and reported as installed; an identical one is reported as unchanged. No backup file is left and no old-versus-new judgment is made.
-- [x] A retire list of exact filenames exists (empty in this ticket). A present retire file is deleted by filename without reading it and reported as removed.
-- [x] Files outside the manifest and retire list, including upstream `sol-advisor-*` entries, unrelated agents, and the primary configuration, are never read or written; a snapshot before and after an install shows them byte-identical.
-- [x] `--check` writes nothing and exits non-zero listing every differing or missing manifest file and every present retire file; it exits zero only when all manifest files match and no retire file exists.
-- [x] Symlinked destinations or ancestors, non-regular destinations, non-directory ancestors, the filesystem root, and dot path segments are still refused before any write, with no partial mutation.
-- [x] Writes are atomic per file (temporary file in the target directory, then rename) so an interrupted install never leaves a half-written entry.
-- [x] A `.gitattributes` at the repository root pins LF for text files so a Windows checkout compares byte-identical to installed copies.
-- [x] The installation group of the verifier is rewritten to the new semantics: overwrite reported, unchanged reported, retire removal, check failing on drift and on residue, preservation of unrelated files, every refusal without partial mutation, default `CODEX_HOME` and relative target behaviour. The case that an old Sol template blocks the upgrade is removed. The installation group passes; the runtime group is unchanged and still passes.
-- [x] The installer's usage text and the operations reference sentences that describe refusal of modified destinations are not edited here; ticket 03 rewrites the reference, and the usage text is updated to the new semantics in this ticket.
+- [x] 清单是安装器旁边随附的那一组 TOML 模板；没有按角色分列的用例表去点名文件。选择性检查用文件名的词干去掉插件前缀来点名模板（今天是 `codex-advisor-`，以后是 `ca-`），并且前缀是一个变量。
+- [x] 缺失或有差异的清单目标被写入，并报告为已安装；相同的一个报告为未改变。不留下备份文件，也不做旧与新的判断。
+- [x] 存在一份精确文件名的退役列表（本工单中为空）。在场的退役文件按文件名删除，不读取它，并报告为已移除。
+- [x] 清单与退役列表之外的文件，包括上游的 `sol-advisor-*` 入口、无关的代理以及主配置，从不被读取或写入；安装前后的快照显示它们逐字节相同。
+- [x] `--check` 不写入任何东西，并以非零状态退出，同时列出每一个有差异或缺失的清单文件以及每一个在场的退役文件；只有当全部清单文件都匹配、且不存在任何退役文件时，它才以零状态退出。
+- [x] 符号链接的目标或其祖先、非常规目标、非目录祖先、文件系统根，以及点路径段，仍然在任何写入之前被拒绝，并且没有部分变更。
+- [x] 写入按文件原子进行（目标目录中的临时文件，然后重命名），因此一次被中断的安装从不留下写了一半的入口。
+- [x] 仓库根目录的一份 `.gitattributes` 为文本文件固定 LF，因此 Windows 检出与已安装副本逐字节相同。
+- [x] 验证器的安装组按新语义重写：覆盖有报告，未改变有报告，退役移除，检查在漂移上失败也在残留上失败，无关文件被保留，每一次拒绝都没有部分变更，默认 `CODEX_HOME` 以及相对目标的行为。旧 Sol 模板阻挡升级的那条用例被移除。安装组通过；运行时组未改变并且仍然通过。
+- [x] 安装器的用法文本，以及描述拒绝已修改目标的操作参考句子，不在这里编辑；工单 03 重写该参考，用法文本在本工单中更新为新语义。
 
-## Acceptance
+## 验收
 
-Accepted 2026-09-16 by the primary. Lane: `generalPurpose` pinned `cursor-grok-4.6-xhigh` (requested, not confirmed). Tier 1: `sh plugins/codex-advisor/scripts/verify.sh` rerun by the primary, both groups pass; `git diff --stat` limited to `install-agents.sh` (150), `verify.sh` (188), new `.gitattributes` and `agents/retire.txt`. Tier 2: the primary read the installer in full — manifest is the `agents/*.toml` glob, retire list is `agents/retire.txt` (comments and blank lines skipped, names with `/` or `..` rejected), writes are `mktemp` + `mv -f`, retire removal accepts regular files and symlinks and refuses other non-regular entries, `--check-role` skips residue and says so in usage. Negative proof recorded by the lane: skipping the overwrite fails the installation group at the `INSTALLED` assertion.
+由主代理于 2026-09-16 验收。通道：`generalPurpose`，固定为 `cursor-grok-4.6-xhigh`（已请求，未经确认）。第 1 级：主代理重跑了 `sh plugins/codex-advisor/scripts/verify.sh`，两个组都通过；`git diff --stat` 限于 `install-agents.sh`（150）、`verify.sh`（188）、新的 `.gitattributes` 以及 `agents/retire.txt`。第 2 级：主代理通读了安装器——清单是 `agents/*.toml` 通配，退役列表是 `agents/retire.txt`（注释与空行被跳过，带有 `/` 或 `..` 的名称被拒绝），写入是 `mktemp` + `mv -f`，退役移除接受常规文件与符号链接并拒绝其他非常规入口，`--check-role` 跳过残留并在用法中如此说明。通道记录的反证：跳过覆盖会使安装组在 `INSTALLED` 断言处失败。

@@ -1,19 +1,19 @@
-# 03: Skill mechanism text, routing profile, and references
+# 03：技能机制文本、路由配置与参考
 
-**What to build:** A primary that loads the skill reads mechanism only (first-round pool, senior gate, escalation ladder, Advisor defaults) and finds every dial value in one routing profile reference. The operations and role-contracts references describe the eleven tier-named entries, the manifest-driven installer, and the generic inspector as ticket 01 and 02 define them. Every touched runtime Markdown gets its Chinese twin in the same change. The eleven templates do not exist yet when this ticket lands; the mechanical profile-to-template check is ticket 06.
+**要构建的内容：** 加载该技能的主代理只读到机制（第一轮池、senior 门禁、升级阶梯、Advisor 默认值），并在一份路由配置参考中找到每一个拨档值。操作参考与角色契约参考描述十一个按档位命名的入口、由清单驱动的安装器，以及工单 01 与工单 02 所定义的通用检查器。每一个被触碰的运行时 Markdown 都在同一次变更中得到它的中文对照。本工单落地时十一个模板尚不存在；机械的配置到模板检查是工单 06。
 
-**Blocked by:** None (documentation files only; disjoint from tickets 01 and 02).
+**Blocked by:** None（仅文档文件；与工单 01 和工单 02 互不相交）。
 
 **Status:** resolved
 
-- [x] The skill's allocation section states: role by output; tier chosen inside the first-round pool by judgment dependence with no precondition between light and standard, cheapest adequate dial at its default; senior only through the senior gate (two capability-attributed complete failed attempts inside the pool, or a user declaration; for the Advisor, a low-confidence verdict or a user declaration); the escalation ladder R1 rework ticket same thread same dial, R2 raise in a fresh thread with the current-state handoff when rework fails and the cause is capability (higher effort of the same model or another model), R3 the same model raised at most once, R4 a major execution problem may skip the rework ticket and change model, counted as one failure. The sentence that no fixed ladder is imposed is gone. No model name, effort value, or default appears in the skill.
-- [x] The complete-attempt definition, the fresh-thread rule for every effort or model change, Architect mode, the required-advice triggers, and the acceptance rules read as before.
-- [x] A new reference `routing-profile.md` beside `role-contracts.md` and `operations.md` carries: declaration date 2026-09-16 and anchored models; the table role × tier → entry names and dials exactly as the spec's Implementation Decisions list them, in the notation `model[a*, b, c]` with candidate order by listing; Advisor defaults (decision shape standard, acceptance shape light); one sentence pointing to the skill for pool, gate, and ladder; the adjustment method (change the template and this table, run the verifier, release).
-- [x] The operations reference replaces the entry table with the eleven entries (entry name, install selector, pinned effort or caller-selected), describes the installer's overwrite and retire semantics and `--check`, and the inspector's `--agent` and `--effort` options with examples; it no longer says modified destinations are refused or that updated templates count as conflicting copies.
-- [x] The role-contracts reference keeps the Explorer and Worker packets, merges the independent-acceptance packet under the Advisor heading as its second request shape, and names no reviewer entry.
-- [x] The words Implementer and implementer do not appear in the skill or the three references; Worker is used.
-- [x] The Chinese twins of the skill, the two references, and the new routing profile are re-translated to match; the failure-reassessment sentence in the skill twin renders the failure-count meaning (audit finding R02); identifiers, commands, entry names, and dial notation stay character-exact. The mirror test passes.
+- [x] 该技能的分配小节陈述：按产出决定角色；档位在第一轮池内按判断依赖来选择，light 与 standard 之间没有前提条件，采用其默认值上最便宜且足够的拨档；senior 只通过 senior 门禁到达（池内两次被归因于能力的、失败的完整尝试，或用户的一次声明；对 Advisor 而言，是低置信度裁定或用户的一次声明）；升级阶梯为 R1 返工工单、同一线程、同一拨档，R2 在返工失败且原因是能力时，在新线程中带着当前状态交接提升（同一模型的更高推理等级，或另一个模型），R3 同一模型至多提升一次，R4 一个重大执行问题可以跳过返工工单并更换模型，计为一次失败。那句不施加固定阶梯的句子已经不在。技能中不出现模型名称、推理等级值或默认值。
+- [x] 完整尝试的定义、每一次推理等级或模型变更的新线程规则、Architect 模式、必需建议的触发条件，以及验收规则，读起来与以前一样。
+- [x] 在 `role-contracts.md` 与 `operations.md` 旁边，一份新的参考 `routing-profile.md` 携带：声明日期 2026-09-16 以及锚定的模型；按规格的实现决定所列出的那样、从角色 × 档位到入口名称与拨档的表，记法为 `model[a*, b, c]`，候选顺序按列出顺序；Advisor 默认值（决策形态为 standard，验收形态为 light）；一句指向该技能以说明池、门禁与阶梯的句子；调整方法（更改模板与这张表，运行验证器，发布）。
+- [x] 操作参考用十一个入口替换入口表（入口名称、安装选择器、固定的推理等级或由调用者选择），描述安装器的覆盖与退役语义以及 `--check`，还有检查器的 `--agent` 与 `--effort` 选项及示例；它不再说已修改的目标会被拒绝，也不再说已更新的模板算作冲突副本。
+- [x] 角色契约参考保留 Explorer 与 Worker 数据包，把独立验收数据包合并到 Advisor 标题之下作为它的第二种请求形态，并且不点名任何 reviewer 入口。
+- [x] Implementer 与 implementer 这两个词不出现在该技能或三份参考中；使用的是 Worker。
+- [x] 该技能、两份参考以及新路由配置的中文对照被重新翻译以匹配；技能对照中的失败再评估句子表达失败计数的含义（审计发现 R02）；标识符、命令、入口名称以及拨档记法保持逐字符精确。镜像测试通过。
 
-## Acceptance
+## 验收
 
-Accepted 2026-09-16 by the primary. Lane: same-model dispatch (`generalPurpose`, model omitted; doctrine prose). Tier 1: `python3 tests/test_zh_mirror.py` rerun, 4/4; `git diff --stat` limited to the skill, two references, `openai.yaml`, three twins, plus the two new `routing-profile.md` files. Tier 2: the primary read `SKILL.md` (154 lines: no model name or effort value; pool, gate, R1–R4, Advisor defaults present; Architect mode, fresh-thread rule, advice triggers, acceptance rules unchanged in meaning) and `routing-profile.md` (11 entries, dial notation, five pinned efforts, Advisor defaults, adjustment method). Lane's judgment call accepted: the decision packet's trigger list gains "or the senior gate after two complete failures", consistent with the skill. Contract typo noted by the lane (ticket filenames) had no effect. The mechanical profile-to-template check is ticket 06.
+由主代理于 2026-09-16 验收。通道：同模型派发（`generalPurpose`，模型被省略；原则散文）。第 1 级：重跑 `python3 tests/test_zh_mirror.py`，4/4；`git diff --stat` 限于该技能、两份参考、`openai.yaml`、三份对照，外加两份新的 `routing-profile.md` 文件。第 2 级：主代理阅读了 `SKILL.md`（154 行：没有模型名称或推理等级值；池、门禁、R1–R4、Advisor 默认值都在；Architect 模式、新线程规则、建议触发条件、验收规则在含义上未改变）以及 `routing-profile.md`（11 个入口、拨档记法、五个固定推理等级、Advisor 默认值、调整方法）。通道的判断调用已被接受：决策数据包的触发列表增加了 "or the senior gate after two complete failures"，与该技能一致。通道注明的契约笔误（工单文件名）没有影响。机械的配置到模板检查是工单 06。

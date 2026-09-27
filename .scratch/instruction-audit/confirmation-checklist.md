@@ -1,277 +1,277 @@
-# Instruction Audit: Confirmation Checklist
+# 指令审计：待确认清单
 
 Status: needs-triage
 
-Recorded: 2026-09-13.
-Reviewed repository revision: `7eca26d41f51c8d63ec4f62c2783fa9cc60c3146`.
+记录日期：2026-09-13。
+审查的仓库版本：`7eca26d41f51c8d63ec4f62c2783fa9cc60c3146`。
 
-This record preserves the twelve findings from the instruction audit for individual user review. No recommendation below is approved for implementation. Recording this checklist does not authorize changes to runtime rules, role defaults, installed copies, permissions, commits, or deployments. This is an audit record, not a combined implementation ticket.
+本记录保存指令审计的十二项发现，供用户逐项审阅。下面的任何建议都尚未批准实施。记录本清单不授权修改运行时规则、角色默认值、已安装副本、权限，也不授权提交或部署。这是一份审计记录，不是一张合并的实现工单。
 
-## How to record decisions
+## 如何记录裁定
 
-Leave an item unchecked until the user has reviewed it. Then check it and replace its decision field with `keep`, `simplify`, `remove`, `update`, `defer`, or `reject`, followed by the agreed scope. A checked item means its decision is recorded; it does not mean implementation or verification is complete.
+用户审阅某一项之前，保持该项未勾选。审阅后勾选，并把该项的裁定字段改为 `keep`、`simplify`、`remove`、`update`、`defer` 或 `reject` 之一，再写明商定的范围。勾选的项表示其裁定已记录；它不表示实现或验证已经完成。
 
-The suggestions to reduce verification in R07, change logging coverage in R10, and introduce a unique Sol worker default in R08 need explicit behavioral decisions. The remaining recommendations also remain pending until the user confirms their scope.
+减少 R07 中验证的建议、改变 R10 中日志覆盖的建议，以及在 R08 中引入唯一 Sol worker 默认值的建议，需要明确的行为裁定。其余建议也保持待裁定，直到用户确认其范围。
 
-## Evidence and scope
+## 证据与范围
 
-- The audit began with the [OpenAI article on rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra), read on 2026-09-13. It supports accurate triggers, progressive disclosure, and proportionate verification; it does not itself authorize removing project safeguards or changing model preferences.
-- Current project policy is [ADR-0003](../../docs/adr/0003-autonomous-primary-and-tiered-role-pool.md). Earlier ADRs and acceptance records provide historical context only where superseded or not rerun.
-- Scope covered the plugin skill, descriptions, references, eight role configurations, presentation metadata, repository instructions, README, domain guidance, relevant architecture records, and three Chinese mirrors. Deployment scope is the repository's existing README, AGENTS.md, and operations reference; there is no additional deployment guide identified for this audit.
-- External inspection covered the loaded [global instructions](/home/hyy/.codex/AGENTS.md), relevant WSL and Windows configuration, and corresponding role, marketplace, and plugin-cache copies. No other plugin's posture, routing, or acceptance strategy is adopted.
-- Observations below were made during the 2026-09-13 audit. Recheck host-dependent claims after host, configuration, installation, marketplace, or template changes. Recheck file locations against the reviewed revision after edits.
-- Expected savings are reasoned estimates of avoided work. No latency, token, cost, or quality improvement was measured.
+- 审计从这篇[关于重新思考 GPT-6 Astra 的技能与提示词的 OpenAI 文章](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)开始，于 2026-09-13 阅读。它支持准确的触发条件、渐进式披露和相称的验证；它本身不授权移除项目保障或改变模型偏好。
+- 当前项目策略是 [ADR-0003](../../docs/adr/0003-autonomous-primary-and-tiered-role-pool.md)。较早的 ADR 和验收记录只在已被取代或未重跑的地方提供历史上下文。
+- 范围覆盖插件技能、描述、参考文件、八个角色配置、呈现元数据、仓库指令、README、领域指导、相关架构记录，以及三份中文镜像。部署范围是本仓库现有的 README、AGENTS.md 和 operations 参考；这次审计没有找到额外的部署指南。
+- 外部检查覆盖已加载的[全局指令](/home/hyy/.codex/AGENTS.md)、相关的 WSL 与 Windows 配置，以及对应的角色、市场和插件缓存副本。没有采用任何其他插件的姿态、路由或验收策略。
+- 下面的观察是在 2026-09-13 的审计期间作出的。在宿主、配置、安装、市场或模板变更之后，重新检查依赖宿主的主张。在编辑之后，对照审查的版本重新检查文件位置。
+- 预期节省是对避免的工作所作的推算估计。没有测量延迟、词元、成本或质量改进。
 
-## Pending findings
+## 待裁定的发现
 
-### R01: Deployment line endings and exact-template checks
+### R01：部署时的行尾与精确模板检查
 
-- [x] Review R01 and record the decision.
+- [x] 审阅 R01 并记录裁定。
 
-**Decision:** update — decided 2026-09-16 in the tier-role-pool spec; `.gitattributes` pins LF for text files and the installer now overwrites this plugin's own files (ticket 01, ADR-0004).
+**裁定：** update——于 2026-09-16 在 tier-role-pool 规格中决定；`.gitattributes` 将文本文件固定为 LF，并且安装器现在会覆盖本插件自己的文件（工单 01、ADR-0004）。
 
-**Classification:** Further verification required.
+**分类：** 需要进一步验证。
 
-**Location and original instruction:** [Operations, lines 27–33](../../plugins/codex-advisor/skills/orchestration/references/operations.md): “Exact files remain unchanged”; modified or conflicting destinations are refused. [The installer, line 82](../../plugins/codex-advisor/scripts/install-agents.sh) compares templates with `cmp -s`.
+**位置与原始指令：** [operations 第 27–33 行](../../plugins/codex-advisor/skills/orchestration/references/operations.md)：“Exact files remain unchanged”；已修改或冲突的目标会被拒绝。[安装器第 82 行](../../plugins/codex-advisor/scripts/install-agents.sh)用 `cmp -s` 比较模板。
 
-**Verified observation:** Windows marketplace and plugin-cache text files use CRLF, while the eight installed role files use LF. Their contents match after line-ending normalization, but their original bytes differ. WSL repository, marketplace, cache, and installed role comparisons passed.
+**已核实的情况：** Windows 市场和插件缓存中的文本文件使用 CRLF，而八个已安装的角色文件使用 LF。它们的内容在行尾规范化之后一致，但原始字节不同。WSL 仓库、市场、缓存和已安装角色的比较通过。
 
-**Proposal:** Document the managed-file line-ending convention, installer source, and target directory. Consider repository attributes that preserve LF in distributed files after checking the actual Windows path. Keep strict drift detection rather than immediately weakening comparison.
+**建议：** 记录受管理文件的行尾约定、安装器来源和目标目录。在检查实际的 Windows 路径之后，考虑使分发文件保持 LF 的仓库属性。保持严格的漂移检测，而不是立即减弱比较。
 
-**Impact:** May avoid manual reconciliation caused solely by line endings. Exact-template refusal remains intact.
+**影响：** 可能避免仅由行尾引起的手工调和。精确模板拒绝保持不变。
 
-**Unverified and next check:** Windows-native execution of cached scripts was not run. Do not label installation as broken from the byte comparison alone. A later authorized check should exercise the documented Windows shell and selective installer check, without overwriting customized roles.
+**未验证与下一步检查：** 没有运行缓存脚本的 Windows 原生执行。不要仅凭字节比较就把安装标为已损坏。以后经过授权的检查应当演练文档中的 Windows shell 和选择性安装器检查，而不覆盖已定制的角色。
 
-### R02: Chinese mirror changes the failure-reassessment rule
+### R02：中文镜像改变了失败再评估规则
 
-- [x] Review R02 and record the decision.
+- [x] 审阅 R02 并记录裁定。
 
-**Decision:** update — the Chinese twin of the skill was re-translated with the failure-count meaning in the tier-role-pool batch (ticket 03).
+**裁定：** update——技能的中文孪生文件已在 tier-role-pool 批次中按失败计数的含义重新翻译（工单 03）。
 
-**Classification:** Correct and simplify.
+**分类：** 纠正并精简。
 
-**Location and original instruction:** [English skill, lines 103–105](../../plugins/codex-advisor/skills/orchestration/SKILL.md): “rather than an unconditional counter-driven call.” [Chinese mirror, line 57](../../docs/zh/skills/orchestration/SKILL.md), verbatim: “而不是无条件地按反对意见再调一次”.
+**位置与原始指令：** [英文技能第 103–105 行](../../plugins/codex-advisor/skills/orchestration/SKILL.md)：“rather than an unconditional counter-driven call.”。[中文镜像第 57 行](../../docs/zh/skills/orchestration/SKILL.md)，逐字如下：“而不是无条件地按反对意见再调一次”。
 
-**Verified observation:** The English instruction concerns automatic consultation driven by a failure count. The Chinese sentence instead refers to opposing opinions. The mirror-existence check cannot detect this semantic difference.
+**已核实的情况：** 英文指令说的是由失败计数驱动的自动咨询。中文句子说的却是反对意见。镜像存在性检查不能发现这一语义差异。
 
-**Proposal:** Restore the failure-count meaning. Correct unclear translations such as the rendering of judgment calls, using natural Chinese for explanatory prose and preserving exact commands, parameters, and role identifiers.
+**建议：** 恢复失败计数的含义。纠正不清楚的翻译，例如判断调用的译法，说明性正文使用自然的中文，并保留精确的命令、参数和角色标识。
 
-**Impact:** Removes a conflicting interpretation without changing the English policy. Preserve mirror synchronization and inspect the meaning of changed clauses.
+**影响：** 去掉一种冲突的解释，而不改变英文策略。保留镜像同步，并检查被改动分句的含义。
 
-**Verification:** Run the existing mirror-existence check and compare edited clauses against their English sources. Model execution is not needed to validate this translation change.
+**验证：** 运行现有的镜像存在性检查，并把编辑过的分句与其英文来源比较。验证这项翻译变更不需要模型执行。
 
-### R03: Separate requested settings, host records, and server execution
+### R03：把请求的设置、宿主记录和服务器执行分开
 
-- [ ] Review R03 and record the decision.
+- [ ] 审阅 R03 并记录裁定。
 
-**Decision:** Pending.
+**裁定：** 待裁定。
 
-**Classification:** Clarify and update against official documentation.
+**分类：** 对照官方文档澄清并更新。
 
-**Location and original instruction:** [Operations, lines 77–99](../../plugins/codex-advisor/skills/orchestration/references/operations.md): “Public spawn/details metadata is authoritative” and requirements to validate actual routing.
+**位置与原始指令：** [operations 第 77–99 行](../../plugins/codex-advisor/skills/orchestration/references/operations.md)：“Public spawn/details metadata is authoritative”，以及验证实际路由的要求。
 
-**Verified observation:** [The inspector, lines 168–185](../../plugins/codex-advisor/scripts/inspect-agent-runtime.sh), extracts `session_meta` and `turn_context` fields. These are host records, not independent evidence of server-side execution. The [official subagent documentation](https://developers.openai.com/codex/subagents), read on 2026-09-13, describes explicit settings, custom-agent overrides, and parent permission overrides.
+**已核实的情况：** [检查器第 168–185 行](../../plugins/codex-advisor/scripts/inspect-agent-runtime.sh)提取 `session_meta` 和 `turn_context` 字段。这些是宿主记录，不是服务器端执行的独立证据。于 2026-09-13 阅读的[官方子代理文档](https://developers.openai.com/codex/subagents)描述了显式设置、自定义代理覆盖和父权限覆盖。
 
-**Proposal:** Name four distinct layers: invocation request, configuration after role overrides, host-observed metadata, and server-side execution. Scope each conclusion to the fields and entrance actually observed. Retain contradiction handling and avoid inventing a metadata tool when the current host does not expose it.
+**建议：** 点名四个不同的层：调用请求、角色覆盖之后的配置、宿主观察到的元数据，以及服务器端执行。把每条结论限定在实际观察到的字段和入口上。保留对矛盾的处理，并且在当前宿主没有暴露某种元数据工具时，避免发明一个。
 
-**Impact:** Prevents overclaiming and unnecessary searches for evidence outside an entrance's contract. Do not replace routing checks with role self-reports or silently substitute settings.
+**影响：** 防止过度声称，以及在一个入口的契约之外不必要地搜寻证据。不要用角色自我报告替换路由检查，也不要静默替换设置。
 
-**Unverified:** Server-side model or effort selection was not investigated. Do not require new server-side investigation for every routine call merely to clarify documentation.
+**未验证：** 没有调查服务器端的模型或推理等级选择。不要仅仅为了澄清文档，就要求每一次例行调用都做新的服务器端调查。
 
-### R04: Make the root skill a smaller phase router
+### R04：让根技能成为更小的阶段路由器
 
-- [ ] Review R04 and record the decision.
+- [ ] 审阅 R04 并记录裁定。
 
-**Decision:** Pending.
+**裁定：** 待裁定。
 
-**Classification:** Simplify.
+**分类：** 精简。
 
-**Location and original instruction:** [Root skill, lines 27–29](../../plugins/codex-advisor/skills/orchestration/SKILL.md), requires the role packet and installation, invocation, evidence, and permission procedures before delegation. The root also repeats recovery and acceptance procedures.
+**位置与原始指令：** [根技能第 27–29 行](../../plugins/codex-advisor/skills/orchestration/SKILL.md)要求在委派之前阅读角色数据包，以及安装、调用、证据和权限程序。根文件还重复了恢复和验收程序。
 
-**Verified observation:** The root contains 142 lines; the role-contract and operations references contain 146 and 235 lines respectively at the reviewed revision. Several responsibilities appear in multiple locations. Line count is context here, not a deletion threshold.
+**已核实的情况：** 在审查的版本上，根文件有 142 行；角色契约参考和 operations 参考分别有 146 行和 235 行。若干职责出现在多个位置。行数在这里是上下文，不是删除阈值。
 
-**Proposal:** Retain authorization, allocation, required-advice triggers, and completion boundaries in the root. Route to invocation material for calls, recovery material after failures, and maintainer verification only when changing the plugin. Explicitly allow reuse of already-loaded guidance while its premises remain valid.
+**建议：** 在根文件中保留授权、分配、必需建议的触发条件，以及完成边界。调用时转到调用材料，失败之后转到恢复材料，并且只在修改本插件时转到维护者验证。在已经加载的指导其前提仍然有效时，显式允许复用。
 
-**Impact:** Reduces irrelevant reading without removing the underlying procedures. Preserve accurate skill triggers; the description is already relatively short.
+**影响：** 减少无关的阅读，而不移除底层程序。保留准确的技能触发条件；描述已经相对较短。
 
-**Verification:** Check that each workflow still has a reachable authoritative entry and that relocated runtime Markdown retains its Chinese twin. No empirical performance claim follows from fewer lines.
+**验证：** 检查每条工作流仍然有一个可到达的权威入口，并且被移动的运行时 Markdown 仍然保留其中文孪生文件。行数更少并不随之产生经验上的性能主张。
 
-### R05: Keep caller scheduling duties out of delegate instructions
+### R05：把调用方的调度职责留在被委派指令之外
 
-- [x] Review R05 and record the decision.
+- [x] 审阅 R05 并记录裁定。
 
-**Decision:** simplify — decided 2026-09-16; every native entry's `developer_instructions` now carries only delegate duties, caller duties live in the skill and references (tickets 04–06, ADR-0004).
+**裁定：** simplify——于 2026-09-16 决定；每个原生入口的 `developer_instructions` 现在只承载被委派方的职责，调用方的职责位于技能和参考文件中（工单 04–06、ADR-0004）。
 
-**Classification:** Simplify.
+**分类：** 精简。
 
-**Location and original instruction:** [Advisor configuration, lines 10–11](../../plugins/codex-advisor/agents/codex-advisor-astra-advisor.toml), repeats mandatory consultation triggers. [Sol worker configuration, lines 24–29](../../plugins/codex-advisor/agents/codex-advisor-sol-implementer.toml), repeats thread replacement, predecessor handling, and primary metadata checks.
+**位置与原始指令：** [Advisor 配置第 10–11 行](../../plugins/codex-advisor/agents/codex-advisor-astra-advisor.toml)重复了强制咨询的触发条件。[Sol worker 配置第 24–29 行](../../plugins/codex-advisor/agents/codex-advisor-sol-implementer.toml)重复了线程替换、前驱处理和主代理元数据检查。
 
-**Verified observation:** These caller duties also appear in the root skill and operations reference. Delegates cannot independently perform all of them.
+**已核实的情况：** 这些调用方职责也出现在根技能和 operations 参考中。被委派方不能独立完成其中的全部事项。
 
-**Proposal:** Keep delegate objectives, ownership, local decision authority, boundaries, meaningful verification, and actual-result reporting in role instructions. Keep dispatch, consultation triggers, lifecycle transitions, and metadata collection with the primary. Preserve information the caller needs to select a standalone role in its discoverable description.
+**建议：** 在角色指令中保留被委派方的目标、所有权、局部决定权限、边界、有意义的验证和实际结果报告。把派发、咨询触发条件、生命周期转换和元数据收集留给主代理。在其可发现的描述中保留调用方选择一个独立角色时所需的信息。
 
-**Impact:** Reduces redundant context and responsibility confusion. Roles may be called without the skill, so their essential read-only or ownership boundaries must remain self-contained. A new configuration-generation system is not proposed.
+**影响：** 减少重复的上下文和职责混淆。角色可能在没有该技能的情况下被调用，因此它们本质的只读边界或所有权边界必须保持自足。没有提议一套新的配置生成系统。
 
-**Verification:** Inspect both skill-assisted and standalone role contracts for retained selection information and boundaries; do not apply worker change contracts to read-only evidence roles.
+**验证：** 检查有技能辅助的契约和独立的角色契约，确认保留了选择信息和边界；不要把 worker 的变更契约应用到只读证据角色上。
 
-### R06: Concentrate installation and update instructions in README
+### R06：把安装和更新指令集中到 README
 
-- [ ] Review R06 and record the decision.
+- [ ] 审阅 R06 并记录裁定。
 
-**Decision:** Pending.
+**裁定：** 待裁定。
 
-**Classification:** Simplify and update against official documentation.
+**分类：** 对照官方文档精简并更新。
 
-**Location and original instruction:** [README, lines 78–117](../../README.md), repeats failure, lifecycle, advice, and acceptance procedures. Its update instruction says to “repeat plugin installation and the companion installer.”
+**位置与原始指令：** [README 第 78–117 行](../../README.md)重复了失败、生命周期、建议和验收程序。它的更新指令说要“repeat plugin installation and the companion installer.”。
 
-**Verified observation:** On WSL, `codex plugin list --json` reports a marketplace snapshot in `.source.path`, while this session loads the skill from the plugin cache. Their bytes currently match. Both WSL and Windows marketplace configurations point at GitHub. CLI `0.154.0` still exposes the documented plugin commands.
+**已核实的情况：** 在 WSL 上，`codex plugin list --json` 在 `.source.path` 中报告一份市场快照，而本次会话从插件缓存加载该技能。它们的字节目前一致。WSL 和 Windows 的市场配置都指向 GitHub。CLI `0.154.0` 仍然暴露文档中的插件命令。
 
-**Proposal:** Keep purpose, prerequisites, installation, examples, a concise role table, and update entry points in README. Link to internal procedures. Distinguish Git-backed marketplace updates from local-checkout development and identify the editable source, marketplace snapshot, loaded cache, and installed role target.
+**建议：** 在 README 中保留目的、前提、安装、示例、一张简明的角色表，以及更新入口。链接到内部程序。把由 Git 支持的市场更新与本地检出的开发区分开，并标明可编辑的源、市场快照、已加载的缓存和已安装的角色目标。
 
-**Impact:** Makes installation conditions and update operations easier to find. Preserve the companion installer, source/target paths, conflict handling, and fresh-task discovery step.
+**影响：** 使安装条件和更新操作更容易找到。保留配套安装器、来源与目标路径、冲突处理，以及新任务的发现步骤。
 
-**Verification:** Check commands against the target host and the selected marketplace type. Keep maintainer dependencies separate from end-user installation requirements.
+**验证：** 对照目标宿主和所选的市场类型检查命令。把维护者依赖与最终用户的安装要求分开。
 
-### R07: Remove duplicate checks without dropping final verification
+### R07：去掉重复检查，同时不丢掉最终验证
 
-- [x] Review R07 and record the decision.
+- [x] 审阅 R07 并记录裁定。
 
-**Decision:** simplify — decided 2026-09-20. The operations reference selects checks by the behavior a change touches: the installation group covers the installer, the entry templates, the manifest, and the routing profile's dials against those templates, the runtime group covers the inspector and the metadata it emits, a template change reaches both, and documentation changes are checked for structure, links, and agreement with actual behavior. The unqualified verifier runs once on the final state and replaces the focused runs instead of following them; `git diff --check` stays. The native scenario list becomes the candidate set: the scenarios a change can break are selected and the rest are recorded as not exercised. After a correction, only the affected checks repeat. Acceptance responsibility is settled separately by [ADR-0005](../../docs/adr/0005-acceptance-ownership-and-verification-batches.md), which replaces the rerun rule quoted in the retained-responsibility paragraph below.
+**裁定：** simplify——于 2026-09-20 决定。operations 参考按一项变更所触及的行为来选择检查：安装组覆盖安装器、入口模板、清单，以及路由配置中对照这些模板的拨档；运行时组覆盖检查器及其发出的元数据；模板变更同时触及这两组；文档变更则检查结构、链接，以及与实际行为的一致性。不带限定参数的验证器在最终状态上运行一次，并取代聚焦运行，而不是跟在聚焦运行之后；`git diff --check` 保留。原生场景清单变为候选集合：选出一项变更可能破坏的场景，其余记录为未执行。修正之后，只有受影响的检查会重复。验收责任由 [ADR-0005](../../docs/adr/0005-acceptance-ownership-and-verification-batches.md) 另行确定，它替换了下面保留的验收责任段落中所引用的重跑规则。
 
-**Classification:** Simplify; safeguard-related change.
+**分类：** 精简；与保障相关的变更。
 
-**Location and original instruction:** [Operations, lines 212–233](../../plugins/codex-advisor/skills/orchestration/references/operations.md), says to use focused checks and then the full suite, showing `--installation`, `--runtime`, and the unqualified verifier in sequence, followed by the full native scenario list.
+**位置与原始指令：** [operations 第 212–233 行](../../plugins/codex-advisor/skills/orchestration/references/operations.md)说要使用聚焦检查，然后再使用完整套件，并按顺序展示 `--installation`、`--runtime` 和不带限定参数的验证器，随后是完整的原生场景清单。
 
-**Verified observation:** The unqualified [verifier](../../plugins/codex-advisor/scripts/verify.sh) contains both groups. Executing all three listed commands repeats each group.
+**已核实的情况：** 不带限定参数的[验证器](../../plugins/codex-advisor/scripts/verify.sh)包含这两组。执行列出的全部三条命令会重复每一组。
 
-**Proposal:** Select checks by changed behavior. Documentation and mirrors need applicable structure, links, and semantic checks. Configuration changes need parsing and affected contracts. Routing and lifecycle changes need relevant native scenarios. Run the full suite once when required. After corrections, rerun affected checks.
+**建议：** 按被改变的行为选择检查。文档和镜像需要适用的结构、链接和语义检查。配置变更需要解析和受影响的契约。路由和生命周期变更需要相关的原生场景。在需要时把完整套件运行一次。修正之后，重跑受影响的检查。
 
-**Retained acceptance responsibility:** Workers verify their own changes. The primary inspects the complete actual deliverable, including new files and worker-authored tests, and runs key verification on the final combined state. High-risk or explicitly requested independent acceptance still requires a fresh second reader after primary checks.
+**保留的验收责任：** worker 验证它们自己的变更。主代理检查完整的实际交付物，包括新文件和 worker 编写的测试，并在最终的合并状态上运行关键验证。高风险的或被明确请求的独立验收，在主代理检查之后仍然需要一名新的第二阅读者。
 
-**Impact and lost coverage:** Removes repeated execution on unchanged state and native scenarios unrelated to the change. It must not remove the distinct final integration check or substitute a worker report for primary acceptance.
+**影响与失去的覆盖：** 去掉在未改变状态上的重复执行，以及与该变更无关的原生场景。它不得去掉单独的最终集成检查，也不得用一份 worker 报告代替主代理验收。
 
-**Unverified:** Real-task savings and the adequacy of any concrete reduced check set remain to be established for the affected change.
+**未验证：** 真实任务的节省，以及任何一套具体的缩减检查集合是否充分，仍有待针对受影响的变更加以确立。
 
-### R08: Distinguish defaults, allowed efforts, and escalation eligibility
+### R08：区分默认值、允许的推理等级和升级资格
 
-- [x] Review R08 and record the decision.
+- [x] 审阅 R08 并记录裁定。
 
-**Decision:** update — decided 2026-09-16; efforts, defaults (`*`), and candidate order are written in `routing-profile.md` with the `model[a*, b, c]` notation; the skill carries no values (ticket 03, ADR-0004). The Sol default question is settled as `gpt-5.6-sol[high*, xhigh]`.
+**裁定：** update——于 2026-09-16 决定；推理等级、默认值（`*`）和候选顺序以 `model[a*, b, c]` 记法写在 `routing-profile.md` 中；技能正文不承载数值（工单 03、ADR-0004）。Sol 的默认值问题确定为 `gpt-5.6-sol[high*, xhigh]`。
 
-**Classification:** Clarify; any new default is a behavior change.
+**分类：** 澄清；任何新的默认值都是行为变更。
 
-**Location and original instruction:** [Root role table, lines 33–47](../../plugins/codex-advisor/skills/orchestration/SKILL.md), mixes “Usually,” allowed ranges, and failure eligibility. It also says “No Explorer `xhigh` route exists.”
+**位置与原始指令：** [根角色表第 33–47 行](../../plugins/codex-advisor/skills/orchestration/SKILL.md)把“Usually,”、允许的范围和失败资格混在一起。它还说“No Explorer `xhigh` route exists.”。
 
-**Proposal:** Describe that exclusion as a restriction of this plugin's default pool, not a universal host limitation. Mark defaults with `*`, keep initial choices separate from conditional later eligibility, and retain explicit user choices.
+**建议：** 把这项排除描述为本插件默认池的一项限制，而不是宿主的普遍限制。用 `*` 标记默认值，把初始选择与有条件的后续资格分开，并保留用户的显式选择。
 
-| Role | Existing initial policy to preserve | Additional condition or pending choice |
+| 角色 | 须保留的现有初始策略 | 附加条件或待定选择 |
 |---|---|---|
-| Luna light Explorer | `[high*]` | Preserve the current light allocation. |
-| Luna standard/senior Explorer | `[max*]` | A usual preference, not a mandatory predecessor to Sol or Astra. |
-| Sol or Astra direct Explorer | `[medium* / high]` | Here `medium*` is only the existing preference for focused questions with sufficient evidence, not an unconditional default. |
-| Luna worker | `[max*]` | Fixed by the role configuration. |
-| Sol worker | `[high / xhigh]` | Both are initially allowed. Choosing `[high* / xhigh]` as a unique default needs confirmation. |
-| Astra worker | `[medium* / high]` | The same conditional medium preference applies. Relevant complete worker failure makes `xhigh` eligible. |
-| Astra Advisor or Independent reviewer | `[medium* / high]` | The same conditional medium preference applies. Relevant complete advisory failure makes `xhigh` eligible. |
+| Luna light Explorer | `[high*]` | 保留当前的 light 分配。 |
+| Luna standard/senior Explorer | `[max*]` | 这是通常的偏好，不是必须先于 Sol 或 Astra 的前置步骤。 |
+| 直接选择的 Sol 或 Astra Explorer | `[medium* / high]` | 这里的 `medium*` 只是针对已有充分证据的聚焦问题的现有偏好，不是无条件的默认值。 |
+| Luna worker | `[max*]` | 由角色配置固定。 |
+| Sol worker | `[high / xhigh]` | 两者在初始时都允许。把 `[high* / xhigh]` 选为唯一默认值需要确认。 |
+| Astra worker | `[medium* / high]` | 同样的、有条件的 medium 偏好适用。相关的 worker 完整失败使 `xhigh` 具备资格。 |
+| Astra Advisor 或 Independent reviewer | `[medium* / high]` | 同样的、有条件的 medium 偏好适用。相关的咨询完整失败使 `xhigh` 具备资格。 |
 
-**Verified observation:** Only the Luna worker pins `model_reasoning_effort`; other role templates omit it. Role-file values can override explicit invocation settings under the official custom-agent contract.
+**已核实的情况：** 只有 Luna worker 固定了 `model_reasoning_effort`；其他角色模板省略了它。在官方的自定义代理契约下，角色文件中的值可以覆盖显式的调用设置。
 
-**Impact:** Reduces routine allocation questions and mistaken inheritance. Do not transfer worker failure eligibility to Explorers or Advisors, derive reviewer effort from the primary, or claim a configured choice executed without corresponding evidence. Astra remains ineligible for first-attempt `xhigh` under the current policy. No additional model or route is proposed.
+**影响：** 减少例行的分配提问和错误的继承。不要把 worker 的失败资格转移给 Explorer 或 Advisor，不要从主代理推导 reviewer 的推理等级，也不要在没有相应证据时声称一个已配置的选择已经执行。在当前策略下，Astra 对首次尝试的 `xhigh` 仍然不具备资格。没有提议额外的模型或路由。
 
-### R09: Replace metric-triggered refactoring actions with scoped judgment
+### R09：用有范围的判断替换由度量触发的重构行动
 
-- [ ] Review R09 and record the decision.
+- [ ] 审阅 R09 并记录裁定。
 
-**Decision:** Pending.
+**裁定：** 待裁定。
 
-**Classification:** Simplify; remove mechanical action triggers.
+**分类：** 精简；去掉机械的行动触发条件。
 
-**Location and original instruction:** [Global instructions, lines 57–64](/home/hyy/.codex/AGENTS.md), associate function length, duplication count, and parameter count with splitting, extraction, or object wrapping.
+**位置与原始指令：** [全局指令第 57–64 行](/home/hyy/.codex/AGENTS.md)把函数长度、重复次数和参数个数与拆分、提取或对象包装关联起来。
 
-**Verified observation:** The section already labels these as rules of thumb. It is not a universal mandatory-refactor rule, but its action table can pull work beyond the requested change.
+**已核实的情况：** 该节已经把这些标为经验法则。它不是一条普遍的强制重构规则，但它的行动表可以把工作拉到所请求的变更之外。
 
-**Proposal:** Keep metrics as investigation clues. Require an actual comprehension, correctness, or maintenance problem within the task before proposing or performing a refactor.
+**建议：** 把度量保留为调查线索。在提议或执行重构之前，要求任务之内存在一个实际的理解、正确性或维护问题。
 
-**Impact:** May reduce unrelated proposals and abstractions. No specific runtime safeguard is removed. This concerns the global instruction source, not a new rule to copy into the plugin.
+**影响：** 可能减少无关的提议和抽象。没有移除具体的运行时保障。这涉及全局指令来源，而不是一条要复制进本插件的新规则。
 
-**Verification:** Check consistency with surgical changes, local ownership, and the ban on speculative abstractions.
+**验证：** 检查与外科手术式变更、局部所有权，以及禁止推测性抽象的一致性。
 
-### R10: Narrow default logging coverage while retaining explicit failure
+### R10：收窄默认的日志覆盖，同时保留显式失败
 
-- [ ] Review R10 and record the decision.
+- [ ] 审阅 R10 并记录裁定。
 
-**Decision:** Pending; explicit approval required for the logging-coverage change.
+**裁定：** 待裁定；日志覆盖范围的变更需要明确批准。
 
-**Classification:** Simplify; error-handling and logging change.
+**分类：** 精简；错误处理与日志变更。
 
-**Location and original instruction:** [Global instructions, line 70](/home/hyy/.codex/AGENTS.md), require logging catch blocks and external calls when no project convention exists.
+**位置与原始指令：** [全局指令第 70 行](/home/hyy/.codex/AGENTS.md)要求，在项目没有约定时，记录捕获块和外部调用。
 
-**Proposal:** Preserve recovery, rethrowing, or explicit failure returns; prohibit fabricated success and hidden failure. Record sufficient diagnostic context at the boundary responsible for handling the failure. Log successful external calls when auditing, diagnosis, or project policy requires it rather than universally. Avoid duplicate logs as the same exception passes through layers.
+**建议：** 保留恢复、重新抛出或显式的失败返回；禁止编造的成功和被隐藏的失败。在负责处理该失败的边界上记录充分的诊断上下文。当审计、诊断或项目策略要求时记录成功的外部调用，而不是普遍记录。当同一个异常穿过各层时，避免重复的日志。
 
-**Impact and lost coverage:** Reduces duplicate logging and unnecessary instrumentation, but removes universal default coverage for successful external calls and every catch point. This is not merely wording deduplication.
+**影响与失去的覆盖：** 减少重复的日志和不必要的插桩，但去掉了对成功外部调用以及每一个捕获点的普遍默认覆盖。这不仅仅是措辞去重。
 
-**Replacement safeguard:** Retain the operation, failure cause, and necessary correlation context without secrets; follow stronger project auditing requirements.
+**替代保障：** 保留操作、失败原因和必要的关联上下文，而不含秘密；遵循更强的项目审计要求。
 
-**Unverified:** No business code was reviewed, so dependencies on success-call logs or particular catch-point logs are unknown. Confirm those requirements when applying the rule to a concrete system.
+**未验证：** 没有审查业务代码，因此对成功调用日志或特定捕获点日志的依赖是未知的。把该规则应用到一个具体系统时，确认那些要求。
 
-### R11: Consolidate disclosures and clarify when uncertainty blocks work
+### R11：合并披露，并澄清不确定性何时阻断工作
 
-- [ ] Review R11 and record the decision.
+- [ ] 审阅 R11 并记录裁定。
 
-**Decision:** Pending.
+**裁定：** 待裁定。
 
-**Classification:** Simplify.
+**分类：** 精简。
 
-**Location and original instruction:** [Global instructions](/home/hyy/.codex/AGENTS.md), lines 3, 33, and 81 require scope disclosure, checkpoints, and a stepwise verification plan. Line 29 says: “If you don't understand why existing code is shaped a certain way, ask first.”
+**位置与原始指令：** [全局指令](/home/hyy/.codex/AGENTS.md)第 3、33 和 81 行要求范围披露、检查点和一份分步验证计划。第 29 行说：“If you don't understand why existing code is shaped a certain way, ask first.”。
 
-**Proposal:** Give one proportionate scope and verification disclosure, then update at material findings, scope changes, or handoff. Investigate unknown implementation reasons using reachable evidence before asking. Pause dependent work for unresolved matters that would change the outcome. Record sources and invalidation conditions for load-bearing assumptions without creating records for ordinary local choices.
+**建议：** 给出一次相称的范围与验证披露，然后在实质性发现、范围变更或交接时更新。在询问之前，用能够到达的证据调查未知的实现原因。对会改变结果的未解决事项，暂停依赖它的工作。为承重假设记录来源和失效条件，而不为普通的局部选择创建记录。
 
-**Impact:** Reduces repeated planning and questions answerable by available tools. User-owned choices, authorizations, explicit gates, irreversible actions, and primary-session reserved operations remain unchanged.
+**影响：** 减少重复的规划，以及可用工具能够回答的问题。用户拥有的选择、授权、显式门禁、不可逆行动，以及主会话保留的操作，保持不变。
 
-**Verification:** Check that the consolidated wording preserves those stop conditions and continues unaffected work where appropriate.
+**验证：** 检查合并后的措辞保留那些停止条件，并在适当的地方继续不受影响的工作。
 
-### R12: Remove inapplicable domain-document templates
+### R12：去掉不适用的领域文档模板
 
-- [ ] Review R12 and record the decision.
+- [ ] 审阅 R12 并记录裁定。
 
-**Decision:** Pending.
+**裁定：** 待裁定。
 
-**Classification:** Simplify; some referenced skill entrances need verification.
+**分类：** 精简；部分被引用的技能入口需要验证。
 
-**Location and original instruction:** [Domain guidance, lines 5–39](../../docs/agents/domain.md), requires preliminary domain reading, describes multi-context layouts, and names entrances such as `/grill-with-docs`. Repository instructions select a single-context layout.
+**位置与原始指令：** [领域指导第 5–39 行](../../docs/agents/domain.md)要求预先的领域阅读，描述多上下文布局，并点名 `/grill-with-docs` 这样的入口。仓库指令选择单上下文布局。
 
-**Proposal:** Retain `CONTEXT.md`, relevant ADRs, and explicit conflict disclosure. Remove unused multi-context examples and make reading conditional on the terminology or architecture question. Refer to maintained skill names. The [triage table](../../docs/agents/triage-labels.md) can drop duplicate identity-mapping columns while retaining every state meaning.
+**建议：** 保留 `CONTEXT.md`、相关 ADR，以及显式的冲突披露。去掉未使用的多上下文示例，并使阅读以术语或架构问题为条件。指向仍在维护的技能名称。[分诊表](../../docs/agents/triage-labels.md)可以去掉重复的身份映射列，同时保留每一种状态的含义。
 
-**Impact:** Reduces template reading and obsolete-name searches. This is lower priority than factual and responsibility issues.
+**影响：** 减少模板阅读和对过时名称的搜索。其优先级低于事实问题和职责问题。
 
-**Evidence boundary:** Some named skill entrances were not exposed in the audited session. That does not establish absence from every host or installation; verify the intended integration before replacing them.
+**证据边界：** 部分被点名的技能入口在被审计的会话中没有暴露。这并不确立它们在每一个宿主或每一次安装中都不存在；在替换它们之前，验证预定的集成。
 
-## Safeguards and policies recommended for retention
+## 建议保留的保障与策略
 
-These are recommendations to preserve existing policy, not new requirements or already approved audit decisions.
+这些是保留现有策略的建议，不是新要求，也不是已经批准的审计裁定。
 
-- Any primary may implement or delegate. Architect mode requires explicit authorization and delegates every implementation edit within that scope.
-- Intermediate test or tool failures are distinct from complete worker failures. Recovery follows diagnosis rather than a mandatory escalation counter.
-- The primary inspects actual complete changes and performs meaningful key verification. Worker reports or self-review do not substitute for a second reader where independent acceptance is required.
-- High-risk delivery and explicit independent-review requests retain fresh independent acceptance. File count, step count, primary identity, or primary effort alone do not trigger it.
-- Effort changes and independent acceptance follow the accepted fresh-thread policy. The current documents already identify this as a user policy, not a general law about host caches or guaranteed savings.
-- Exact-template checks, refusal to overwrite modified or unsafe destinations, preservation of unrelated configuration, and honest permission/isolation evidence remain.
-- The [official plugin packaging documentation](https://developers.openai.com/plugins/build/plugins), read on 2026-09-13, still supports `.codex-plugin/plugin.json` as a compatibility layout. A portable-manifest migration is not necessary solely because a newer format exists.
-- The [upstream README at revision 37b75cad535abdd46531f0227483a8842d045ab8](https://github.com/DannyMac180/sol-advisor/blob/37b75cad535abdd46531f0227483a8842d045ab8/README.md) uses a fixed Sol primary and a different route policy. No direct policy import was recommended.
+- 任一主代理都可以实现或委派。Architect 模式要求明确授权，并委派该范围内的每一处实现编辑。
+- 中间的测试或工具失败与完整的 worker 失败不同。恢复跟随诊断，而不是一个强制的升级计数器。
+- 主代理检查实际的完整变更，并执行有意义的关键验证。在要求独立验收的地方，worker 报告或自评不能代替第二名阅读者。
+- 高风险交付和明确的独立评审请求保留新的独立验收。仅有文件数、步数、主代理身份或主代理推理等级不会触发它。
+- 推理等级变更和独立验收遵循已接受的新线程策略。当前文档已经把这标明为一项用户策略，而不是关于宿主缓存或保证节省的一般规律。
+- 精确模板检查、拒绝覆盖已修改或不安全的目标、保留无关配置，以及诚实的权限与隔离证据，都保持不变。
+- 于 2026-09-13 阅读的[官方插件打包文档](https://developers.openai.com/plugins/build/plugins)仍然支持把 `.codex-plugin/plugin.json` 作为兼容布局。仅仅因为存在更新的格式，就没有必要做可移植清单迁移。
+- [修订 37b75cad535abdd46531f0227483a8842d045ab8 的上游 README](https://github.com/DannyMac180/sol-advisor/blob/37b75cad535abdd46531f0227483a8842d045ab8/README.md)使用固定的 Sol 主代理和不同的路由策略。没有建议直接引入该策略。
 
-## Separate safeguard-change register
+## 单独的保障变更登记
 
-| Finding | Proposed change | Retained or replacement safeguard | Remaining uncertainty |
+| 发现 | 建议的变更 | 保留或替代的保障 | 剩余的不确定性 |
 |---|---|---|---|
-| R07 | Reduce duplicate suites and unrelated native scenarios. | Worker verification, primary complete-result inspection and final key checks, and required fresh independent review. | Concrete check-set adequacy and measured savings. |
-| R10 | Remove universal logging at every catch point and every successful external call. | Explicit failure handling, responsible-boundary diagnostics, and applicable audit requirements. | System-specific diagnostic and audit dependencies. |
+| R07 | 减少重复的套件以及与变更无关的原生场景。 | worker 验证、主代理对完整结果的检查与最终关键检查，以及必要的全新独立评审。 | 具体检查集合是否充分，以及测得的节省。 |
+| R10 | 去掉在每个捕获点以及每次成功的外部调用上的普遍日志。 | 显式的失败处理、负责边界上的诊断，以及适用的审计要求。 | 因系统而异的诊断与审计依赖。 |
 
-No recommendation authorizes broader permissions, removal of mandatory independent review, weaker drift refusal, weaker concurrent-write isolation, deletion of recovery backups, or broader release staging. R01 proposes consistent deployment files while retaining strict comparison.
+没有任何建议授权更宽的权限、取消强制的独立评审、减弱漂移拒绝、减弱并发写入隔离、删除恢复备份，或扩大发布暂存范围。R01 建议使部署文件一致，同时保留严格比较。
 
-## Completed checks and remaining verification
+## 已完成的检查与剩余验证
 
-The audit completed read-only role-template comparisons, JSON/TOML parsing, local-link checks for current documents, three Chinese-mirror existence checks, and `git diff --check`. These establish structure and file consistency only, except for the explicit semantic observations recorded above.
+审计完成了只读的角色模板比较、JSON 与 TOML 解析、当前文档的本地链接检查、三次中文镜像存在性检查，以及 `git diff --check`。除上面记录的显式语义观察之外，这些只确立结构和文件一致性。
 
-The audit did not run the full fixture suite, native model route/lifecycle scenarios, Windows installation, server-side configuration investigation, or business-code review. Historical native acceptance remains a reported prior result, not a newly executed test. Translation accuracy beyond the inspected clauses and task-level efficiency gains are not established by the structural checks.
+审计没有运行完整的夹具套件、原生的模型路由与生命周期场景、Windows 安装、服务器端配置调查或业务代码审查。历史的原生验收仍然是一份被报告的先前结果，不是一次新执行的测试。结构检查没有确立已检查分句之外的翻译准确性，也没有确立任务级的效率收益。
 
-At audit completion, the existing untracked `.scratch/codex-advisor/spec.md` was preserved. This follow-up adds only this checklist. Implementation status remains unchanged for all twelve findings.
+审计完成时，现有的未跟踪文件 `.scratch/codex-advisor/spec.md` 得以保留。这次后续只增加本清单。全部十二项发现的实现状态保持不变。

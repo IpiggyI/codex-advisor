@@ -1,104 +1,52 @@
-# Tickets 03 and 04 acceptance
+# 工单 03 与 04 的验收
 
-Date: 2026-09-06. Implementation base: `d313560e5efaf27895f1573450869adf0c573c44`.
-Scope: authorized Astra Architect work with Luna, and independent Astra review.
-Direct Sol and parallel implementation remain outside this delivery.
+日期：2026-09-06。实现基础：`d313560e5efaf27895f1573450869adf0c573c44`。
+范围：带有 Luna 的已授权 Astra Architect 工作，以及独立的 Astra 评审。
+直接的 Sol 实现和并行实现仍在本次交付之外。
 
-## Ticket 03 verification
+## 工单 03 的验证
 
-Focused installation and runtime checks passed. New checks first failed for the
-absent Luna template and then for the absent `--luna` interface before their
-implementations passed. Installation checks cover all shipped roles, exact bytes,
-selective checks, unrelated configuration preservation, and refusal before any
-partial installation. Runtime fixtures reject wrong roles/models, Luna effort
-below max, missing permissions, and conflicting evidence without emitting payloads.
+聚焦的安装检查和运行时检查已通过。新检查首先因缺少 Luna 模板而失败，然后因缺少 `--luna` 接口而失败，随后它们的实现才通过。安装检查覆盖全部已交付的角色、精确字节、选择性检查、无关配置的保留，以及在任何部分安装之前的拒绝。运行时夹具拒绝错误的角色和模型、低于 max 的 Luna 推理等级、缺失的权限和冲突的证据，并且不发出载荷。
 
-Live runs used Codex CLI `0.153.4` in a disposable home and workspaces at
-`/tmp/codex-advisor-03-04.5e8rordh`. The plugin and native roles were installed there;
-the active user installation was unchanged. Each scenario has a named prompt,
-JSONL event log, and final response. Native rollouts live in that home's `sessions`.
-These paths are temporary local evidence, not release assets.
+实机运行使用 Codex CLI `0.153.4`，在一次性主目录和工作区中进行，路径为 `/tmp/codex-advisor-03-04.5e8rordh`。插件和原生角色安装在那里；用户当前使用中的安装未被改变。每个场景都有一份具名提示词、一份 JSONL 事件日志和一份最终响应。原生会话记录位于该主目录的 `sessions` 中。这些路径是临时的本地证据，不是发布资产。
 
-| Scenario | Observation | Evidence |
+| 场景 | 观察 | 证据 |
 |---|---|---|
-| No authorization and an unaccepted proposal | Astra / low performed the one-line fix itself and verified `PASS: double`; no delegation. | `solo.jsonl`; parent `01a074ca-e572-7242-8564-20b0f18d6aa9` |
-| Task authorization, bounded one-line change | Astra / low delegated to native Luna / max, inspected complete before/after contents, and reran the meaningful check. No extra reviewer was added. | `authorized.jsonl`; parent `01a074ca-da5e-7141-b26d-55f05ba5d67b`; child `01a074cb-c760-7b30-b646-21a1b674d707` |
-| Same-task correction and inadequate evidence | The harness changed the result to multiplication by 3 and supplied a false pass report without command evidence. The parent observed a failing check, resumed the Luna Implementer for correction, and reran the check successfully. | `correction.jsonl`; same parent and child; child patch and parent check output |
-| Unrelated task after task authorization | The parent explicitly expired the authorization, created `label.txt` itself, checked exact bytes, and preserved existing hashes. No delegation. | `task-new.jsonl`; same task-authorized parent |
-| Session-wide authorization | The initial task and an unrelated later task each used Luna / max; the parent checked actual changes and reran verification. | `sessionwide.jsonl`, `session-new.jsonl`; parent `01a074cc-62d7-7f72-9b00-1bce7e7785f3`; children `01a074cd-5c53-7582-9b88-3dbb0c1dde06`, `01a074cf-6ef2-7210-9333-840d7ab7428e` |
-| Non-Astra prerequisite and direct Luna freedom | Luna primary remained at low and declined to claim active Architect mode. No file edit, model switch, or delegation occurred. | `nonastra.jsonl`; parent `01a074cc-7ffa-78d2-9436-66e87e8fb333` |
+| 没有授权，以及一项未被接受的提议 | Astra / low 自己完成了这一行修复，并验证了 `PASS: double`；没有委派。 | `solo.jsonl`；父级 `01a074ca-e572-7242-8564-20b0f18d6aa9` |
+| 任务授权，范围受控的一行变更 | Astra / low 委派给原生 Luna / max，检视了完整的之前与之后内容，并重新运行了有意义的检查。没有额外增加 Reviewer。 | `authorized.jsonl`；父级 `01a074ca-da5e-7141-b26d-55f05ba5d67b`；子级 `01a074cb-c760-7b30-b646-21a1b674d707` |
+| 同一任务中的修正与不充分的证据 | 测试装置把结果改成乘以 3，并提供了一份没有命令证据的虚假通过报告。父级观察到一次失败的检查，恢复了 Luna Implementer 以进行修正，并成功地重新运行了该检查。 | `correction.jsonl`；同一父级和同一子级；子级补丁和父级检查输出 |
+| 任务授权之后的无关任务 | 父级明确使该授权过期，自己创建了 `label.txt`，检查了精确字节，并保留了既有散列。没有委派。 | `task-new.jsonl`；同一个已获得任务授权的父级 |
+| 全会话授权 | 初始任务和后来的一项无关任务各自使用了 Luna / max；父级检查了实际变更并重新运行了验证。 | `sessionwide.jsonl`、`session-new.jsonl`；父级 `01a074cc-62d7-7f72-9b00-1bce7e7785f3`；子级 `01a074cd-5c53-7582-9b88-3dbb0c1dde06`、`01a074cf-6ef2-7210-9333-840d7ab7428e` |
+| 非 Astra 前提，以及直接使用 Luna 的自由 | Luna 主代理保持在 low，并拒绝声称 Architect 模式处于活动状态。没有发生文件编辑、模型切换或委派。 | `nonastra.jsonl`；父级 `01a074cc-7ffa-78d2-9436-66e87e8fb333` |
 
-The delegated patches and parent reruns were inspected independently of final
-reports. Parent turn contexts establish the direct low efforts; child turn contexts
-and `--luna` output establish the native model and max effort. Implementers made
-the observed implementation edits and no further implementation delegations.
+委派的补丁和父级的重新运行，是独立于最终报告而被检视的。父级回合上下文确立直接的 low 推理等级；子级回合上下文和 `--luna` 输出确立原生模型和 max 推理等级。Implementer 做了所观察到的实现编辑，并且没有进一步的实现委派。
 
-## Ticket 04 verification
+## 工单 04 的验证
 
-The full `sh plugins/codex-advisor/scripts/verify.sh` entry point passed after
-implementation. Focused runtime checks passed after test cleanup. JSON, TOML,
-YAML, skill frontmatter parsing, local skill links, and `git diff --check` passed.
-These are the applicable static checks; this repository has no typed application.
-New tests first failed for the missing reviewer template and then for the missing
-effort selector. Fixtures cover all five specified primary defaults, every pair
-of primary and explicit reviewer efforts, unestablished ordering, role/model
-mismatches, missing and conflicting settings/permissions, and payload filtering.
+完整的 `sh plugins/codex-advisor/scripts/verify.sh` 入口在实现之后通过。聚焦的运行时检查在测试清理之后通过。JSON、TOML、YAML、技能前言解析、本地技能链接和 `git diff --check` 已通过。这些是适用的静态检查；本仓库没有带类型的应用程序。新测试首先因缺少 Reviewer 模板而失败，然后因缺少推理等级选择器而失败。夹具覆盖全部五个已写明的主代理默认值、主代理推理等级与显式 Reviewer 推理等级的每一对、尚未确立的排序、角色和模型不匹配、缺失的和冲突的设置与权限，以及载荷过滤。
 
-Successful live review runs used a second disposable installation at
-`/tmp/codex-advisor-03-04.2j5aqxnj` on the same Codex version. All review spawns used
-`fork_turns: none`. The parent inspected actual changes and reran the meaningful
-check before review. Reviewer activity independently shows actual file inspection
-and check execution. The parent compared scoped state and verified runtime settings
-before acceptance; the implementation agent and reviewer were distinct threads.
+成功的实机评审运行在同一 Codex 版本上使用了第二套一次性安装，路径为 `/tmp/codex-advisor-03-04.2j5aqxnj`。全部评审派发都使用了 `fork_turns: none`。父级在评审之前检视了实际变更，并重新运行了有意义的检查。Reviewer 的活动独立地显示了实际的文件检视和检查执行。父级在验收之前比较了限定范围的状态，并验证了运行时设置；实现代理和 Reviewer 是不同的线程。
 
-| Scenario | Observation | Evidence |
+| 场景 | 观察 | 证据 |
 |---|---|---|
-| User-requested review of a bounded Luna change | Primary Astra / xhigh delegated the one-line fix to Luna / max, reran `check.py`, and invoked fresh Astra review / xhigh. | `review-xhigh.jsonl`; parent `01a074da-2029-7db2-8191-3762d9c8a622`; Implementer `01a074db-cde3-7783-ac50-3885ed75a9f1`; reviewer `01a074df-2836-7ec3-88a7-3d4f61c0e692` |
-| High-risk review without an explicit review request | Acceptance of an existing access-policy change triggered review after complete diff inspection and `PASS: access policy`. Primary and reviewer both ran Astra / max. | `risk-max.jsonl`; parent `01a074da-3104-70b0-9670-40911debfec9`; reviewer `01a074dd-6eda-7c22-8099-4dc9fdc4730d` |
-| Default review for low primary effort | Primary Astra / low invoked reviewer Astra / high and verified the unchanged scoped state. | `unavailable.jsonl`; parent `01a074db-1d93-7151-a3d9-9ef29f274301`; reviewer `01a074dc-26a3-7ab3-a3aa-5ff036f9c82b` |
-| Explicit supported adjustment | Same low-effort primary obtained a new Astra review / medium. Actual effort confirms that the model-only role does not override the allowed adjustment. | `adjusted.jsonl`; reviewer `01a074de-fefb-78b1-9f34-102edc693a77` |
-| Rejected lower override | Astra / xhigh inspected and checked the change, but rejected requested high review, invoked no reviewer, and reported acceptance pending. | `lower.jsonl`; parent `01a074da-3d39-7eb2-8d6a-59cc5c2cfb77` |
-| Ordinary completion without review | The bounded ticket 03 scenarios completed after the architect's own checks with no automatically added reviewer. | Ticket 03 records above |
-| Required reviewer unavailable | A separate installed home withheld only its reviewer role. The parent inspected the diff and passed its check, then stopped on the failed selective installation check. It invoked no substitute and explicitly left acceptance pending. | `/tmp/codex-advisor-03-04.hcj_ja7y/missing-reviewer.jsonl`; parent `01a074e1-bcda-7f71-bf92-97e727bfaf3f` |
+| 对一处范围受控的 Luna 变更做用户请求的评审 | 主代理 Astra / xhigh 把这一行修复委派给 Luna / max，重新运行了 `check.py`，并调用了新的 Astra 评审 / xhigh。 | `review-xhigh.jsonl`；父级 `01a074da-2029-7db2-8191-3762d9c8a622`；Implementer `01a074db-cde3-7783-ac50-3885ed75a9f1`；Reviewer `01a074df-2836-7ec3-88a7-3d4f61c0e692` |
+| 没有显式评审请求的高风险评审 | 对一项既有访问策略变更的验收，在完整差异检视和 `PASS: access policy` 之后触发了评审。主代理和 Reviewer 都运行了 Astra / max。 | `risk-max.jsonl`；父级 `01a074da-3104-70b0-9670-40911debfec9`；Reviewer `01a074dd-6eda-7c22-8099-4dc9fdc4730d` |
+| 低主代理推理等级的默认评审 | 主代理 Astra / low 调用了 Reviewer Astra / high，并验证了未改变的限定范围状态。 | `unavailable.jsonl`；父级 `01a074db-1d93-7151-a3d9-9ef29f274301`；Reviewer `01a074dc-26a3-7ab3-a3aa-5ff036f9c82b` |
+| 显式的受支持调整 | 同一个低推理等级的主代理取得了一次新的 Astra 评审 / medium。实际推理等级确认：这个只指定模型的角色不会覆盖被允许的调整。 | `adjusted.jsonl`；Reviewer `01a074de-fefb-78b1-9f34-102edc693a77` |
+| 被拒绝的更低覆盖 | Astra / xhigh 检视并检查了该变更，但拒绝了所请求的 high 评审，没有调用 Reviewer，并报告验收待定。 | `lower.jsonl`；父级 `01a074da-3d39-7eb2-8d6a-59cc5c2cfb77` |
+| 没有评审的普通完成 | 范围受控的工单 03 场景在 Architect 自己的检查之后完成，没有自动增加 Reviewer。 | 上面的工单 03 记录 |
+| 必需的 Reviewer 不可用 | 另一套已安装主目录只扣下了它的 Reviewer 角色。父级检视了差异并通过了自己的检查，然后在失败的选择性安装检查上停止。它没有调用替代，并明确使验收保持待定。 | `/tmp/codex-advisor-03-04.hcj_ja7y/missing-reviewer.jsonl`；父级 `01a074e1-bcda-7f71-bf92-97e727bfaf3f` |
 
-All observed reviewers received `workspace-write` / `managed` permissions despite
-their role's read-only request. Exact scoped contents, file metadata, and inventory
-were compared before/after review, and tool activity contained reads and checks,
-not implementation. Protected directory timestamps changed during sandbox mounts;
-this was disclosed separately from file state. The evidence establishes behavioral
-read-only review within the inspected scope, not enforced isolation or prevention
-of writes elsewhere.
+全部被观察到的 Reviewer 都收到了 `workspace-write` / `managed` 权限，尽管它们的角色请求只读。精确的限定范围内容、文件元数据和清单在评审之前与之后做了比较，并且工具活动包含读取和检查，不包含实现。受保护目录的时间戳在沙箱挂载期间发生了变化；这一点与文件状态分开披露。该证据确立的是在所检视范围内行为上的只读评审，不是强制隔离，也不是阻止其他地方的写入。
 
-The logs named `unavailable` and `required-unavailable` both produced successful
-reviews: disabling `multi_agent`, and then both `multi_agent` and `multi_agent_v2`,
-did not remove native calls on this host. Neither run counts as failure coverage.
-The separate missing-role scenario establishes unavailable-role refusal, not a
-provider outage. Temporary authentication copies in all three test homes were
-removed after the runs; no active-environment credential file was changed.
+名为 `unavailable` 和 `required-unavailable` 的日志都产生了成功的评审：禁用 `multi_agent`，然后同时禁用 `multi_agent` 和 `multi_agent_v2`，并没有在这个宿主上移除原生调用。两次运行都不算作失败覆盖。单独的缺失角色场景确立的是不可用角色的拒绝，不是提供方中断。全部三个测试主目录中的临时认证副本在运行之后被移除；没有任何当前使用环境的凭据文件被改变。
 
-## Code review
+## 代码评审
 
-The code-review skill ran separate read-only Standards and Spec agents against
-`git diff --cached d313560e5efaf27895f1573450869adf0c573c44`. This adapts the usual
-HEAD comparison to implement's review-before-commit sequence. No implementation
-findings were reported on either axis. Spec kept ticket 04 live acceptance pending
-until this record was completed. Its final read-only follow-up independently
-confirmed the four observed reviewer settings, fresh contexts, parent linkage,
-pre-review checks, and missing-role refusal, closing that gap without new findings.
-Reviewers did not edit files or invoke live models.
+code-review 技能针对 `git diff --cached d313560e5efaf27895f1573450869adf0c573c44` 运行了各自只读的标准轴代理和规格轴代理。这把通常的 HEAD 比较适配为实现流程的先评审后提交顺序。两条轴都没有报告实现发现。规格轴使工单 04 的实机验收保持待定，直到本记录完成。它最后的只读后续独立确认了四个被观察到的 Reviewer 设置、新上下文、父级关联、评审前检查，以及缺失角色的拒绝，从而关闭该缺口，并且没有新的发现。Reviewer 没有编辑文件，也没有调用实机模型。
 
-## Evidence limits
+## 证据限制
 
-The official custom-agent documentation endpoint returned HTTP 403 during this run.
-Native precedence is established by the exercised host calls, not a fresh docs
-fetch. Recheck after host upgrades or role configuration changes. Fixture success
-establishes parser and refusal behavior, not live model behavior. Authorization
-is a conversational contract; these observations do not establish deterministic
-enforcement for every possible prompt.
+在这次运行期间，官方自定义代理文档端点返回了 HTTP 403。原生优先级由所演练的宿主调用确立，不是由一次新的文档获取确立。在宿主升级或角色配置变更之后重新检查。夹具成功确立的是解析器和拒绝行为，不是实机模型行为。授权是一份会话契约；这些观察并不确立对每一个可能提示词的确定性强制执行。
 
-Live floor coverage establishes low -> high, xhigh -> xhigh, max -> max, and an
-explicit low -> medium adjustment. Medium/high primary defaults and other allowed
-override pairs are fixture coverage only. Missing/conflicting runtime records are
-tested deterministically, not by corrupting real host rollouts. Provider outages
-and enforced read-only isolation remain unverified. High-risk implementation routing
-belongs to ticket 05; the high-risk scenario here only accepts an existing change.
+实机下限覆盖确立了 low -> high、xhigh -> xhigh、max -> max，以及一次显式的 low -> medium 调整。medium、high 的主代理默认值，以及其他被允许的覆盖组合，只有夹具覆盖。缺失的和冲突的运行时记录是确定性测试的，不是通过破坏真实宿主会话记录来测试的。提供方中断和强制只读隔离仍未验证。高风险实现路由属于工单 05；这里的高风险场景只验收一项既有变更。

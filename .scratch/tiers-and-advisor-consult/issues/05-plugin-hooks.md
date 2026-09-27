@@ -1,74 +1,70 @@
-# 05: Plugin hooks: posture injection and per-dispatch verification
+# 05：插件钩子：姿态注入与每次派发的验证
 
-**What to build:** Hooks shipped with the plugin, doing two things:
-- inject the primary's posture variant at every session start;
-- verify every native dispatch's actual model and effort automatically, surfacing a mismatch to the primary.
+**要构建的内容：** 随插件交付的钩子，做两件事：
+- 在每一次会话开始时注入主代理的姿态变体；
+- 自动验证每一次原生派发的实际模型与推理等级，并把不匹配呈现给主代理。
 
-No hook runs on the primary's `Stop` or a worker's `SubagentStop`, and no hook keeps any record beyond one session. The user cancelled AC-9 on 2026-09-26 and authorized continuation to ticket 06 with this retained scope. Workers still follow the canonical consultation posture.
+没有钩子运行在主代理的 `Stop` 或 worker 的 `SubagentStop` 上，并且没有钩子在一个会话之外保留任何记录。用户于 2026-09-26 取消了 AC-9，并授权以这个保留的范围继续到工单 06。Worker 仍然遵循规范的咨询姿态。
 
-**Blocked by:** 01 (hook capabilities on this Codex version, including the P5 rows that need trusted running hooks), 02 (canonical posture text), 03 (routing profile and entries, for the AC-5 comparison and the AC-10 expectations), 04 (consultation result validation).
+**Blocked by:** 01（本 Codex 版本上的钩子能力，包括需要受信任且正在运行的钩子的那些 P5 行）, 02（规范姿态文本）, 03（路由配置与入口，供 AC-5 比较与 AC-10 期望）, 04（咨询结果校验）。
 
 **Status:** resolved
 
-## Required reading before starting
+## 开始前必读
 
-- `spec.md`: AC-5, AC-8, AC-9, AC-10, AC-11, AC-12, EN-5 (last bullet), DR-5 (ticket 05 section), DR-9 (the hooks field), X-2, X-3, §Decision Boundaries, §Open Decisions (O3, O4), §Stop and Return (S5, S6, S9), §Testing Decisions items 3 and 6, §Goal-Drift Checks.
-- `sources.md` §2.4 rows D8, D20, D27, D29, D30, D31, D33, D42. The originals behind these rows (Part 1 U5, U6, U10) are traceability only and are not required reading.
-- `acceptance.md` §01 P5 (hook capabilities on this Codex version) and §04 (consultation observability).
-- `plugins/codex-advisor/skills/orchestration/references/consult-posture.md` (the injected text, unmodified).
-- `plugins/codex-advisor/skills/orchestration/references/routing-profile.md` (advisor model per caller, for the AC-5 comparison; expected dials for AC-10).
-- `references/operations.md` §Process consultation (from ticket 04).
-- Codex Hooks documentation <https://learn.chatgpt.com/docs/hooks>, re-read and date-stamped.
+- `spec.md`：AC-5、AC-8、AC-9、AC-10、AC-11、AC-12、EN-5（最后一条）、DR-5（工单 05 小节）、DR-9（钩子字段）、X-2、X-3、§Decision Boundaries、§Open Decisions（O3、O4）、§Stop and Return（S5、S6、S9）、§Testing Decisions 第 3 项与第 6 项、§Goal-Drift Checks。
+- `sources.md` §2.4 行 D8、D20、D27、D29、D30、D31、D33、D42。这些行背后的原文（第 1 部分 U5、U6、U10）只用于追溯，不是必读。
+- `acceptance.md` §01 P5（本 Codex 版本上的钩子能力）以及 §04（咨询的可观察性）。
+- `plugins/codex-advisor/skills/orchestration/references/consult-posture.md`（被注入的文本，不作修改）。
+- `plugins/codex-advisor/skills/orchestration/references/routing-profile.md`（每个调用者的 advisor 模型，供 AC-5 比较；供 AC-10 的期望拨档）。
+- `references/operations.md` §Process consultation（来自工单 04）。
+- Codex Hooks 文档 <https://learn.chatgpt.com/docs/hooks>，重新阅读并标明日期。
 
-## Owns
+## 拥有
 
-- The plugin's hook files and scripts under `plugins/codex-advisor/`.
-- The `plugin.json` `hooks` field, if the default location is not used.
-- A `verify.sh` hooks group, included in the unqualified run.
-- The new §Hooks in `references/operations.md`, the hooks group in §Verify changes, and their twins.
+- `plugins/codex-advisor/` 之下的插件钩子文件与脚本。
+- `plugin.json` 的 `hooks` 字段，如果不使用默认位置。
+- 一个 `verify.sh` 钩子组，包含在不加限定的运行中。
+- `references/operations.md` 中新的 §Hooks、§Verify changes 中的钩子组，以及它们的对照。
 
-## Acceptance
+## 验收
 
-- [x] **`SessionStart`.**
-  - It selects the variant by comparing the session's model id with the advisor model id AC-4 assigns to the primary, and injects exactly that `consult-posture.md` block plus the adoption rules, byte-equal.
-  - Tests: `gpt-6-astra` gets reduced; `gpt-6-sol` gets full; `gpt-5.6-terra` gets full; the resumed-session case is covered.
-  - If ticket 01 found that it fires in subagent sessions, subagents receive nothing from it.
-- [x] **No primary `Stop` or worker `SubagentStop` hook** exists (D30 and the AC-9 cancellation).
-- [x] **AC-10 route.**
-  - A dispatch whose actual model and effort match the expected ones is silent.
-  - A mismatched model, a mismatched effort, and a caller-effort entry spawned without an effort are each surfaced to the primary in the same session without a manual inspector run.
-- [x] **AC-11.**
-  - The only state written lives in a per-session temporary location and is deleted at session end, or cannot be read by any later session.
-  - Nothing is written to the repository or `CODEX_HOME`, and nothing is aggregated.
-  - Record each file-write site in the hook code and where it writes.
-- [x] The hooks group in `verify.sh` covers every case above at the hook command-line boundary, with pinned JSON fixtures. Each blocking or surfacing case also has a negative proof: the hook disabled or its condition inverted makes the test fail.
-- [x] **AC-12.** Nothing in the plugin, installer, or docs marks hooks trusted, edits trust state, or passes `--dangerously-bypass-hook-trust`. The §Hooks section of `operations.md` states the `/hooks` review for first install and for updates that change hooks.
-- [x] Live check (`acceptance.md` §05), in a temporary `CODEX_HOME` with the plugin and entries installed. Every row records its trust state: trusted through `/hooks`, bypassed (only if O4 allows it), or untrusted.
-  - [x] untrusted after install: the hooks are skipped and the host's `/hooks` warning appears;
-  - [x] at least one run with hooks the user trusted through `/hooks`, showing the injection works without any bypass;
-  - [x] the primary sees its injected variant in a new and in a resumed session;
-  - [x] a caller-effort entry spawned without an effort is surfaced;
-  - [x] after the sessions end, no per-session state remains.
+- [x] **`SessionStart`。**
+  - 它通过把会话的模型标识与 AC-4 指定给主代理的 advisor 模型标识相比较来选择变体，并恰好注入那个 `consult-posture.md` 块加上采纳规则，逐字节相等。
+  - 测试：`gpt-6-astra` 得到精简变体；`gpt-6-sol` 得到完整变体；`gpt-5.6-terra` 得到完整变体；恢复会话的情形被覆盖。
+  - 如果工单 01 发现它在子代理会话中触发，子代理不从它收到任何东西。
+- [x] **不存在主代理 `Stop` 或 worker `SubagentStop` 钩子**（D30 以及 AC-9 的取消）。
+- [x] **AC-10 路线。**
+  - 实际模型与推理等级与期望相符的一次派发是沉默的。
+  - 不匹配的模型、不匹配的推理等级，以及一个由调用者给出推理等级的入口在没有推理等级的情况下被派发，各自在同一会话中呈现给主代理，而无须一次手工的检查器运行。
+- [x] **AC-11。**
+  - 所写入的唯一状态位于一个按会话的临时位置，并在会话结束时删除，或者不能被任何以后的会话读取。
+  - 没有任何东西被写入仓库或 `CODEX_HOME`，并且没有任何东西被聚合。
+  - 记录钩子代码中的每一个文件写入点以及它写到哪里。
+- [x] `verify.sh` 中的钩子组在钩子命令行边界上覆盖上面的每一种情形，并带有被固定的 JSON 夹具。每一个阻断或呈现的情形也有一条反证：钩子被禁用或它的条件被反转会使测试失败。
+- [x] **AC-12。** 插件、安装器或文档中没有任何东西把钩子标为受信任、编辑信任状态，或传入 `--dangerously-bypass-hook-trust`。`operations.md` 的 §Hooks 小节陈述首次安装时、以及任何改变钩子的更新之后的 `/hooks` 评审。
+- [x] 实况检查（`acceptance.md` §05），在一个临时 `CODEX_HOME` 中，插件与入口已安装。每一行都记录它的信任状态：通过 `/hooks` 受信任、被绕过（仅当 O4 允许它时），或未受信任。
+  - [x] 安装之后未受信任：钩子被跳过，并且宿主的 `/hooks` 警告出现；
+  - [x] 至少一次运行使用用户通过 `/hooks` 信任的钩子，表明注入在没有任何绕过的情况下工作；
+  - [x] 主代理在新会话中以及在恢复的会话中看到它被注入的变体；
+  - [x] 一个由调用者给出推理等级的入口在没有推理等级的情况下被派发，会被呈现；
+  - [x] 这些会话结束之后，没有按会话的状态留下。
 
-## Verification
+## 验证
 
-- `sh plugins/codex-advisor/scripts/verify.sh` (all groups)
+- `sh plugins/codex-advisor/scripts/verify.sh`（全部组）
 - `python3 tests/test_zh_mirror.py`
 - `git diff --check`
-- The live table in `acceptance.md` §05
+- `acceptance.md` §05 中的实况表
 
-## Stop conditions
+## 停止条件
 
-S5, S6, S8, S9. Do not replace a missing hook capability with a primary `Stop` hook or with skill-only text.
+S5、S6、S8、S9。不要用主代理的 `Stop` 钩子或只用技能的文本去替换一项缺失的钩子能力。
 
-## Not in this ticket
+## 不在本工单内
 
-README, the manual, the version bump, and any logging or statistics.
+README、手册、版本提升，以及任何日志或统计。
 
-## Comments
+## 评论
 
-Resolved on 2026-09-26 after primary verification and fresh independent senior
-acceptance. See `../acceptance.md` section 05 and Final acceptance for
-evidence and limitations. D47 cancels finish blocking, D48 permits only a local
-commit, and D49 waives only repetition of the final-definition manual trust test.
-No push or real installation update was performed.
+于 2026-09-26 在主代理验证以及新的独立 senior 验收之后解决。见 `../acceptance.md` 第 05 节与 Final acceptance，其中有证据与限制。D47 取消完成阻断，D48 只允许一次本地提交，D49 只免除最终定义手册信任测试的重复。没有执行推送或真实的安装更新。

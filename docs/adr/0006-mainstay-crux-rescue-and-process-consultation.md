@@ -74,9 +74,9 @@ handles credentials.
 
 These facts were established on 2026-09-26 with Codex CLI `0.157.0`:
 
-The maintenance sources are the [mechanism decision](../../.scratch/tiers-and-advisor-consult/spec.md#mechanism-decision-filled-by-ticket-01),
-the [decision ledger](../../.scratch/tiers-and-advisor-consult/sources.md#24-decision-ledger),
-and the [P6 probe record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p6-authorized-continuation-and-selected-mechanism).
+The maintenance sources are the [mechanism decision](../../.scratch/tiers-and-advisor-consult/spec.md#机制决定由工单-01-填写),
+the [decision ledger](../../.scratch/tiers-and-advisor-consult/sources.md#24-决定台账),
+and the [P6 probe record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p6-已授权的延续与选定机制).
 
 | Host fact | Evidence boundary | Invalidation check |
 |---|---|---|
@@ -117,7 +117,7 @@ claim that the user entered `/hooks`.
 Revalidate this boundary if the host's hook discovery, startup review, hash trust,
 overview, warning, or event semantics change.
 The detailed sequence belongs in the
-[P7 trust record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p7-user-trusted-execution-and-untrusted-skip).
+[P7 trust record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p7-用户信任的执行与不受信任跳过).
 
 ## What this supersedes
 

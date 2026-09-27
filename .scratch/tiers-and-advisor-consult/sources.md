@@ -1,59 +1,59 @@
-# Sources and decision ledger: mainstay/crux/rescue tiers and process consultation (0.3.0)
+# 来源与决定台账：mainstay/crux/rescue 档位与过程咨询（0.3.0）
 
-This file is for traceability. The binding requirements are in [spec.md](spec.md). Part 1 holds the user's words verbatim; Part 2 is the organized result. Part 2 never replaces Part 1: when they seem to disagree, read the original and the ledger basis, then treat the spec as current.
+本文件用于溯源。具有约束力的要求在 [spec.md](spec.md) 中。第 1 部分逐字保存用户的话；第 2 部分是整理结果。第 2 部分从不取代第 1 部分：当二者看起来不一致时，阅读原文和台账依据，然后把规格视为当前有效文本。
 
-Recorded 2026-09-26 from the Claude Code session that ran the discussion and wrote this spec.
+记录于 2026-09-26，来自运行讨论并写下本规格的 Claude Code 会话。
 
-## Part 1 — Originals (verbatim, not edited)
+## 第 1 部分 — 原文（逐字，未经编辑）
 
-### 1.1 Records that already hold originals (cite, do not copy)
+### 1.1 已经保存原文的记录（引用，不要复制）
 
-The discussion directory is `.agent-discuss/tiers-and-advisor-next-iteration/` in this checkout. It is untracked by git, reachable only in this working tree, and closed (its `final.md` exists), so it must not be edited. Versions are identified by SHA-256:
+讨论目录是本检出中的 `.agent-discuss/tiers-and-advisor-next-iteration/`。它未被 git 跟踪，只能在这个工作区里到达，并且已经关闭（其 `final.md` 存在），因此不得编辑它。版本以 SHA-256 标识：
 
-| File | Holds | SHA-256 |
+| 文件 | 所保存的内容 | SHA-256 |
 |---|---|---|
-| `request-001.md` | The first question (light versus standard, the `.scratch/` translation example) and the complete `/discuss` request, both in the user's words | `7d7dd72471aa35d3222afd34edfd9a83cfada78ec5a4f93cb19285f7e47ea4fc` |
-| `request-002.md` | `request-001` unchanged, plus the user's round-2 decisions verbatim (Terra removal, escalation rule, crux guardrail question, calling-posture priority, "首轮准入采用GPT方案…其他按推荐…"), an expansion of what "GPT方案", "收窄选项", and "其他按推荐" referred to, and the GPT-session decision as relayed | `3ca1d08520f711e0d47d8cd75cdadb5cab899ffc93ce3cb4e7ccdce05bfe623c` |
-| `claude/001.md` | Claude's first publication (analysis, not user words) | `8ac6ad4916b9023a161097a4656203796e4daee98e3002802ce66ed2d1e8348d` |
-| `gpt/001.md` | GPT's first publication; relays the user's GPT-session decision | `59fd2d72310581df87538eddc994ac56ead071b117a29fd019ccad0de0ca63b8` |
-| `gpt/002.md` | GPT's second publication (three disagreements, rescue-entry gap) | `0d35f7300a3929a82781081d6b113c669ed52dddf06c028475bdf54b1afa8191` |
-| `final.md` | The conclusion the user confirmed before closing (2026-09-25 23:50 local) | `67eb045f8d130cc6a0b9b1c4fc76ea6c4d08bc799d750dd3779d679a45fc293a` |
+| `request-001.md` | 第一个问题（light 相对于 standard，以及 `.scratch/` 翻译示例）以及完整的 `/discuss` 请求，二者都是用户的原话 | `7d7dd72471aa35d3222afd34edfd9a83cfada78ec5a4f93cb19285f7e47ea4fc` |
+| `request-002.md` | `request-001` 保持不变，加上用户第 2 轮决定的逐字文本（移除 Terra、升级规则、crux 护栏问题、调用姿态的优先级、"首轮准入采用GPT方案…其他按推荐…"），对 "GPT方案"、"收窄选项" 和 "其他按推荐" 所指内容的展开，以及转述的 GPT 会话决定 | `3ca1d08520f711e0d47d8cd75cdadb5cab899ffc93ce3cb4e7ccdce05bfe623c` |
+| `claude/001.md` | Claude 的第一次发布（分析，不是用户的话） | `8ac6ad4916b9023a161097a4656203796e4daee98e3002802ce66ed2d1e8348d` |
+| `gpt/001.md` | GPT 的第一次发布；转述用户的 GPT 会话决定 | `59fd2d72310581df87538eddc994ac56ead071b117a29fd019ccad0de0ca63b8` |
+| `gpt/002.md` | GPT 的第二次发布（三处不同意，rescue 入口的缺口） | `0d35f7300a3929a82781081d6b113c669ed52dddf06c028475bdf54b1afa8191` |
+| `final.md` | 用户在关闭前确认的结论（2026-09-25 23:50 本地） | `67eb045f8d130cc6a0b9b1c4fc76ea6c4d08bc799d750dd3779d679a45fc293a` |
 
-Unavailable original: the user's own words in the GPT session are not reachable from this session. `gpt/001.md` relays them as: "保留独立验收，并引入自动传递上下文的咨询方式（推荐）". "（推荐）" is GPT's option label, not the user's wording. Treat this as relayed, not verbatim.
+无法取得的原文：用户在 GPT 会话中的原话无法从本会话到达。`gpt/001.md` 将其转述为："保留独立验收，并引入自动传递上下文的咨询方式（推荐）"。"（推荐）" 是 GPT 的选项标签，不是用户的措辞。将其视为转述，而不是逐字原文。
 
-### 1.2 Originals that exist only in the Claude session (copied here verbatim)
+### 1.2 只存在于 Claude 会话中的原文（逐字复制到此处）
 
-**U1** — sent after the assistant began searching the web for a Pi advisor implementation (the session showed "[Request interrupted by user for tool use]" before it):
+**U1** — 在助手开始为一种 Pi advisor 实现搜索网页之后发送（在此之前会话显示了 "[Request interrupted by user for tool use]"）：
 
 > 哦，插件我忘记给了：rpiv-mono
 
-**U2** — sent while the assistant was reading the rpiv-advisor documentation:
+**U2** — 在助手阅读 rpiv-advisor 文档时发送：
 
 > 本地已经拉取了源码了
 
-**U3** — after the assistant answered `gpt/002.md` point by point (that answer's conclusions are what `final.md` §一.A.8 and §一.B.6/B.9 and §五 record):
+**U3** — 在助手逐点回答 `gpt/002.md` 之后（该回答的结论就是 `final.md` §一.A.8 与 §一.B.6/B.9 以及 §五所记录的内容）：
 
 > 剩下几个问题不必再过一遍GPT了，我敲定按你现在说的来，可以收口讨论了
 
-**U4** — answer to the structured question "按上面的正文写入 final.md 并关闭讨论吗？关闭后不能再发布、读取或修订请求。":
+**U4** — 对结构化问题 "按上面的正文写入 final.md 并关闭讨论吗？关闭后不能再发布、读取或修订请求。" 的回答：
 
 > 我有要调整的地方，先别写入
 
-**U5** — the adjustments that followed U4:
+**U5** — 紧接 U4 的调整：
 
 > 1. `astra[xhigh]` 主会话用精简姿态 是举例还是限制成xhigh了？如果是限制 是为什么呢？
 > 2. 观察由我肉眼判断，不要为此改变工作逻辑、增加本地日志等
 > 3. 完成前咨询不要作为后续可选，在本版本一并加入，不要挤牙膏
 
-**U6** — answer to the structured question "完成前咨询的钩子范围选哪个？选定后我就把对应正文写入 final.md 并关闭讨论。". Chosen option label and its description as shown to the user:
+**U6** — 对结构化问题 "完成前咨询的钩子范围选哪个？选定后我就把对应正文写入 final.md 并关闭讨论。" 的回答。向用户展示的所选选项标签及其描述：
 
 > 方案 B 后关闭 (Recommended) — 只用 SubagentStop 拦 worker；主会话靠常驻说明。正文 B.8、理由、放弃选项和待验证第 4 条按右侧预览修改，其余不变。
 
-**U7** — answer to "request-002 按上面的草稿写入吗？写入后不能修改或删除，只能再追加新版本。":
+**U7** — 对 "request-002 按上面的草稿写入吗？写入后不能修改或删除，只能再追加新版本。" 的回答：
 
 > 按草稿写入 (Recommended) — 保留 request-001 全文，追加你的原话、展开说明和 GPT 会话里的决定。
 
-**U8** — the `/to-spec` request that produced this directory (arguments verbatim):
+**U8** — 产生本目录的 `/to-spec` 请求（参数逐字）：
 
 > 执行会交由Codex完成，在写spec和票据时遵守下面的提示词规则：
 > 请按以下交接要求整理规划文档：
@@ -67,7 +67,7 @@ Unavailable original: the user's own words in the GPT session are not reachable 
 >
 > 共同要求集中在规格中维护，票据引用适用部分，避免重复产生分歧。原始需求和讨论记录用于溯源；正式规格及其指定依据表达当前有效要求。沿用现有任务记录和目录，不另建内容重复的文档体系。
 
-**U9** — the assistant's proposal the user confirmed in U10.1, reproduced verbatim because the confirmation refers to it:
+**U9** — 用户在 U10.1 中确认的助手提议，因该确认指向它而逐字复现：
 
 > 1. **`verify.sh` 的安装组**：已有。扩展到 13 个入口、新的 retire list、路由表与模板一致、姿态段落与模型级别一致。
 > 2. **`verify.sh` 的运行组**：已有。inspector 继续按模板逐个入口驱动。
@@ -82,132 +82,132 @@ Unavailable original: the user's own words in the GPT session are not reachable 
 >   - 不允许：持久记录，以及任何用于统计或观察的数据。
 > - **姿态说明怎么交给子代理**：写进每个入口的 `developer_instructions`。入口的模型是钉死的，所以 luna 和 sol 入口写完整姿态，astra 入口写精简姿态，不依赖尚未验证的钩子能力。相应地，`verify.sh` 里"同角色说明逐字相同"的检查改为：姿态段落以外的部分同角色相同，姿态段落按模型级别相同。
 
-U10.5 later replaced "by model level" in the last bullet with a model-identity comparison; the resulting assignment for the shipped entries is unchanged (luna and sol entries differ from the `astra` advisor model, `astra` entries match it).
+U10.5 后来把最后一条中的 "by model level" 替换为按模型身份比较；对已交付入口的最终指派不变（luna 与 sol 入口不同于 `astra` 顾问模型，`astra` 入口与它一致）。
 
-**U10** — answers to the five `/to-spec` questions. Question text, then the chosen option and its description, verbatim:
+**U10** — 对五个 `/to-spec` 问题的回答。先是问题文本，然后是所选选项及其描述，逐字如下：
 
 1. "上面列的 7 个测试接缝（含新增的钩子组和过程咨询工具边界），以及对“不增加日志”的理解，符合你的预期吗？" → **符合 (Recommended)** — 按上面的接缝写进 spec；只用于强制咨询、会话结束即失效的临时状态允许存在。
 2. "独立验收用哪个顾问 dial？验收结论报告低置信度时怎么办？（final.md 取消了顾问自己的升级梯子，原来“低置信度转 senior 顾问”的路径随之失效，目前没有替代规则。）" → **按被验收工作所在档 (Recommended)** — mainstay 档完成的工作用 astra[low*, medium]，crux 用 astra[high]，rescue 用 astra[xhigh]；主会话自己完成的工作取不弱于主会话的最低一档。低置信度时验收保持待定，交给用户决定。
 3. "新版本说明书的画面基准用哪个？`.scratch/manual-redesign/0.2.0-magazine.html` 是一份没有采纳记录的预览稿，和已发布的 `docs/releases/0.2.0.html` 不同。" → **沿用 0.2.0.html (Recommended)** — 以已发布的 docs/releases/0.2.0.html 为画面基准，版式、配色、组件保持一致。
 4. "上一轮 spec 把 0.3.0 预留给了 grok lane。这次改动用什么版本号？" → **本次用 0.3.0 (Recommended)** — 本次改动发布为 0.3.0，grok lane 顺延到 0.4.0。本次入口改名是破坏性变更，0.x 升 minor。
-5. "主会话的模型不属于 luna、sol、astra 任一系列时（例如其他厂商或其他系列的模型），调用姿态和顾问 dial 怎么定？模型级别规则在这种情况下无法比较强弱。" → the user typed:
+5. "主会话的模型不属于 luna、sol、astra 任一系列时（例如其他厂商或其他系列的模型），调用姿态和顾问 dial 怎么定？模型级别规则在这种情况下无法比较强弱。" → 用户输入了：
 
    > 按完整姿态；我补充一下：不能写死成luna、sol、astra，应该和advisor的模型对比是否一致，一致是就是精简姿态不一致就是完整姿态；比如说：虽然没有6-terra但是我要是使用5.6-terra呢？这个时候不能抓瞎呀
 
-   The option "按完整姿态" had this description: 视为有更强的顾问可问：注入完整姿态，顾问用 astra[xhigh]。
+   选项 "按完整姿态" 有这样的描述：视为有更强的顾问可问：注入完整姿态，顾问用 astra[xhigh]。
 
-**U11** — the `/to-tickets` request (arguments verbatim) and the answer to its breakdown question "按哪种拆法重写票据？":
+**U11** — `/to-tickets` 请求（参数逐字）以及对拆分问题 "按哪种拆法重写票据？" 的回答：
 
 > 按此规范检查一遍票据，之前没走这个skill
 
 > 保持现有 6 张
 
-The chosen option's description: 只修格式、依赖边和姿态段落的顺序问题，不重拆。
+所选选项的描述：只修格式、依赖边和姿态段落的顺序问题，不重拆。
 
-**U12** — the request to check the executor's handoff review (`handoff-review.md`, 2026-09-26), verbatim:
+**U12** — 要求检查执行者交接评审（`handoff-review.md`，2026-09-26）的请求，逐字如下：
 
 > 读取 @.scratch/tiers-and-advisor-consult/handoff-review.md ，对照原始需求、有效决定及正式规格，核对执行者理解的成品和提出的问题，不只检查其是否理解了现有规划。
 > 确认的规划缺口修入规格及相关票据，不只在聊天中解释；执行者误读指出依据；需用户决定的事项保留未决。返回修正位置和待决问题，不开始实施。
 
-### 1.3 Session messages that do not affect the deliverable
+### 1.3 不影响交付物的会话消息
 
-"发布一版", "阅读GPT发布" (twice), and the `/discuss` and `/to-spec` command invocations themselves only drove the discussion protocol. They are listed so a reader knows nothing was dropped.
+"发布一版"、"阅读GPT发布"（两次），以及 `/discuss` 与 `/to-spec` 命令调用本身只是推动了讨论流程。把它们列在这里，是为了让读者知道没有任何内容被丢弃。
 
-## Part 2 — Organized result (not verbatim)
+## 第 2 部分 — 整理结果（非逐字）
 
-### 2.1 Goals
+### 2.1 目标
 
-- **G1 Tier redesign.** Replace light/standard/senior with 主力 `mainstay`, 攻坚 `crux`, 后援 `rescue`: tiers ordered by model, effort as a finer grade inside a tier. Most tasks end in `mainstay`; very few reach `rescue`. Basis: `request-001` (user text), `final.md` §一.A.1.
-- **G2 Absorb the Claude Code advisor calling posture.** The user observed that the 0.2.0 plugin rarely calls its Advisor while Claude Code calls its advisor often; the posture is the main thing to migrate. Basis: `request-002` (fourth bullet), `final.md` §一.B.3.
-- **G3 Keep independent acceptance** beside the new automatic-context consultation. Basis: relayed GPT-session decision (`gpt/001.md`), `final.md` §一.B.1.
+- **G1 档位重设计。** 用主力 `mainstay`、攻坚 `crux`、后援 `rescue` 取代 light/standard/senior：档位按模型排序，推理等级是档位内部更细的等级。大多数任务在 `mainstay` 结束；极少任务到达 `rescue`。依据：`request-001`（用户文本），`final.md` §一.A.1。
+- **G2 吸收 Claude Code 顾问的调用姿态。** 用户观察到 0.2.0 插件很少调用它的 Advisor，而 Claude Code 经常调用它的 advisor；姿态是要迁移的主要东西。依据：`request-002`（第四条），`final.md` §一.B.3。
+- **G3 保留独立验收**，与新的自动上下文咨询并列。依据：转述的 GPT 会话决定（`gpt/001.md`），`final.md` §一.B.1。
 
-### 2.2 Constraints
+### 2.2 约束
 
-- Everything a live location depends on arrives through plugin install or the companion installer (ADR-0004); nothing is hand-copied.
-- Commits, pushes, marketplace upgrades, and runs against the user's real `CODEX_HOME` need the user's explicit authorization at that time (user global rule; 0.2.0 ticket 07 precedent).
-- Observation of effects is by the user's own eye: no markers, persistent logs, or statistics added for observation (U5.2). Transient per-session state used only for enforcement is allowed (U10.1).
-- Before-done enforcement was requested in U5.3 and cancelled by D47 on 2026-09-26.
-- Posture choice must not be hard-coded to model family names (U10.5).
+- 一个运行位置所依赖的一切都通过插件安装或配套安装器到达（ADR-0004）；没有任何内容是手工复制的。
+- 提交、推送、市场升级，以及针对用户真实 `CODEX_HOME` 的运行，需要用户在当时的明确授权（用户全局规则；0.2.0 工单 07 先例）。
+- 对效果的观察由用户本人肉眼进行：不为观察添加标记、持久日志或统计（U5.2）。仅用于强制执行的、按会话存在的临时状态是允许的（U10.1）。
+- 完成前强制执行在 U5.3 中被要求，并在 2026-09-26 被 D47 取消。
+- 姿态选择不得写死为模型系列名称（U10.5）。
 
-### 2.3 Trade-offs and the reasons the user accepted
+### 2.3 取舍以及用户接受的理由
 
-- **Tier by model.** The user observed a bigger gain from changing model than from raising effort, and a distinct jump at `xhigh`. These are recorded as declared assumptions with the next model generation change as the invalidation trigger (`final.md` §一.A.9).
-- **Wide first-round `crux` admission.** Forcing `mainstay` to fail first on a known-hard task wastes an attempt. The risk of over-routing is accepted and watched by the user; the narrow option is kept in reserve (`request-002`; `final.md` §一.A.5–A.6).
-- **Escalate across tiers, not within.** This avoids trying every model of one tier; the model-level floor prevents a downgrade such as explorer `sol[high]` → `luna[max]` (`final.md` §一.A.7).
-- **Keep independent acceptance.** A consultant that sees the executor's reasoning is anchored by it and is not independent (`final.md` §二).
-- **Reduced posture when the caller already runs the advisor's model.** Claude Code's frequent-call posture pays off when a weaker executor asks a stronger model; a same-model consultation is the most expensive and adds a second view, not capability (`final.md` §二; generalized by U10.5).
-- **Advisor has no tools during consultation.** Frequent calls need low per-call cost and latency; verification belongs to the executor and to independent acceptance (`final.md` §二).
-- **Before-done enforcement only on subagents.** A hook cannot tell a primary's turn end from task completion, and blocking every primary turn would make an `astra` primary re-read the full transcript each turn (U6; `final.md` §二).
+- **按模型划分档位。** 用户观察到，更换模型带来的收益大于提高推理等级，并且在 `xhigh` 处有一次明显的跃升。这些被记录为已声明的假设，下一次模型代际变更是失效触发条件（`final.md` §一.A.9）。
+- **放宽的首轮 `crux` 准入。** 强迫 `mainstay` 先在已知困难的任务上失败，会浪费一次尝试。过度路由的风险被接受，并由用户观察；收窄选项被保留备用（`request-002`；`final.md` §一.A.5–A.6）。
+- **跨档位升级，不在档位内升级。** 这样避免把一个档位的每个模型都试一遍；模型级别下限防止降级，例如 explorer 从 `sol[high]` 降到 `luna[max]`（`final.md` §一.A.7）。
+- **保留独立验收。** 一个看得到执行者推理的咨询者会被该推理锚定，因而不是独立的（`final.md` §二）。
+- **当调用方已经运行顾问的模型时使用精简姿态。** 当较弱的执行者询问较强的模型时，Claude Code 的频繁调用姿态才有回报；同模型咨询是最贵的一种，并且增加的是第二视角，而不是能力（`final.md` §二；由 U10.5 推广）。
+- **咨询期间顾问没有工具。** 频繁调用需要每次调用的成本低、延迟低；验证属于执行者，也属于独立验收（`final.md` §二）。
+- **完成前强制执行只针对子代理。** 钩子无法把主代理的回合结束与任务完成区分开，并且阻断每一次主代理回合会让一个 `astra` 主代理每个回合都重新阅读完整记录（U6；`final.md` §二）。
 
-### 2.4 Decision ledger
+### 2.4 决定台账
 
-States: **Confirmed** (binding now), **Confirmed-reserved** (kept, not enabled), **Derived** (the spec's closure of a confirmed decision; binding, but the user may override), **Superseded** (replaced by a later user decision), **Rejected** (must not be reintroduced), **Open** (needs a user decision; none may be guessed).
+状态：**已确认**（现在具有约束力），**已确认并保留**（保留，未启用），**派生**（规格对一项已确认决定的收口；具有约束力，但用户可以推翻），**已替代**（被后来的用户决定取代），**已否决**（不得重新引入），**未决**（需要用户决定；一概不得猜测）。
 
-| ID | Decision | State | Basis | Spec |
+| 编号 | 决定 | 状态 | 依据 | 规格 |
 |---|---|---|---|---|
-| D1 | Tiers `mainstay`/`crux`/`rescue` replace light/standard/senior for explorer, worker, advisor | Confirmed | `request-001`; `final.md` §一.A.1 | TR-1 |
-| D2 | Models `gpt-6-luna`, `gpt-6-sol`, `gpt-6-astra`; Terra leaves the table because the 6 series has none | Confirmed | `request-002` bullet 1 | TR-2 |
-| D3 | The user's table is authoritative; table wins over prose (worker `mainstay` is `sol[high]`, not `sol[medium*, high]`) | Confirmed | `request-002` ("表和正文不一致都不重要"); `final.md` §一.A.3 | TR-3 |
-| D4 | Worker `crux` `astra[low, medium]` default is `low` | Derived | Unmarked cell; `final.md` §一.A.3 says fill at implementation; §一.A.4 "排列顺序约等于使用顺序" makes the first listed effort the default | TR-3 |
-| D5 | In-tier order ≈ usage order; in-tier choice by judgment the packet cannot capture | Confirmed | `request-001`; `final.md` §一.A.4 | TR-4 |
-| D6 | First-round `crux` allowed when a key difficulty is identified or interacting constraints must be handled; default `mainstay`; no usage quota | Confirmed | `request-002` ("首轮准入采用GPT方案"); `final.md` §一.A.5 | TR-5 |
-| D7 | Narrow first-round admission (invisible failure, costly failure, evidence of predicted failure, user declaration) | Confirmed-reserved | `request-002` ("先把收窄选项保留"); `final.md` §一.A.6 | TR-6 |
-| D8 | Observation by the user's eye; no markers, logs, or statistics for it | Confirmed | U5.2; `final.md` §一.A.6, §一.B.10 | AC-11, X-3 |
-| D8a | Explicit markers, local logs, or statistics to watch first-round `crux` | Superseded by D8 | `final.md` draft before U5; U5.2 | — |
-| D9 | Escalation floor: model level not lower (luna < sol < astra) unless no other choice; same model needs a higher effort; above the floor, choose by the exposed difficulty | Confirmed | `request-002` bullet 2 and "其他按推荐"; `gpt/001.md`; `final.md` §一.A.7 | TR-7 |
-| D10 | Capability-failure counting; path `mainstay` → `crux` → `rescue` → user; `rescue` only through `crux` or a user declaration; first-round `crux` reaches `rescue` after one `crux` failure; R3 kept | Confirmed | U3; `final.md` §一.A.8 | TR-8 |
-| D11 | `rescue` requires two accumulated failures (retry inside `crux`) | Rejected | Conflicts with escalate-not-switch; `final.md` §三 | — |
-| D12 | Same-tier model switch after a capability failure (unless no other choice) | Rejected | `request-001`; `final.md` §三 | — |
-| D13 | Declared assumptions (model change beats effort; `xhigh` jump) in the routing profile, invalidated by the next generation change; the Anthropic rumour is not a basis | Confirmed | `final.md` §一.A.9 | TR-9 |
-| D14 | Keep independent acceptance (packet, fresh thread, read-only checks); consultation never substitutes | Confirmed | Relayed GPT-session decision; `final.md` §一.B.1 | AC-1 |
-| D15 | Replace the whole Advisor and drop independent acceptance | Rejected | `final.md` §三 | — |
-| D16 | Acceptance dial by the tier of the accepted work; primary-authored work uses the lowest advisor dial not weaker than the primary; a low-confidence verdict leaves acceptance pending and goes to the user | Confirmed | U10.2 | AC-2 |
-| D16a | Work built by several tiers is accepted at the highest tier involved; a primary whose model is not in the routing profile gets `astra[xhigh]` | Derived | Closure of D16 and D20 (U10.5 option description) | AC-2 |
-| D17 | Process consultation: automatic current context, advisor has no tools, returns exactly one of plan / correction / stop | Confirmed | `final.md` §一.B.2 | AC-3 |
-| D18 | Workers and explorers may call the consultation | Confirmed | `request-002` ("其他按推荐"); `final.md` §一.B.4 | AC-3 |
-| D19 | Consultation dial follows the caller: `mainstay` caller → `astra[low*, medium]`, `crux` → `astra[high]`, `rescue` → `astra[xhigh]`, primary → lowest advisor dial not weaker; the advisor has no ladder of its own | Confirmed | `final.md` §一.B.5 | AC-4 |
-| D20 | Posture by comparing the caller's model with the advisor model it would consult: same model → reduced posture; different → full posture; no hard-coded family list; a primary model not in the routing profile gets the full posture and `astra[xhigh]` | Confirmed | U10.5 | AC-5 |
-| D20a | "`astra[xhigh]` primary uses the reduced posture" | Superseded by D20 (it was an example, U5.1) | `request-002`; U5.1 | — |
-| D20b | Posture by model level (luna/sol full, astra reduced, regardless of effort) | Superseded by D20 | `final.md` §一.B.3; U10.5 | — |
-| D21 | Adoption: default adopt; deviate with a reason when following fails or primary-source evidence contradicts; a constraint conflict is rejected directly with a reason; advice grants no authorization | Confirmed | U3; `final.md` §一.B.6 | AC-6 |
-| D22 | Rejecting for a reasoning flaw: advisor model different from the caller's → one reconcile call first; same model → may reject directly with a reason | Derived | `final.md` §一.B.6 said "higher model" versus "same model"; D20 removed the model order for posture, so the same identity comparison is applied here | AC-6 |
-| D23 | Reject a stronger advisor's advice directly for a reasoning flaw (GPT's `gpt/002.md` position) | Rejected | U3; `final.md` §三 | — |
-| D24 | Record a category for every non-adoption | Superseded by D8 (it existed only to feed a later check) | `final.md` draft before U5; U5.2 | — |
-| D25 | Posture text rewritten from rpiv-advisor's guidelines without the "commit the change" step; restate key guidance in the next visible reply | Confirmed | `gpt/001.md`; `final.md` §一.B.7 | AC-7 |
-| D26 | Reuse rpiv-advisor's guidelines as-is | Superseded by D25 | `claude/001.md`; `final.md` §三 | — |
-| D27 | Always-on posture: a plugin-shipped `SessionStart` hook injects the primary's posture text | Confirmed | `final.md` §一.B.8 | AC-8 |
-| D28 | Delegates carry their posture variant in their entry's `developer_instructions`; the same-role identical-instructions check is narrowed to exclude the posture section | Confirmed | U9 (confirmed in U10.1) | EN-5 |
-| D29 | Before-done enforcement: plugin-shipped `SubagentStop` hook on workers, this version | Superseded by D47 | U5.3; U6; `final.md` §一.B.8 | AC-9 cancelled |
-| D29a | Before-done enforcement as an optional later step | Superseded by D29 | U5.3 | — |
-| D30 | `Stop` hook blocking every primary turn (方案 A) | Rejected | U6; `final.md` §三 | — |
-| D31 | Per-dispatch automatic verification of actual model and effort; installation evidence reusable | Confirmed | `gpt/002.md`; U3; `final.md` §一.B.9 | AC-10 |
-| D32 | Check model settings once per task per entry | Superseded by D31 | `claude/001.md`; `final.md` §三 | — |
-| D33 | Transient per-session enforcement state is allowed; persistent or statistical records are not | Confirmed | U10.1 | AC-11 |
-| D34 | Consultation mechanism: candidates A (native spawn, positive-integer `fork_turns`), A' (App Server `thread/fork`), B (MCP tool reading the session record, calling `codex exec`); each judged per configuration against four checks; one failure rejects only that configuration | Confirmed (method) | `gpt/002.md`; U3; `final.md` §五.2 | AC-3, ticket 01 |
-| D35 | Advisor tiers varying only effort and forming their own ladder | Rejected | `final.md` §三 | — |
-| D36 | Version `0.3.0`; the grok lane moves to `0.4.0` | Confirmed | U10.4 | DR-9, DR-11 |
-| D37 | Version manual visual baseline: shipped `docs/releases/0.2.0.html`; the magazine preview is not adopted | Confirmed | U10.3 | DR-10 |
-| D38 | Test seams as proposed in U9 | Confirmed | U10.1 | spec §Testing Decisions |
-| D39 | The Anthropic rumour about removing effort levels as a rule basis | Rejected | `final.md` §三 | — |
-| D40 | The old light/standard free choice with the two-failure senior gate | Rejected (replaced by D6, D9, D10) | `final.md` §三 | — |
-| D41 | The consultation reaches models only through Codex's own authenticated paths and never reads, copies, or transmits credentials itself | Derived | The user's standing rule to keep credentials out of logs and reports, and operations.md's credential handling for live checks; it closes candidate B's option of calling a model API with copied credentials | AC-3 |
-| D42 | Hook trust is the user's gate. The plugin, installer, and docs never mark hooks trusted, never edit trust state, and never pass `--dangerously-bypass-hook-trust` in anything the user runs. Install, update, and release steps include the `/hooks` review. Tests distinguish an untrusted skip from a failure | Derived | Codex Hooks documentation read 2026-09-26 (plugin hooks are not trusted by install; trust is keyed to the hook hash; untrusted hooks are skipped with a startup warning); the user's standing rule that security gates and privilege changes need explicit authorization; handoff review F2 | AC-12 |
-| D43 | "Current effective context" means everything the caller's model would receive on its next request: the latest compaction summary, every later message and tool call/result including the earliest still in context, and the unfinished turn. A recent-turn window is eligible only if it provably covers all of it | Derived | D17 and the goal that a consultation must not lose facts a summary would drop (spec §Reasons); handoff review F3 | AC-3; eligibility check 5 |
-| D44 | "No tools" is shown by the advisor request's actual empty tool set, not by a refused attempt or the model's own statement | Derived | D17 ("no tools", read-only excluded); handoff review F4 | AC-3; eligibility check 4 |
-| D45 | Tickets 02 and 03 scope their text searches to the files they own; X-5 applies in full at final acceptance; ticket 01 judges its file changes against its start state | Derived | Ticket file ownership; handoff review F1 | X-5; tickets 01–03 |
-| D46 | The plugin adds no detection of its own for untrusted hooks; the host's startup warning pointing to `/hooks` is the signal | Derived (scope choice) | Codex Hooks documentation read 2026-09-26; no user request for plugin-side detection; avoids new scope | AC-12 |
-| D47 | No automatic worker finish blocking. Retain primary posture injection, native-dispatch verification, and process consultation. Continue ticket 06; fresh Astra xhigh final acceptance, then commit/push and update WSL and Windows | Confirmed | Explicit user selection on 2026-09-26 after explanation of AC-9; supersedes its earlier deferral and O3's hook-blocking clause | AC-9 cancelled; retained AC-8/AC-10; 06 and final acceptance authorized; X-1 release authorization |
-| D48 | After acceptance, create a local commit only; do not push or update WSL/Windows installations | Confirmed; supersedes D47's release scope only | Later explicit user instruction on 2026-09-26 | X-1; final local delivery |
-| D49 | Skip repeating the manual trust run after adding the cross-platform launcher; retain prior trusted/untrusted evidence and disclose that the final hook definition was not retested with manual trust | Confirmed | User declined the repeated test on 2026-09-26 | AC-12 verification only; product trust requirements unchanged |
+| D1 | 档位 `mainstay`/`crux`/`rescue` 为 explorer、worker、advisor 取代 light/standard/senior | 已确认 | `request-001`；`final.md` §一.A.1 | TR-1 |
+| D2 | 模型为 `gpt-6-luna`、`gpt-6-sol`、`gpt-6-astra`；Terra 离开此表，因为 6 系列没有 Terra | 已确认 | `request-002` 第 1 条 | TR-2 |
+| D3 | 用户的表具有权威；表优先于正文（worker 的 `mainstay` 是 `sol[high]`，而不是 `sol[medium*, high]`） | 已确认 | `request-002`（"表和正文不一致都不重要"）；`final.md` §一.A.3 | TR-3 |
+| D4 | worker 的 `crux` 中 `astra[low, medium]` 的默认值是 `low` | 派生 | 未标记的单元格；`final.md` §一.A.3 说在实施时填写；§一.A.4 "排列顺序约等于使用顺序" 使最先列出的推理等级成为默认值 | TR-3 |
+| D5 | 档位内顺序约等于使用顺序；档位内的选择依据数据包无法捕获的判断 | 已确认 | `request-001`；`final.md` §一.A.4 | TR-4 |
+| D6 | 当已识别出一个关键困难，或必须处理相互影响的约束时，允许首轮 `crux`；默认是 `mainstay`；没有使用配额 | 已确认 | `request-002`（"首轮准入采用GPT方案"）；`final.md` §一.A.5 | TR-5 |
+| D7 | 收窄的首轮准入（不可见的失败、代价高的失败、对预计失败的证据、用户声明） | 已确认并保留 | `request-002`（"先把收窄选项保留"）；`final.md` §一.A.6 | TR-6 |
+| D8 | 由用户肉眼观察；不为它添加标记、日志或统计 | 已确认 | U5.2；`final.md` §一.A.6、§一.B.10 | AC-11、X-3 |
+| D8a | 用显式标记、本地日志或统计来观察首轮 `crux` | 已被 D8 替代 | U5 之前的 `final.md` 草稿；U5.2 | — |
+| D9 | 升级下限：模型级别不降低（luna < sol < astra），除非没有其他选择；同一模型需要更高的推理等级；在该下限之上，按暴露出的困难选择 | 已确认 | `request-002` 第 2 条以及 "其他按推荐"；`gpt/001.md`；`final.md` §一.A.7 | TR-7 |
+| D10 | 能力失败的计数；路径为 `mainstay` → `crux` → `rescue` → 用户；`rescue` 只能经过 `crux` 或用户声明到达；首轮 `crux` 在一次 `crux` 失败之后到达 `rescue`；R3 保留 | 已确认 | U3；`final.md` §一.A.8 | TR-8 |
+| D11 | `rescue` 要求两次累计失败（在 `crux` 内部重试） | 已否决 | 与「升级而不是切换」冲突；`final.md` §三 | — |
+| D12 | 能力失败之后在同一档位内切换模型（除非没有其他选择） | 已否决 | `request-001`；`final.md` §三 | — |
+| D13 | 已声明的假设（更换模型优于推理等级；`xhigh` 跃升）写在路由配置中，由下一次代际变更使之失效；Anthropic 的传闻不是依据 | 已确认 | `final.md` §一.A.9 | TR-9 |
+| D14 | 保留独立验收（数据包、新线程、只读检查）；咨询从不替代它 | 已确认 | 转述的 GPT 会话决定；`final.md` §一.B.1 | AC-1 |
+| D15 | 替换整个 Advisor 并放弃独立验收 | 已否决 | `final.md` §三 | — |
+| D16 | 验收拨档按被验收工作的档位；主代理撰写的工作使用不弱于主代理的最低顾问拨档；低置信度的裁定使验收保持待定并交给用户 | 已确认 | U10.2 | AC-2 |
+| D16a | 由多个档位建成的工作按所涉及的最高档位验收；模型不在路由配置中的主代理得到 `astra[xhigh]` | 派生 | 对 D16 与 D20 的收口（U10.5 选项描述） | AC-2 |
+| D17 | 过程咨询：自动的当前上下文，顾问没有工具，恰好返回计划 / 纠正 / 停止三者之一 | 已确认 | `final.md` §一.B.2 | AC-3 |
+| D18 | worker 与 explorer 可以调用咨询 | 已确认 | `request-002`（"其他按推荐"）；`final.md` §一.B.4 | AC-3 |
+| D19 | 咨询拨档跟随调用方：`mainstay` 调用方 → `astra[low*, medium]`，`crux` → `astra[high]`，`rescue` → `astra[xhigh]`，主代理 → 不弱于主代理的最低顾问拨档；顾问没有自己的阶梯 | 已确认 | `final.md` §一.B.5 | AC-4 |
+| D20 | 姿态通过比较调用方的模型与它将要咨询的顾问模型来确定：同一模型 → 精简姿态；不同 → 完整姿态；没有写死的系列列表；不在路由配置中的主代理模型得到完整姿态和 `astra[xhigh]` | 已确认 | U10.5 | AC-5 |
+| D20a | "`astra[xhigh]` 主会话使用精简姿态" | 已被 D20 替代（它是一个例子，U5.1） | `request-002`；U5.1 | — |
+| D20b | 按模型级别确定姿态（不论推理等级，luna/sol 为完整姿态，astra 为精简姿态） | 已被 D20 替代 | `final.md` §一.B.3；U10.5 | — |
+| D21 | 采纳：默认采纳；当遵循失败或第一手来源的证据与之矛盾时，带理由偏离；约束冲突直接拒绝并给出理由；建议不授予任何授权 | 已确认 | U3；`final.md` §一.B.6 | AC-6 |
+| D22 | 因推理缺陷而拒绝：顾问模型与调用方不同 → 先做一次调和调用；同一模型 → 可以带理由直接拒绝 | 派生 | `final.md` §一.B.6 说的是 "higher model" 相对于 "same model"；D20 取消了姿态所用的模型排序，因此这里应用同一种身份比较 | AC-6 |
+| D23 | 因推理缺陷而直接拒绝更强顾问的建议（GPT 在 `gpt/002.md` 中的立场） | 已否决 | U3；`final.md` §三 | — |
+| D24 | 为每一次不采纳记录一个类别 | 已被 D8 替代（它存在只是为了供给后来的一次检查） | U5 之前的 `final.md` 草稿；U5.2 | — |
+| D25 | 姿态文本由 rpiv-advisor 的指南改写而来，去掉 "commit the change" 这一步；在下一条可见回复中重述关键指导 | 已确认 | `gpt/001.md`；`final.md` §一.B.7 | AC-7 |
+| D26 | 原样复用 rpiv-advisor 的指南 | 已被 D25 替代 | `claude/001.md`；`final.md` §三 | — |
+| D27 | 常驻姿态：一个随插件交付的 `SessionStart` 钩子注入主代理的姿态文本 | 已确认 | `final.md` §一.B.8 | AC-8 |
+| D28 | 被委派的代理在其入口的 `developer_instructions` 中携带自己的姿态变体；同角色说明逐字相同的检查被收窄，以排除姿态段落 | 已确认 | U9（在 U10.1 中确认） | EN-5 |
+| D29 | 完成前强制执行：本版本中，随插件交付的、作用于 worker 的 `SubagentStop` 钩子 | 已被 D47 替代 | U5.3；U6；`final.md` §一.B.8 | AC-9 已取消 |
+| D29a | 把完成前强制执行作为以后的可选步骤 | 已被 D29 替代 | U5.3 | — |
+| D30 | 阻断每一次主代理回合的 `Stop` 钩子（方案 A） | 已否决 | U6；`final.md` §三 | — |
+| D31 | 每次派发都自动验证实际模型与推理等级；安装证据可以复用 | 已确认 | `gpt/002.md`；U3；`final.md` §一.B.9 | AC-10 |
+| D32 | 每个任务对每个入口检查一次模型设置 | 已被 D31 替代 | `claude/001.md`；`final.md` §三 | — |
+| D33 | 允许按会话存在的临时强制执行状态；不允许持久记录或统计记录 | 已确认 | U10.1 | AC-11 |
+| D34 | 咨询机制：候选 A（原生派发，正整数 `fork_turns`）、A'（App Server `thread/fork`）、B（读取会话记录并调用 `codex exec` 的 MCP 工具）；每一种配置都对照四项检查来判定；一次失败只否决该配置 | 已确认（方法） | `gpt/002.md`；U3；`final.md` §五.2 | AC-3、工单 01 |
+| D35 | 顾问档位只改变推理等级并形成自己的阶梯 | 已否决 | `final.md` §三 | — |
+| D36 | 版本 `0.3.0`；grok lane 移到 `0.4.0` | 已确认 | U10.4 | DR-9、DR-11 |
+| D37 | 版本说明书的画面基准：已交付的 `docs/releases/0.2.0.html`；杂志预览未被采纳 | 已确认 | U10.3 | DR-10 |
+| D38 | 测试接缝如 U9 所提议 | 已确认 | U10.1 | 规格 §测试决定 |
+| D39 | 把 Anthropic 关于取消推理等级的传闻当作规则依据 | 已否决 | `final.md` §三 | — |
+| D40 | 旧的 light/standard 自由选择，外加两次失败的 senior 门禁 | 已否决（由 D6、D9、D10 替代） | `final.md` §三 | — |
+| D41 | 咨询只通过 Codex 自己的已认证路径到达模型，并且自身从不读取、复制或传输凭据 | 派生 | 用户关于把凭据排除在日志和报告之外的常设规则，以及 operations.md 对实机检查的凭据处理；它收口了候选 B 中用复制的凭据调用模型 API 这一选项 | AC-3 |
+| D42 | 钩子信任是用户的门禁。插件、安装器和文档从不把钩子标为已信任，从不编辑信任状态，也从不在用户运行的任何东西中传递 `--dangerously-bypass-hook-trust`。安装、更新和发布步骤包含 `/hooks` 评审。测试把未受信任而跳过与失败区分开 | 派生 | 于 2026-09-26 阅读的 Codex Hooks 文档（插件钩子不会因安装而受信任；信任以钩子哈希为键；未受信任的钩子被跳过，并伴有启动警告）；用户关于安全门禁和权限变更需要明确授权的常设规则；交接评审 F2 | AC-12 |
+| D43 | 「当前有效上下文」指调用方的模型在下一次请求中会收到的一切：最新的压缩摘要、此后的每一条消息和工具调用或结果（包括仍在上下文中的最早内容），以及未完成的回合。近期回合窗口只有在它可证明地覆盖全部这些内容时才有资格 | 派生 | D17，以及咨询不得丢失摘要会丢掉的事实这一目标（规格 §约束实施选择的理由）；交接评审 F3 | AC-3；资格检查 5 |
+| D44 | 「无工具」由顾问请求实际为空的工具集来表明，而不是由一次被拒绝的尝试或模型自己的陈述来表明 | 派生 | D17（"no tools"，只读被排除）；交接评审 F4 | AC-3；资格检查 4 |
+| D45 | 工单 02 和 03 把文本搜索的范围限定在它们拥有的文件；X-5 在最终验收时完整适用；工单 01 对照它的起始状态判定其文件变更 | 派生 | 工单的文件所有权；交接评审 F1 | X-5；工单 01–03 |
+| D46 | 插件不为未受信任的钩子添加自己的检测；宿主指向 `/hooks` 的启动警告就是信号 | 派生（范围选择） | 于 2026-09-26 阅读的 Codex Hooks 文档；没有用户要求插件侧检测；避免新的范围 | AC-12 |
+| D47 | 不自动阻断 worker 的完成。保留主代理姿态注入、原生派发验证和过程咨询。继续工单 06；以新的 Astra xhigh 做最终验收，然后提交、推送并更新 WSL 与 Windows | 已确认 | 在解释 AC-9 之后，用户于 2026-09-26 的明确选择；替代此前的推迟以及 O3 的钩子阻断条款 | AC-9 已取消；保留 AC-8/AC-10；06 与最终验收已获授权；X-1 发布授权 |
+| D48 | 验收之后只创建本地提交；不要推送，也不要更新 WSL/Windows 安装 | 已确认；只替代 D47 的发布范围 | 用户后来于 2026-09-26 的明确指示 | X-1；最终本地交付 |
+| D49 | 在加入跨平台启动器之后，跳过重复的手动信任运行；保留先前受信任与未受信任的证据，并披露最终钩子定义没有用手动信任重新测试 | 已确认 | 用户于 2026-09-26 拒绝了重复测试 | 仅 AC-12 的验证；产品的信任要求不变 |
 
-### 2.5 Open items
+### 2.5 未决事项
 
-The two decisions surfaced by the executor's handoff review (`handoff-review.md`, 2026-09-26) were resolved by explicit user replies during ticket 01 on 2026-09-26. The spec's §Open Decisions retains the alternatives and marks option (a) selected for each.
+执行者交接评审（`handoff-review.md`，2026-09-26）提出的两项决定，已由用户在 2026-09-26 工单 01 期间的明确回复解决。规格的 §未决决定保留了各选项，并标明每一项都选择了选项 (a)。
 
-- **O3 — Success policy retained; hook clause superseded by D47.** Only a successful consultation counts; the primary sees failures, and the work stays pending until successful consultation or user release. There is no automatic worker finish block.
-- **O4 — Confirmed, option (a).** `--dangerously-bypass-hook-trust` is allowed only for automated live checks in a temporary `CODEX_HOME`. At least one run must still use hooks the user trusted through `/hooks`, and one must record the untrusted skip and its warning. No authorization was given to edit trust state or bypass trust in a real home.
+- **O3 — 成功政策保留；钩子条款已被 D47 替代。** 只有成功的咨询才算数；主代理看得到失败，并且工作保持待定，直到成功的咨询或用户放行。没有自动的 worker 完成阻断。
+- **O4 — 已确认，选项 (a)。** `--dangerously-bypass-hook-trust` 只允许用于临时 `CODEX_HOME` 中的自动化实机检查。至少仍有一次运行必须使用用户通过 `/hooks` 信任的钩子，并且有一次运行必须记录未受信任的跳过及其警告。没有给予编辑信任状态或在真实主目录中绕过信任的授权。
 
-The items below become user decisions only if a probe result forces them; the spec's stop-and-return conditions (spec §Stop and return) say when:
+下面这些事项只有在某次探测结果迫使它们成为用户决定时，才成为用户决定；规格的停止并返回条件（规格 §停止并返回）说明何时如此：
 
-- **O1** — which consultation mechanism ships. This is not a user decision while at least one candidate passes all four checks; the ticket 01 rule in the spec decides. If none passes, it becomes a user decision.
-- **O2** — whether the narrow first-round admission (D7) is enabled. This is the user's call, made from their own observation, at any time after release.
+- **O1** — 哪一种咨询机制交付。只要至少有一个候选通过全部四项检查，这就不是用户决定；规格中的工单 01 规则来决定。如果没有一个通过，它才成为用户决定。
+- **O2** — 是否启用收窄的首轮准入（D7）。这由用户决定，依据用户自己的观察，在发布之后的任何时间作出。

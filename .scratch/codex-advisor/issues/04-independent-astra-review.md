@@ -1,36 +1,29 @@
-# 04: Independent Astra Review with a Primary-Effort Floor
+# 04：带有主代理推理等级下限的独立 Astra 评审
 
 Status: resolved
 
-Blocked by: 03 - Authorized Architect Mode with Luna Implementation.
+Blocked by: 03 - 带有 Luna 实现的已授权 Architect 模式。
 
-**What to build:** Architect-mode work that requires independent review is inspected by a fresh Astra reviewer after the architect's own checks. Review uses the agreed effort floor and cannot be reported complete when the required call or its evidence is unavailable.
+**要构建的内容：** 需要独立评审的 Architect 模式工作，在 Architect 自己的检查之后，由一名新线程中的 Astra Reviewer 检视。评审使用约定的推理等级下限，并且在必需的调用或其证据不可用时，不能被报告为完成。
 
-- [x] A distinct native Independent reviewer contract uses Astra, starts with a fresh context, inspects the actual changes and verification evidence, and does not implement its own corrections.
-- [x] High-risk work and explicit user review requests require independent review after the architect has inspected the complete diff and rerun key verification.
-- [x] Work without either review trigger does not acquire mandatory independent review merely because Architect mode is active.
-- [x] The default reviewer effort is the higher of `high` and the Astra primary session's resolved reasoning effort: `high` for primary `low`, `medium`, or `high`; `xhigh` for primary `xhigh`; and `max` for primary `max`.
-- [x] Explicit reviewer-effort adjustments are honored only when supported and not below the primary session's effort. These checks do not restrict the user's directly selected primary effort.
-- [x] Selection uses supported reasoning settings and observed evidence rather than lexical ordering or an assumed interpretation of a display label. An unestablished floor is not reported as satisfied.
-- [x] Native configuration precedence does not silently replace the selected reviewer effort with a fixed lower setting, and actual runtime evidence confirms the effective model and effort.
-- [x] If required Astra review is unavailable or actual model or effort evidence is missing or conflicting, the affected step pauses with a reason. No silent substitute or successful-review claim is introduced.
-- [x] Actual reviewer permissions are reported accurately. Behavioral read-only instructions are distinguished from enforced isolation, with the existing state-comparison safeguards retained when broader permissions apply.
-- [x] The fork's active independent-review contract replaces the upstream Sol reviewer role; Advisor consultation remains a separate contract and does not automatically satisfy final review.
-- [x] The architect remains accountable for acceptance. A review report does not remove the architect's verification responsibility or authorize a reviewer to implement fixes.
-- [x] Installed-plugin scenarios include a user-requested review of a bounded Luna-produced change, a high-risk review requirement, ordinary completion without extra review, the effort-floor cases, a rejected lower override, and required-review failure.
-- [x] Deterministic fixtures validate role and effort evidence and refusal behavior. Live scenarios establish actual invocation and isolation results separately from fixture coverage.
+- [x] 一份单独的原生独立 Reviewer 契约使用 Astra，以新上下文开始，检视实际变更和验证证据，并且不实现它自己的修正。
+- [x] 高风险工作，以及显式的用户评审请求，要求在 Architect 已经检视完整差异并重新运行关键验证之后进行独立评审。
+- [x] 两种评审触发条件都不具备的工作，不会仅仅因为 Architect 模式处于活动状态就获得强制的独立评审。
+- [x] 默认的 Reviewer 推理等级是 `high` 与该 Astra 主代理会话已解析推理等级中的较高者：主代理为 `low`、`medium` 或 `high` 时，Reviewer 为 `high`；主代理为 `xhigh` 时，Reviewer 为 `xhigh`；主代理为 `max` 时，Reviewer 为 `max`。
+- [x] 显式的 Reviewer 推理等级调整只有在受支持、并且不低于主代理会话推理等级时才被尊重。这些检查不限制用户直接选定的主代理推理等级。
+- [x] 选择使用受支持的推理设置和观察到的证据，而不是词典序，也不是对某个显示标签的假定解释。一个尚未确立的下限不被报告为已经满足。
+- [x] 原生配置的优先级不会静默地用一个固定的更低设置替换所选的 Reviewer 推理等级，并且实际的运行时证据确认生效的模型和推理等级。
+- [x] 如果必需的 Astra 评审不可用，或者实际的模型证据或推理等级证据缺失或冲突，受影响的步骤连同原因一起暂停。不引入静默替代，也不引入评审已成功的声称。
+- [x] 实际的 Reviewer 权限被准确报告。行为上的只读指令与强制隔离被区分开；当适用更宽的权限时，既有的状态比较保障予以保留。
+- [x] 该分叉现行的独立评审契约取代上游的 Sol Reviewer 角色；Advisor 咨询仍然是一份单独的契约，并且不自动满足最终评审。
+- [x] Architect 对验收保持负责。一份评审报告不解除 Architect 的验证责任，也不授权 Reviewer 去实现修复。
+- [x] 已安装插件的场景包括：对一处范围受控的、由 Luna 产出的变更做用户请求的评审，一项高风险评审要求，不附加额外评审的普通完成，推理等级下限的各个情形，一次被拒绝的更低覆盖，以及必需评审的失败。
+- [x] 确定性夹具验证角色证据、推理等级证据和拒绝行为。实机场景把实际调用结果和隔离结果，与夹具覆盖分开确立。
 
-## Verification
+## 验证
 
-Build on the bounded implementation workflow from ticket 03 and explicitly request independent review to exercise the complete path. Use the same Astra model on both sides when checking the effort floor. Observe the fresh reviewer context, actual diff inspection, effective settings, and completion behavior; record unavailable live settings or permission probes as unverified.
+在工单 03 的范围受控实现工作流之上继续，并显式请求独立评审，以演练完整路径。在检查推理等级下限时，两侧使用同一个 Astra 模型。观察新的 Reviewer 上下文、实际的差异检视、生效的设置和完成行为；把不可用的实机设置或权限探测记录为未验证。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-06. Installed-host runs confirmed fresh Astra review after
-Luna implementation and architect checks, a high-risk review trigger, actual high,
-xhigh, and max defaults, a supported medium adjustment, rejection of a lower
-override, and pending acceptance when the required native role is unavailable.
-Fixtures cover the complete specified effort matrix and missing/conflicting
-evidence. Observed review was behaviorally read-only under workspace-write
-permissions; enforced read-only isolation remains unverified.
-See [the acceptance record](../acceptance-03-04.md) for evidence and limits.
+已于 2026-09-06 完成。已安装宿主的运行确认：在 Luna 实现和 Architect 检查之后进行新的 Astra 评审，一项高风险评审触发条件，实际的 high、xhigh、max 默认值，一次受支持的 medium 调整，对更低覆盖的拒绝，以及在必需的原生角色不可用时验收待定。夹具覆盖完整的、已写明的推理等级矩阵，以及缺失证据和冲突证据。观察到的评审在 workspace-write 权限下表现为行为上的只读；强制只读隔离仍未验证。证据和限制见[验收记录](../acceptance-03-04.md)。

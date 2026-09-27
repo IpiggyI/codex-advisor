@@ -1,35 +1,30 @@
-# 02: Advisor Mode and Ordinary Astra Solo Work
+# 02：Advisor 模式与普通的 Astra 单独工作
 
 Status: resolved
 
-Blocked by: 01 - Independent Installation and Safe Verification.
+Blocked by: 01 - 独立安装与安全验证。
 
-**What to build:** Sol and Luna primary sessions perform their own work and consult an independent Astra Advisor at the agreed boundaries. Astra primary sessions remain able to work solo without unsolicited Architect-mode activation. The new workflow replaces the old selective-route protocol.
+**要构建的内容：** Sol 主代理会话和 Luna 主代理会话自行完成工作，并在约定的边界上咨询一个独立的 Astra Advisor。Astra 主代理会话仍然能够单独工作，而不会在未经请求时激活 Architect 模式。新工作流取代旧的选择性路由协议。
 
-- [x] Non-Astra primary sessions, including Sol and Luna, use Advisor mode without a plugin-imposed requirement on their primary reasoning effort.
-- [x] An Astra primary session without an explicit Architect-mode request or consent remains in ordinary solo work; an assistant's unaccepted proposal does not authorize delegation-only Architect mode.
-- [x] The plugin does not automatically change the primary model or require a dedicated mode-switch command.
-- [x] A native Astra Advisor contract is installable, selectively checkable, and callable under the fork identity. It provides judgment and does not implement changes.
-- [x] Advisor-mode consultations use `gpt-6-astra`, default to `high`, and permit explicit supported reasoning adjustments. Live invocation confirms that native configuration precedence honors an allowed adjustment.
-- [x] Consultation occurs before architecture decisions, data migrations, API designs, and refactors touching at least three files.
-- [x] Consultation is required after two distinct unsuccessful attempts at the same problem and before declaring a multi-step deliverable complete; additional useful consultations remain allowed.
-- [x] The primary agent supplies the decision and relevant constraints, checks the Advisor's evidence, and explains its resulting decision, including any disagreement. The Advisor's recommendation does not replace user authorization or project approval requirements.
-- [x] A required consultation pauses the affected step when Astra is unavailable or actual model or effort evidence is missing or conflicting. The workflow neither silently substitutes a model nor claims consultation occurred.
-- [x] Judgment-agent permissions are observed and reported accurately; a behavioral read-only instruction under broader host permissions is not reported as enforced isolation.
-- [x] Ordinary consultation is not reported as proof of independent final review of actual changes.
-- [x] The old `SELECTIVE ROUTE` declaration, four-route dispatch contract, Sol-primary reasoning prerequisite, and old-route compatibility requirement no longer govern the fork's workflow.
-- [x] The installed-plugin acceptance scenarios demonstrate primary-session effort freedom, ordinary Astra solo work, consultation triggers, an explicit Advisor-effort adjustment, disagreement handling, and unavailable or unobservable required consultation.
-- [x] Runtime fixtures cover the new Advisor evidence and refusal cases without exposing unrelated session content. Obsolete exact-word old-route assertions are updated and are not presented as behavioral proof.
+- [x] 非 Astra 的主代理会话，包括 Sol、Luna，使用 Advisor 模式，并且插件不对其主代理推理等级施加要求。
+- [x] 没有显式 Architect 模式请求或同意的 Astra 主代理会话保持在普通单独工作中；助手未被接受的提议并不授权只做委派的 Architect 模式。
+- [x] 插件不自动更改主代理模型，也不要求一条专门的模式切换命令。
+- [x] 一份原生 Astra Advisor 契约可以安装、可以选择性检查，并且可以在该分叉身份下调用。它提供判断，并且不实现变更。
+- [x] Advisor 模式的咨询使用 `gpt-6-astra`，默认推理等级为 `high`，并允许显式的、受支持的推理调整。实机调用确认：原生配置的优先级会尊重一项被允许的调整。
+- [x] 在架构决定、数据迁移、API 设计，以及触及至少三个文件的重构之前，进行咨询。
+- [x] 在对同一问题做了两次不同的不成功尝试之后，以及在宣布一项多步骤交付物完成之前，咨询是必需的；额外的有用咨询仍然允许。
+- [x] 主代理提供决定和相关约束，检查 Advisor 的证据，并解释由此产生的决定，包括任何分歧。Advisor 的建议不取代用户授权或项目批准要求。
+- [x] 当 Astra 不可用，或者实际的模型证据或推理等级证据缺失或冲突时，一次必需的咨询暂停受影响的步骤。该工作流既不静默地替换模型，也不声称咨询已经发生。
+- [x] 判断代理的权限被观察并被准确报告；在更宽的宿主权限之下，一条行为上的只读指令不被报告为强制隔离。
+- [x] 普通咨询不被报告为对实际变更做了独立最终评审的证明。
+- [x] 旧的 `SELECTIVE ROUTE` 声明、四条路由的派发契约、Sol 主代理的推理前提，以及旧路由的兼容性要求，不再管辖该分叉的工作流。
+- [x] 已安装插件的验收场景展示主代理会话的推理等级自由、普通的 Astra 单独工作、咨询触发条件、一次显式的 Advisor 推理等级调整、分歧处理，以及不可用或不可观察的必需咨询。
+- [x] 运行时夹具覆盖新的 Advisor 证据和拒绝情形，并且不暴露无关的会话内容。过时的、要求精确用词的旧路由断言已更新，并且不被当作行为证明来呈现。
 
-## Verification
+## 验证
 
-Exercise Advisor mode and ordinary Astra solo work through the installed plugin in a disposable workspace. Inspect the actual consultation record, model and effort metadata, permission evidence, and primary-agent response. Use deterministic fixtures for parser and failure cases, and state separately which model-dependent scenarios were run. Delegated Architect-mode implementation is delivered by ticket 03.
+通过已安装的插件，在一次性工作区中演练 Advisor 模式和普通的 Astra 单独工作。检视实际的咨询记录、模型和推理等级元数据、权限证据，以及主代理的响应。对解析器和失败情形使用确定性夹具，并另行说明哪些依赖模型的场景已运行。委派的 Architect 模式实现由工单 03 交付。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-06. Installed-host runs observed Sol and Luna at low primary
-effort, Astra consultations at default high and explicit medium, ordinary Astra solo
-work, required consultation boundaries, explicit disagreement handling, and pausing
-when native consultation was unavailable. Runtime fixtures cover missing and
-conflicting evidence. Permissions were broader than enforced read-only isolation.
-See [the acceptance record](../acceptance-01-02.md) for exact evidence and limits.
+已于 2026-09-06 完成。已安装宿主的运行观察到 Sol、Luna 的主代理推理等级为 low，Astra 咨询的推理等级为默认 high 和显式 medium，普通的 Astra 单独工作，必需咨询的边界，显式的分歧处理，以及在原生咨询不可用时暂停。运行时夹具覆盖缺失证据和冲突证据。权限宽于强制只读隔离。确切证据和限制见[验收记录](../acceptance-01-02.md)。

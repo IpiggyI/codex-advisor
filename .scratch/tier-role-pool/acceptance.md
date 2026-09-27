@@ -1,48 +1,48 @@
-# Acceptance record: tier-named native entries (0.2.0)
+# 验收记录：按档位命名的原生入口（0.2.0）
 
-Recorded 2026-09-17 by the primary. Host: `codex-cli 0.154.0` on WSL; provider `official` from the user's `config.toml`; parent model `gpt-6-astra` at `low` (the user's default). Working tree at tickets 01–06 accepted, before ticket 07.
+由主代理于 2026-09-17 记录。宿主：WSL 上的 `codex-cli 0.154.0`；提供方 `official` 来自用户的 `config.toml`；父模型 `gpt-6-astra`，推理等级为 `low`（用户的默认值）。工作区处于工单 01–06 已验收、工单 07 之前。
 
-## Live route check (eleven entries)
+## 实况路由检查（十一个入口）
 
-Method: a temporary `CODEX_HOME` received copies of `auth.json` and `config.toml` and the eleven templates through `install-agents.sh --target-dir`; a scratch workspace held a two-line `README.md`; one `codex exec --sandbox read-only` run per entry asked the parent to spawn exactly one subagent of that entry with `fork_turns none` (passing `reasoning_effort` only for the six caller-selected entries) and to report the file's first line; the child rollout was located by `agent_role` and read with `inspect-agent-runtime.sh --sessions-dir … --agent <name> [--effort <e>]`. The temporary home, the credential copies, the workspace, and the logs were deleted afterwards.
+方法：一个临时 `CODEX_HOME` 接收了 `auth.json` 与 `config.toml` 的副本，并通过 `install-agents.sh --target-dir` 接收了十一个模板；一个临时工作区放有一份两行的 `README.md`；每个入口各运行一次 `codex exec --sandbox read-only`，要求父代理以 `fork_turns none` 恰好派发一个该入口的子代理（只对六个由调用者选择推理等级的入口传入 `reasoning_effort`），并报告该文件的第一行；子会话记录按 `agent_role` 定位，并用 `inspect-agent-runtime.sh --sessions-dir … --agent <name> [--effort <e>]` 读取。临时主目录、凭据副本、工作区以及日志随后被删除。
 
-| Entry | Effort passed | Observed model | Observed effort | Sandbox / permission | Child thread | Inspector |
+| 入口 | 传入的推理等级 | 观察到的模型 | 观察到的推理等级 | 沙箱 / 权限 | 子线程 | 检查器 |
 |---|---|---|---|---|---|---|
-| `ca_explorer_light` | high | gpt-5.6-luna | high | read-only / managed | 01a0ab15-d019-7ad0-9413-12de29c51eaf | exit 0 |
-| `ca_explorer_standard_m` | (pinned) | gpt-5.6-luna | max | read-only / managed | 01a0ab16-e0ff-7ce3-95b3-c88115e40773 | exit 0 |
-| `ca_explorer_standard_h` | medium | gpt-5.6-terra | medium | read-only / managed | 01a0ab17-8ab8-7380-a40c-1c8c99b10fac | exit 0 |
-| `ca_explorer_senior` | medium | gpt-5.6-sol | medium | read-only / managed | 01a0ab17-e0ad-7341-b4d8-bbf7bdf93451 | exit 0 |
-| `ca_worker_light` | (pinned) | gpt-5.6-luna | max | read-only / managed | 01a0ab18-330e-7f13-9944-44efbf6cdb48 | exit 0 |
-| `ca_worker_standard_m` | high | gpt-5.6-sol | high | read-only / managed | 01a0ab18-a2fe-71a2-bf3d-613185fb2c94 | exit 0 |
-| `ca_worker_standard_h` | (pinned) | gpt-6-astra | low | read-only / managed | 01a0ab18-fc17-7b23-b70c-a1c415dcb248 | exit 0 |
-| `ca_worker_senior` | medium | gpt-6-astra | medium | read-only / managed | 01a0ab19-4e18-7772-b6d1-f69ae563aa80 | exit 0 |
-| `ca_advisor_light` | (pinned) | gpt-6-astra | low | read-only / managed | 01a0ab19-a580-79e2-91a4-73030ed6b232 | exit 0 |
-| `ca_advisor_standard` | (pinned) | gpt-6-astra | medium | read-only / managed | 01a0ab1a-09f9-7ad3-9334-ab193ffb2a84 | exit 0 |
-| `ca_advisor_senior` | high | gpt-6-astra | high | read-only / managed | 01a0ab1a-7676-7cb1-9401-6819e8dd3564 | exit 0 |
+| `ca_explorer_light` | high | gpt-5.6-luna | high | read-only / managed | 01a0ab15-d019-7ad0-9413-12de29c51eaf | 退出码 0 |
+| `ca_explorer_standard_m` | （固定） | gpt-5.6-luna | max | read-only / managed | 01a0ab16-e0ff-7ce3-95b3-c88115e40773 | 退出码 0 |
+| `ca_explorer_standard_h` | medium | gpt-5.6-terra | medium | read-only / managed | 01a0ab17-8ab8-7380-a40c-1c8c99b10fac | 退出码 0 |
+| `ca_explorer_senior` | medium | gpt-5.6-sol | medium | read-only / managed | 01a0ab17-e0ad-7341-b4d8-bbf7bdf93451 | 退出码 0 |
+| `ca_worker_light` | （固定） | gpt-5.6-luna | max | read-only / managed | 01a0ab18-330e-7f13-9944-44efbf6cdb48 | 退出码 0 |
+| `ca_worker_standard_m` | high | gpt-5.6-sol | high | read-only / managed | 01a0ab18-a2fe-71a2-bf3d-613185fb2c94 | 退出码 0 |
+| `ca_worker_standard_h` | （固定） | gpt-6-astra | low | read-only / managed | 01a0ab18-fc17-7b23-b70c-a1c415dcb248 | 退出码 0 |
+| `ca_worker_senior` | medium | gpt-6-astra | medium | read-only / managed | 01a0ab19-4e18-7772-b6d1-f69ae563aa80 | 退出码 0 |
+| `ca_advisor_light` | （固定） | gpt-6-astra | low | read-only / managed | 01a0ab19-a580-79e2-91a4-73030ed6b232 | 退出码 0 |
+| `ca_advisor_standard` | （固定） | gpt-6-astra | medium | read-only / managed | 01a0ab1a-09f9-7ad3-9334-ab193ffb2a84 | 退出码 0 |
+| `ca_advisor_senior` | high | gpt-6-astra | high | read-only / managed | 01a0ab1a-7676-7cb1-9401-6819e8dd3564 | 退出码 0 |
 
-Every run exited 0 and the parent's reply carried the child's answer (the fixture's first line). Every child rollout's `parent_thread_id` was the run's parent session and `cwd` was the scratch workspace. Parent token usage per run ranged from about 1,000 to about 20,000.
+每一次运行都以退出码 0 结束，并且父代理的回复带有子代理的答案（夹具的第一行）。每一个子会话记录的 `parent_thread_id` 都是该次运行的父会话，`cwd` 都是该临时工作区。每次运行的父令牌用量大约从 1,000 到大约 20,000。
 
-What this establishes: each entry is discoverable by name after installation, spawns with the template's `model`, and runs at the pinned effort or the passed effort. `gpt-5.6-terra` and Luna at `max` are callable on this account; Luna `xhigh` was not exercised.
+本检查所确立的内容：安装之后，每个入口都可以按名称被发现，以模板的 `model` 派发，并运行在被固定的推理等级或被传入的推理等级上。`gpt-5.6-terra` 以及推理等级为 `max` 的 Luna 在此账户上可以调用；Luna 的 `xhigh` 未被行使。
 
-What this does not establish: enforced isolation (the observed `read-only` sandbox came from the parent's `--sandbox read-only`; `permission_profile_type` was `managed`), quality, cost, or stability; the `[agents]` defaults path (none set in the copied `config.toml`); behaviour under an interactive session rather than `codex exec`.
+本检查所不确立的内容：强制隔离（观察到的 `read-only` 沙箱来自父代理的 `--sandbox read-only`；`permission_profile_type` 为 `managed`）、质量、成本或稳定性；`[agents]` 默认值路径（被复制的 `config.toml` 中没有设置）；在交互会话中、而不是在 `codex exec` 下的行为。
 
-## Deterministic checks at acceptance of ticket 06
+## 工单 06 验收时的确定性检查
 
-- `sh plugins/codex-advisor/scripts/verify.sh`: installation and runtime groups pass (manifest-driven installer with overwrite, retire, drift and residue checks; profile-to-template names and models; same-role identical instructions; pinned set; table-driven inspector cases; payload filtering).
-- `python3 tests/test_zh_mirror.py`: 26/26 (four Markdown twins, eleven TOML twins by existence, eleven by key equality and Chinese prose).
-- `python3 tests/test_version_manual.py`: 3/3 for the current `0.1.0` (ticket 07 bumps and adds the 0.2.0 manual).
+- `sh plugins/codex-advisor/scripts/verify.sh`：安装组与运行时组通过（由清单驱动的安装器，带有覆盖、退役、漂移与残留检查；路由配置到模板的名称与模型；同一角色的指令相同；固定集合；由表驱动的检查器用例；载荷过滤）。
+- `python3 tests/test_zh_mirror.py`：26/26（四份 Markdown 对照，十一份按存在性计的 TOML 对照，十一份按键相等与中文散文计的对照）。
+- `python3 tests/test_version_manual.py`：针对当前 `0.1.0` 为 3/3（工单 07 会提升版本并加入 0.2.0 手册）。
 
-## Code review (two axes, codex lane report mode, `gpt-6-astra[low]`, 2026-09-17)
+## 代码评审（两个轴线，Codex 通道报告模式，`gpt-6-astra[low]`，2026-09-17）
 
-Both lanes returned `complete` receipts (sessions `01a0ab26-3e55-7fe1-aae1-43e6fbdc6f9b` standards, `01a0ab26-3e55-7980-b81a-1bee98ce9e34` spec; `dirty_baseline: true`, so the read-only tool set was the only guard). Dispositions:
+两个通道都返回了 `complete` 回执（会话 `01a0ab26-3e55-7fe1-aae1-43e6fbdc6f9b` 为标准轴线，`01a0ab26-3e55-7980-b81a-1bee98ce9e34` 为规格轴线；`dirty_baseline: true`，因此只读工具集是唯一的防护）。处置如下：
 
-- Standards, hard: a symlink at a retired filename was deleted instead of refused (installer preflight exempted symlinks) → rework on the scripts lane; preflight now refuses any non-regular entry at a retired name and the removal loop deletes regular files only; verifier case added.
-- Standards, hard: the 0.2.0 manual omitted `codex plugin marketplace upgrade` and the per-side reinstall order required by `AGENTS.md` → rework on the docs lane; the manual now lists the full sequence.
-- Standards, judgement: duplicated existence-check block in `tests/test_zh_mirror.py` → noted, not changed.
-- Standards, contract gap: the glossary's Routing profile `_Avoid_` forbade any dial value in a TOML description while the spec requires a pinned entry to name its fixed effort → glossary wording narrowed by the primary.
-- Spec, missing: ticket 07 did not list the release commands → added to the ticket by the primary.
-- Spec, missing: README repeated an effort value in the inspector example → rework; the example now uses the pinned `ca_worker_light`.
-- Spec, wrong: the verifier hardcoded the pinned set and the entry count → rework; both are now derived from the routing profile only (negative proof: an unpinned template given an effort fails naming the entry).
-- Spec, scope creep: none found.
+- 标准，硬性：退役文件名处的符号链接被删除，而不是被拒绝（安装器预检豁免了符号链接）→ 在脚本通道上返工；预检现在拒绝退役名称处的任何非常规入口，删除循环只删除常规文件；已加入验证器用例。
+- 标准，硬性：0.2.0 手册遗漏了 `codex plugin marketplace upgrade`，以及 `AGENTS.md` 所要求的每一侧重新安装顺序 → 在文档通道上返工；手册现在列出完整顺序。
+- 标准，判断：`tests/test_zh_mirror.py` 中重复的存在性检查块 → 已注明，未更改。
+- 标准，契约缺口：术语表中路由配置的 `_Avoid_` 禁止在 TOML 描述里出现任何拨档值，而规格要求固定入口写明其固定推理等级 → 主代理收窄了术语表措辞。
+- 规格，缺失：工单 07 没有列出发布命令 → 主代理已把它们加入该工单。
+- 规格，缺失：README 在检查器示例中重复了一个推理等级值 → 返工；该示例现在使用固定的 `ca_worker_light`。
+- 规格，错误：验证器把固定集合和入口数量写死 → 返工；两者现在只从路由配置推导（反证：给一个未固定的模板加上推理等级，会在点名该入口时失败）。
+- 规格，范围蔓延：未发现。
 
-After the reworks: `verify.sh` both groups, `tests/test_zh_mirror.py` 26/26, `tests/test_version_manual.py` 3/3, `git diff --check` clean.
+返工之后：`verify.sh` 的两个组、`tests/test_zh_mirror.py` 的 26/26、`tests/test_version_manual.py` 的 3/3，以及 `git diff --check` 均为干净。

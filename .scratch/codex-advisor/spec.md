@@ -1,160 +1,160 @@
-# Codex Advisor: Native Architect and Advisor Modes
+# Codex Advisor：原生 Architect 模式与 Advisor 模式
 
 Status: ready-for-agent
 
-## Problem Statement
+## 问题陈述
 
-Users need to choose how much work their primary model performs without losing access to Astra's judgment. The current plugin requires a Sol primary session at high reasoning and organizes work through four selective routes. It cannot express an Astra architect that delegates all implementation, or a Sol or Luna primary session that implements work while consulting Astra at important decisions.
+用户需要选择他们的主代理模型完成多少工作，同时又不失去对 Astra 判断的使用。当前插件要求一个推理等级为 high 的 Sol 主代理会话，并通过四条选择性路由来组织工作。它不能表达一个把全部实现都委派出去的 Astra Architect，也不能表达一个在实现工作的同时于重要决定上咨询 Astra 的 Sol 或 Luna 主代理会话。
 
-Users also need predictable delegated model settings without having the plugin restrict the reasoning effort of models they use directly. Selecting Astra must not automatically turn an ordinary coding session into a delegation-only workflow.
+用户还需要可预期的委派模型设置，而又不让插件限制他们直接使用的模型的推理等级。选择 Astra 不得自动把一次普通的编码会话变成只做委派的工作流。
 
-## Solution
+## 方案
 
-Create a Codex-only fork named `codex-advisor`, using the project's existing native custom-agent foundation. Replace the old four-route protocol with Architect mode and Advisor mode while preserving ordinary solo work outside authorized Architect mode.
+创建一个仅面向 Codex 的分叉，名为 `codex-advisor`，使用本项目既有的原生自定义代理基础。用 Architect 模式和 Advisor 模式替换旧的四路由协议，同时保留已授权 Architect 模式之外的普通单独工作。
 
-An Astra primary session enters Architect mode only when the user requests it or agrees to a proposal. Authorization defaults to the current task, including its follow-up turns and implementation subtasks. It does not carry into a new task unless the user explicitly authorized Architect mode for the whole session. Without authorization, Astra continues ordinary solo work.
+一个 Astra 主代理会话只有在用户请求 Architect 模式，或同意一项提议时，才进入该模式。授权默认适用于当前任务，包括它的后续回合和实现子任务。除非用户显式授权整个会话使用 Architect 模式，否则它不会带入一个新任务。没有授权时，Astra 继续普通的单独工作。
 
-Other primary models, including Sol and Luna, use Advisor mode: the primary agent performs the work and consults Astra at the agreed decision boundaries. The primary agent remains accountable for decisions and must explain disagreements with its Advisor.
+其他主代理模型，包括 Sol、Luna，使用 Advisor 模式：主代理执行工作，并在约定的决定边界上咨询 Astra。主代理对决定保持负责，并且必须解释与其 Advisor 的分歧。
 
-Architect mode keeps design, specifications, and acceptance in the primary session and delegates every implementation change to Luna or Sol. Independent Astra review is added for high-risk work or at the user's request. Required delegated calls use verified models and reasoning settings; unavailable or unobservable required consultation and review pause the affected step instead of silently changing the workflow.
+Architect 模式把设计、规格和验收留在主代理会话中，并把每一处实现变更委派给 Luna 或 Sol。对高风险工作或在用户请求时，增加独立的 Astra 评审。必需的委派调用使用经过验证的模型和推理设置；不可用的或不可观察的必需咨询和评审会暂停受影响的步骤，而不是静默地改变该工作流。
 
-## User Stories
+## 用户故事
 
-1. As a Codex user, I want to install the fork as `codex-advisor`, so that I can identify and invoke the intended workflow.
-2. As a Codex user, I want native custom agents, so that the workflow fits the host I already use.
-3. As an Astra user, I want ordinary solo work without automatic Architect mode, so that choosing a model does not change my preferred workflow.
-4. As an Astra user, I want an explicit request to activate Architect mode, so that I control when implementation is delegated.
-5. As an Astra user, I want the assistant to obtain my agreement before activating a proposed Architect mode, so that a suggestion alone does not authorize it.
-6. As a user, I want Architect-mode authorization to cover the current task's follow-up turns and subtasks, so that I do not have to approve the same workflow repeatedly.
-7. As a user, I want a new task to start without inherited task-scoped authorization, so that a previous choice does not silently govern unrelated work.
-8. As a user, I want to explicitly authorize Architect mode for a whole session, so that I can choose a consistent workflow for several tasks.
-9. As a user, I want Architect mode to require an Astra primary session, so that the designated architect model actually owns the work.
-10. As a user, I want the plugin to preserve my primary model and reasoning effort, so that my host settings remain under my control.
-11. As a Sol or Luna user, I want my primary agent to implement work in Advisor mode, so that consulting a stronger model does not transfer the whole task to it.
-12. As an Advisor-mode user, I want Astra consulted before architecture decisions, data migrations, API designs, and refactors touching at least three files, so that judgment arrives before consequential implementation choices.
-13. As an Advisor-mode user, I want Astra consulted after two distinct unsuccessful attempts at the same problem, so that the primary agent can obtain an independent assessment before continuing.
-14. As an Advisor-mode user, I want consultation before a multi-step deliverable is declared complete, so that completion receives an additional judgment check.
-15. As an Advisor-mode user, I want additional consultations when useful, so that the fixed triggers do not prevent justified requests for help.
-16. As an Advisor-mode user, I want the primary agent to explain how it handled the Advisor's recommendation, so that I can inspect disagreements rather than discover that advice was silently ignored.
-17. As a user, I want my authorization boundaries and project approval requirements preserved, so that an Advisor's opinion does not substitute for my permission.
-18. As an Architect-mode user, I want the architect to own design, task specifications, and acceptance, so that architectural responsibility remains clear.
-19. As an Architect-mode user, I want every implementation change delegated, including one-line changes and corrections, so that the responsibility boundary does not depend on patch size.
-20. As an Architect-mode user, I want bounded, fully specified implementation assigned to Luna, so that the selected executor matches the task requirements.
-21. As an Architect-mode user, I want judgment-heavy, context-heavy, or higher-risk implementation assigned directly to Sol, so that the workflow does not require an unsuitable Luna attempt first.
-22. As an Architect-mode user, I want delegated Luna calls to use `max`, so that the intended implementation configuration is stable.
-23. As an Architect-mode user, I want delegated Sol calls to default to `high` while allowing explicit adjustments, so that I can change the reasoning allocation when necessary.
-24. As an Advisor-mode user, I want Astra consultations to default to `high` while allowing explicit adjustments, so that consultation settings are predictable and controllable.
-25. As a user directly running Luna, Sol, or Astra, I want no plugin-imposed reasoning-effort restriction, so that delegated-call policies do not constrain the primary session.
-26. As an Implementer, I want a complete specification containing the objective, ownership, interfaces, constraints, and verification requirements, so that I can work within a settled scope.
-27. As a user, I want concurrent edits preserved and implementation ownership respected, so that delegated work does not overwrite unrelated changes.
-28. As an Architect-mode user, I want independent tasks with nonconflicting ownership dispatched in parallel, so that useful concurrency is available within the host limit.
-29. As an Architect-mode user, I want implementation scheduling to remain with the primary agent, so that Implementers do not create further implementation delegations.
-30. As an Architect-mode user, I want the primary agent to inspect all actual changes and rerun key verification, so that a worker's completion claim alone is insufficient for acceptance.
-31. As an Architect-mode user, I want a fresh Astra reviewer for high-risk work or when I request independent review, so that those changes receive scrutiny outside the architect's accumulated context.
-32. As an Architect-mode user, I want ordinary work to finish after the architect's acceptance checks without a mandatory additional reviewer, so that independent review is added for the agreed reasons.
-33. As an Architect-mode user, I want an Independent reviewer's default effort to be the higher of `high` and the primary session's effort, so that review does not default to a lower reasoning tier than the architect.
-34. As an Architect-mode user, I want explicit reviewer-effort adjustments to remain at or above the primary session's effort, so that a manual override preserves the review floor.
-35. As a user, I want Advisors and Independent reviewers to provide judgment without implementing their own changes, so that judgment and implementation responsibilities remain separate.
-36. As a user, I want a required consultation or review to pause when Astra is unavailable or its actual model or effort cannot be confirmed, so that the workflow does not falsely report that the required step occurred.
-37. As a user, I want configuration intentions distinguished from observed runtime settings, so that an installed role definition is not presented as proof of the model that actually ran.
-38. As a user, I want the actual permission boundary reported for judgment agents, so that a behavioral read-only instruction is not mistaken for enforced isolation.
-39. As a user, I want installation and checking to preserve modified, unsafe, and unrelated local files, so that changing the plugin does not silently damage my environment.
-40. As a user, I want runtime inspection to expose only the routing evidence it needs, so that prompts, credentials, and unrelated session content do not appear in diagnostics.
-41. As a user, I want the new workflow without the old `SELECTIVE ROUTE` declaration requirement, so that I do not have to reason about two overlapping routing protocols.
-42. As a user, I want decision consultation distinguished from final review of actual changes, so that an ordinary consultation is not reported as satisfying a different review obligation.
+1. 作为 Codex 用户，我希望把该分叉安装为 `codex-advisor`，以便我能识别并调用预期的工作流。
+2. 作为 Codex 用户，我希望有原生自定义代理，以便该工作流适合我已经在使用的宿主。
+3. 作为 Astra 用户，我希望有不带自动 Architect 模式的普通单独工作，以便选择一个模型不改变我偏好的工作流。
+4. 作为 Astra 用户，我希望一次显式请求来激活 Architect 模式，以便我控制何时委派实现。
+5. 作为 Astra 用户，我希望助手在激活所提议的 Architect 模式之前取得我的同意，以便仅凭一条建议并不授权它。
+6. 作为用户，我希望 Architect 模式的授权覆盖当前任务的后续回合和子任务，以便我不必反复批准同一个工作流。
+7. 作为用户，我希望一个新任务在开始时不带有继承来的、以任务为范围的授权，以便先前的选择不静默地管辖无关工作。
+8. 作为用户，我希望显式授权整个会话使用 Architect 模式，以便我能为若干任务选择一个一致的工作流。
+9. 作为用户，我希望 Architect 模式要求一个 Astra 主代理会话，以便被指定的 Architect 模型确实拥有该工作。
+10. 作为用户，我希望该插件保留我的主代理模型和推理等级，以便我的宿主设置仍由我控制。
+11. 作为 Sol 或 Luna 用户，我希望我的主代理在 Advisor 模式中实现工作，以便咨询一个更强的模型并不把整个任务转移给它。
+12. 作为 Advisor 模式的用户，我希望在架构决定、数据迁移、API 设计，以及触及至少三个文件的重构之前咨询 Astra，以便判断在后果重大的实现选择之前到达。
+13. 作为 Advisor 模式的用户，我希望在对同一问题做了两次不同的不成功尝试之后咨询 Astra，以便主代理能在继续之前取得一份独立评估。
+14. 作为 Advisor 模式的用户，我希望在一项多步骤交付物被宣布完成之前进行咨询，以便完成再接受一次判断检查。
+15. 作为 Advisor 模式的用户，我希望在有用时进行额外咨询，以便固定的触发条件不阻止有理由的求助请求。
+16. 作为 Advisor 模式的用户，我希望主代理解释它如何处理 Advisor 的建议，以便我能检视分歧，而不是事后才发现建议被静默忽略。
+17. 作为用户，我希望我的授权边界和项目批准要求被保留，以便 Advisor 的意见不代替我的许可。
+18. 作为 Architect 模式的用户，我希望 Architect 拥有设计、任务规格和验收，以便架构责任保持清楚。
+19. 作为 Architect 模式的用户，我希望每一处实现变更都被委派，包括一行变更和修正，以便责任边界不取决于补丁大小。
+20. 作为 Architect 模式的用户，我希望把范围受控且规格完整的实现分配给 Luna，以便所选的执行者与任务要求相匹配。
+21. 作为 Architect 模式的用户，我希望把判断量大、上下文量大或较高风险的实现直接分配给 Sol，以便该工作流不要求先有一次不合适的 Luna 尝试。
+22. 作为 Architect 模式的用户，我希望委派的 Luna 调用使用 `max`，以便预期的实现配置是稳定的。
+23. 作为 Architect 模式的用户，我希望委派的 Sol 调用默认使用 `high`，同时允许显式调整，以便我能在必要时改变推理等级分配。
+24. 作为 Advisor 模式的用户，我希望 Astra 咨询默认使用 `high`，同时允许显式调整，以便咨询设置是可预期的并且可控。
+25. 作为直接运行 Luna、Sol 或 Astra 的用户，我希望没有插件施加的推理等级限制，以便委派调用策略不约束主代理会话。
+26. 作为 Implementer，我希望有一份包含目标、所有权、接口、约束和验证要求的完整规格，以便我能在一个已确定的范围内工作。
+27. 作为用户，我希望并发编辑被保留并且实现所有权受到尊重，以便委派的工作不覆盖写入无关变更。
+28. 作为 Architect 模式的用户，我希望所有权不冲突的独立任务被并行派发，以便有用的并发在宿主限制之内可用。
+29. 作为 Architect 模式的用户，我希望实现调度仍留在主代理处，以便 Implementer 不创建进一步的实现委派。
+30. 作为 Architect 模式的用户，我希望主代理检视全部实际变更并重新运行关键验证，以便仅凭 Worker 的完成声称不足以验收。
+31. 作为 Architect 模式的用户，我希望对高风险工作，或当我请求独立评审时，有一名新的 Astra Reviewer，以便那些变更在 Architect 已积累的上下文之外接受审视。
+32. 作为 Architect 模式的用户，我希望普通工作在 Architect 的验收检查之后结束，而没有一名强制附加的 Reviewer，以便独立评审是因约定的理由才增加的。
+33. 作为 Architect 模式的用户，我希望独立 Reviewer 的默认推理等级是 `high` 与主代理会话推理等级中的较高者，以便评审不默认使用比 Architect 更低的推理档位。
+34. 作为 Architect 模式的用户，我希望显式的 Reviewer 推理等级调整保持在主代理会话推理等级之上或与之相等，以便手动覆盖保留评审下限。
+35. 作为用户，我希望 Advisor 和独立 Reviewer 提供判断，而不实现它们自己的变更，以便判断责任和实现责任保持分开。
+36. 作为用户，我希望当 Astra 不可用，或其实际模型或推理等级不能被确认时，必需的咨询或评审暂停，以便该工作流不虚假地报告必需步骤已经发生。
+37. 作为用户，我希望配置意图与观察到的运行时设置被区分开，以便一份已安装的角色定义不被呈现为实际运行的那个模型的证明。
+38. 作为用户，我希望判断代理的实际权限边界被报告，以便一条行为上的只读指令不被误认为强制隔离。
+39. 作为用户，我希望安装和检查保留已修改的、不安全的和无关的本地文件，以便更改该插件不静默地损坏我的环境。
+40. 作为用户，我希望运行时检视只暴露它所需的路由证据，以便提示词、凭据和无关的会话内容不出现在诊断中。
+41. 作为用户，我希望新工作流不带有旧的 `SELECTIVE ROUTE` 声明要求，以便我不必对两套重叠的路由协议进行推理。
+42. 作为用户，我希望决定咨询与对实际变更的最终评审被区分开，以便一次普通咨询不被报告为满足了一项不同的评审义务。
 
-## Implementation Decisions
+## 实现决定
 
-- Keep the implementation Codex-native. Adapt the plugin manifest and marketplace registration, orchestration skill, native agent definitions, role contracts, installation and checking tools, runtime inspector, verification entry point, and user-facing instructions already present in the project.
-- Use `codex-advisor` as the active fork identity and a corresponding distinct namespace for its installed roles. Remove active dependency on the old four-route protocol and its compatibility layer. Historical attribution is not an active workflow identifier.
-- Separate eligibility from authorization. Astra is required for Architect mode, but Astra identity alone is insufficient. An explicit user request or accepted proposal provides authorization; a suggestion, generic request to implement, or unrelated task does not supply it.
-- Preserve task-scoped authorization through follow-up turns and implementation subtasks. A new task requires new authorization unless the user explicitly selected session-wide authorization. Continue to require an Astra primary session while Architect mode is active.
-- Provide activation through the user's request and consent in the normal conversation. Do not require a dedicated mode-switch command or change the host's primary model automatically.
-- Preserve ordinary Astra solo work. Advisor mode applies to other primary models, including Sol and Luna. The two plugin work modes do not redefine every ordinary host operation as a plugin-controlled route.
-- Do not impose a primary-session reasoning floor or rewrite the user's primary model settings. This includes Astra used directly as the architect and Luna used directly in Advisor mode.
-- Define separate native contracts for the Advisor, Luna Implementer, Sol Implementer, and Independent reviewer. The Advisor and Independent reviewer have different inputs and purposes even though both use Astra for judgment.
-- Apply reasoning rules by call context: Luna delegated by Astra in Architect mode always uses `max`; Sol delegated in that mode defaults to `high` and permits explicit adjustments; Astra consultation in Advisor mode defaults to `high` and permits explicit adjustments.
-- For an Independent Astra reviewer in Architect mode, choose the higher of `high` and the primary session's resolved reasoning effort by default. An explicit adjustment must not fall below the primary session's effort. Use the host's supported reasoning settings and actual runtime evidence rather than comparing display labels or strings lexicographically.
-- Ensure native role configuration and invocation precedence permit the allowed adjustments while preserving the required model identity and Luna constraint. An immutable default in a role definition must not silently defeat an allowed user adjustment. The exact supported native configuration mechanism must be verified during implementation.
-- Keep model and effort resolution, input validation, evidence parsing, and error reporting deterministic where executable tooling owns them. Keep task interpretation, risk assessment, specification writing, and review judgment with the model. Extend existing interfaces before introducing new orchestration infrastructure.
-- Retain the five-part implementation contract: objective, files and ownership, interfaces, constraints, and verification. Require a structured return containing completion status, actual changes, verification evidence, judgment calls, and unresolved gaps. Do not treat that report as independent proof of acceptance.
-- Keep every implementation edit with an Implementer during Architect mode, including corrections to earlier delegated work. The architect continues to own design and task-specification artifacts as part of its assigned responsibility.
-- Select Luna for bounded, fully specified implementation. Select Sol directly for work that requires substantial judgment or context, or carries higher risk. An unsuccessful Luna attempt is not a prerequisite for Sol selection.
-- Permit parallel implementation only for independent tasks with nonconflicting ownership, within host concurrency limits. Keep implementation delegation one level deep and scheduling under primary-agent control.
-- In Advisor mode, require consultation at the agreed design boundaries, after two distinct failed attempts at one problem, and before declaring a multi-step deliverable complete. Permit additional useful consultation. Require the primary agent to explain its treatment of the Advisor's recommendation, including any disagreement.
-- In Architect mode, require the architect to inspect all actual changes and rerun key verification. Add a fresh Independent reviewer after those checks for high-risk work or an explicit user review request. Do not add mandatory independent review to every implementation task.
-- Preserve the distinction between consultation and independent final review. Coverage of the old responsibility combinations does not preserve every old route-specific gate, verdict format, or declaration rule.
-- Use observed role, model, effort, and permission evidence when accepting delegated results. Prefer exposed runtime metadata and use the existing narrow runtime-inspection interface for fields the public evidence omits. Missing or conflicting evidence is not permission to infer a successful call.
-- Pause an affected required consultation or independent review if Astra is unavailable or its actual model or reasoning effort cannot be confirmed. Report the reason and do not silently substitute another model or skip the required step. Failure handling must not weaken Architect-mode Luna's `max` requirement.
-- Request read-only behavior and supported isolation for judgment agents, and report the actual observed boundary. Preserve the existing distinction between an enforced read-only sandbox and a behavioral instruction under broader host permissions.
-- Retain the installer's non-destructive checking and refusal behavior. Do not overwrite modified or unsafe destinations, change global primary-session configuration, or treat a successful installation as proof of a successful model invocation.
+- 使实现保持为 Codex 原生。改编本项目中已经存在的插件清单和插件市场注册、编排技能、原生代理定义、角色契约、安装和检查工具、运行时检查器、验证入口，以及面向用户的说明。
+- 使用 `codex-advisor` 作为现行的分叉身份，并为其已安装角色使用一个相应的、不同的命名空间。移除对旧的四路由协议及其兼容层的现行依赖。历史归属说明不是一个现行的工作流标识符。
+- 把资格与授权分开。Architect 模式要求 Astra，但仅有 Astra 身份是不够的。一次显式的用户请求或已被接受的提议提供授权；一条建议、一条笼统的实现请求，或一个无关任务，都不提供授权。
+- 使以任务为范围的授权通过后续回合和实现子任务得以保留。一个新任务需要新的授权，除非用户显式选择了全会话授权。在 Architect 模式处于活动状态时，继续要求一个 Astra 主代理会话。
+- 通过用户在正常对话中的请求和同意来提供激活。不要要求一条专门的模式切换命令，也不要自动更改宿主的主代理模型。
+- 保留普通的 Astra 单独工作。Advisor 模式适用于其他主代理模型，包括 Sol、Luna。这两种插件工作模式并不把每一次普通的宿主操作都重新定义为一条由插件控制的路由。
+- 不要施加主代理会话的推理下限，也不要改写用户的主代理模型设置。这包括被直接用作 Architect 的 Astra，以及在 Advisor 模式中被直接使用的 Luna。
+- 为 Advisor、Luna Implementer、Sol Implementer 和独立 Reviewer 定义各自的原生契约。Advisor 和独立 Reviewer 有不同的输入和目的，尽管两者都使用 Astra 来做判断。
+- 按调用上下文应用推理规则：由 Astra 在 Architect 模式中委派的 Luna 始终使用 `max`；在该模式中被委派的 Sol 默认使用 `high`，并允许显式调整；Advisor 模式中的 Astra 咨询默认使用 `high`，并允许显式调整。
+- 对于 Architect 模式中的一名独立 Astra Reviewer，默认选择 `high` 与主代理会话已解析推理等级中的较高者。一次显式调整不得低于主代理会话的推理等级。使用宿主所支持的推理设置和实际运行时证据，而不是按词典序比较显示标签或字符串。
+- 确保原生角色配置和调用优先级允许那些被允许的调整，同时保留所要求的模型身份和 Luna 约束。角色定义中一个不可变的默认值不得静默地抵消一项被允许的用户调整。精确的、受支持的原生配置机制必须在实现期间得到验证。
+- 在可执行工具拥有模型与推理等级解析、输入验证、证据解析和错误报告的地方，使它们保持确定性。把任务解释、风险评估、规格撰写和评审判断留在模型处。在引入新的编排基础设施之前，先扩展既有接口。
+- 保留五部分实现契约：目标、文件与所有权、接口、约束和验证。要求一份结构化的返回，包含完成状态、实际变更、验证证据、判断决定和未解决的缺口。不要把那份报告当作验收的独立证明。
+- 在 Architect 模式期间，把每一处实现编辑都留在一名 Implementer 处，包括对更早委派工作的修正。Architect 继续拥有设计和任务规格产物，作为其被分配责任的一部分。
+- 对范围受控且规格完整的实现选择 Luna。对需要大量判断或大量上下文，或者带有较高风险的工作，直接选择 Sol。一次不成功的 Luna 尝试不是选择 Sol 的前提。
+- 只对所有权不冲突的独立任务允许并行实现，并且在宿主并发限制之内。使实现委派保持一层深，并使调度处于主代理的控制之下。
+- 在 Advisor 模式中，在约定的设计边界上、在对一个问题做了两次不同的失败尝试之后，以及在宣布一项多步骤交付物完成之前，要求咨询。允许额外的有用咨询。要求主代理解释它如何对待 Advisor 的建议，包括任何分歧。
+- 在 Architect 模式中，要求 Architect 检视全部实际变更并重新运行关键验证。对高风险工作或一次显式的用户评审请求，在那些检查之后增加一名新的独立 Reviewer。不要给每一个实现任务都增加强制的独立评审。
+- 保留咨询与独立最终评审之间的区别。对旧责任组合的覆盖，并不保留每一条旧的、特定于路由的门禁、裁决格式或声明规则。
+- 在验收委派结果时，使用观察到的角色、模型、推理等级和权限证据。优先使用暴露出来的运行时元数据，并对公开证据所省略的字段使用既有的窄运行时检视接口。缺失的或冲突的证据并不是推断一次成功调用的许可。
+- 如果 Astra 不可用，或其实际模型或推理等级不能被确认，就暂停受影响的必需咨询或独立评审。报告原因，并且不要静默地替换另一个模型或跳过必需步骤。失败处理不得削弱 Architect 模式中 Luna 的 `max` 要求。
+- 为判断代理请求只读行为和受支持的隔离，并报告实际观察到的边界。保留强制只读沙箱与更宽宿主权限之下的行为指令之间既有的区别。
+- 保留安装器的非破坏性检查和拒绝行为。不要覆盖写入已修改的或不安全的目标位置，不要更改全局主代理会话配置，也不要把一次成功的安装当作一次成功的模型调用的证明。
 
-## Testing Decisions
+## 测试决定
 
-- The primary acceptance boundary is the installed plugin's complete workflow in a disposable Codex workspace. Tests should observe authorization, actual delegated calls, model and effort evidence, owned changes, verification output, and completion behavior.
-- Reuse the existing repository verification entry point for deterministic installer and runtime-inspection checks. Existing prior art includes disposable installation targets, idempotence checks, selective role checks, refusal without partial mutation, structured TOML validation, synthetic runtime records, invalid thread identifiers, missing records, and payload-leak checks.
-- Treat exact-word and keyword assertions over Markdown as documentation consistency checks only. They cannot prove that a model respected authorization, used the intended effort, or performed an independent review. New workflow acceptance must not cite such assertions as behavioral evidence.
-- Test externally visible behavior rather than internal helper names, prompt wording, or implementation structure. A meaningful negative test must fail when a required boundary is violated, such as an unauthorized architect delegation, a lower-effort Luna call, or acceptance without required review evidence.
-- Prefer extending the current installation and runtime-inspection interfaces to creating additional low-level test interfaces. Use one workflow scenario matrix to organize live acceptance; use deterministic fixtures where they can establish the same boundary without a paid model call.
+- 主要的验收边界是已安装插件在一次性 Codex 工作区中的完整工作流。测试应当观察授权、实际的委派调用、模型和推理等级证据、所拥有的变更、验证输出，以及完成行为。
+- 对确定性的安装器检查和运行时检视检查，复用既有的仓库验证入口。既有做法包括一次性安装目标、幂等检查、选择性角色检查、在没有部分改动的情况下拒绝、结构化的 TOML 验证、合成的运行时记录、无效的线程标识、缺失的记录，以及载荷泄漏检查。
+- 把针对 Markdown 的精确用词断言和关键词断言只当作文档一致性检查。它们不能证明一个模型尊重了授权、使用了预期的推理等级，或执行了一次独立评审。新工作流的验收不得把这样的断言引用为行为证据。
+- 测试外部可见的行为，而不是内部辅助函数名称、提示词用词或实现结构。一个有意义的否定测试必须在一条必需边界被违反时失败，例如一次未经授权的 Architect 委派、一次更低推理等级的 Luna 调用，或在没有必需评审证据时的验收。
+- 优先扩展当前的安装接口和运行时检视接口，而不是创建额外的低层测试接口。用一个工作流场景矩阵来组织实机验收；在确定性夹具能够不借助一次付费模型调用就确立同一条边界的地方，使用确定性夹具。
 
-The workflow acceptance matrix must cover:
+工作流验收矩阵必须覆盖：
 
-| Scenario | Required observation |
+| 场景 | 必需的观察 |
 |---|---|
-| Astra primary session, no Architect-mode request or consent | Ordinary solo work remains available; model identity alone does not activate Architect mode |
-| Astra primary session, assistant proposes Architect mode but user has not agreed | The proposed mode is not treated as authorized |
-| Astra primary session, explicit task-scoped authorization | Architect mode covers the current task and its follow-ups and subtasks |
-| New task after task-scoped authorization | The earlier authorization does not carry over |
-| Explicit session-wide authorization | Architect mode remains authorized for subsequent tasks in that session while its model prerequisite holds |
-| Sol or Luna primary session at a user-selected effort | Advisor-mode work proceeds without imposing the delegated-call effort policy on the primary session |
-| Architect mode requested with a non-Astra primary model | The plugin does not claim that Architect mode is active or silently change the primary model |
-| Bounded implementation delegated to Luna | The observed model is Luna and its observed effort is `max` |
-| Complex or higher-risk implementation delegated to Sol | Sol can be selected directly; its default effort is `high` and supported explicit adjustments take effect |
-| Advisor-mode consultation with Astra | The observed model is Astra; its default effort is `high` and supported explicit adjustments take effect |
-| Architecture, migration, API, or qualifying refactor decision | Consultation occurs before committing to the consequential implementation decision |
-| Two distinct failed attempts at one problem | Required consultation occurs before further progress is accepted as following the workflow |
-| Multi-step Advisor-mode deliverable | Required pre-completion consultation is evidenced before completion is declared |
-| Primary agent disagrees with the Advisor | The decision and reasons for disagreement are visible; advice is not silently ignored |
-| One-line implementation or correction in Architect mode | An Implementer performs the edit rather than the architect |
-| Independent implementation tasks | Parallel dispatch respects ownership and host limits; Implementers do not delegate implementation further |
-| Tasks with dependencies or conflicting ownership | Their implementation is not dispatched as independent concurrent work |
-| Worker claims completion with missing or false evidence | The architect's acceptance checks expose the gap rather than accepting the claim alone |
-| Architect-mode work requiring no extra reviewer | Completion follows actual-diff inspection and rerun verification without an automatically added Independent reviewer |
-| High-risk Architect-mode work or an explicit review request | A fresh Independent Astra reviewer examines actual changes after the architect's checks |
-| Astra architect at `low`, `medium`, or `high` | The Independent reviewer's default is `high` |
-| Astra architect at `xhigh` or `max` | The Independent reviewer's default matches that effort |
-| Explicit reviewer effort below the primary session | The lower setting is not accepted as satisfying the review floor |
-| Required Astra call unavailable or model/effort evidence missing or conflicting | The affected step pauses with an explicit reason; no substitute or completed-step claim is silently introduced |
-| Ordinary decision consultation | It is not reported as proof that independent final review of the actual changes occurred |
-| New workflow invocation | The old `SELECTIVE ROUTE` declaration protocol is not required |
+| Astra 主代理会话，没有 Architect 模式请求或同意 | 普通单独工作仍然可用；仅凭模型身份不会激活 Architect 模式 |
+| Astra 主代理会话，助手提议 Architect 模式但用户尚未同意 | 所提议的模式不被当作已授权 |
+| Astra 主代理会话，显式的、以任务为范围的授权 | Architect 模式覆盖当前任务及其后续回合和子任务 |
+| 以任务为范围的授权之后的新任务 | 更早的授权不会延续 |
+| 显式的全会话授权 | 只要它的模型前提仍然成立，Architect 模式对该会话中的后续任务保持已授权 |
+| 处于用户所选推理等级的 Sol 或 Luna 主代理会话 | Advisor 模式的工作继续进行，而不把委派调用的推理等级策略施加到主代理会话上 |
+| 在非 Astra 主代理模型下请求 Architect 模式 | 该插件不声称 Architect 模式处于活动状态，也不静默更改主代理模型 |
+| 委派给 Luna 的范围受控实现 | 观察到的模型是 Luna，并且观察到的推理等级是 `max` |
+| 委派给 Sol 的复杂实现或较高风险实现 | Sol 可以被直接选择；它的默认推理等级是 `high`，并且受支持的显式调整生效 |
+| 与 Astra 进行的 Advisor 模式咨询 | 观察到的模型是 Astra；它的默认推理等级是 `high`，并且受支持的显式调整生效 |
+| 架构、迁移、API 或符合条件的重构决定 | 咨询发生在承诺那个后果重大的实现决定之前 |
+| 对一个问题的两次不同的失败尝试 | 必需的咨询发生在进一步的进展被接受为遵循该工作流之前 |
+| 多步骤的 Advisor 模式交付物 | 在宣布完成之前，必需的完成前咨询已有证据 |
+| 主代理不同意 Advisor | 决定和分歧的理由是可见的；建议没有被静默忽略 |
+| Architect 模式中的一行实现或修正 | 由一名 Implementer 执行该编辑，而不是由 Architect 执行 |
+| 相互独立的实现任务 | 并行派发尊重所有权和宿主限制；Implementer 不进一步委派实现 |
+| 带有依赖或所有权冲突的任务 | 它们的实现不被当作相互独立的并发工作来派发 |
+| Worker 以缺失的或虚假的证据声称完成 | Architect 的验收检查暴露该缺口，而不是仅接受该声称 |
+| 不需要额外 Reviewer 的 Architect 模式工作 | 完成跟随实际差异检视和重新运行验证，而没有自动增加的独立 Reviewer |
+| 高风险的 Architect 模式工作，或一次显式的评审请求 | 一名新的独立 Astra Reviewer 在 Architect 的检查之后检查实际变更 |
+| 处于 `low`、`medium` 或 `high` 的 Astra Architect | 独立 Reviewer 的默认值是 `high` |
+| 处于 `xhigh` 或 `max` 的 Astra Architect | 独立 Reviewer 的默认值与该推理等级相符 |
+| 低于主代理会话的显式 Reviewer 推理等级 | 该更低设置不被接受为满足评审下限 |
+| 必需的 Astra 调用不可用，或模型证据或推理等级证据缺失或冲突 | 受影响的步骤以一个显式原因暂停；不静默引入替代或步骤已完成的声称 |
+| 普通的决定咨询 | 它不被报告为实际变更的独立最终评审已经发生的证明 |
+| 新工作流的调用 | 旧的 `SELECTIVE ROUTE` 声明协议不是必需的 |
 
-- Extend deterministic installation tests to the fork identity and new role contracts, including clean install, repeat install, non-mutating checks, selective checks, modified files, unsafe destinations, and preservation of unrelated configuration.
-- Extend runtime fixtures to the new roles and relevant effort settings, including missing or contradictory evidence. Assert parsed values and refusal behavior, and retain checks that unrelated prompt or credential material is not emitted.
-- Validate live model and effort routing in a fresh host task after role discovery. A fixture verifies the parser; it does not prove that Codex honored a role definition. Record each live scenario's actual outcome and leave unrun or inaccessible scenarios explicitly unverified.
-- Include a scenario that observes effective permission behavior for a judgment agent. Do not infer enforced read-only isolation from a configuration field alone.
-- During implementation, update obsolete old-route text assertions instead of retaining tests that require the retired protocol. Do not add a new general-purpose test framework merely to express these scenarios.
+- 把确定性安装测试扩展到该分叉身份和新的角色契约，包括干净安装、重复安装、不改动的检查、选择性检查、已修改的文件、不安全的目标位置，以及无关配置的保留。
+- 把运行时夹具扩展到新角色和相关的推理等级设置，包括缺失的或相互矛盾的证据。断言被解析的值和拒绝行为，并保留无关的提示词材料或凭据材料不被发出的检查。
+- 在角色发现之后，于一个新的宿主任务中验证实机的模型和推理等级路由。一份夹具验证解析器；它并不证明 Codex 尊重了一份角色定义。记录每一个实机场景的实际结果，并使未运行的或不可达的场景保持明确的未验证。
+- 纳入一个观察判断代理有效权限行为的场景。不要仅凭一个配置字段就推断强制只读隔离。
+- 在实现期间，更新过时的旧路由文本断言，而不是保留那些要求已退役协议的测试。不要仅仅为了表达这些场景就增加一个新的通用测试框架。
 
-## Out of Scope
+## 范围之外
 
-- Claude Code, Cursor, or other host support.
-- External model-provider lanes, nested CLI runners, or user-mediated handoff lanes.
-- An additional Terra implementation lane in the first version.
-- Compatibility with the old four-route declaration protocol.
-- A dedicated mode-switch command or automatic primary-model switching.
-- Global reasoning-effort restrictions on directly used primary models.
-- Automatic Architect mode based solely on choosing Astra.
-- Implementation delegation by Implementers to further implementation agents.
-- Mandatory independent review for every ordinary implementation task.
-- Claims that higher effort guarantees a better review, or that different OpenAI models provide cross-vendor review.
-- Automatic changes to the user's global host configuration, deletion of an existing installation, or deployment of this fork as part of writing this specification.
-- Benchmarks, broad framework refactoring, or unrelated repository cleanup.
+- Claude Code、Cursor 或其他宿主支持。
+- 外部模型提供方通道、嵌套的 CLI 运行器，或由用户中介的交接通道。
+- 第一个版本中的一条额外 Terra 实现通道。
+- 与旧的四路由声明协议兼容。
+- 一条专门的模式切换命令，或自动的主代理模型切换。
+- 对直接使用的主代理模型施加全局推理等级限制。
+- 仅基于选择 Astra 的自动 Architect 模式。
+- Implementer 向进一步的实现代理做实现委派。
+- 对每一个普通实现任务都做强制的独立评审。
+- 声称更高的推理等级保证更好的评审，或不同的 OpenAI 模型提供跨供应商评审。
+- 自动更改用户的全局宿主配置、删除一套既有安装，或把部署该分叉作为撰写本规格的一部分。
+- 基准测试、宽泛的框架重构，或无关的仓库清理。
 
-## Further Notes
+## 补充说明
 
-This specification uses the project's Architect mode, Advisor mode, Advisor, Implementer, and Independent reviewer vocabulary and implements the accepted dual-mode architecture decision. It describes the target fork; the implementation baseline uses the upstream workflow.
+本规格使用本项目的 Architect 模式、Advisor 模式、Advisor、Implementer 和独立 Reviewer 词汇，并实现已被接受的双模式架构决定。它描述目标分叉；实现基线使用上游工作流。
 
-The new rules cover the main responsibility combinations of solo work, delegated implementation, primary implementation with independent judgment, and delegated implementation with independent final review. They do not make every Advisor consultation equivalent to the upstream final-review gate.
+这些新规则覆盖单独工作、委派实现、带有独立判断的主代理实现，以及带有独立最终评审的委派实现这些主要责任组合。它们并不使每一次 Advisor 咨询都等同于上游的最终评审门禁。
 
-Implementation is divided into six independently verifiable tickets: installation, Advisor mode, authorized Architect mode with Luna, independent Astra review, Sol implementation, and parallel implementation. Each ticket owns its behavior and corresponding verification. A ticket can start only after its declared blockers are complete; the readiness label does not override those dependencies.
+实现被分为六个可独立验证的工单：安装、Advisor 模式、带有 Luna 的已授权 Architect 模式、独立的 Astra 评审、Sol 实现，以及并行实现。每个工单拥有它的行为和相应的验证。一个工单只有在它所声明的阻塞项完成之后才能开始；就绪标签并不覆盖那些依赖。
 
-Runtime capabilities that have not been exercised must remain identified as unverified when implementation is accepted. Static configuration checks and synthetic runtime records do not establish live model routing or enforced isolation.
+在实现被验收时，尚未被演练的运行时能力必须仍然被标识为未验证。静态配置检查和合成的运行时记录并不确立实机模型路由或强制隔离。

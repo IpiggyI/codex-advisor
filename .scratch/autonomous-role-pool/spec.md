@@ -1,167 +1,167 @@
-# Codex Advisor: Autonomous Primary Agent and Tiered Role Pool
+# Codex Advisor：自主主代理与分档角色池
 
 Status: resolved
 
-## Problem Statement
+## 问题陈述
 
-Users want a moderately capable primary model, such as Sol, to take initiative: understand the objective, do useful work directly, delegate bounded work to an appropriate model, notice when the plan no longer fits, and adjust the division of work. The current plugin ties its delegation-only Architect mode to Astra, reserves Sol implementation for explicit user selection, offers only a Luna Explorer, and requires advice before every multi-step delivery completes. These rules limit autonomous progress even when the user has already authorized the work.
+用户希望一个中等能力的主代理模型，例如 Sol，能够主动行事：理解目标，直接做有用的工作，把有界工作委派给合适的模型，注意到计划不再适合，并调整分工。当前插件把仅委派的 Architect 模式绑定到 Astra，把 Sol 实现保留给用户的显式选择，只提供一个 Luna Explorer，并要求在每一次多步交付完成之前先取得建议。即使用户已经授权了这项工作，这些规则仍然限制自主推进。
 
-Delegation also loses its value when the primary agent specifies every implementation detail, repeats an executor's exploration, or keeps an unsuitable executor in an advice-and-rework loop. Users need outcome-based contracts, explicit local authority, and cause-based reassignment. They also need predictable model and effort choices, fresh sessions whenever delegated effort changes, and independent acceptance where the consequences justify it.
+当主代理规定每一个实现细节、重复执行者的探索，或把一个不合适的执行者留在建议与返工的循环中时，委派也会失去价值。用户需要基于结果的契约、显式的局部权限，以及基于原因的重新分配。他们还需要可预测的模型与推理等级选择，在委派的推理等级每次变化时使用新会话，并在后果足以证明其合理时使用独立验收。
 
-## Solution
+## 方案
 
-Give any primary model access to the same role pool. The default workflow lets the primary agent implement directly or delegate, adjust task boundaries and scheduling within the user's authorization, consult an Advisor, and retain responsibility for the combined result. A midrange primary is the user's preferred starting point, not a model selected or enforced by the plugin. An explicit Architect-mode request makes implementation delegation-only for its authorized scope, regardless of the primary model. A task artifact alone does not activate that restriction.
+让任一主代理模型访问同一个角色池。默认工作流让主代理直接实现或委派，在用户授权范围内调整任务边界和调度，咨询 Advisor，并保留对合并结果的责任。中档主代理是用户偏好的起点，不是由插件选择或强制的模型。明确的 Architect 模式请求使其已授权范围内的实现变为仅委派，与主代理模型无关。仅有任务件不会激活该限制。
 
-Separate the semantic role from its capability tier and concrete model/effort selection. Explorer returns source-backed evidence; Implementer, called worker in the routing policy, owns scoped implementation and verification; Advisor supplies decision advice or independent acceptance. Independent reviewer remains the stricter acceptance contract, not an extra capability tier. Existing native entry points may retain their names where their responsibility remains correct.
+把语义角色与其能力档位以及具体的模型与推理等级选择分开。Explorer 返回有来源依据的证据；Implementer 在路由策略中称为 worker，拥有有范围的实现和验证；Advisor 提供决策建议或独立验收。Independent reviewer 仍然是更严格的验收契约，不是额外的能力档位。现有原生入口在其职责仍然正确时可以保留原名。
 
-Use this complete delegated routing policy:
+使用这份完整的委派路由策略：
 
-| Role | Tier | Initial model and effort | Additional eligibility |
+| 角色 | 档位 | 初始模型与推理等级 | 额外资格 |
 |---|---|---|---|
-| Explorer | light | Luna at high | No other default fill |
-| Explorer | standard or senior | Usually Luna at max; Sol at medium or high; Astra at medium or high | Luna is a preference, never a required first attempt |
-| worker | light | Luna at max | No other default fill |
-| worker | standard | Sol at high or xhigh | xhigh is available on the first attempt |
-| worker | senior | Astra at medium or high | xhigh becomes eligible after a relevant complete attempt fails |
-| Advisor, including independent acceptance | senior | Astra at medium or high | xhigh becomes eligible after a relevant complete advisory attempt fails |
+| Explorer | light | 推理等级为 high 的 Luna | 没有其他默认填充 |
+| Explorer | standard 或 senior | 通常是推理等级为 max 的 Luna；推理等级为 medium 或 high 的 Sol；推理等级为 medium 或 high 的 Astra | Luna 是偏好，从不是必须的首次尝试 |
+| worker | light | 推理等级为 max 的 Luna | 没有其他默认填充 |
+| worker | standard | 推理等级为 high 或 xhigh 的 Sol | xhigh 在首次尝试即可使用 |
+| worker | senior | 推理等级为 medium 或 high 的 Astra | 在一次相关的完整尝试失败之后，xhigh 变为具备资格 |
+| Advisor，包括独立验收 | senior | 推理等级为 medium 或 high 的 Astra | 在一次相关的完整咨询尝试失败之后，xhigh 变为具备资格 |
 
-The primary chooses within the allowed range. Focused questions with clear constraints and sufficient evidence normally favor medium; unresolved alternatives, conflicting evidence, or important cross-module constraints can justify high on the first attempt. These are selection guidelines, not measured capability or cost guarantees. Unlisted combinations, including light and standard Advisor tiers, are outside the default pool.
+主代理在允许的范围内选择。约束清楚且证据充分的聚焦问题通常偏向 medium；未解决的替代方案、冲突的证据，或重要的跨模块约束，可以在首次尝试时证明 high 合理。这些是选择指导，不是测得的能力或成本保证。未列出的组合，包括 light 和 standard 的 Advisor 档位，在默认池之外。
 
-Every delegated effort change, upward or downward, starts a new native thread. Same-model, same-effort worker rework may reuse its thread. New threads receive the current task contract, actual state, verification results, failure evidence, and remaining work. Independent acceptance always uses a fresh context, including review of corrected changes.
+每一次委派的推理等级变更，无论升高或降低，都开始一条新的原生线程。同模型、同推理等级的 worker 返工可以复用其线程。新线程收到当前任务契约、实际状态、验证结果、失败证据和剩余工作。独立验收始终使用新的上下文，包括对修正后变更的评审。
 
-Ordinary work can finish after the primary checks actual changes and completes relevant verification. Step count alone does not require an Advisor. Key decisions not covered by an applicable plan, material evidence against an established plan, and failures whose causes remain unclear require decision advice. High-risk delivery or an explicit user request requires independent acceptance. Relevant advice can be reused until new evidence changes its premises; the primary owns the resulting decision and explains material disagreement.
+普通工作可以在主代理检查实际变更并完成相关验证之后结束。仅有步数不要求 Advisor。适用计划没有覆盖的关键决定、反对既定计划的实质性证据，以及原因仍然不明的失败，都要求决策建议。高风险交付或用户的明确请求要求独立验收。相关建议可以复用，直到新证据改变其前提；主代理拥有由此产生的决定，并解释实质性分歧。
 
-## User Stories
+## 用户故事
 
-1. As a user, I want to use a midrange primary such as Sol, so that ongoing coordination can match my preferred resource allocation.
-2. As a user, I want the plugin to preserve my selected primary model and effort, so that delegated defaults never reconfigure my own session.
-3. As a user, I want every primary model to access the same role pool, so that model identity does not decide who may delegate implementation.
-4. As a primary agent, I want to implement work I already understand, so that a small bounded change does not require an unnecessary handoff.
-5. As a primary agent, I want to delegate complete independent work, so that implementation detail and debugging can stay with its owner.
-6. As a primary agent, I want to change the division of work as evidence changes, so that an early allocation does not trap the task on an unsuitable path.
-7. As a user, I want an explicit Architect-mode request honored with any primary model, so that I can require delegation-only implementation when I choose.
-8. As a user, I want the existence of a ticket or specification to leave the default workflow autonomous, so that documentation alone does not withdraw direct implementation.
-9. As a user, I want goals, reserved decisions, scope, and explicit resource limits respected, so that initiative remains within my authorization.
-10. As a primary agent, I want to investigate mismatches between a task artifact and current code, so that I can propose a supported adjustment while continuing unaffected work.
-11. As a user, I want Explorer, worker, and Advisor responsibilities separated from capability tiers, so that model selection does not change permissions or deliverables.
-12. As a primary agent, I want explicit model and effort choices on delegated calls, so that a child does not silently inherit an unintended allocation.
-13. As a primary agent, I want light exploration to use Luna at high, so that simple evidence collection has a clear default.
-14. As a primary agent, I want standard and senior exploration usually to start with Luna at max, so that the preferred exploration allocation is easy to apply.
-15. As a primary agent, I want direct Sol or Astra exploration at medium or high when appropriate, so that Luna is not a mandatory preliminary attempt.
-16. As a user, I want all Explorers to return source locations, search scope, and unresolved gaps, so that a negative search result is not mistaken for universal absence.
-17. As a primary agent, I want light implementation to use Luna at max, so that bounded work keeps the agreed allocation.
-18. As a primary agent, I want standard implementation to use Sol at high or xhigh from the first attempt, so that xhigh does not require a prior failure in this tier.
-19. As a primary agent, I want senior implementation to use Astra at medium or high initially, so that demanding work can go directly to Astra.
-20. As a primary agent, I want Astra worker xhigh to become eligible after a relevant complete attempt fails, so that increased effort follows observed failure rather than routine preference.
-21. As a primary agent, I want senior decision advice at Astra medium or high, so that I can choose the effort appropriate to the judgment.
-22. As a primary agent, I want independent acceptance to use the same senior Advisor effort policy, so that review allocation does not inherit a primary-session floor.
-23. As a primary agent, I want Advisor xhigh eligible only after a relevant complete advisory attempt fails, so that an unrelated implementation failure does not unlock a new advisory allocation.
-24. As a user, I want unlisted role, tier, model, or effort combinations rejected as default routes, so that the agreed pool remains predictable.
-25. As a primary agent, I want to select medium or high without asking the user for each call, so that normal routing remains autonomous.
-26. As a user, I want unavailable settings and conflicting runtime evidence disclosed, so that the plugin never reports a substituted call as the requested one.
-27. As an Implementer, I want an objective, owned scope, interfaces, reserved constraints, and meaningful verification, so that I can complete the task independently.
-28. As an Implementer, I want unspecified local implementation choices left to me, so that the primary does not have to write an implementation tutorial.
-29. As an Implementer, I want to report unclear behavior, conflicting requirements, or required changes to reserved interfaces, so that genuine contract gaps are resolved before dependent edits.
-30. As an Implementer, I want access to the original task and scoped source evidence, so that a coordinator's summary does not become my only source of truth.
-31. As a primary agent, I want rework to identify violated requirements and reproducible failures, so that the Implementer can repair its own work.
-32. As a user, I want every worker to preserve unrelated and concurrent edits, so that delegation cannot overwrite someone else's work.
-33. As a primary agent, I want a complete implementation attempt distinguished from intermediate test failures, so that ordinary debugging does not unlock escalation.
-34. As a primary agent, I want an advisory attempt judged against its specified question and evidence, so that disagreement alone is not counted as failure.
-35. As a primary agent, I want to distinguish environment problems, contract gaps, reasoning failures, and unsuitable executors, so that the response addresses the observed cause.
-36. As a primary agent, I want eligibility for higher effort to remain a choice, so that failure does not automatically force xhigh.
-37. As a primary agent, I want to choose a stronger worker directly after diagnosing a capability problem, so that the pool is not a mandatory sequence of every available setting.
-38. As a user, I want every delegated effort increase to start a new native thread, so that the lifecycle follows the agreed fresh-session policy.
-39. As a user, I want every delegated effort decrease to start a new native thread, so that the same policy applies in both directions.
-40. As a primary agent, I want same-model, same-effort worker rework to reuse its thread when useful, so that an unchanged allocation can retain working context.
-41. As a primary agent, I want a replacement thread to receive current changes, completed checks, failed attempts, and remaining gaps, so that it can continue from actual state.
-42. As a user, I want the previous conflicting writer stopped before reassignment, so that a new executor does not race an old one over the same files.
-43. As a user, I want actual thread IDs and observed efforts checked across an effort change, so that a new prompt in an old thread is not reported as a fresh session.
-44. As a primary agent, I want to consult an Advisor proactively, so that I can resolve an important uncertainty before it becomes a failed implementation.
-45. As a primary agent, I want required advice for uncovered key decisions and evidence that invalidates the plan, so that established assumptions do not continue unchecked.
-46. As a primary agent, I want advice when failure causes remain unclear, so that repeated ineffective attempts do not replace diagnosis.
-47. As a primary agent, I want to reuse advice whose premises remain valid, so that routine execution does not repeatedly pay for the same judgment.
-48. As a user, I want the primary to explain material disagreement with advice, so that an Advisor preference does not silently become either a veto or an ignored finding.
-49. As a user, I want ordinary multi-step work to finish after the primary's checks, so that step count alone does not impose another consultation.
-50. As a user, I want high-risk delivery or my explicit review request to receive independent acceptance, so that changes needing additional scrutiny have a second reader.
-51. As a user, I want independent acceptance to inspect the actual deliverable in a fresh context, so that an earlier planning consultation is not mislabeled as final review.
-52. As a user, I want corrected high-risk work reviewed again in a fresh context, so that acceptance applies to the revised result.
-53. As a user, I want the primary to inspect actual changes and rerun key verification, so that a successful worker report alone cannot complete the task.
-54. As a user, I want missing or false evidence, skipped required checks, and unresolved findings to remain pending, so that ordinary completion never means unverified completion.
-55. As a primary agent, I want independent tasks scheduled concurrently only with disjoint ownership and available capacity, so that autonomous dispatch preserves safe coordination.
-56. As a user, I want dependent or conflicting tasks sequenced and combined changes checked together, so that local successes do not conceal integration failures.
-57. As a user, I want native role discovery and selective installation checks for every supported Explorer and worker, so that the advertised pool is actually callable.
-58. As a user, I want unchanged installations to remain idempotent and conflicting destinations refused before mutation, so that new role definitions cannot overwrite local customization.
-59. As a user, I want native role identity, actual model, effort, parent association, and permissions verified, so that requested settings are not mistaken for observed behavior.
-60. As a user, I want requested read-only access distinguished from enforced isolation and observed read-only behavior, so that permission claims match the host evidence.
-61. As a user, I want runtime diagnostics restricted to necessary metadata, so that validation does not expose prompts, credentials, or unrelated session content.
-62. As a user, I want workflow instructions, native descriptions, examples, and architecture records to agree, so that old model gates or review floors cannot silently return.
-63. As a user, I want lightweight installed-host routing checks separated from deterministic fixtures and document checks, so that planning or parser success is not reported as actual dispatch.
-64. As a user, I want delivery effectiveness, quality, and savings left to subsequent real-task experience, so that a routing smoke check is not advertised as a performance result.
+1. 作为用户，我希望使用 Sol 这样的中档主代理，以便持续协调能够符合我偏好的资源分配。
+2. 作为用户，我希望插件保留我选定的主代理模型与推理等级，以便委派的默认值从不会重新配置我自己的会话。
+3. 作为用户，我希望每一个主代理模型都访问同一个角色池，以便模型身份不会决定谁可以委派实现。
+4. 作为主代理，我希望实现我已经理解的工作，以便一项小的有界变更不需要不必要的交接。
+5. 作为主代理，我希望委派完整的独立工作，以便实现细节和调试可以留在其所有者那里。
+6. 作为主代理，我希望在证据变化时改变分工，以便早期分配不会把任务困在一条不合适的路径上。
+7. 作为用户，我希望明确的 Architect 模式请求在任一主代理模型上都被遵守，以便我可以在我选择时要求仅委派的实现。
+8. 作为用户，我希望工单或规格的存在使默认工作流保持自主，以便仅有文档不会收回直接实现。
+9. 作为用户，我希望目标、保留决定、范围和显式的资源限额受到尊重，以便主动行事保持在我的授权之内。
+10. 作为主代理，我希望调查任务件与当前代码之间的不符之处，以便我可以提出一个有支持的调整，同时继续处理不受影响的工作。
+11. 作为用户，我希望 Explorer、worker 和 Advisor 的职责与能力档位分开，以便模型选择不会改变权限或交付物。
+12. 作为主代理，我希望委派调用上有显式的模型和推理等级选择，以便子代理不会静默继承一个并非本意的分配。
+13. 作为主代理，我希望 light 探索使用推理等级为 high 的 Luna，以便简单的证据收集有一个清楚的默认值。
+14. 作为主代理，我希望 standard 与 senior 探索通常从推理等级为 max 的 Luna 开始，以便偏好的探索分配易于应用。
+15. 作为主代理，我希望在适当的时候直接以 medium 或 high 使用 Sol 或 Astra 进行探索，以便 Luna 不是必须的预备尝试。
+16. 作为用户，我希望所有 Explorer 都返回来源位置、搜索范围和未解决的缺口，以便否定的搜索结果不会被误认为普遍不存在。
+17. 作为主代理，我希望 light 实现使用推理等级为 max 的 Luna，以便有界工作保持约定的分配。
+18. 作为主代理，我希望 standard 实现从首次尝试起使用推理等级为 high 或 xhigh 的 Sol，以便 xhigh 在这个档位不要求先前的失败。
+19. 作为主代理，我希望 senior 实现最初使用推理等级为 medium 或 high 的 Astra，以便要求高的工作可以直接交给 Astra。
+20. 作为主代理，我希望 Astra worker 的 xhigh 在一次相关的完整尝试失败之后变为具备资格，以便提高推理等级跟随观察到的失败，而不是例行偏好。
+21. 作为主代理，我希望 senior 决策建议使用推理等级为 medium 或 high 的 Astra，以便我可以选择与该判断相称的推理等级。
+22. 作为主代理，我希望独立验收使用同一份 senior Advisor 推理等级策略，以便评审分配不会继承主会话的下限。
+23. 作为主代理，我希望 Advisor 的 xhigh 只有在一次相关的完整咨询尝试失败之后才具备资格，以便无关的实现失败不会解锁一种新的咨询分配。
+24. 作为用户，我希望未列出的角色、档位、模型或推理等级组合作为默认路由被拒绝，以便约定的池保持可预测。
+25. 作为主代理，我希望选择 medium 或 high 时不必为每次调用询问用户，以便正常路由保持自主。
+26. 作为用户，我希望不可用的设置和冲突的运行时证据被披露，以便插件从不会把一次被替换的调用报告为所请求的那一次。
+27. 作为 Implementer，我希望收到目标、拥有的范围、接口、保留约束和有意义的验证，以便我可以独立完成任务。
+28. 作为 Implementer，我希望未规定的局部实现选择留给我，以便主代理不必写一份实现教程。
+29. 作为 Implementer，我希望报告不明的行为、冲突的要求，或对保留接口的必要变更，以便真正的契约缺口在依赖它们的编辑之前得到解决。
+30. 作为 Implementer，我希望能够访问原始任务和有范围的来源证据，以便协调者的摘要不会成为我唯一的事实来源。
+31. 作为主代理，我希望返工指明被违反的要求和可复现的失败，以便 Implementer 可以修复它自己的工作。
+32. 作为用户，我希望每一个 worker 都保留无关的和并发的编辑，以便委派不能覆盖其他人的工作。
+33. 作为主代理，我希望把一次完整的实现尝试与中间的测试失败区分开，以便常规调试不会解锁升级。
+34. 作为主代理，我希望一次咨询尝试按其指定的问题和证据来评判，以便仅有分歧不被计为失败。
+35. 作为主代理，我希望区分环境问题、契约缺口、推理失败和不合适的执行者，以便响应针对观察到的原因。
+36. 作为主代理，我希望更高推理等级的资格仍然是一种选择，以便失败不会自动强制使用 xhigh。
+37. 作为主代理，我希望在诊断出能力问题之后直接选择一个更强的 worker，以便这个池不是把每个可用设置都走一遍的强制顺序。
+38. 作为用户，我希望每一次委派的推理等级升高都开始一条新的原生线程，以便生命周期遵循约定的新会话策略。
+39. 作为用户，我希望每一次委派的推理等级降低都开始一条新的原生线程，以便同一策略在两个方向上都适用。
+40. 作为主代理，我希望同模型、同推理等级的 worker 返工在有用时复用其线程，以便未改变的分配可以保留工作上下文。
+41. 作为主代理，我希望替换线程收到当前变更、已完成的检查、失败的尝试和剩余缺口，以便它可以从实际状态继续。
+42. 作为用户，我希望先前冲突的写入者在改派之前被停止，以便新的执行者不会与旧的执行者争用同一批文件。
+43. 作为用户，我希望在一次推理等级变更的两侧检查实际的线程标识和观察到的推理等级，以便旧线程中的新提示词不会被报告为新会话。
+44. 作为主代理，我希望主动咨询 Advisor，以便我可以在一项重要的不确定性变成失败的实现之前解决它。
+45. 作为主代理，我希望对未被覆盖的关键决定和使计划失效的证据取得必需的建议，以便既定假设不会在未经检查的情况下继续。
+46. 作为主代理，我希望在失败原因仍然不明时取得建议，以便重复的无效尝试不会取代诊断。
+47. 作为主代理，我希望复用前提仍然有效的建议，以便例行执行不会为同一次判断重复付出代价。
+48. 作为用户，我希望主代理解释与建议的实质性分歧，以便 Advisor 的偏好不会静默地变成否决或被忽略的发现。
+49. 作为用户，我希望普通的多步工作在主代理的检查之后结束，以便仅有步数不会施加另一次咨询。
+50. 作为用户，我希望高风险交付或我的明确评审请求得到独立验收，以便需要额外审视的变更有第二名阅读者。
+51. 作为用户，我希望独立验收在新的上下文中检查实际交付物，以便较早的规划咨询不会被误标为最终评审。
+52. 作为用户，我希望修正后的高风险工作在新的上下文中被再次评审，以便验收适用于修订后的结果。
+53. 作为用户，我希望主代理检查实际变更并重新运行关键验证，以便仅有一份成功的 worker 报告不能完成任务。
+54. 作为用户，我希望缺失或虚假的证据、被跳过的必要检查和未解决的发现保持待定，以便普通完成从不意味着未经验证的完成。
+55. 作为主代理，我希望独立任务只有在所有权互不重叠且容量可用时才并发调度，以便自主派发保持安全的协调。
+56. 作为用户，我希望有依赖或冲突的任务按顺序执行，并且合并的变更被一起检查，以便局部成功不会掩盖集成失败。
+57. 作为用户，我希望对每一个受支持的 Explorer 和 worker 都有原生角色发现和选择性安装检查，以便对外说明的池确实可以被调用。
+58. 作为用户，我希望未改变的安装保持幂等，并且冲突的目标在变更之前被拒绝，以便新的角色定义不能覆盖本地定制。
+59. 作为用户，我希望原生角色身份、实际模型、推理等级、父关联和权限得到验证，以便请求的设置不会被误认为观察到的行为。
+60. 作为用户，我希望请求的只读访问与被强制的隔离以及观察到的只读行为被区分开，以便权限主张与宿主证据一致。
+61. 作为用户，我希望运行时诊断限于必要的元数据，以便验证不会暴露提示词、凭据或无关的会话内容。
+62. 作为用户，我希望工作流指令、原生描述、示例和架构记录彼此一致，以便旧的模型门禁或评审下限不能静默回归。
+63. 作为用户，我希望轻量的已安装宿主路由检查与确定性夹具和文档检查分开，以便规划或解析器的成功不会被报告为实际派发。
+64. 作为用户，我希望交付效果、质量和节省留待随后的真实任务经验，以便一次路由冒烟检查不会被宣称为性能结果。
 
-## Implementation Decisions
+## 实现决定
 
-- **Primary authority.** Replace model-identity selection of the workflow with ordinary autonomous work. The primary interprets and carries out the user's requirements, owns task decomposition, scheduling, in-scope technical decisions, and acceptance, and does not unilaterally change user goals, scope, reserved choices, or resource limits. It proposes any necessary change for user resolution and continues unaffected work. It can perform implementation and corrections itself unless an explicit Architect-mode instruction forbids it. Preserve task-scoped and explicitly session-scoped authorization lifetimes. Architect mode no longer requires Astra; it still delegates every implementation edit, including small corrections. Do not infer that mode from a task artifact, the selected model, or a proposal the user did not accept.
-- **Domain vocabulary.** Keep Explorer, Implementer, Advisor, and Independent reviewer meanings where applicable. Introduce worker as the routing name for Implementer and tier as an allocation dimension. Decision advice and independent acceptance are two Advisor request contracts; independence, timing, and evidence requirements remain distinct. Retire automatic non-Astra Advisor-mode selection and update the glossary and architecture record as part of implementation.
-- **Native pool.** Reuse the existing model-pinned Luna, Sol, and Astra Implementer entry points, the Luna Explorer, Astra Advisor, and Astra Independent reviewer. Add model-pinned Sol and Astra Explorer entry points with the same read-only evidence contract. Keeping native identities distinct avoids depending on per-call model overrides defeating a pinned role. Logical role/tier selection is independent of these installation names; do not build nine interchangeable role files merely to fill a rectangular table.
-- **Effort selection.** Pin the intended model on each native role. Preserve Luna worker max. Adjustable roles leave effort unset in their templates and require an explicit allowed effort on every initial call. The native inspector validates the selected role/model/effort combination. The complete policy is the table in Solution; it replaces Sol's explicit-user-selection restriction, the old open-ended Explorer effort policy, and primary-derived Advisor/reviewer allocation. Initial Sol worker xhigh is valid. Initial Astra worker or Advisor xhigh without relevant failure evidence is invalid. Explorer has no xhigh route in this policy.
-- **Routing judgment.** Usually prefer Luna max for standard or senior exploration. Existing evidence, expected judgment needs, or the task's complexity can justify immediate Sol or Astra selection without a Luna attempt or another user confirmation. Route within the user's authorized resources; preserve explicit exclusions and restrictions. Do not introduce a new user-profile file format, price-ranking service, or automatic primary-model switch.
-- **Contracts and local autonomy.** Reuse the five-part task contract. Describe observable outcomes, ownership, interfaces, reserved constraints, and verification that can fail when the goal is unmet. Reference original task artifacts and let the executor inspect scoped source. Local implementation choices belong to the worker. Contract gaps return to the primary; user-owned changes to goals, scope, or reserved decisions require user resolution. Preserve unaffected progress while a dependent choice is unresolved. Do not relax acceptance conditions to convert a failure into completion.
-- **Failure attribution.** A complete worker attempt includes implementation, ordinary debugging, and verification followed by failed acceptance or a concrete inability to complete the assigned objective. Intermediate command or test failures do not individually count. An advisory attempt fails when it does not answer the specified question or its material reasoning is invalidated by source or verification evidence. Mere disagreement is insufficient. Unavailable infrastructure or missing facts first require repair or evidence collection, not presumed model insufficiency.
-- **Escalation eligibility.** Preserve the relevant failed objective or advisory question, attempted allocation, verification evidence, and diagnosis in task context. A failed complete attempt makes Astra xhigh eligible for that work; it does not force it. Failure evidence transfers with a takeover of the same work, while unrelated task or role failures do not unlock a different request. The primary chooses clarification, unchanged-allocation rework, more effort, or a stronger executor based on the cause. Do not require exhausting every cheaper setting. The inspector validates observed allocations; the workflow, not a log parser reading prompts, establishes whether failure evidence makes a conditional route eligible.
-- **Session lifecycle.** Every effort change uses a newly spawned native thread with a fresh context. This applies to increases and decreases and to every delegated role. Never adjust effort through a follow-up or resume of the existing thread. Same-model, same-effort worker correction may reuse its native thread. Model or role reassignment uses the matching native entry point in a new thread. Independent acceptance always starts fresh, even at unchanged effort. Capture actual predecessor and successor thread IDs and compare observed efforts; a role self-report cannot certify the transition.
-- **Actual-state handoff.** Before assigning conflicting work to a replacement, stop the prior writer and inspect its actual scoped state. Preserve useful partial changes. Transfer the objective, binding decisions, ownership, current changes, checks already run, observed failures, and remaining verification. Carry relevant evidence through references and concise facts rather than copying the entire conversation. Recheck the combined state before completion.
-- **Decision advice.** The primary may request advice proactively. Require it for key unresolved decisions not covered by the applicable plan, new evidence undermining a key plan assumption, and failure causes that remain unclear after initial diagnosis. Repeated failures require reassessment but are not a universal counter-driven consultation policy. Existing applicable advice may be reused; material new evidence requires renewed judgment. The primary explains material disagreement and retains decision ownership. Advice neither grants authorization nor automatically creates a new requirement.
-- **Delivery acceptance.** Every completed task requires actual-change inspection and relevant verification by the primary. Ordinary multi-step work may then complete without an Advisor. High-risk delivery and explicit independent-review requests require fresh independent acceptance after those checks. Risk depends on failure consequences, reversibility, and how difficult correctness is to establish; step count, file count, primary identity, or use of Astra implementation alone do not establish it. Existing behavior-critical examples include data loss, authorization failures, and cross-module correctness whose failure is costly or hard to detect.
-- **Independent acceptance contract.** Provide the original objective and constraints, complete actual changes including new files, verification evidence, and remaining gaps. Use the senior Advisor routing policy through the native Independent reviewer entry point; remove the requirement to match or exceed primary effort. A high-effort primary can therefore receive medium or high acceptance when appropriate. A decision consultation cannot substitute for review of the actual deliverable. Required findings must be resolved, revised changes checked, and fresh acceptance obtained. Missing required review leaves the affected completion pending while independent work can continue.
-- **Scheduling.** Preserve primary-owned scheduling, explicit ownership, capacity limits, dependency sequencing, and combined-result verification. Workers continue performing their own implementation without further implementation delegation; Explorers remain non-delegating. This change gives the primary more autonomy and does not import unlimited delegation depth from the reference repository.
-- **Installation and evidence.** Extend the existing installer, selective checks, and metadata inspector for the new native entries. Preserve exact-template comparison, idempotence, refusal of modified or unsafe destinations before mutation, unrelated agents, and primary settings. Retire the reviewer selector that derives effort from the primary; require an explicit allowed reviewer effort instead and give a bounded diagnostic for obsolete selector usage. Continue validating actual roles, models, efforts, parent linkage, permissions, and thread identity. Report missing or conflicting evidence without silently substituting or certifying the requested route.
-- **Permission and enforcement boundary.** Explorer and Advisor requests are read-only; workers may write only their assigned scope. Observe actual tool activity and scoped before/after state. Distinguish host-enforced isolation from a read-only prompt under broader permissions. Preserve the existing installer and metadata checks as deterministic mechanisms. Routing judgment, contract quality, failure attribution, advice triggers, and completion decisions are behavioral requirements that need installed-host scenarios; do not describe them as mechanically enforced by a new scheduler or hook.
-- **Source consistency and compatibility.** Update shipped role descriptions, workflow instructions, contracts, operation examples, user-facing documentation, and the domain decision record within the implementing tickets. Preserve native identities whose responsibilities continue. Updated installed templates remain subject to the existing explicit reconciliation requirement; no silent global migration or installation rewrite is added. Use the established native tools and scripts rather than cross-vendor runners or a replacement orchestration framework.
+- **主代理权限。** 用普通的自主工作替换按模型身份选择工作流。主代理解释并执行用户的要求，拥有任务分解、调度、范围内的技术决定和验收，并且不单方面改变用户目标、范围、保留选择或资源限额。它把任何必要的变更提交给用户决议，并继续处理不受影响的工作。除非明确的 Architect 模式指令禁止，它可以自己完成实现和修正。保留任务级的授权期限，以及显式的会话级授权期限。Architect 模式不再要求 Astra；它仍然委派每一处实现编辑，包括小的修正。不要从任务件、选定的模型，或用户没有接受的提议推断该模式。
+- **领域词汇。** 在适用处保留 Explorer、Implementer、Advisor 和 Independent reviewer 的含义。引入 worker 作为 Implementer 的路由名称，并引入档位作为一个分配维度。决策建议和独立验收是两种 Advisor 请求契约；独立性、时机和证据要求仍然不同。停用自动的、非 Astra 的 Advisor 模式选择，并在实现过程中更新术语表和架构记录。
+- **原生池。** 复用现有的、模型已固定的 Luna、Sol 和 Astra Implementer 入口，Luna Explorer，Astra Advisor，以及 Astra Independent reviewer。增加模型已固定的 Sol Explorer 与 Astra Explorer 入口，使用同一份只读证据契约。保持原生身份不同，是为了避免依赖每次调用的模型覆盖去打破一个已固定的角色。逻辑上的角色与档位选择独立于这些安装名称；不要仅仅为了填满一张矩形表而建立九个可互换的角色文件。
+- **推理等级选择。** 在每个原生角色上固定预定的模型。保留 Luna worker 的 max。可调角色在其模板中不设置推理等级，并要求每一次初始调用都带有一个显式的、允许的推理等级。原生检查器验证选定的角色、模型与推理等级组合。完整策略是方案中的表；它替换 Sol 的显式用户选择限制、旧的开放式 Explorer 推理等级策略，以及由主代理推导的 Advisor 与 reviewer 分配。初始的 Sol worker xhigh 有效。没有相关失败证据的初始 Astra worker 或 Advisor xhigh 无效。在本策略中，Explorer 没有 xhigh 路由。
+- **路由判断。** 对 standard 或 senior 探索通常偏好 Luna 的 max。已有证据、预期的判断需要，或任务的复杂度，可以证明立即选择 Sol 或 Astra 合理，而不先尝试 Luna，也不再向用户确认一次。在用户授权的资源内路由；保留显式的排除和限制。不要引入新的用户档案文件格式、价格排序服务，或自动的主代理模型切换。
+- **契约与局部自主。** 复用五部分的任务契约。描述可观察的结果、所有权、接口、保留约束，以及在目标未满足时能够失败的验证。引用原始任务件，并让执行者检查有范围的来源。局部实现选择归 worker。契约缺口返回主代理；用户拥有的对目标、范围或保留决定的变更需要用户决议。在一个有依赖的选择尚未解决时，保留不受影响的进展。不要放宽验收条件来把失败变成完成。
+- **失败归因。** 一次完整的 worker 尝试包括实现、常规调试和验证，随后是验收失败，或确实无法完成被分配的目标。中间的命令或测试失败不单独计算。一次咨询尝试在没有回答指定问题，或其实质性推理被来源或验证证据推翻时失败。仅有分歧是不够的。不可用的基础设施或缺失的事实首先要求修复或收集证据，而不是被假定为模型能力不足。
+- **升级资格。** 在任务上下文中保留相关的失败目标或咨询问题、尝试过的分配、验证证据和诊断。一次失败的完整尝试使 Astra 的 xhigh 对该工作具备资格；它并不强制使用。失败证据随同一项工作的接管一起转移，而无关的任务或角色失败不会解锁一个不同的请求。主代理根据原因选择澄清、分配不变的返工、更高的推理等级，或更强的执行者。不要要求耗尽每一个更便宜的设置。检查器验证观察到的分配；是工作流，而不是一个阅读提示词的日志解析器，确立失败证据是否使一条有条件的路由具备资格。
+- **会话生命周期。** 每一次推理等级变更都使用一条新派发的、带有新上下文的原生线程。这适用于升高和降低，也适用于每一个被委派的角色。绝不通过现有线程的后续或恢复来调整推理等级。同模型、同推理等级的 worker 修正可以复用其原生线程。模型或角色改派在一条新线程中使用匹配的原生入口。独立验收始终重新开始，即使推理等级不变。捕获实际的前驱与后继线程标识，并比较观察到的推理等级；角色的自我报告不能为该转换出具证明。
+- **当前状态交接。** 在把冲突的工作分配给替换者之前，停止先前的写入者，并检查其实际的有范围状态。保留有用的部分变更。转移目标、有约束力的决定、所有权、当前变更、已经运行的检查、观察到的失败和剩余验证。通过引用和简要事实携带相关证据，而不是复制整段对话。在完成之前重新检查合并状态。
+- **决策建议。** 主代理可以主动请求建议。对适用计划没有覆盖的关键未决决定、削弱关键计划假设的新证据，以及在初始诊断之后仍然不明的失败原因，要求建议。重复的失败要求重新评估，但不是一项普遍的、由计数器驱动的咨询策略。现有的适用建议可以复用；实质性的新证据要求重新作出判断。主代理解释实质性分歧，并保留决定的所有权。建议既不授予授权，也不自动创建一项新要求。
+- **交付验收。** 每一项完成的任务都要求主代理检查实际变更并做相关验证。普通的多步工作随后可以在没有 Advisor 的情况下完成。高风险交付和明确的独立评审请求，要求在这些检查之后做新的独立验收。风险取决于失败后果、可逆性，以及正确性有多难确立；步数、文件数、主代理身份，或仅使用 Astra 实现，都不能确立它。现有的、对行为关键的例子包括数据丢失、授权失败，以及失败代价高或难以发现的跨模块正确性。
+- **独立验收契约。** 提供原始目标与约束、包括新文件在内的完整实际变更、验证证据和剩余缺口。通过原生 Independent reviewer 入口使用 senior Advisor 路由策略；去掉与主代理推理等级持平或超过它的要求。因此，高推理等级的主代理可以在适当的时候收到 medium 或 high 验收。决策咨询不能代替对实际交付物的评审。必要的发现必须被解决，修订后的变更必须被检查，并且必须取得新的验收。缺失必要评审会使受影响的完成保持待定，而独立工作可以继续。
+- **调度。** 保留由主代理拥有的调度、显式所有权、容量限额、依赖顺序和合并结果验证。worker 继续自行完成实现，而不再进一步委派实现；Explorer 保持不委派。这项变更给主代理更多自主，并且不从参考仓库引入无限的委派深度。
+- **安装与证据。** 为新的原生入口扩展现有安装器、选择性检查和元数据检查器。保留精确模板比较、幂等、在变更之前拒绝已修改或不安全的目标、无关的代理，以及主代理设置。停用从主代理推导推理等级的 reviewer 选择器；改为要求一个显式的、允许的 reviewer 推理等级，并对过时选择器的使用给出有界诊断。继续验证实际角色、模型、推理等级、父链接、权限和线程身份。报告缺失或冲突的证据，而不静默替换或为所请求的路由出具证明。
+- **权限与强制边界。** Explorer 和 Advisor 请求是只读的；worker 只能写入其被分配的范围。观察实际的工具活动和有范围的前后状态。把宿主强制的隔离与更宽权限下的只读提示区分开。保留现有的安装器和元数据检查，作为确定性机制。路由判断、契约质量、失败归因、建议触发条件和完成决定是行为要求，需要已安装宿主上的场景；不要把它们描述为由一个新的调度器或钩子机械强制。
+- **来源一致性与兼容。** 在实现工单内更新随附的角色描述、工作流指令、契约、操作示例、面向用户的文档和领域决定记录。保留职责继续存在的原生身份。更新后的已安装模板仍然受现有的显式调和要求约束；不增加静默的全局迁移或安装改写。使用已建立的原生工具和脚本，而不是跨供应商运行器或一套替换的编排框架。
 
-## Testing Decisions
+## 测试决定
 
-- Validation is deliberately lightweight: ensure each configured route and lifecycle branch behaves as specified. Use the existing installed-plugin boundary in a disposable Codex environment with tiny source lookups, small reversible edits, and controlled attempt outcomes. Do not require complex real projects, a large task corpus, repeated quality trials, or performance benchmarks to accept these tickets.
-- Reuse the public installer and metadata-inspector interfaces through the existing verification entry point for deterministic cases. Prior art includes temporary installation targets, repeat installation, selective checks, refusal before mutation, TOML parsing, synthetic rollout records, wrong role/model/effort, conflicting metadata, malformed or ambiguous records, permission gaps, and payload filtering. Preserve the existing checks and add only cases needed by the changed contracts.
-- Check the complete route table with request/metadata fixtures and small native calls. Each advertised route needs evidence at the boundary claimed: fixture validation proves selection and parsing; observed native metadata proves actual dispatch on the tested host. Reuse a tiny task and already captured calls across checks. Do not multiply all primary models, efforts, task classes, and transports into a Cartesian test suite. An unexercised or unavailable route is reported explicitly rather than silently treated as verified.
-- Good checks fail for the intended mistake: first-attempt Sol xhigh is rejected, an ineligible Astra xhigh is chosen, an effort change reuses the same thread, a reviewer medium is rejected because the primary used max, or ordinary completion unnecessarily requires advice. Use observable calls, thread IDs, exit status, scoped state, and completion decisions. Source-string checks may check consistency but cannot prove these behaviors.
-- Use short scenario prompts with controlled evidence to check behavioral branches. A deliberately failed complete attempt can exercise eligibility without a difficult implementation. A declared high-risk scenario can exercise review dispatch without performing a real migration. Trace the chosen action and reason; the smoke check does not establish that the model will diagnose arbitrary future tasks correctly.
+- 验证有意保持轻量：确保每一条已配置的路由和生命周期分支都按规格行为。在一次性的 Codex 环境中使用现有的已安装插件边界，配以极小的来源查找、小的可逆编辑和受控的尝试结果。接受这些工单不要求复杂的真实项目、大型任务语料、重复的质量试验或性能基准。
+- 通过现有的验证入口，为确定性用例复用公开的安装器和元数据检查器接口。已有做法包括临时安装目标、重复安装、选择性检查、在变更之前拒绝、TOML 解析、合成的会话记录、错误的角色或模型或推理等级、冲突的元数据、畸形或含糊的记录、权限缺口和载荷过滤。保留现有检查，并且只添加被变更的契约所需要的用例。
+- 用请求与元数据夹具以及小型原生调用检查完整的路由表。每一条对外说明的路由都需要其声称边界上的证据：夹具验证证明选择和解析；观察到的原生元数据证明在被测试宿主上的实际派发。在各项检查之间复用一项极小任务和已经捕获的调用。不要把全部主代理模型、推理等级、任务类别和传输方式乘成一套笛卡尔测试。未演练或不可用的路由被显式报告，而不是被静默当作已验证。
+- 好的检查会因预定的错误而失败：首次尝试的 Sol xhigh 被拒绝，选择了不符合资格的 Astra xhigh，推理等级变更复用了同一条线程，因为主代理使用了 max 而拒绝 reviewer 的 medium，或普通完成不必要地要求建议。使用可观察的调用、线程标识、退出状态、有范围的状态和完成决定。来源字符串检查可以检查一致性，但不能证明这些行为。
+- 使用带有受控证据的简短场景提示词来检查行为分支。一次有意失败的完整尝试可以演练资格，而不需要困难的实现。一个声明的高风险场景可以演练评审派发，而不执行真实迁移。追踪所选的行动和理由；冒烟检查并不确立模型会正确诊断任意的未来任务。
 
-| Case | Lightweight check | Owning ticket |
+| 用例 | 轻量检查 | 所属工单 |
 |---|---|---|
-| R01 | Install the native pool into a temporary target, check every entry and candidate allocation, and observe tiny calls through each advertised route. Preserve existing conflict and payload-filter fixtures. | 01, 02, 04 |
-| R02 | Use a short Sol-primary scenario to check direct work, autonomous worker choice, and unchanged primary settings; a task artifact does not force delegation, while explicit Architect mode does. | 01 |
-| R03 | Check usual Luna-max exploration and direct Sol/Astra exploration without a Luna prerequisite; confirm scoped evidence and read-only behavior with a tiny lookup. | 02 |
-| R04 | Check initial Sol xhigh, initial Astra medium/high, rejection of ineligible Astra xhigh, and eligibility after a controlled complete failure. Intermediate test failures do not count. | 01, 03 |
-| R05 | Trace an effort increase and decrease into distinct native threads; trace same-model/same-effort worker rework into a reused thread. Confirm the compact handoff describes current state. | 03 |
-| R06 | Supply controlled environment, contract-gap, and capability failures; check the primary chooses repair, clarification, or eligible reassignment rather than automatic escalation. | 03 |
-| R07 | Supply an uncovered key decision, invalidated advice premises, and an unclear failure cause; check advice dispatch. With unchanged premises, check continuation without redundant advice. | 04 |
-| R08 | Check ordinary multi-step completion without mandatory advice, and high-risk or explicitly requested independent acceptance after the primary's checks. Reuse one tiny deliverable. | 04 |
-| R09 | Check explicit reviewer medium/high independently of primary effort, Advisor xhigh eligibility from advisory failure, and fresh review after corrections. Decision advice does not count as final acceptance. | 04 |
-| R10 | Inject a missing role, unsupported allocation, conflicting metadata, or unavailable required review; check the visible pending status and absence of silent substitution. | 01, 02, 04 |
-| R11 | Reuse existing scheduling cases to check independent dispatch, dependency/conflict sequencing, incomplete evidence, and primary inspection of the combined result. Add a small trace only where the new workflow changes the branch. | 01, 03 |
-| R12 | Check requested and observed read-only settings against tool activity and scoped state, and record the limits of any isolation claim. | 02, 04 |
+| R01 | 把原生池安装到一个临时目标，检查每一个入口和候选分配，并观察经过每一条对外说明路由的极小调用。保留现有的冲突夹具和载荷过滤夹具。 | 01、02、04 |
+| R02 | 用一个简短的 Sol 主代理场景检查直接工作、自主的 worker 选择和未改变的主代理设置；任务件不强制委派，而明确的 Architect 模式会强制。 | 01 |
+| R03 | 检查通常的 Luna max 探索，以及不以 Luna 为前提的直接 Sol 与 Astra 探索；用一次极小查找确认有范围的证据和只读行为。 | 02 |
+| R04 | 检查初始 Sol xhigh、初始 Astra medium 与 high、对不符合资格的 Astra xhigh 的拒绝，以及一次受控的完整失败之后的资格。中间的测试失败不算。 | 01、03 |
+| R05 | 把推理等级的升高和降低追踪到不同的原生线程；把同模型、同推理等级的 worker 返工追踪到一条被复用的线程。确认紧凑交接描述的是当前状态。 | 03 |
+| R06 | 提供受控的环境失败、契约缺口和能力失败；检查主代理选择修复、澄清或符合资格的重新分配，而不是自动升级。 | 03 |
+| R07 | 提供一个未被覆盖的关键决定、被推翻的建议前提，以及一个不明的失败原因；检查建议派发。在前提未改变时，检查不带冗余建议的继续。 | 04 |
+| R08 | 检查没有强制建议的普通多步完成，以及在主代理检查之后的高风险或被明确请求的独立验收。复用一份极小交付物。 | 04 |
+| R09 | 独立于主代理推理等级检查显式的 reviewer medium 与 high，检查由咨询失败而来的 Advisor xhigh 资格，以及修正之后的新评审。决策建议不算最终验收。 | 04 |
+| R10 | 注入缺失角色、不受支持的分配、冲突的元数据，或不可用的必要评审；检查可见的待定状态，以及不存在静默替换。 | 01、02、04 |
+| R11 | 复用现有调度用例，检查独立派发、依赖与冲突的顺序、不完整证据，以及主代理对合并结果的检查。只在新工作流改变该分支的地方添加一条小痕迹。 | 01、03 |
+| R12 | 对照工具活动和有范围的状态检查请求的与观察到的只读设置，并记录任何隔离主张的限度。 | 02、04 |
 
-- Each ticket owns its relevant documentation and smoke checks and checks integration with completed siblings. Reuse valid evidence rather than repeating calls for another acceptance report. Keep a compact record of the tested revision, host, route, expected/observed settings, thread IDs where relevant, outcome, and unverified branches. Exclude credentials and private transcripts.
-- Product effectiveness, quality, long-run stability, and actual savings require substantial later real-task experience and are outside this acceptance requirement. No smoke result may be presented as evidence of those benefits.
-- This planning task validates status labels, required sections, consecutive user-story IDs, complete ticket coverage, existing source links, and an acyclic dependency graph. It does not run product tests or claim the target workflow is already implemented.
+- 每张工单拥有其相关文档和冒烟检查，并检查与已完成兄弟的集成。复用有效证据，而不是为另一份验收报告重复调用。保留一份紧凑记录，写明测试的修订、宿主、路由、期望的与观察到的设置、相关处的线程标识、结果和未验证的分支。排除凭据和私有记录文本。
+- 产品效果、质量、长期稳定性和实际节省需要大量以后的真实任务经验，并且在本验收要求之外。任何冒烟结果都不得被呈现为这些收益的证据。
+- 这项规划任务验证状态标签、必需的章节、连续的用户故事标识、完整的工单覆盖、现有的来源链接，以及一张无环的依赖图。它不运行产品测试，也不声称目标工作流已经实现。
 
-## Out of Scope
+## 范围之外
 
-- Implementing the feature, changing the active Codex installation, committing, pushing, publishing a release, or running paid model acceptance during specification publication.
-- Cross-vendor lanes, Claude or Cursor hooks, Grok runners, user-mediated handoff transports, or a new orchestration service.
-- Automatic primary-model switching, forced use of Sol as the primary, a budget ledger, a price table, model benchmarks, or a new user-profile configuration format.
-- Filling unlisted role/tier cells, forcing Luna before every substantial exploration, forcing all work through workers, or making every multi-step deliverable require advice.
-- Unlimited nested delegation, automatic escalation after every test failure, mandatory traversal of all effort settings, or automatic effort changes within an existing thread.
-- Replacing the existing complete-diff inspection and key-verification obligation with the reference repository's summary-first acceptance scheme. Review depth may be targeted, but no complete-deliverable check is waived by this specification.
-- Treating native role names as new public capability tiers, deleting existing identities solely to rename Implementer to worker, or silently updating modified installed templates.
-- Claiming guaranteed cost, cache behavior, or quality improvements from the selected model names and efforts.
-- Requiring a large real-task evaluation or exhaustive primary/model/effort/transport combinations to accept the routing change.
+- 实现该功能、改变正在使用的 Codex 安装、提交、推送、发布版本，或在规格发布期间运行付费的模型验收。
+- 跨供应商通道、Claude 或 Cursor 钩子、Grok 运行器、由用户中转的交接传输，或一项新的编排服务。
+- 自动的主代理模型切换、强制使用 Sol 作为主代理、预算账本、价格表、模型基准，或一种新的用户档案配置格式。
+- 填满未列出的角色与档位单元格、在每一次较重探索之前强制使用 Luna、强制全部工作都经过 worker，或使每一个多步交付物都要求建议。
+- 无限的嵌套委派、在每一次测试失败之后自动升级、强制遍历全部推理等级设置，或在现有线程内自动改变推理等级。
+- 用参考仓库的摘要优先验收方案，替换现有的完整差异检查和关键验证义务。评审深度可以有针对性，但这份规格不免除任何一次完整交付物检查。
+- 把原生角色名当作新的公开能力档位、仅仅为了把 Implementer 改名为 worker 而删除现有身份，或静默更新已修改的已安装模板。
+- 声称所选模型名称和推理等级带来保证的成本、缓存行为或质量改进。
+- 要求大型真实任务评估，或穷尽主代理、模型、推理等级和传输方式的组合，才接受这项路由变更。
 
-## Further Notes
+## 补充说明
 
-- Planning basis: the conversation's final corrections take precedence over its earlier alternatives. Sol standard-worker xhigh is allowed immediately; Astra senior-worker and Advisor xhigh remain conditional; Luna is the usual substantial-exploration choice rather than a mandatory first attempt; every effort change requires a fresh thread; step count no longer triggers mandatory delivery advice.
-- Current source baseline checked on 2026-09-12: f170eef80734e9140231defcd87a91281549ba3d. The existing native workflow, installer, metadata inspector, and deterministic verifier provide the implementation foundation. Existing unrelated or untracked files are not part of this planning change.
-- This target supersedes the Astra-only eligibility, non-Astra mode selection, unconditional multi-step consultation, Explorer allocation, and primary-derived review-floor decisions in [ADR 0001](../../docs/adr/0001-codex-native-dual-mode-orchestration.md). It also supersedes the default worker routing and explicit Sol selection in [ADR 0002](../../docs/adr/0002-luna-astra-implementation-routing.md). Implementation must add a superseding decision record and update the relevant current glossary without rewriting historical acceptance evidence.
-- The reference repository's [model-orchestration discussion](../../../fable-advisor/docs/chatgpt_模型编排模式比较_6aa2cfb9.md) and role-pool changes informed the conversation. Its automatic task-artifact posture selection, unlimited delegation, arbitrary Advisor tiers, private fill-table design, and cross-vendor mechanisms are not imported.
-- Fresh sessions on effort change are an explicit lifecycle requirement. The requirement does not depend on establishing a universal cache-invalidation claim for every Codex host or transport. Candidate setting support and savings remain live-verification questions.
-- The approved implementation has four behavior tickets, each owning its documentation and verification: [01 Autonomous implementation and delegation](issues/01-autonomous-primary.md), [02 Tiered exploration](issues/02-tiered-exploration.md), [03 Failure and session lifecycle](issues/03-failure-and-session-lifecycle.md), and [04 Advice and independent acceptance](issues/04-advice-and-independent-acceptance.md). Dependencies are 01 -> 03 -> 04; 02 is independent. Tickets 01 and 02 can start immediately. Shared-file edits are coordinated even across independent tickets.
+- 规划依据：对话中的最终修正优先于其中较早的替代方案。Sol standard worker 的 xhigh 被立即允许；Astra senior worker 和 Advisor 的 xhigh 仍然是有条件的；Luna 是通常的较重探索选择，而不是必须的首次尝试；每一次推理等级变更都要求一条新线程；步数不再触发强制的交付建议。
+- 于 2026-09-12 检查的当前源码基线：f170eef80734e9140231defcd87a91281549ba3d。现有的原生工作流、安装器、元数据检查器和确定性验证器提供实现基础。现有的无关或未跟踪文件不属于这次规划变更。
+- 本目标取代 [ADR 0001](../../docs/adr/0001-codex-native-dual-mode-orchestration.md) 中仅 Astra 的资格、非 Astra 的模式选择、无条件的多步咨询、Explorer 分配，以及由主代理推导的评审下限决定。它也取代 [ADR 0002](../../docs/adr/0002-luna-astra-implementation-routing.md) 中的默认 worker 路由和显式的 Sol 选择。实现必须增加一份取代性的决定记录，并更新相关的当前术语表，而不改写历史验收证据。
+- 参考仓库的[模型编排讨论](../../../fable-advisor/docs/chatgpt_模型编排模式比较_6aa2cfb9.md)和角色池变更为本对话提供了信息。它的自动任务件姿态选择、无限委派、任意 Advisor 档位、私有填充表设计，以及跨供应商机制，都没有被引入。
+- 推理等级变更时的新会话是一项显式的生命周期要求。该要求并不依赖于为每一个 Codex 宿主或传输方式确立一项普遍的缓存失效主张。候选设置的支持和节省仍然是实机验证问题。
+- 已批准的实现有四张行为工单，每张拥有自己的文档和验证：[01 自主实现与委派](issues/01-autonomous-primary.md)、[02 分档探索](issues/02-tiered-exploration.md)、[03 失败与会话生命周期](issues/03-failure-and-session-lifecycle.md)，以及 [04 建议与独立验收](issues/04-advice-and-independent-acceptance.md)。依赖关系为 01 -> 03 -> 04；02 独立。工单 01 和 02 可以立即开始。即使跨独立工单，共享文件的编辑也会被协调。

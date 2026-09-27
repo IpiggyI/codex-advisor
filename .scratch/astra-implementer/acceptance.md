@@ -1,17 +1,15 @@
-# Astra Implementer acceptance
+# Astra Implementer 验收
 
-Date: 2026-09-08
+日期：2026-09-08
 
-Implementation baseline: `3fb02206b9a614d64e72c915978251242864fe0b`.
-Scope: [the feature specification](spec.md) and [ADR-0002](../../docs/adr/0002-luna-astra-implementation-routing.md).
+实现基线：`3fb02206b9a614d64e72c915978251242864fe0b`。
+范围：[功能规格](spec.md)和 [ADR-0002](../../docs/adr/0002-luna-astra-implementation-routing.md)。
 
-## Deterministic verification
+## 确定性验证
 
-The installation test first failed because full installation did not include an
-Astra Implementer. The runtime test first failed because `--astra-effort` was an
-unknown argument. Both passed after their corresponding implementation changes.
+安装测试首先失败，原因是完整安装没有包含 Astra Implementer。运行时测试首先失败，原因是 `--astra-effort` 是未知参数。两者都在各自对应的实现变更之后通过。
 
-The following public checks passed:
+下列公开检查已通过：
 
 ~~~sh
 sh plugins/codex-advisor/scripts/verify.sh --installation
@@ -20,38 +18,26 @@ sh plugins/codex-advisor/scripts/verify.sh
 git diff --check
 ~~~
 
-Coverage includes full and selective installation checks, idempotence, refusal
-without partial mutation, the previous valid Sol description during upgrade,
-exact native role/model identity, adjustable Astra effort, wrong Astra judgment
-roles, mismatched or missing settings, conflicting evidence, invalid arguments,
-permission metadata, and payload filtering. JSON/TOML parsing and Shell syntax
-checks are the applicable configuration checks; this project has no typecheck task.
+覆盖范围包括完整安装检查和选择性安装检查、幂等、在没有部分改动的情况下拒绝、升级期间先前有效的 Sol 描述、精确的原生角色和模型身份、可调整的 Astra 推理等级、错误的 Astra 判断角色、不匹配的或缺失的设置、冲突的证据、无效参数、权限元数据，以及载荷过滤。JSON、TOML 解析和 Shell 语法检查是适用的配置检查；本项目没有类型检查任务。
 
-These checks establish installer and parser behavior, not live model behavior.
+这些检查确立的是安装器和解析器的行为，不是实机模型行为。
 
-## Live host observations
+## 实机宿主观察
 
-Host: `codex-cli 0.153.4`. The local marketplace, plugin, and all six role templates
-were installed into a temporary `CODEX_HOME`. Four fresh fixture sessions used an
-Astra primary at `high`, `workspace-write`, persistent runtime records, and explicit
-task-scoped Architect-mode authorization. The user's active installation was not
-updated. No implementation benchmark or subscription-allowance comparison was run.
+宿主：`codex-cli 0.153.4`。本地插件市场、插件和全部六个角色模板被安装进一个临时的 `CODEX_HOME`。四个新的夹具会话使用推理等级为 `high` 的 Astra 主代理、`workspace-write`、持久的运行时记录，以及显式的、以任务为范围的 Architect 模式授权。用户当前使用中的安装未被更新。没有运行实现基准测试或订阅额度比较。
 
-Evidence root: `/tmp/codex-advisor-astra.isz2w1tr`. It contains fixture prompts,
-source files, tests, event streams, final responses, selected check outputs, and
-runtime sessions. Temporary connection settings and authentication were used for
-these calls; authentication copies were removed after the sessions completed.
+证据根目录：`/tmp/codex-advisor-astra.isz2w1tr`。它包含夹具提示词、源文件、测试、事件流、最终响应、选定的检查输出，以及运行时会话。这些调用使用了临时连接设置和认证；认证副本在会话完成之后被移除。
 
-| Fixture | Observed result |
+| 夹具 | 观察到的结果 |
 |---|---|
-| Default Astra implementation | The parent explicitly passed `medium` without a user effort adjustment. The child implemented recursive dictionary merging; 8 meaningful tests went from failure to pass. The parent inspected the actual change, reran all 8 tests, and checked protected files. |
-| Explicit Astra effort adjustment | The user selected `high`; the child observed `high` and completed the same 8-case contract. The parent inspected and reran the checks. |
-| Default routing, explicit Sol, and required review | A bounded sum used Luna at `max`; user-selected stable deduplication used Sol at `high`; a designated high-risk balance validator used Astra at `medium` directly. All three owned files passed the combined suite. A fresh Astra reviewer at `high` then inspected the balance validator and returned no findings. |
-| Missing Astra role | A separate temporary installation lacked only the Astra Implementer. Selective preflight failed; the primary left work and acceptance pending, made no edit, and did not invoke Sol or another substitute. |
+| 默认的 Astra 实现 | 父级在没有用户推理等级调整的情况下明确传入了 `medium`。子级实现了递归字典合并；8 个有意义的测试从失败变为通过。父级检视了实际变更，重新运行了全部 8 个测试，并检查了受保护文件。 |
+| 显式的 Astra 推理等级调整 | 用户选择了 `high`；子级观察到 `high`，并完成了同一份 8 个用例的契约。父级检视并重新运行了这些检查。 |
+| 默认路由、显式 Sol，以及必需的评审 | 一个范围受控的求和使用了推理等级为 `max` 的 Luna；用户选定的稳定去重使用了推理等级为 `high` 的 Sol；一个指定的高风险余额校验器直接使用了推理等级为 `medium` 的 Astra。全部三个所拥有的文件都通过了合并套件。随后一个推理等级为 `high` 的新 Astra Reviewer 检视了余额校验器，并且没有返回发现。 |
+| 缺失的 Astra 角色 | 另一套临时安装仅缺少 Astra Implementer。选择性预检失败；主代理把工作和验收留为待定，没有做任何编辑，也没有调用 Sol 或其他替代。 |
 
-Exact child evidence was checked independently with the repository runtime inspector:
+精确的子级证据用本仓库的运行时检查器独立检查过：
 
-| Native role | Effort | Child thread | Parent thread |
+| 原生角色 | 推理等级 | 子线程 | 父线程 |
 |---|---|---|---|
 | `codex_advisor_astra_implementer` | `medium` | `01a07ee2-4b20-7932-8199-c37fcf0b4587` | `01a07ee0-bc9c-7e03-b91f-ab03891e32ff` |
 | `codex_advisor_astra_implementer` | `high` | `01a07ee2-9b3f-76e2-93e5-221155860fd4` | `01a07ee0-fce3-7ae2-b6d8-3e1bd23f13b4` |
@@ -60,48 +46,23 @@ Exact child evidence was checked independently with the repository runtime inspe
 | `codex_advisor_astra_implementer` | `medium` | `01a07ee7-7254-74b2-9809-cf6feeff7146` | `01a07ee5-6f1f-7f62-bdd6-27048292bb03` |
 | `codex_advisor_astra_reviewer` | `high` | `01a07ee9-ad4b-79b2-9506-144467f14ac8` | `01a07ee5-6f1f-7f62-bdd6-27048292bb03` |
 
-Primary runtime records remained Astra at `high`; native spawn arguments selected
-fresh contexts. The root verification reran both 8-case merge suites and the
-3-case routing suite successfully, inspected the generated implementations, checked
-protected files, and compared every observed parent association. The two ordinary
-Astra sessions completed without an added Independent reviewer.
+主代理运行时记录仍然是推理等级为 `high` 的 Astra；原生派发参数选择了新上下文。根验证重新成功地运行了两套 8 个用例的合并套件和一套 3 个用例的路由套件，检视了生成的实现，检查了受保护文件，并比较了每一个被观察到的父级关联。两个普通的 Astra 会话在没有额外增加独立 Reviewer 的情况下完成。
 
-Initial WebSocket connections experienced transport retries; the host recovered
-through HTTPS. Later fixture sessions disabled WebSocket support only in their
-temporary connection configuration. This was transport handling, not a model
-fallback. It does not establish terminal provider-failure handling.
+最初的 WebSocket 连接经历了传输重试；宿主通过 HTTPS 恢复。后来的夹具会话仅在其临时连接配置中禁用了 WebSocket 支持。这是传输处理，不是模型回退。它并不确立终态的提供方失败处理。
 
-The Independent reviewer was behaviorally read-only over the inspected fixture
-files, with unchanged post-review state. Runtime permissions remained managed
-`workspace-write`; this is not evidence of enforced read-only isolation.
+独立 Reviewer 在所检视的夹具文件上表现为行为上的只读，评审后的状态未变。运行时权限仍是受管理的 `workspace-write`；这不是强制只读隔离的证据。
 
-## Review
+## 评审
 
-Standards and Spec were reviewed independently against the staged changes from the
-baseline. Standards found no documented-rule violation; the added per-role argument
-branch follows the existing pattern, so its repeated validation did not warrant an
-unrelated refactor. Spec found one missing named upgrade fixture for the old valid
-Sol description. That fixture was added, the installation group passed, and the
-Spec reviewer confirmed the finding was closed. No implementation defects or scope
-creep were reported.
+标准轴和规格轴针对从该基线起的暂存变更做了独立评审。标准轴没有发现已记录规则的违反；新增的按角色参数分支遵循既有模式，因此它被重复验证这一点并不足以构成一次无关重构的理由。规格轴发现缺少一个针对旧的有效 Sol 描述的具名升级夹具。该夹具已被加入，安装组通过，并且规格轴 Reviewer 确认该发现已关闭。没有报告实现缺陷或范围蔓延。
 
-## Remaining validation limits
+## 剩余的验证限制
 
-- Terminal invocation failure after discovery was not forced; transient recovered
-  transport errors and the missing-role scenario do not cover that path.
-- Missing/conflicting evidence rejection was tested at the inspector boundary;
-  a live parent handling deliberately corrupted evidence was not exercised.
-- Live specification-gap resolution, environment-caused Luna failure, cause-based
-  Luna reassignment with partial edits, and rejection of a false worker completion
-  report were not exercised. Their documented responsibilities were reviewed.
-- The review fixture covered high risk plus an explicit review request. A separate
-  low-risk review request, review-required corrections, and unavailable required
-  review were not exercised in this run. Existing review-floor checks passed.
-- Explicit Sol effort adjustment was covered by deterministic fixtures; this live
-  run used Sol's default `high`.
-- These fixtures do not establish broad `Astra-medium` quality, comparative latency,
-  statistical significance, or savings in the user's Codex subscription allowance.
+- 发现之后的终态调用失败没有被强制制造；已恢复的瞬时传输错误和缺失角色场景并不覆盖那条路径。
+- 对缺失证据或冲突证据的拒绝在检查器边界上得到测试；实机父级处理被故意破坏的证据这一点没有被演练。
+- 实机的规格缺口解决、环境导致的 Luna 失败、带有部分编辑的基于原因的 Luna 改派，以及对虚假 Worker 完成报告的拒绝，都没有被演练。它们被记录下来的责任已得到审阅。
+- 该评审夹具覆盖了高风险加上一次显式的评审请求。另一次低风险评审请求、评审所要求的修正，以及不可用的必需评审，在这次运行中没有被演练。既有的评审下限检查已通过。
+- 显式的 Sol 推理等级调整由确定性夹具覆盖；这次实机运行使用了 Sol 的默认 `high`。
+- 这些夹具并不确立宽泛的 `Astra-medium` 质量、比较延迟、统计显著性，或用户 Codex 订阅额度上的节省。
 
-Temporary paths are evidence locations from this run and may be removed later.
-Recheck current host discovery, model support, and allowance rules before extending
-these observations to a different installation or performance claim.
+临时路径是这次运行的证据位置，以后可以移除。在把这些观察推广到另一套安装或一项性能声称之前，重新检查当前宿主的发现、模型支持和额度规则。

@@ -1,22 +1,22 @@
-# 02: Generic inspector driven by the shipped templates
+# 02：由随附模板驱动的通用检查器
 
-**What to build:** The primary verifies a delegated call with `--agent <entry name>` and, when the entry leaves effort to the caller, `--effort <effort>`. The inspector reads the expected model and any pinned effort from the shipped template with that name, so renaming or re-dialling an entry never changes the inspector. Policy about which efforts a tier allows leaves the inspector. This ticket still runs against the current eight templates.
+**要构建的内容：** 主代理用 `--agent <entry name>` 验证一次委派调用，并且当入口把推理等级留给调用者时，再用 `--effort <effort>`。检查器从具有该名称的随附模板读取期望的模型以及任何被固定的推理等级，因此重命名或重新拨档一个入口从不改变检查器。关于一个档位允许哪些推理等级的策略离开检查器。本工单仍然针对当前的八个模板运行。
 
-**Blocked by:** 01 (both tickets edit the verifier).
+**Blocked by:** 01（两份工单都编辑验证器）。
 
 **Status:** resolved
 
-- [x] `--agent NAME` selects the template whose `name` field equals NAME from the templates directory resolved beside the script; an unknown name fails with a diagnostic and no output.
-- [x] When the template pins `model_reasoning_effort`, that is the expected effort; a `--effort` that differs from the pin is rejected. When the template does not pin it, `--effort` is required and is the expected effort.
-- [x] The expected model is the template's `model`. Observed model, effort, and agent role must equal the expectations; a mismatch fails as today.
-- [x] No allowed-effort validation remains: any non-empty effort string is accepted as the expectation and compared to the observed value.
-- [x] Unchanged: exactly one UUID-matched rollout; a role check requires parent linkage, working directory, sandbox and permission evidence; conflicting values across turn contexts are rejected; the output object contains only the allowlisted keys; no prompt or credential bytes appear in stdout or stderr; without `--agent` generic evidence is emitted.
-- [x] The eight retired per-role options (`--luna`, `--sol-effort`, `--astra-effort`, `--explorer-effort`, `--sol-explorer-effort`, `--astra-explorer-effort`, `--advisor-effort`, `--reviewer-effort`) fail with a diagnostic naming `--agent`; `--review-primary-effort` and `--select-review-effort` keep their existing diagnostic.
-- [x] The runtime group of the verifier is rewritten to iterate over every shipped template: for each, an accepted case with matching metadata (pinned or a passed effort), rejections for mismatched model, effort, role, sandbox, permission, parent, and working directory, a `--effort` mismatch against a pin, a missing `--effort` for an unpinned template, and the payload-leak assertion. Hand-written per-role cases are removed. Both verifier groups pass.
-- [x] The inspector's usage text describes the new options; the operations reference is left to ticket 03.
+- [x] `--agent NAME` 从解析到脚本旁边的模板目录中，选择 `name` 字段等于 NAME 的模板；未知名称以一条诊断失败，并且没有输出。
+- [x] 当模板固定 `model_reasoning_effort` 时，那就是期望的推理等级；与固定值不同的 `--effort` 被拒绝。当模板不固定它时，`--effort` 是必需的，并且就是期望的推理等级。
+- [x] 期望的模型是模板的 `model`。观察到的模型、推理等级以及代理角色必须等于这些期望；不匹配像今天一样失败。
+- [x] 不再留下允许推理等级的校验：任何非空的推理等级字符串都被接受为期望，并与观察到的值比较。
+- [x] 未改变的部分：恰好一条按 UUID 匹配的会话记录；角色检查要求父链接、工作目录、沙箱与权限证据；跨轮次上下文相互冲突的值被拒绝；输出对象只包含允许列表中的键；标准输出或标准错误中不出现提示或凭据字节；没有 `--agent` 时发出通用证据。
+- [x] 八个已退役的按角色选项（`--luna`、`--sol-effort`、`--astra-effort`、`--explorer-effort`、`--sol-explorer-effort`、`--astra-explorer-effort`、`--advisor-effort`、`--reviewer-effort`）以一条点名 `--agent` 的诊断失败；`--review-primary-effort` 与 `--select-review-effort` 保持它们现有的诊断。
+- [x] 验证器的运行时组被重写为遍历每一个随附模板：对每一个模板，有一条元数据匹配的接受用例（固定的或传入的推理等级），对不匹配的模型、推理等级、角色、沙箱、权限、父级以及工作目录的拒绝，与固定值不匹配的 `--effort`，未固定模板缺少 `--effort`，以及载荷泄漏断言。手写的按角色用例被移除。两个验证器组都通过。
+- [x] 检查器的用法文本描述新选项；操作参考留给工单 03。
 
-## Acceptance
+## 验收
 
-Accepted 2026-09-16 by the primary. Lane: `generalPurpose` pinned `cursor-grok-4.6-xhigh` (requested, not confirmed). Tier 1: full `verify.sh` rerun by the primary, both groups pass; `git diff --stat`: inspector 136 lines, verifier 671 lines. Tier 2: the primary read the inspector's option parsing and template resolution — `awk` extraction of top-level `name`/`model`/`model_reasoning_effort` stopping at the first `"""`, duplicate-name and unknown-name failures, pinned-effort equality rule, `--effort` without `--agent` rejected; the retired ten options fail before any rollout is read. Negative proof recorded by the lane: dropping the model comparison fails the runtime group at the named assertion.
+由主代理于 2026-09-16 验收。通道：`generalPurpose`，固定为 `cursor-grok-4.6-xhigh`（已请求，未经确认）。第 1 级：主代理重跑了完整的 `verify.sh`，两个组都通过；`git diff --stat`：检查器 136 行，验证器 671 行。第 2 级：主代理阅读了检查器的选项解析与模板解析——用 `awk` 提取顶层的 `name`/`model`/`model_reasoning_effort`，停在第一个 `"""`，重复名称与未知名称的失败，固定推理等级的相等规则，没有 `--agent` 的 `--effort` 被拒绝；十个已退役选项在读取任何会话记录之前失败。通道记录的反证：去掉模型比较会使运行时组在被点名的断言处失败。
 
-Carried over to ticket 04 (contract gap on the primary's side, not a lane defect): the contract told the lane to keep the old text of the `--review-primary-effort` / `--select-review-effort` diagnostic, which still points at the now-retired `--reviewer-effort`; ticket 04 changes that diagnostic to name `--agent` and adjusts the verifier assertion.
+结转到工单 04（主代理一侧的契约缺口，并非通道缺陷）：契约让通道保持 `--review-primary-effort` / `--select-review-effort` 诊断的旧文本，而该文本仍然指向现已退役的 `--reviewer-effort`；工单 04 把该诊断改为点名 `--agent`，并调整验证器断言。

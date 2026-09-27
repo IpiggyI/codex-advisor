@@ -1,34 +1,30 @@
-# 03: Authorized Architect Mode with Luna Implementation
+# 03：带有 Luna 实现的已授权 Architect 模式
 
 Status: resolved
 
-Blocked by: 02 - Advisor Mode and Ordinary Astra Solo Work.
+Blocked by: 02 - Advisor 模式与普通的 Astra 单独工作。
 
-**What to build:** After explicit user authorization, an Astra primary session completes a bounded implementation task by specifying work, delegating all implementation to Luna at `max`, inspecting the actual result, and rerunning key verification before acceptance.
+**要构建的内容：** 在用户显式授权之后，一个 Astra 主代理会话完成一项范围受控的实现任务：写明工作，把全部实现委派给推理等级为 `max` 的 Luna，检视实际结果，并在验收之前重新运行关键验证。
 
-- [x] Architect mode requires both an Astra primary session and an explicit user request or accepted proposal. Model identity, a generic implementation request, or an unaccepted suggestion alone is insufficient.
-- [x] Task-scoped authorization survives follow-up turns and implementation subtasks within the same task but does not carry into an unrelated new task.
-- [x] Explicit session-wide authorization applies to subsequent tasks in that session while the Astra prerequisite holds.
-- [x] A non-Astra primary model is not reported as an active architect, and the plugin does not switch the primary model automatically.
-- [x] The Astra architect's directly selected reasoning effort remains unrestricted by the plugin.
-- [x] The architect owns design, task specifications, scheduling, and acceptance. Every implementation edit, including a one-line change and a correction to delegated work, is performed by an Implementer.
-- [x] Bounded, fully specified implementation is delegated to native `gpt-5.6-luna` at observed `max` effort. Incorrect or unobservable routing is not accepted as satisfying the contract.
-- [x] The Luna constraint applies to Astra's delegated calls in Architect mode and does not leak into the reasoning settings of a directly used Luna primary session.
-- [x] Each implementation specification supplies objective, files and ownership, interfaces, constraints, and verification. It requires preservation of concurrent edits and a structured evidence report.
-- [x] The Implementer stays within ownership, surfaces material ambiguity and failed verification, and does not create further implementation delegations.
-- [x] The architect inspects all actual changes and reruns the key verification checks. A worker report with missing or incorrect evidence cannot by itself establish acceptance.
-- [x] A bounded task that does not require independent review completes after the architect's checks without automatically adding another reviewer.
-- [x] The native role contract, installation checks, runtime evidence handling, and user instructions agree on the supported behavior and model constraint.
-- [x] Installed-plugin scenarios cover authorization present and absent, unaccepted proposals, task and session lifetimes, one-line changes, correction ownership, Luna's actual effort, and rejection of inadequate worker evidence.
+- [x] Architect 模式同时要求一个 Astra 主代理会话，以及一次显式的用户请求或已被接受的提议。仅有模型身份、一条笼统的实现请求，或一条未被接受的建议，都是不够的。
+- [x] 以任务为范围的授权在同一任务内的后续回合和实现子任务中继续有效，但不会带入一个无关的新任务。
+- [x] 显式的全会话授权适用于该会话中的后续任务，只要 Astra 这一前提仍然成立。
+- [x] 非 Astra 的主代理模型不被报告为正在活动的 Architect，并且插件不自动切换主代理模型。
+- [x] Astra Architect 直接选定的推理等级不受该插件限制。
+- [x] Architect 拥有设计、任务规格、调度和验收。每一处实现编辑，包括一行变更和对已委派工作的一处修正，都由一名 Implementer 完成。
+- [x] 范围受控且规格完整的实现被委派给原生 `gpt-5.6-luna`，观察到的推理等级为 `max`。不正确的路由或不可观察的路由，不被接受为满足该契约。
+- [x] Luna 约束适用于 Astra 在 Architect 模式中的委派调用，并且不泄漏到一个被直接使用的 Luna 主代理会话的推理设置中。
+- [x] 每一份实现规格都提供目标、文件与所有权、接口、约束和验证。它要求保留并发编辑，并要求一份结构化的证据报告。
+- [x] Implementer 停留在所有权之内，提出实质性含糊和失败的验证，并且不创建进一步的实现委派。
+- [x] Architect 检视全部实际变更，并重新运行关键验证检查。一份证据缺失或不正确的 Worker 报告，不能单独确立验收。
+- [x] 一项不需要独立评审的范围受控任务，在 Architect 的检查之后完成，而不自动再增加一名 Reviewer。
+- [x] 原生角色契约、安装检查、运行时证据处理，以及用户说明，对受支持的行为和模型约束保持一致。
+- [x] 已安装插件的场景覆盖授权存在与不存在、未被接受的提议、任务寿命和会话寿命、一行变更、修正的所有权、Luna 的实际推理等级，以及对不充分 Worker 证据的拒绝。
 
-## Verification
+## 验证
 
-Use a disposable repository with a small behavior change and an existing meaningful check. Observe who edited the files, the delegated model and effort, the complete resulting diff, and the architect's rerun evidence. Include authorization scenarios across follow-up turns and a new task. Independent-review completion is delivered by ticket 04, and direct Sol implementation by ticket 05.
+使用一个带有小行为变更和一项既有的有意义检查的一次性仓库。观察是谁编辑了文件、被委派的模型和推理等级、完整的结果差异，以及 Architect 重新运行的证据。纳入跨后续回合和一个新任务的授权场景。独立评审的完成由工单 04 交付，直接的 Sol 实现由工单 05 交付。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-06. Installed-host scenarios confirmed task and session
-authorization lifetimes, ordinary solo work, the non-Astra prerequisite refusal,
-Luna implementation and corrections at observed max effort, and rejection of an
-inadequate worker report through actual-diff inspection and rerun verification.
-See [the acceptance record](../acceptance-03-04.md) for evidence and limits.
+已于 2026-09-06 完成。已安装宿主的场景确认了任务授权和会话授权的寿命、普通的单独工作、对非 Astra 前提的拒绝、在观察到的 max 推理等级上的 Luna 实现和修正，以及通过实际差异检视和重新运行验证来拒绝一份不充分的 Worker 报告。证据和限制见[验收记录](../acceptance-03-04.md)。

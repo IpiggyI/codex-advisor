@@ -1,39 +1,34 @@
-# 04: Decision Advice and Independent Acceptance
+# 04：决策建议与独立验收
 
-**What to build:** Any primary can obtain senior advice for important judgments and fresh independent acceptance when delivery risk or the user requires it. The primary reuses advice while its premises hold, explains material disagreement, and retains decision ownership. Both advisory request shapes use Astra at medium or high initially, with xhigh eligible after a relevant failed complete advisory attempt and fresh sessions following ticket 03's lifecycle.
+**要构建：** 任一主代理都可以为重要判断取得 senior 建议，并在交付风险或用户要求时取得新的独立验收。主代理在前提仍然成立时复用建议，解释实质性分歧，并保留决定的所有权。两种咨询请求形态最初都使用推理等级为 medium 或 high 的 Astra；在一次相关的、失败的完整咨询尝试之后，xhigh 具备资格，并且新会话遵循工单 03 的生命周期。
 
-**Blocked by:** 03 - Failure Recovery and Fresh Sessions.
+**Blocked by:** 03 - 失败恢复与新会话。
 
 **Status:** resolved
 
-- [x] The primary may consult an Advisor proactively without changing work mode, model, or primary effort. Only the senior Advisor tier is supplied by the default pool.
-- [x] Advice is required for key decisions not covered by an applicable plan, new evidence undermining a key plan assumption, and failure causes still unclear after initial diagnosis. Repeated failures require reassessment, not an unconditional counter-driven consultation.
-- [x] Applicable advice can be reused while its relevant premises remain valid. Material new evidence requires renewed judgment; routine implementation of an already supported decision does not require another consultation.
-- [x] The primary checks cited evidence and explains material disagreement. Advice grants no authorization, does not automatically impose a new requirement or veto, and does not transfer ownership of user goals or final decisions.
-- [x] Ordinary direct, delegated, and mixed multi-step completion remains possible after primary inspection and relevant verification, as delivered by ticket 01. Step count, file count, primary identity, or Astra implementation alone does not mandate independent acceptance.
-- [x] High-risk delivery and explicit independent-review requests each require fresh independent acceptance after the primary's checks, for any primary model. Risk depends on failure consequences, reversibility, and difficulty establishing correctness.
-- [x] Decision advice receives a specific question, constraints, options, and scoped evidence. Independent acceptance receives the binding task contract, actual complete changes including new files, primary verification evidence, and unresolved gaps.
-- [x] Both request shapes belong to the semantic Advisor role. Preserve the distinct native Astra Advisor and Independent reviewer entry points so that an earlier decision consultation, worker self-review, or report cannot satisfy independent final acceptance.
-- [x] Both advisory entries use model-pinned Astra at explicitly chosen medium or high initially, without a primary-derived effort floor or a template that overrides the choice. A primary at max can receive valid medium or high independent acceptance.
-- [x] A complete advisory attempt fails when it does not answer the specified question or its material conclusion is invalidated by source or verification evidence. Mere disagreement, intermediate tool errors, or worker failure alone does not unlock Advisor xhigh.
-- [x] A relevant complete advisory failure makes Astra xhigh eligible for that question without forcing it. The primary diagnoses the failure and may gather missing facts, clarify the question, or adjust effort; effort changes always start a new native thread.
-- [x] Explicit reviewer effort can be validated independently of primary effort. Obsolete primary-floor selection requests receive a bounded diagnostic rather than being silently reinterpreted. Wrong advisory identities, unlisted efforts, conflicting inputs, or missing metadata cannot certify the call.
-- [x] Observe actual role, model, effort, thread identity, parent association, and permissions. Decision advice and independent acceptance remain distinguishable in the evidence, and diagnostics expose no prompts or credentials.
-- [x] Both advisory contracts remain read-only. Inspect scoped tool activity and before/after state and distinguish a read-only request, observed behavior under broader permissions, and host-enforced isolation.
-- [x] Required review findings lead to corrections, primary re-verification, and fresh independent acceptance of the revised deliverable, even when the effort stays the same. Worker-session reuse does not waive review freshness.
-- [x] Unavailable required review, unsupported settings, inconsistent evidence, or unresolved material findings leave affected completion pending. The primary can continue independent unaffected work without bypassing required acceptance.
-- [x] Updated advisory templates retain safe installation and selective-check behavior: repeated installation is idempotent, conflicts require explicit reconciliation without partial mutation, and unrelated agents and primary settings are preserved.
-- [x] Advisory descriptions, request and return contracts, operation guidance, current glossary, superseding architecture decisions, and public explanations agree on the final triggers, efforts, and independence requirements. Historical acceptance records remain historical.
-- [x] Reuse one tiny deliverable with controlled instructions to check ordinary completion, declared high-risk acceptance, and explicit review. Short advisory scenarios exercise proactive advice, invalidated premises, reusable advice, disagreement, and failed-advice xhigh eligibility without a real destructive migration.
-- [x] Verify the advisory allocations through small native calls and observed metadata; existing fixtures cover explicit reviewer selection, rejection of the old primary floor, wrong identity, and missing evidence. Reuse valid lifecycle evidence from ticket 03, and do not require ticket 02's Explorer additions.
-- [x] Record expected and observed branches, freshness evidence, primary checks, tested revision and host, and gaps. Check integration with completed sibling work and reuse valid evidence, with only affected checks rerun. Documentation and verification finish in this ticket rather than in a separate final ticket.
-- [x] These are simple routing and lifecycle checks, not evidence of general review accuracy, quality, stability, or savings. Use disposable environments, keep active installations unchanged, and perform no release publication or large real-task evaluation.
+- [x] 主代理可以主动咨询 Advisor，而不改变工作模式、模型或主代理的推理等级。默认池只提供 senior 的 Advisor 档位。
+- [x] 建议对于以下情况是必需的：适用计划没有覆盖的关键决定、削弱关键计划假设的新证据，以及在初始诊断之后原因仍然不明的失败。重复的失败要求重新评估，而不是无条件的、由计数器驱动的咨询。
+- [x] 适用的建议在其相关前提仍然有效时可以复用。实质性的新证据要求重新作出判断；对一项已经得到支持的决定做例行实现，不要求另一次咨询。
+- [x] 主代理检查被引用的证据，并解释实质性分歧。建议不授予授权，不自动施加新要求或否决，也不转移用户目标或最终决定的所有权。
+- [x] 普通的直接、委派和混合的多步完成，在主代理检查和相关验证之后仍然可能，如工单 01 所交付。步数、文件数、主代理身份，或仅有 Astra 实现，都不强制独立验收。
+- [x] 高风险交付和明确的独立评审请求，各自都要求在主代理的检查之后做新的独立验收，对任一主代理模型都成立。风险取决于失败后果、可逆性，以及确立正确性的难度。
+- [x] 决策建议收到一个具体问题、约束、选项和有范围的证据。独立验收收到有约束力的任务契约、包括新文件在内的实际完整变更、主代理的验证证据，以及未解决的缺口。
+- [x] 两种请求形态都属于语义上的 Advisor 角色。保留不同的原生 Astra Advisor 入口和 Independent reviewer 入口，以便较早的决策咨询、worker 自评或报告不能满足独立的最终验收。
+- [x] 两个咨询入口最初都使用模型已固定的 Astra，推理等级为显式选择的 medium 或 high，没有由主代理推导的推理等级下限，也没有覆盖该选择的模板。推理等级为 max 的主代理可以收到有效的 medium 或 high 独立验收。
+- [x] 一次完整的咨询尝试在没有回答指定问题，或其实质性结论被来源或验证证据推翻时失败。仅有分歧、中间的工具错误，或仅有 worker 失败，都不会解锁 Advisor 的 xhigh。
+- [x] 一次相关的完整咨询失败使 Astra 的 xhigh 对该问题具备资格，而不强制使用它。主代理诊断该失败，并且可以收集缺失事实、澄清问题或调整推理等级；推理等级变更始终开始一条新的原生线程。
+- [x] 显式的 reviewer 推理等级可以独立于主代理的推理等级被验证。过时的、按主代理下限选择的请求会收到一条有界诊断，而不是被静默重新解释。错误的咨询身份、未列出的推理等级、冲突的输入或缺失的元数据，都不能为该调用出具证明。
+- [x] 观察实际的角色、模型、推理等级、线程身份、父关联和权限。决策建议和独立验收在证据中仍然可以区分，并且诊断不暴露提示词或凭据。
+- [x] 两份咨询契约都保持只读。检查有范围的工具活动和前后状态，并区分只读请求、更宽权限下观察到的行为，以及宿主强制的隔离。
+- [x] 必要评审的发现会导致修正、主代理重新验证，以及对修订后交付物的新的独立验收，即使推理等级保持不变。复用 worker 会话并不免除评审的新鲜性。
+- [x] 不可用的必要评审、不受支持的设置、不一致的证据，或未解决的实质性发现，会使受影响的完成保持待定。主代理可以继续不受影响的独立工作，而不绕过必要的验收。
+- [x] 更新后的咨询模板保留安全的安装和选择性检查行为：重复安装是幂等的，冲突需要显式调和而不做部分变更，并且无关的代理和主代理设置得以保留。
+- [x] 咨询描述、请求与返回契约、操作指导、当前术语表、取代性的架构决定和公开说明，对最终的触发条件、推理等级和独立性要求一致。历史验收记录仍然是历史记录。
+- [x] 复用一份极小的交付物，配以受控指令，来检查普通完成、声明的高风险验收和显式评审。简短的咨询场景演练主动建议、被推翻的前提、可复用的建议、分歧，以及失败建议之后的 xhigh 资格，而不做真实的破坏性迁移。
+- [x] 通过小型原生调用和观察到的元数据验证咨询分配；现有夹具覆盖显式的 reviewer 选择、对旧的主代理下限的拒绝、错误身份和缺失证据。复用工单 03 的有效生命周期证据，并且不要求工单 02 增加的 Explorer。
+- [x] 记录期望的与观察到的分支、新鲜性证据、主代理检查、测试的修订与宿主，以及缺口。检查与已完成的兄弟工作的集成，并复用有效证据，只重跑受影响的检查。文档和验证在本工单内完成，而不是在一张单独的最终工单中完成。
+- [x] 这些是简单的路由和生命周期检查，不是关于一般评审准确性、质量、稳定性或节省的证据。使用一次性环境，保持正在使用的安装不变，并且不发布版本，也不做大规模的真实任务评估。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-12. Native calls covered proactive and required advice, reusable
-and invalidated premises, controlled failed-advice recovery, and medium/high/xhigh
-review allocations. A max primary received medium acceptance. Actual review findings
-led to primary correction, re-verification, and a different medium review thread.
-Public checks reject obsolete primary-floor selection. See [acceptance evidence](../acceptance.md)
-for native identities, permissions, exact outcomes, and limits.
+于 2026-09-12 完成。原生调用覆盖了主动的和必需的建议、可复用的和被推翻的前提、受控的失败建议恢复，以及 medium、high 和 xhigh 的评审分配。推理等级为 max 的主代理收到了 medium 验收。实际的评审发现导致了主代理修正、重新验证，以及另一条 medium 评审线程。公开检查拒绝过时的主代理下限选择。原生身份、权限、精确结果和限度见[验收证据](../acceptance.md)。

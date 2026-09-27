@@ -1,86 +1,50 @@
-# Tickets 01 and 02 acceptance
+# 工单 01 与 02 的验收
 
-Date: 2026-09-06. Implementation base: `37b75cad535abdd46531f0227483a8842d045ab8`.
-Scope: independent installation, Advisor mode, and ordinary Astra solo work.
-Tickets 03-06 remain outside this delivery.
+日期：2026-09-06。实现基础：`37b75cad535abdd46531f0227483a8842d045ab8`。
+范围：独立安装、Advisor 模式，以及普通的 Astra 单独工作。
+工单 03-06 仍在本次交付之外。
 
-## Deterministic verification
+## 确定性验证
 
-- `sh plugins/codex-advisor/scripts/verify.sh --installation`: passed.
-- `sh plugins/codex-advisor/scripts/verify.sh --runtime`: passed.
-- `sh plugins/codex-advisor/scripts/verify.sh`: passed after implementation.
-- Plugin schema validation and skill frontmatter validation: passed.
-- `git diff --check`: passed.
+- `sh plugins/codex-advisor/scripts/verify.sh --installation`：已通过。
+- `sh plugins/codex-advisor/scripts/verify.sh --runtime`：已通过。
+- `sh plugins/codex-advisor/scripts/verify.sh`：在实现之后已通过。
+- 插件模式验证和技能前言验证：已通过。
+- `git diff --check`：已通过。
 
-The installer tests observe exact bytes and directory state across clean and repeat
-installation, non-mutating all-role and selective checks, missing and unknown roles,
-modified files, symlinks, unsafe ancestors, directories, FIFOs, relative targets,
-CODEX_HOME targets, and root refusal. Existing upstream-role files, unrelated agents,
-and primary configuration are preserved. The fork currently ships only the Advisor;
-selective checks ignore unrelated conflicting files.
+安装器测试在干净安装和重复安装、不改动的全角色检查和选择性检查、缺失角色和未知角色、已修改文件、符号链接、不安全的上级路径、目录、FIFO、相对目标、CODEX_HOME 目标，以及对根目录的拒绝之间，观察精确字节和目录状态。既有的上游角色文件、无关代理和主代理配置予以保留。该分叉目前只交付 Advisor；选择性检查忽略无关的冲突文件。
 
-Runtime fixtures verify the exact Advisor role/model, adjustable effort, absent and
-conflicting settings, missing permissions, broader permissions, invalid and ambiguous
-records, and an output allowlist that excludes prompt and credential markers.
-The tests first failed on the missing fork identity and missing Advisor role before
-the corresponding implementation passed. JSON/TOML parsing and shell syntax are the
-applicable static checks; this repository has no typed application build.
+运行时夹具验证精确的 Advisor 角色和模型、可调整的推理等级、缺失的设置和冲突的设置、缺失的权限、更宽的权限、无效记录和含糊记录，以及一份把提示词标记和凭据标记排除在外的输出允许列表。这些测试首先因缺失的分叉身份和缺失的 Advisor 角色而失败，然后相应的实现才通过。JSON、TOML 解析和 shell 语法是适用的静态检查；本仓库没有带类型的应用程序构建。
 
-## Installed-host observations
+## 已安装宿主的观察
 
-Host: Codex CLI `0.153.4`. All installations and workflow runs used temporary
-CODEX_HOME directories and disposable workspaces. No active-environment installation
-was performed. Raw acceptance logs live under
-`/tmp/codex-advisor-acceptance.dft5rp7s`; initial discovery logs live under
-`/tmp/codex-advisor-live.pfb9shnp`. These are local, temporary evidence, not release
-assets. Credential copies are removed after verification.
+宿主：Codex CLI `0.153.4`。全部安装和工作流运行都使用了临时的 CODEX_HOME 目录和一次性工作区。没有对当前使用环境执行安装。原始验收日志位于 `/tmp/codex-advisor-acceptance.dft5rp7s`；初始发现日志位于 `/tmp/codex-advisor-live.pfb9shnp`。这些是本地的临时证据，不是发布资产。凭据副本在验证之后被移除。
 
-The role's model-only configuration follows the
-[official custom-agent precedence documentation](https://developers.openai.com/codex/subagents#custom-agents),
-fetched on the acceptance date: role-level effort overrides spawn effort, while a
-model-only role preserves the resolved spawn effort. The calls below verify that
-assumption on this host. Recheck it after a host upgrade or native-role format change.
+该角色的只指定模型的配置遵循[官方自定义代理优先级文档](https://developers.openai.com/codex/subagents#custom-agents)，于验收日期获取：角色级推理等级覆盖派发推理等级，而一个只指定模型的角色保留已解析的派发推理等级。下面的调用在这个宿主上验证该假设。在宿主升级或原生角色格式变更之后重新检查它。
 
-| Scenario | Observed result | Evidence |
+| 场景 | 观察到的结果 | 证据 |
 |---|---|---|
-| Independent plugin installation and discovery | Marketplace/plugin registration succeeded; fresh tasks exposed `codex-advisor:orchestration` and the fork's native types. The final package exposes `codex_advisor_astra_advisor` and passes selective checking. | Initial thread `01a074b0-f58b-7691-8a42-04b81214b6de`; final `plugin-list.json`, `sol-api.jsonl` |
-| Sol primary effort freedom and API boundary | Parent remained `gpt-5.6-sol` / `low`; fresh native consultation preceded the API decision and file creation. | Parent `01a074b6-35e1-7412-9585-51b841f8e9e7`; design Advisor `01a074b6-c4e1-7ba2-8cc1-854329c4324e` |
-| Explicit Advisor effort adjustment | Role selected `gpt-6-astra`; explicit `medium` took effect despite role defaults. Both design and readiness calls were observed at that effort. | Design above; readiness `01a074b8-ab76-7911-a40c-241f0fa05b77` |
-| Multi-step readiness | Parent implemented and verified the sum function, then obtained a distinct readiness consultation before completion. The final report distinguished consultation from independent review. | `sol-api.jsonl`; separate HTTP repeat in `sol-http.jsonl` |
-| Luna primary effort freedom and persistent failure | Parent remained `gpt-5.6-luna` / `low`. It reproduced two distinct ValueErrors, consulted Astra before a third approach, verified conversion to integer 1234, then obtained readiness advice. | Parent `01a074b7-a7be-7e33-aeb6-8905210ec75b`; Advisors `01a074b8-3ab8-7451-8ef4-96ed6a3c6af2` and `01a074b9-4fd1-7b53-bf4f-fa8371e16504`; `luna-failures.jsonl` |
-| Default Advisor effort | Both Luna consultations ran `gpt-6-astra` / `high`. | The two Advisor records above |
-| Ordinary Astra solo, unaccepted proposal | Astra / low wrote and verified exact `hello` bytes itself, with no delegation or Architect activation. | Parent `01a074b6-9ffb-7593-968a-9eec63819e26`; `astra-solo.jsonl` |
-| Unavailable required consultation | With native agents disabled, Luna paused before choosing architecture, designing a migration, or refactoring three files. All three input files retained exact original bytes. | Parent `01a074b9-2056-7f83-bcf6-cb20805c722e`; `unavailable.jsonl` |
-| Actual judgment permissions | Every observed Advisor had `workspace-write` / `managed` despite the role's read-only request. Scoped before/after state and activity showed behavioral read-only operation. Reports did not claim enforced isolation. | Narrow runtime inspector output and per-consultation hashes in the live logs |
-| Disagreement handling | A same-task user requirement admitted bool values. The parent explicitly explained why this superseded the previous Advisor's bool-rejection recommendation, implemented the change itself, verified 150 for the old example and 3 for the bool example, and requested new design and readiness advice. | `disagreement.jsonl`; design `01a074bc-e9f9-78e0-89ba-9be56f21fedf`; readiness `01a074be-4edc-7300-a2ce-0acb77c852ca` |
+| 独立的插件安装与发现 | 插件市场和插件注册成功；新任务暴露了 `codex-advisor:orchestration` 和该分叉的原生类型。最终包暴露 `codex_advisor_astra_advisor`，并通过选择性检查。 | 初始线程 `01a074b0-f58b-7691-8a42-04b81214b6de`；最终的 `plugin-list.json`、`sol-api.jsonl` |
+| Sol 主代理的推理等级自由与 API 边界 | 父级保持为 `gpt-5.6-sol` / `low`；在 API 决定和文件创建之前进行了新的原生咨询。 | 父级 `01a074b6-35e1-7412-9585-51b841f8e9e7`；设计 Advisor `01a074b6-c4e1-7ba2-8cc1-854329c4324e` |
+| 显式的 Advisor 推理等级调整 | 角色选定了 `gpt-6-astra`；显式的 `medium` 生效，尽管角色有默认值。设计调用和就绪调用都被观察到处于该推理等级。 | 设计见上；就绪 `01a074b8-ab76-7911-a40c-241f0fa05b77` |
+| 多步骤就绪 | 父级实现并验证了求和函数，然后在完成之前取得了一次不同的就绪咨询。最终报告把咨询与独立评审区分开。 | `sol-api.jsonl`；`sol-http.jsonl` 中另一次 HTTP 重复 |
+| Luna 主代理的推理等级自由与持续失败 | 父级保持为 `gpt-5.6-luna` / `low`。它复现了两个不同的 ValueErrors，在第三次方案之前咨询了 Astra，验证了转换为整数 1234，然后取得了就绪建议。 | 父级 `01a074b7-a7be-7e33-aeb6-8905210ec75b`；Advisor `01a074b8-3ab8-7451-8ef4-96ed6a3c6af2` 和 `01a074b9-4fd1-7b53-bf4f-fa8371e16504`；`luna-failures.jsonl` |
+| 默认的 Advisor 推理等级 | 两次 Luna 咨询都运行了 `gpt-6-astra` / `high`。 | 上面的两份 Advisor 记录 |
+| 普通的 Astra 单独工作，未被接受的提议 | Astra / low 自己写入并验证了精确的 `hello` 字节，没有委派，也没有激活 Architect。 | 父级 `01a074b6-9ffb-7593-968a-9eec63819e26`；`astra-solo.jsonl` |
+| 不可用的必需咨询 | 在原生代理被禁用时，Luna 在选择架构、设计一次迁移或重构三个文件之前暂停。全部三个输入文件都保留了精确的原始字节。 | 父级 `01a074b9-2056-7f83-bcf6-cb20805c722e`；`unavailable.jsonl` |
+| 实际的判断权限 | 每一个被观察到的 Advisor 都是 `workspace-write` / `managed`，尽管该角色请求只读。限定范围的之前与之后状态以及活动显示了行为上的只读操作。报告没有声称强制隔离。 | 窄运行时检查器的输出，以及实机日志中每次咨询的散列 |
+| 分歧处理 | 同一任务的一项用户要求允许 bool 值。父级明确解释了为什么这一点取代了先前 Advisor 拒绝 bool 的建议，自己实现了该变更，对旧示例验证了 150、对 bool 示例验证了 3，并请求了新的设计建议和就绪建议。 | `disagreement.jsonl`；设计 `01a074bc-e9f9-78e0-89ba-9be56f21fedf`；就绪 `01a074be-4edc-7300-a2ce-0acb77c852ca` |
 
-The first Sol run encountered WebSocket reconnects and eventually completed. A
-separate HTTP transport repeat also completed; no model substitution was used.
-Primary settings were independently checked in parent turn-context records. A
-child's prose described Sol generically and Luna's final report could not itself
-observe the parent effort; those claims were not used as routing evidence.
+第一次 Sol 运行遇到了 WebSocket 重新连接，并最终完成。另一次 HTTP 传输重复也完成了；没有使用模型替换。主代理设置在父级回合上下文记录中被独立检查。一名子级的散文笼统地描述了 Sol，并且 Luna 的最终报告本身无法观察父级推理等级；那些声称没有被用作路由证据。
 
-## Verification boundaries
+## 验证边界
 
-- Live calls establish routing for the exercised default `high` and adjusted
-  `medium` efforts, not all supported settings. Other accepted parser values are
-  fixture coverage only.
-- Missing or contradictory runtime records are covered deterministically. The live
-  failure scenario disables native invocation; it does not corrupt host records or
-  establish behavior during every possible provider outage.
-- Successful API and persistent-failure triggers were exercised live. Architecture,
-  migration, and three-file refactor triggers were exercised together on the
-  unavailable-call branch, not as separate successful migrations or refactors.
-- The host's broader permissions mean enforced read-only isolation was not verified.
-  Unchanged scoped files do not prove prevention of writes elsewhere.
-- No Architect implementation or independent final-review workflow is claimed.
+- 实机调用确立的是所演练的默认 `high` 和调整后的 `medium` 推理等级的路由，不是全部受支持的设置。其他已被接受的解析器值只有夹具覆盖。
+- 缺失的或相互矛盾的运行时记录由确定性检查覆盖。实机失败场景禁用原生调用；它不破坏宿主记录，也不确立每一次可能的提供方中断期间的行为。
+- 成功的 API 触发条件和持续失败触发条件已在实机上演练。架构、迁移和三文件重构触发条件是在不可用调用这一分支上一同演练的，而不是作为各自成功的迁移或重构。
+- 宿主更宽的权限意味着强制只读隔离未得到验证。未改变的限定范围文件并不能证明阻止了其他地方的写入。
+- 没有声称 Architect 实现或独立的最终评审工作流。
 
-## Review
+## 评审
 
-The code-review skill ran independent Standards and Spec agents against the staged
-diff from the implementation base. The pre-commit diff adapts its usual HEAD-based
-comparison to the implement skill's review-before-commit sequence.
-Standards found no required changes. Spec found one live-acceptance gap: the initial
-consultations had no disagreement. A same-task follow-up exercises a new explicit
-user constraint against the actual previous Advisor recommendation. Its observed
-decision and reasoning close that gap; both new calls again used Astra / medium.
+code-review 技能针对从实现基础起的暂存差异，运行了独立的标准轴代理和规格轴代理。提交前差异把该技能通常基于 HEAD 的比较，适配为实现技能的先评审后提交顺序。标准轴没有发现必需的变更。规格轴发现一个实机验收缺口：最初的咨询没有分歧。同一任务的一次后续演练，用一项新的显式用户约束对照实际的先前 Advisor 建议。观察到的决定和推理关闭了该缺口；两次新调用再次使用了 Astra / medium。

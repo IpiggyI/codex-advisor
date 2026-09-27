@@ -1,27 +1,25 @@
-# 01: Independent Installation and Safe Verification
+# 01：独立安装与安全验证
 
 Status: resolved
 
-Blocked by: None (can start immediately).
+Blocked by: 无（可以立即开始）。
 
-**What to build:** A user can install, discover, and check the Codex-only fork under the `codex-advisor` identity and its own native-agent namespace, without overwriting another installation or changing primary-session settings. This ticket establishes the installable delivery surface used by the later workflow tickets.
+**要构建的内容：** 用户可以在 `codex-advisor` 身份及其自己的原生代理命名空间下安装、发现并检查这个仅面向 Codex 的分叉，而不覆盖另一套安装，也不更改主代理会话设置。本工单确立后续工作流工单所使用的可安装交付面。
 
-- [x] The marketplace entry, plugin registration, invocation instructions, and native role namespace consistently identify the active fork as `codex-advisor`.
-- [x] A clean installation into a disposable target produces the expected native role definitions, and a fresh Codex task can discover the installed fork's supported entry points.
-- [x] Repeating installation is idempotent; a successful check reports the expected installed state without modifying it.
-- [x] Selective checks validate only the requested roles; an unrelated role conflict does not invalidate a valid selected-role check.
-- [x] Missing roles, unknown role requests, modified destinations, unsafe destinations, and conflicting files fail with a clear reason and no partial mutation.
-- [x] Existing `sol-advisor` installation files, unrelated agents, and global primary-session configuration remain unchanged.
-- [x] Active installation references use the fork identity; historical attribution is preserved where it is not an active workflow identifier.
-- [x] The existing verification entry point exercises installation, repeat installation, selective checking, and refusal behavior against disposable targets, using observed files and outcomes rather than documentation keywords alone.
-- [x] Installation instructions describe the actual discovery and checking process. The report distinguishes successful installation and discovery from live model routing, which later workflow tickets verify.
+- [x] 市场入口、插件注册、调用说明和原生角色命名空间一致地把当前分叉标识为 `codex-advisor`。
+- [x] 向一次性目标做一次干净安装会产出预期的原生角色定义，并且一个新的 Codex 任务能够发现已安装分叉所支持的入口。
+- [x] 重复安装是幂等的；一次成功的检查报告预期的已安装状态，且不修改该状态。
+- [x] 选择性检查只验证所请求的角色；一个无关的角色冲突不会使一次有效的选定角色检查失效。
+- [x] 缺失的角色、未知的角色请求、已修改的目标位置、不安全的目标位置和冲突文件会以明确原因失败，并且不发生部分改动。
+- [x] 既有的 `sol-advisor` 安装文件、无关代理和全局主代理会话配置保持不变。
+- [x] 当前使用中的安装引用使用该分叉身份；在历史归属说明不是当前工作流标识符的地方，历史归属说明予以保留。
+- [x] 既有的验证入口针对一次性目标演练安装、重复安装、选择性检查和拒绝行为，依据观察到的文件和结果，而不是仅依据文档关键词。
+- [x] 安装说明描述实际的发现过程和检查过程。报告把成功的安装和发现，与实机模型路由区分开；实机模型路由由后续工作流工单验证。
 
-## Verification
+## 验证
 
-Use the existing installer and checking interfaces with disposable targets and before/after state comparisons. Inspect structured plugin and role metadata. Run a fresh-host discovery check when available and explicitly identify any discovery result that could not be observed. This ticket does not install the fork into the user's active environment as a side effect of development.
+使用既有的安装器和检查接口，配合一次性目标以及之前与之后的状态比较。检视结构化的插件元数据和角色元数据。在可用时运行一次新宿主的发现检查，并明确指出任何未能观察到的发现结果。本工单不把该分叉安装进用户的当前使用环境，作为开发的副作用。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-06. Deterministic installation checks and fresh-host discovery
-passed in disposable targets. See [the acceptance record](../acceptance-01-02.md)
-for actual commands, host evidence, preservation checks, and verification limits.
+已于 2026-09-06 完成。确定性安装检查和新宿主发现在一次性目标中通过。实际命令、宿主证据、保留性检查和验证限制见[验收记录](../acceptance-01-02.md)。

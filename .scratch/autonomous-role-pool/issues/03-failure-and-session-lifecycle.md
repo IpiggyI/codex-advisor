@@ -1,33 +1,29 @@
-# 03: Failure Recovery and Fresh Sessions
+# 03：失败恢复与新会话
 
-**What to build:** After a complete failed worker attempt, the primary diagnoses the cause and chooses repair, clarification, rework, higher effort, or a more suitable executor. Any delegated effort change starts a fresh native session with the actual current task state. Same-model, same-effort worker correction can reuse its session. This recovery path builds on the autonomous worker execution delivered by ticket 01.
+**要构建：** 在一次完整的失败 worker 尝试之后，主代理诊断原因，并选择修复、澄清、返工、更高的推理等级，或更合适的执行者。任何委派的推理等级变更都以实际的当前任务状态开始一条新的原生会话。同模型、同推理等级的 worker 修正可以复用其会话。这条恢复路径建立在工单 01 交付的自主 worker 执行之上。
 
-**Blocked by:** 01 - Autonomous Implementation and Delegation.
+**Blocked by:** 01 - 自主实现与委派。
 
 **Status:** resolved
 
-- [x] A complete worker attempt includes implementation, ordinary debugging, and verification followed by failed acceptance or a concrete inability to complete the assigned objective. Intermediate failing tests and individual tool errors do not count as complete failed attempts.
-- [x] The primary distinguishes environment problems, missing facts, contract gaps, reasoning failures, and an unsuitable executor. Environment and contract failures first lead to repair or clarification rather than presumed model insufficiency.
-- [x] The primary chooses the response from the observed cause: unchanged-allocation rework, more effort, or stronger-worker takeover are options rather than a mandatory ladder. Eligibility for xhigh does not force its use.
-- [x] Relevant complete failure makes Astra worker xhigh eligible for that same work, including a takeover carrying its failure evidence. An unrelated task or role failure does not establish eligibility. Sol worker xhigh remains available initially, and Explorer does not gain an xhigh route.
-- [x] The handoff retains the failed objective, attempted allocation, observed checks and failure, diagnosis, and remaining work. The workflow establishes eligibility; the metadata inspector checks actual allocation without claiming to have inferred failure or authorization from private prompts.
-- [x] Every delegated effort change, upward or downward, starts a fresh native thread with explicit settings. This lifecycle rule applies to all roles; use the already available worker routes to verify it without requiring ticket 02's additional Explorers.
-- [x] Same-model, same-effort worker rework may reuse its thread. Model or role reassignment uses a fresh matching entry point, and independent acceptance always starts fresh even when its effort is unchanged.
-- [x] Compare actual predecessor and successor thread IDs and observed efforts. A follow-up or resume in the old thread cannot be reported as a fresh session, even if its prompt requests a different effort.
-- [x] Before reassignment, stop the previous conflicting writer, inspect actual scoped state, and preserve useful partial changes. The primary can take over directly in ordinary work; explicit Architect mode keeps implementation delegated.
-- [x] The new executor receives the objective, binding decisions, ownership, current changes, relevant task and source references, completed checks, failed-attempt evidence, and remaining verification. It need not reconstruct state from a copied full conversation.
-- [x] Corrections remain within user-authorized goals and constraints. The primary does not lower acceptance standards to declare recovery successful and verifies the actual combined result after rework or takeover.
-- [x] Unknown failure causes lead to a focused request for judgment before another unsupported attempt; ticket 04 supplies the complete revised advisory policy and advisory-failure eligibility. Independent unaffected work can continue.
-- [x] Missing or contradictory transition metadata, unsupported settings, or unavailable required execution leaves the affected result pending. No role self-report or silent substitution can establish a successful transition.
-- [x] Recovery contracts, native invocation guidance, affected role instructions, current architecture decisions, and public descriptions agree on the lifecycle. Fresh sessions are an explicit policy, not a claim about universal cache invalidation or guaranteed savings.
-- [x] Controlled evidence distinguishes an intermediate test failure from a complete failed attempt and exercises environment repair, contract clarification, unchanged rework, and eligible escalation. Use tiny tasks, not difficult real projects, to trigger the branches.
-- [x] Observe one unchanged-allocation worker correction and effort changes in both directions, with actual native thread IDs, selected settings, and a compact current-state handoff. Reuse these traces and existing metadata fixtures across checks rather than repeating calls.
-- [x] Record branch outcomes, actual thread transitions, tested revision and host, and unverified gaps. Run the relevant existing checks against the combined state, complete documentation in this ticket, and defer quality, stability, and savings judgments to later real-task experience.
+- [x] 一次完整的 worker 尝试包括实现、常规调试和验证，随后是验收失败，或确实无法完成被分配的目标。中间失败的测试和单次工具错误不算完整的失败尝试。
+- [x] 主代理区分环境问题、缺失事实、契约缺口、推理失败和不合适的执行者。环境失败和契约失败首先导致修复或澄清，而不是被假定为模型能力不足。
+- [x] 主代理根据观察到的原因选择响应：分配不变的返工、更高的推理等级，或由更强 worker 接管，这些是选项，而不是强制的阶梯。具备 xhigh 资格并不强制使用它。
+- [x] 相关的完整失败使 Astra worker 的 xhigh 对同一项工作具备资格，包括携带其失败证据的接管。无关的任务或角色失败不确立资格。Sol worker 的 xhigh 在初始时仍然可用，并且 Explorer 不获得 xhigh 路由。
+- [x] 交接保留失败的目标、尝试过的分配、观察到的检查与失败、诊断和剩余工作。工作流确立资格；元数据检查器检查实际分配，而不声称已从私有提示词推断出失败或授权。
+- [x] 每一次委派的推理等级变更，无论升高或降低，都以显式设置开始一条新的原生线程。这条生命周期规则适用于全部角色；使用已经可用的 worker 路由来验证它，而不要求工单 02 增加的 Explorer。
+- [x] 同模型、同推理等级的 worker 返工可以复用其线程。模型或角色改派使用一个新的、匹配的入口，并且独立验收始终重新开始，即使其推理等级不变。
+- [x] 比较实际的前驱与后继线程标识，以及观察到的推理等级。旧线程中的后续或恢复不能被报告为新会话，即使其提示词要求不同的推理等级。
+- [x] 在改派之前，停止先前冲突的写入者，检查实际的有范围状态，并保留有用的部分变更。主代理可以在普通工作中直接接管；明确的 Architect 模式仍把实现委派出去。
+- [x] 新的执行者收到目标、有约束力的决定、所有权、当前变更、相关的任务与来源引用、已完成的检查、失败尝试的证据和剩余验证。它不必从一份复制的完整对话中重建状态。
+- [x] 修正保持在用户授权的目标与约束之内。主代理不降低验收标准来宣布恢复成功，并在返工或接管之后验证实际的合并结果。
+- [x] 未知的失败原因会在另一次没有支持的尝试之前，导致一次聚焦的判断请求；工单 04 提供完整的修订后咨询策略，以及咨询失败的资格。不受影响的独立工作可以继续。
+- [x] 缺失或矛盾的转换元数据、不受支持的设置，或不可用的必要执行，会使受影响的结果保持待定。任何角色的自我报告或静默替换都不能确立一次成功的转换。
+- [x] 恢复契约、原生调用指导、受影响的角色指令、当前的架构决定和公开描述，对生命周期一致。新会话是一项显式策略，不是关于普遍缓存失效或保证节省的主张。
+- [x] 受控证据把中间的测试失败与一次完整的失败尝试区分开，并演练环境修复、契约澄清、不变的返工和符合资格的升级。用极小的任务触发这些分支，而不是用困难的真实项目。
+- [x] 观察一次分配不变的 worker 修正，以及两个方向上的推理等级变更，并带有实际的原生线程标识、选定的设置和一份紧凑的当前状态交接。在各项检查之间复用这些痕迹和现有的元数据夹具，而不是重复调用。
+- [x] 记录分支结果、实际的线程转换、测试的修订与宿主，以及未验证的缺口。针对合并状态运行相关的现有检查，在本工单内完成文档，并把质量、稳定性和节省的判断推迟到以后的真实任务经验。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-12. A controlled complete missing-prerequisite failure led to
-environment repair and same-thread medium correction. Medium-to-high and high-to-medium
-changes used different native threads with actual-state handoffs; an eligible xhigh
-call carried the relevant failure evidence. Short policy probes covered clarification,
-cause-based choices, and invalid transitions. See [acceptance evidence](../acceptance.md).
+于 2026-09-12 完成。一次受控的、完整的缺失前提失败，导致了环境修复和同一线程上的 medium 修正。从 medium 到 high，以及从 high 到 medium 的变更，使用了不同的原生线程和实际状态交接；一次符合资格的 xhigh 调用携带了相关的失败证据。简短的策略探查覆盖了澄清、基于原因的选择和无效转换。见[验收证据](../acceptance.md)。

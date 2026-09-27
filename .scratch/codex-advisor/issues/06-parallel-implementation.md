@@ -1,31 +1,26 @@
-# 06: Parallel Implementation with Explicit Ownership
+# 06：带有显式所有权的并行实现
 
 Status: resolved
 
-Blocked by: 03 - Authorized Architect Mode with Luna Implementation.
+Blocked by: 03 - 带有 Luna 实现的已授权 Architect 模式。
 
-**What to build:** An authorized Astra architect completes independent implementation tasks concurrently when their ownership does not conflict, while retaining scheduling, verification, and acceptance responsibility. Tasks that depend on each other or would conflict are sequenced instead.
+**要构建的内容：** 一名已授权的 Astra Architect 在所有权不冲突时并发完成相互独立的实现任务，同时保留调度、验证和验收责任。相互依赖或会发生冲突的任务则改为按顺序执行。
 
-- [x] The architect can dispatch at least two independent bounded implementation tasks concurrently when the host has sufficient capacity, each with a complete specification and explicit nonconflicting ownership.
-- [x] Tasks with dependencies or conflicting ownership are not treated as independent concurrent work. Limited host capacity results in sequencing rather than exceeding the limit or claiming nonexistent parallel execution.
-- [x] Implementation scheduling stays with the primary agent; Implementers do not create further implementation delegations.
-- [x] Parallel execution preserves user and peer edits, and each worker reports its own changes, checks, judgment calls, and gaps.
-- [x] Architect-mode Luna calls remain at observed `max`. The scheduling behavior preserves each selected role's model and effort contract rather than inheriting a different primary-session setting.
-- [x] The architect obtains every delegated report needed for the task, inspects all actual changes, and reruns key verification against the combined result before accepting completion.
-- [x] A failed, blocked, or incomplete worker prevents acceptance of its affected work and is reported explicitly; another worker's success is not treated as evidence that the whole task is complete.
-- [x] The scheduler preserves the independent-review obligations applicable to the combined deliverable instead of bypassing them because work ran concurrently.
-- [x] Installed-plugin scenarios exercise two independent Luna tasks, dependent tasks, conflicting ownership, constrained host capacity, and incomplete worker output, with actual task and verification evidence.
-- [x] This ticket can be verified with the Luna workflow from ticket 03 and does not require Sol support from ticket 05. It does not introduce a separate implementation model catalog or duplicate role-selection rules.
+- [x] 当宿主有足够容量时，Architect 可以并发派发至少两个相互独立的、范围受控的实现任务，每一项都带有完整规格和显式的、不冲突的所有权。
+- [x] 带有依赖或所有权冲突的任务不被当作相互独立的并发工作。有限的宿主容量导致按顺序执行，而不是超过该限制，或声称并不存在的并行执行。
+- [x] 实现调度留在主代理处；Implementer 不创建进一步的实现委派。
+- [x] 并行执行保留用户编辑和同行编辑，并且每一名 Worker 报告它自己的变更、检查、判断决定和缺口。
+- [x] Architect 模式中的 Luna 调用保持在观察到的 `max`。该调度行为保留每一个所选角色自己的模型和推理等级契约，而不是继承一个不同的主代理会话设置。
+- [x] Architect 取得该任务所需的每一份委派报告，检视全部实际变更，并在接受完成之前针对合并结果重新运行关键验证。
+- [x] 一名失败、受阻或不完整的 Worker 阻止对其受影响工作的验收，并且被显式报告；另一名 Worker 的成功不被当作整个任务已经完成的证据。
+- [x] 调度者保留适用于合并后交付物的独立评审义务，而不是因为工作并发运行就绕过这些义务。
+- [x] 已安装插件的场景演练两个相互独立的 Luna 任务、有依赖的任务、冲突的所有权、受限的宿主容量，以及不完整的 Worker 输出，并带有实际的任务证据和验证证据。
+- [x] 本工单可以用工单 03 的 Luna 工作流来验证，并且不需要工单 05 的 Sol 支持。它不引入单独的实现模型目录，也不复制角色选择规则。
 
-## Verification
+## 验证
 
-Use two bounded changes with disjoint ownership and a meaningful combined check in a disposable repository. Observe actual overlap when host capacity permits, and verify sequencing for dependencies or conflicts. Reuse the role and evidence interfaces from the authorized Architect-mode workflow; do not count a requested parallel dispatch as proof that concurrent execution occurred.
+在一个一次性仓库中使用两处范围受控的变更，它们的所有权互不相交，并带有一项有意义的合并检查。在宿主容量允许时观察实际重叠，并验证依赖或冲突时的按顺序执行。复用已授权 Architect 模式工作流中的角色接口和证据接口；不要把一次被请求的并行派发算作并发执行已经发生的证明。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-06. Installed scenarios confirm actual overlap between two
-native Luna max workers, sequencing for dependencies, shared ownership and a single
-worker slot, and pending whole-task acceptance when a worker reports incomplete
-verification. The architect inspected actual changes and reran combined checks;
-the requested independent review followed those checks on the combined result.
-See [the acceptance record](../acceptance-05-06.md) for evidence and limits.
+已于 2026-09-06 完成。已安装场景确认两名原生 Luna max Worker 之间的实际重叠，依赖情形的按顺序执行，共享所有权和单个 Worker 槽位，以及当一名 Worker 报告验证不完整时整个任务的验收保持待定。Architect 检视了实际变更并重新运行了合并检查；所请求的独立评审在这些检查之后针对合并结果进行。证据和限制见[验收记录](../acceptance-05-06.md)。

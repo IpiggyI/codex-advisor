@@ -1,32 +1,28 @@
-# 02: Tiered Read-Only Exploration
+# 02：分档的只读探索
 
-**What to build:** Any primary can select an appropriate read-only Explorer, obtain source-backed findings, and verify which model and effort actually ran. Light exploration uses Luna at high; standard and senior exploration usually use Luna at max, while direct Sol or Astra exploration is available when the task warrants it. Selection, native discovery, invocation, evidence, and a small route check are delivered together, without depending on worker orchestration.
+**要构建：** 任一主代理都可以选择合适的只读 Explorer，取得有来源依据的发现，并核实实际运行的模型与推理等级。light 探索使用推理等级为 high 的 Luna；standard 与 senior 探索通常使用推理等级为 max 的 Luna，而当任务需要时也可以直接使用 Sol 或 Astra 进行探索。选择、原生发现、调用、证据和一次小型路由检查一起交付，而不依赖 worker 编排。
 
-**Blocked by:** None (can start immediately).
+**Blocked by:** 无（可以立即开始）。
 
 **Status:** resolved
 
-- [x] Explorer remains a read-only evidence role available to any primary, without requiring Architect mode or a particular primary model. The plugin preserves the primary's selected model and effort.
-- [x] Light exploration uses Luna at high. Standard and senior exploration usually prefer Luna at max, with Sol at medium or high and Astra at medium or high also available.
-- [x] Luna is a preference, not a prerequisite. The primary may directly choose an authorized Sol or Astra Explorer based on complexity, judgment needs, or existing evidence without first attempting Luna or asking the user to approve each routine route.
-- [x] The primary respects explicit model exclusions, resource limits, and scope. It selects effort explicitly; focused questions with sufficient evidence can use medium where allowed, while alternatives or conflicting evidence can justify high.
-- [x] Retain the model-pinned Luna Explorer and add distinct model-pinned Sol and Astra Explorers with the same evidence contract. Adjustable Explorer templates honor the caller's effort; installation names are not separate capability tiers.
-- [x] Every Explorer receives a scoped question, source boundary, and expected evidence. It returns precise source locations, examined scope, supporting observations, explanations labeled where inferred, and unresolved gaps. A negative search result does not imply absence outside the examined scope.
-- [x] Explorers do not write, format, implement, or delegate. The primary retains design decisions and acceptance and may inspect the original source; exploration does not count as implementation or independent final review.
-- [x] Explorer calls start with fresh context and explicit settings. Any effort increase or decrease, model change, or role reassignment uses a new native thread; an effort-changing resume cannot satisfy this requirement.
-- [x] Full and selective installation checks discover the new entries while preserving existing identities. Repeated installation is idempotent; modified, conflicting, or unsafe destinations are refused before partial mutation. Unrelated agents and primary settings are preserved.
-- [x] Runtime checking recognizes every allowed Explorer allocation, distinguishes Explorers from workers using the same model, and rejects unlisted default allocations such as Explorer xhigh. It validates observed role, model, effort, thread, parent association, working directory, and permissions without exposing prompts or credentials.
-- [x] A missing role, unsupported setting, or absent, ambiguous, or conflicting evidence is reported explicitly. The primary may continue independent investigation but cannot silently substitute a call or certify an unobserved route.
-- [x] Requested read-only access is distinguished from actual host permissions. Check source evidence, tool activity, and scoped before/after state; broader permissions with no observed writes establish behavioral read-only operation, not enforced isolation.
-- [x] Explorer selection instructions, native descriptions, installation and invocation guidance, glossary, applicable architecture decisions, and public descriptions agree on the delivered routes. This slice works with the existing primary workflow even if ticket 01 has not been implemented.
-- [x] Reuse one tiny source lookup to check each advertised Explorer route, including direct Sol and Astra selection without a Luna attempt. Native metadata establishes actual dispatch; existing fixtures cover allocation validation, installation refusal, malformed evidence, and bounded diagnostics. Record any unexercised route.
-- [x] Keep a compact record of expected and observed routing, source citations, thread identity where relevant, permission limits, tested revision and host, and gaps. Integrate with completed sibling changes and rerun affected checks without deferring documentation or verification to another ticket.
-- [x] Verification remains a simple route check, not a model-quality, cost, or stability evaluation. Reuse calls and fixtures rather than testing every primary and transport combination, and keep the active user installation unchanged.
+- [x] Explorer 仍然是任一主代理都可使用的只读证据角色，不要求 Architect 模式，也不要求某个特定的主代理模型。插件保留主代理选定的模型与推理等级。
+- [x] light 探索使用推理等级为 high 的 Luna。standard 与 senior 探索通常偏好推理等级为 max 的 Luna，同时也可以使用推理等级为 medium 或 high 的 Sol，以及推理等级为 medium 或 high 的 Astra。
+- [x] Luna 是偏好，不是前提。主代理可以根据复杂度、判断需要或已有证据，直接选择一个已授权的 Sol 或 Astra Explorer，而不必先尝试 Luna，也不必请用户批准每一条例行路由。
+- [x] 主代理尊重显式的模型排除、资源限额和范围。它显式选择推理等级；有充分证据的聚焦问题可以在允许的情况下使用 medium，而替代方案或冲突的证据可以证明 high 合理。
+- [x] 保留模型已固定的 Luna Explorer，并增加模型已固定的、契约相同的 Sol Explorer 与 Astra Explorer。可调的 Explorer 模板遵从调用方的推理等级；安装名称不是单独的能力档位。
+- [x] 每个 Explorer 收到一个有范围的问题、来源边界和期望的证据。它返回精确的来源位置、已检查的范围、支持性观察、在属于推断处标明的解释，以及未解决的缺口。否定的搜索结果并不意味着已检查范围之外也不存在。
+- [x] Explorer 不写入、不格式化、不实现，也不委派。主代理保留设计决定和验收，并且可以检查原始来源；探索不算实现，也不算独立的最终评审。
+- [x] Explorer 调用以新的上下文和显式设置开始。推理等级的任何升高或降低、模型变更或角色改派都使用一条新的原生线程；改变推理等级的恢复不能满足这项要求。
+- [x] 完整的和选择性的安装检查都能发现新入口，同时保留现有身份。重复安装是幂等的；已修改、冲突或不安全的目标在部分变更之前被拒绝。无关的代理和主代理设置得以保留。
+- [x] 运行时检查识别每一种允许的 Explorer 分配，把 Explorer 与使用同一模型的 worker 区分开，并拒绝未列出的默认分配，例如 Explorer 的 xhigh。它验证观察到的角色、模型、推理等级、线程、父关联、工作目录和权限，而不暴露提示词或凭据。
+- [x] 缺失角色、不受支持的设置，或缺失、含糊或冲突的证据，都会被显式报告。主代理可以继续独立调查，但不能静默替换一次调用，也不能为一条未观察到的路由出具证明。
+- [x] 请求的只读访问与宿主的实际权限被区分开。检查来源证据、工具活动和有范围的前后状态；更宽的权限加上没有观察到的写入，确立的是行为上的只读运行，不是被强制的隔离。
+- [x] Explorer 选择指令、原生描述、安装与调用指导、术语表、适用的架构决定和公开描述，对已交付的路由一致。即使工单 01 尚未实现，这一片也能与现有的主代理工作流一起工作。
+- [x] 复用一次极小的来源查找来检查每一条对外说明的 Explorer 路由，包括不先尝试 Luna 就直接选择 Sol 和 Astra。原生元数据确立实际派发；现有夹具覆盖分配验证、安装拒绝、畸形证据和有界诊断。记录任何未演练的路由。
+- [x] 保留一份紧凑记录，写明期望的与观察到的路由、来源引用、相关处的线程身份、权限限度、测试的修订与宿主，以及缺口。与已完成的兄弟变更集成，并重跑受影响的检查，而不把文档或验证推迟到另一张工单。
+- [x] 验证仍然是一次简单的路由检查，不是对模型质量、成本或稳定性的评估。复用调用和夹具，而不是测试每一种主代理与传输方式的组合，并保持用户正在使用的安装不变。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-12. All six advertised Explorer allocations ran natively,
-including Sol before any Luna call. Each returned correct per-file evidence for
-the same source lookup. Installation, allocation refusal, actual metadata, and
-unchanged source checks passed. See [acceptance evidence](../acceptance.md), which
-distinguishes observed read-only behavior from unavailable hard isolation.
+于 2026-09-12 完成。全部六种对外说明的 Explorer 分配都在原生环境中运行，包括在任何 Luna 调用之前的 Sol。每一次都为同一次来源查找返回了正确的按文件证据。安装、分配拒绝、实际元数据和来源未改变的检查已通过。见[验收证据](../acceptance.md)，其中把观察到的只读行为与不可用的硬隔离区分开。

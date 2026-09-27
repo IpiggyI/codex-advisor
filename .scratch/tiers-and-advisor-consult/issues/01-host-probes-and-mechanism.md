@@ -1,88 +1,88 @@
-# 01: Host probes and the consultation mechanism decision
+# 01：宿主探测与咨询机制决定
 
-**What to build:** Evidence, recorded in `acceptance.md` §01, that settles every host fact the rest of the spec depends on, plus the consultation mechanism decision written into spec §Mechanism decision. No plugin, documentation, script, or test file changes in this ticket.
+**要构建的内容：** 记录在 `acceptance.md` §01 中的证据，它解决本规格其余部分所依赖的每一项宿主事实，加上写入规格 §Mechanism decision 的咨询机制决定。本工单不变更任何插件、文档、脚本或测试文件。
 
-**Blocked by:** None (can start immediately).
+**Blocked by:** None（可以立即开始）。
 
 **Status:** resolved
 
-## Required reading before starting
+## 开始前必读
 
-- `.scratch/tiers-and-advisor-consult/spec.md`: §Materials, §Authority and conflicts, TR-2, TR-3, AC-3, AC-4, AC-8, AC-9, AC-10, AC-11, AC-12, EN-5 (last bullet), X-1, X-2, §Mechanism decision, §Open Decisions (O4), §Stop and Return (S1–S6, S9), §Testing Decisions item 6, §Further Notes (assumptions).
-- `.scratch/tiers-and-advisor-consult/sources.md` §2.4 rows D17, D20, D29, D31, D33, D34, D41, D42, D43, D44, D45.
-- `plugins/codex-advisor/skills/orchestration/references/operations.md` §Install and discover (the temporary `CODEX_HOME` procedure) and §Invoke and validate (spawn shape, inspector usage).
-- `.scratch/tier-role-pool/acceptance.md` §Live route check (method and record shape to reuse).
-- `docs/adr/0004-tier-named-entries-first-round-pool.md` lines 29 and 47 (the precedence facts and their recheck trigger).
-- Codex documentation, re-read now and record the read date: Hooks <https://learn.chatgpt.com/docs/hooks>, App Server <https://learn.chatgpt.com/docs/app-server>, Subagents <https://learn.chatgpt.com/docs/agent-configuration/subagents>.
-- rpiv-advisor at commit `d74b1c99830a565f3df3f37e0a36616d17ffc574`: `advisor/execute.ts` and `advisor/context.ts`, for what "current effective context" means (post-compaction view, in-flight call stripped, user-role tail).
+- `.scratch/tiers-and-advisor-consult/spec.md`：§Materials、§Authority and conflicts、TR-2、TR-3、AC-3、AC-4、AC-8、AC-9、AC-10、AC-11、AC-12、EN-5（最后一条）、X-1、X-2、§Mechanism decision、§Open Decisions（O4）、§Stop and Return（S1–S6、S9）、§Testing Decisions 第 6 项、§Further Notes（各项假设）。
+- `.scratch/tiers-and-advisor-consult/sources.md` §2.4 行 D17、D20、D29、D31、D33、D34、D41、D42、D43、D44、D45。
+- `plugins/codex-advisor/skills/orchestration/references/operations.md` §Install and discover（临时 `CODEX_HOME` 规程）以及 §Invoke and validate（派发形态、检查器用法）。
+- `.scratch/tier-role-pool/acceptance.md` §Live route check（要复用的方法与记录形态）。
+- `docs/adr/0004-tier-named-entries-first-round-pool.md` 第 29 行与第 47 行（优先级事实及其重新检查触发条件）。
+- Codex 文档，现在重新阅读并记录阅读日期：Hooks <https://learn.chatgpt.com/docs/hooks>、App Server <https://learn.chatgpt.com/docs/app-server>、Subagents <https://learn.chatgpt.com/docs/agent-configuration/subagents>。
+- 处于提交 `d74b1c99830a565f3df3f37e0a36616d17ffc574` 的 rpiv-advisor：`advisor/execute.ts` 与 `advisor/context.ts`，用于 "current effective context" 的含义（压缩之后的视图、进行中的调用已被去掉、用户角色的尾部）。
 
-## Owns
+## 拥有
 
-- `acceptance.md` §01 (create the tables there).
-- The §Mechanism decision block of `spec.md`: fill the decision and set its status line. Change nothing else in the spec. If a finding contradicts another spec line, stop (S8).
-- Throwaway probe material lives in a temporary directory outside the repository and is deleted afterwards.
+- `acceptance.md` §01（在那里创建这些表）。
+- `spec.md` 的 §Mechanism decision 块：填写决定并设置它的状态行。不改变规格中的其他任何东西。如果一项发现与另一行规格矛盾，就停止（S8）。
+- 一次性探测材料位于仓库之外的一个临时目录中，并在之后删除。
 
-## Probes
+## 探测
 
-Run every probe in a temporary `CODEX_HOME` per X-2, with parents at the cheapest setting except where X-2 says otherwise. For every spawn, record the command shape, the thread IDs, the observed model and effort from `inspect-agent-runtime.sh` (generic mode is fine for probe entries), and the Codex version.
+按 X-2 在一个临时 `CODEX_HOME` 中运行每一次探测，父代理处于最便宜的设置，除非 X-2 另有说明。对每一次派发，记录命令形态、线程标识、来自 `inspect-agent-runtime.sh` 的观察到的模型与推理等级（对探测入口，通用模式即可），以及 Codex 版本。
 
-1. **P1 Host version.** Record `codex --version` and the date.
-2. **P2 Dial availability (TR-3, S1).** Run each distinct (model, effort) in TR-3 once and record the observed model and effort:
-   - `gpt-6-luna`: `high`, `xhigh`, `max`
-   - `gpt-6-sol`: `medium`, `high`, `xhigh`, `max`
-   - `gpt-6-astra`: `low`, `medium`, `high`, `xhigh`
+1. **P1 宿主版本。** 记录 `codex --version` 与日期。
+2. **P2 拨档可用性（TR-3、S1）。** 把 TR-3 中每一个不同的（模型、推理等级）各运行一次，并记录观察到的模型与推理等级：
+   - `gpt-6-luna`：`high`、`xhigh`、`max`
+   - `gpt-6-sol`：`medium`、`high`、`xhigh`、`max`
+   - `gpt-6-astra`：`low`、`medium`、`high`、`xhigh`
 
-   Use per-spawn overrides with `fork_turns` set to `"none"`, or temporary probe templates in the temporary home.
-3. **P3 Precedence on this version (S2).** Record three cases:
-   - A probe template that pins `model` and `model_reasoning_effort`, spawned with conflicting per-spawn values.
-   - A template that pins only `model`, spawned with a per-spawn effort.
-   - A full-history fork (`fork_turns` omitted or `"all"`) with per-spawn overrides, to see what it inherits.
-4. **P4 Consultation candidates (AC-3, S3, S4).** Test each configuration you try, and record every configuration you did not try as untested.
-   - **A:** native spawn with a positive-integer `fork_turns` (at least `"1"` and one larger value) and a pinned probe advisor template.
-   - **A':** App Server `thread/fork` (with and without `lastTurnId`), then `thread/resume` with a model override.
-   - **B:** an MCP tool that locates the calling session's record, rebuilds the context, and calls `codex exec` with the advisor dial and tools disabled.
+   使用把 `fork_turns` 设为 `"none"` 的每次派发覆盖，或临时主目录中的临时探测模板。
+3. **P3 本版本上的优先级（S2）。** 记录三种情形：
+   - 一份固定 `model` 与 `model_reasoning_effort` 的探测模板，以相互冲突的每次派发值来派发。
+   - 一份只固定 `model` 的模板，以每次派发的推理等级来派发。
+   - 一次完整历史分叉（`fork_turns` 被省略或为 `"all"`）带有每次派发覆盖，以查看它继承什么。
+4. **P4 咨询候选（AC-3、S3、S4）。** 测试你所尝试的每一种配置，并把每一种你没有尝试的配置记录为未测试。
+   - **A：** 带有正整数 `fork_turns`（至少 `"1"` 以及一个更大的值）的原生派发，以及一份被固定的探测 advisor 模板。
+   - **A'：** App Server 的 `thread/fork`（有与没有 `lastTurnId`），然后是带有模型覆盖的 `thread/resume`。
+   - **B：** 一个 MCP 工具，它定位调用会话的记录、重建上下文，并以该 advisor 拨档且工具被禁用的方式调用 `codex exec`。
 
-   Stay within D41: no configuration may read or send credentials itself. For each configuration, record:
-   - **(a) Nonce.** In one turn, a tool call prints a random value, then the consultation runs in the same turn; the advisor must repeat the value.
-   - **(b) Model and effort.** The actual model and effort equal the AC-4 dial.
-   - **(c) Compaction.** Force a compaction, add a message, and consult; the advisor must see both the summary and the later message.
-   - **(d) Tools.** The advisor has no tools. Show the actual tool set of the advisor request, as sent or as recorded by the host, and show that it is empty (D44). A refused tool attempt, one unavailable tool, or the advisor saying it has no tools does not count; read-only tools fail this check. If the host exposes no record of the tool set for a configuration, that configuration is unproven and not eligible.
-   - **(e) Callers.** The consultation can be called from the primary, from a spawned worker, and from a spawned explorer.
-   - **(f) Earliest context.** State a constraint in the first turn of a session, then add more uncompacted turns than any window the configuration uses, and consult. The advisor must report the constraint (D43). For a configuration with a bounded window, also record the rule that makes the window cover the whole current effective context in every session state, not only in this test.
-5. **P5 Hooks (AC-8, AC-9, AC-10, AC-11, AC-12, S5, S6).** Use a temporary plugin install that ships hooks, through the `plugin.json` `hooks` field or `hooks/hooks.json`, installed only by the X-2 route (a throwaway copy of the checkout is allowed for probe hooks, so that no repository file changes). Record:
-   - The trust state of every run: trusted by the user through `/hooks` in the temporary home, bypassed (only if the user decided O4 to allow it), or untrusted. A run without a recorded trust state is not evidence.
-   - Untrusted plugin hooks: with the plugin freshly installed and nothing trusted, the hooks are skipped and the host prints its `/hooks` warning. Record both.
-   - Plugin hooks load once trusted.
-   - `SessionStart` input fields; its `additionalContext` reaches the model in a new session and in a resumed session.
-   - Whether `SessionStart` also fires in subagent sessions (EN-5).
-   - `SubagentStart` input fields, and whether the child's model and effort are present.
-   - `SubagentStop` input fields; whether `{"decision": "block", "reason": …}` or exit code 2 makes the worker continue, and whether a loop-prevention signal exists.
-   - `PostToolUse` input for the spawn tool, and whether it sees `agent_type`, `reasoning_effort`, and the child thread ID.
-   - Whether `SessionEnd` exists for cleaning up per-session state.
+   停留在 D41 之内：任何配置都不得自行读取或发送凭据。对每一种配置，记录：
+   - **（a）随机数。** 在一轮之内，一次工具调用打印一个随机值，然后咨询在同一轮中运行；advisor 必须重复该值。
+   - **（b）模型与推理等级。** 实际的模型与推理等级等于 AC-4 拨档。
+   - **（c）压缩。** 强制一次压缩，增加一条消息，然后咨询；advisor 必须同时看到摘要与后面的消息。
+   - **（d）工具。** advisor 没有工具。展示 advisor 请求的实际工具集，按发送时或按宿主所记录的那样，并展示它是空的（D44）。一次被拒绝的工具尝试、一个不可用的工具，或 advisor 说它没有工具，都不算数；只读工具使这项检查失败。如果宿主对一种配置不暴露工具集的记录，该配置未经证明，并且没有资格。
+   - **（e）调用者。** 咨询可以从主代理、从被派发的 worker、从被派发的 explorer 调用。
+   - **（f）最早的上下文。** 在会话的第一轮陈述一条约束，然后增加比该配置所使用的任何窗口都多的、未被压缩的轮次，再咨询。advisor 必须报告该约束（D43）。对带有有界窗口的配置，还要记录使该窗口在每一种会话状态下都覆盖整个当前有效上下文的规则，而不仅是在这次测试中。
+5. **P5 钩子（AC-8、AC-9、AC-10、AC-11、AC-12、S5、S6）。** 使用一次交付钩子的临时插件安装，经由 `plugin.json` 的 `hooks` 字段或 `hooks/hooks.json`，只按 X-2 路线安装（允许用检出的一次性副本来做探测钩子，以便没有仓库文件改变）。记录：
+   - 每一次运行的信任状态：用户通过临时主目录中的 `/hooks` 予以信任、被绕过（仅当用户决定 O4 允许它时），或未受信任。一次没有记录信任状态的运行不是证据。
+   - 未受信任的插件钩子：插件刚安装且没有任何东西受信任时，钩子被跳过，宿主打印它的 `/hooks` 警告。两者都要记录。
+   - 插件钩子一旦受信任就会加载。
+   - `SessionStart` 的输入字段；它的 `additionalContext` 在新会话中以及在恢复的会话中到达模型。
+   - `SessionStart` 是否也在子代理会话中触发（EN-5）。
+   - `SubagentStart` 的输入字段，以及子代理的模型与推理等级是否在场。
+   - `SubagentStop` 的输入字段；`{"decision": "block", "reason": …}` 或退出码 2 是否使 worker 继续，以及是否存在防止循环的信号。
+   - 派发工具的 `PostToolUse` 输入，以及它是否看到 `agent_type`、`reasoning_effort` 与子线程标识。
+   - `SessionEnd` 是否存在，以便清理按会话的状态。
 
-   Rows that need trusted running hooks wait until the user decides O4 or trusts the hooks through `/hooks` in the temporary home. Such waiting rows do not block ticket 02, but they must be filled before ticket 05 starts. Never count an untrusted skip as S5 (spec AC-12).
-6. **Cleanup.** Delete the temporary home, the credential copies, workspaces, probe templates, and logs. Record that you did.
+   需要受信任且正在运行的钩子的那些行，等到用户决定 O4，或通过临时主目录中的 `/hooks` 信任这些钩子。这样的等待行不阻塞工单 02，但它们必须在工单 05 开始之前被填上。决不要把一次未受信任的跳过算作 S5（规格 AC-12）。
+6. **清理。** 删除临时主目录、凭据副本、工作区、探测模板以及日志。记录你已经这样做。
 
-## Acceptance
+## 验收
 
-- [x] `acceptance.md` §01 has P1–P5 tables. Every row has observed values and thread IDs, or is marked untested with a reason.
-- [x] Every S1–S6 and S9 condition is marked "not triggered" with the probe that shows it, or "triggered" with the evidence and a stop.
-- [x] If no stop triggered, the spec's §Mechanism decision names the selected configuration and its five-check and caller evidence, gives the reasons for choosing it among the eligible ones, and has its status line changed from "pending ticket 01" to the date and the word "decided".
-- [x] The documentation read dates are recorded next to the facts taken from each page.
-- [x] Compared with the state recorded at ticket start (`git status --short` output plus the SHA-256 of every file in the task directory), the only files this ticket changed are `acceptance.md` and `spec.md`, and `git diff --stat` for tracked files is empty. Files that were already untracked at the start stay as they were: do not commit, move, or delete them to satisfy this check (D45).
-- [x] The temporary home and credential copies are gone.
+- [x] `acceptance.md` §01 有 P1–P5 表。每一行都有观察到的值与线程标识，或者被标为未测试并附有理由。
+- [x] 每一个 S1–S6 与 S9 条件都被标为 "not triggered" 并附有表明它的探测，或者被标为 "triggered" 并附有证据与一次停止。
+- [x] 如果没有停止被触发，规格的 §Mechanism decision 点名所选配置及其五项检查与调用者证据，给出在有资格者当中选择它的理由，并且它的状态行已从 "pending ticket 01" 改为该日期以及 "decided" 这个词。
+- [x] 文档阅读日期被记录在从每一页取得的事实旁边。
+- [x] 与工单开始时所记录的状态相比（`git status --short` 的输出，加上任务目录中每一个文件的 SHA-256），本工单改变的仅有文件是 `acceptance.md` 与 `spec.md`，并且对已跟踪文件的 `git diff --stat` 为空。开始时已经未跟踪的文件保持原样：不要为了满足这项检查而提交、移动或删除它们（D45）。
+- [x] 临时主目录与凭据副本已经不在。
 
-## Stop conditions
+## 停止条件
 
-S1–S6 and S9 (spec §Stop and Return). On a stop, finish recording, leave §Mechanism decision as pending with the reason, and report to the user. Do not start ticket 02.
+S1–S6 与 S9（规格 §Stop and Return）。在一次停止上，完成记录，把 §Mechanism decision 留为待定并附上理由，并向用户报告。不要开始工单 02。
 
-## Not in this ticket
+## 不在本工单内
 
-Writing any runtime file, template, script, test, ADR, or README; the thirteen-entry route check (ticket 03).
+书写任何运行时文件、模板、脚本、测试、ADR 或 README；十三入口的路由检查（工单 03）。
 
-## Comments
+## 评论
 
-Resolved on 2026-09-26. The checked items record this ticket's acceptance
-checkpoint; later tickets extend the intermediate state where specified.
-See `../acceptance.md` section 01 for commands, evidence, authorized
-exceptions and the current result. Final delivery review is recorded separately.
+于 2026-09-26 解决。已勾选的条目记录本工单的验收
+检查点；后续工单在有规定的地方延伸中间状态。
+见 `../acceptance.md` 第 01 节，其中有命令、证据、已授权的
+例外以及当前结果。最终交付评审另行记录。

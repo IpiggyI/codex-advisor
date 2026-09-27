@@ -1,135 +1,135 @@
-# Codex Advisor: Astra Implementer and Default Implementation Routing
+# Codex Advisor：Astra Implementer 与默认实现路由
 
 Status: ready-for-agent
 
-## Problem Statement
+## 问题陈述
 
-Architect mode currently assigns bounded implementation to Luna and judgment-heavy, context-heavy, or higher-risk implementation to Sol. Users who prioritize completion quality while managing Codex subscription allowance cannot select a dedicated Astra Implementer through the plugin's supported installation, invocation, and runtime-verification contracts.
+Architect 模式目前把范围受控的实现分配给 Luna，把判断量大、上下文量大或较高风险的实现分配给 Sol。在管理 Codex 订阅额度的同时优先考虑完成质量的用户，不能通过该插件所支持的安装、调用和运行时验证契约，选择一名专用的 Astra Implementer。
 
-Sol's place in the default routing policy no longer matches the intended trade-off. Users want Luna for clearly specified work with little implementation judgment, Astra for work requiring more judgment or carrying higher risk, and Sol when explicitly requested. They also need a predictable Astra implementation effort that does not automatically inherit the stronger reasoning allocation of the primary architect.
+Sol 在默认路由策略中的位置不再符合预期的权衡。用户希望：对规格清楚、实现判断很少的工作使用 Luna；对需要更多判断或带有较高风险的工作使用 Astra；并在被显式请求时使用 Sol。他们还需要一个可预期的 Astra 实现推理等级，它不自动继承主 Architect 更强的推理分配。
 
-Adding a role alone would leave conflicting selection guidance, incomplete installation and evidence checks, and uncertainty about failure handling and independent review. The complete workflow must express the same responsibility and model-selection rules.
+仅仅增加一个角色，会留下相互冲突的选择指导、不完整的安装检查和证据检查，以及对失败处理和独立评审的不确定。完整的工作流必须表达同一套责任规则和模型选择规则。
 
-## Solution
+## 方案
 
-Add a dedicated Astra Implementer and make Luna and Astra the default implementation choices within authorized Architect mode. Luna uses `max` for bounded tasks with complete specifications, little implementation judgment, and clear acceptance checks. Astra defaults to `medium` for tasks requiring substantial implementation judgment or cross-module understanding, or carrying higher risk. The architect can select Astra directly without first attempting Luna.
+增加一名专用的 Astra Implementer，并使 Luna、Astra 成为已授权 Architect 模式之内的默认实现选择。Luna 对规格完整、实现判断很少并且验收检查清楚的范围受控任务使用 `max`。Astra 对需要大量实现判断或跨模块理解，或者带有较高风险的任务，默认使用 `medium`。Architect 可以直接选择 Astra，而不必先尝试 Luna。
 
-Keep the existing Sol Implementer, with its Sol model identity and default `high` effort, available only when explicitly selected by the user. Explicit supported user adjustments remain available for Astra and Sol. All implementers receive complete specifications; model selection does not transfer architecture or final acceptance to an implementer.
+保留既有的 Sol Implementer，其 Sol 模型身份和默认 `high` 推理等级仅在用户显式选择时可用。对 Astra、Sol，显式的、受支持的用户调整仍然可用。全部 Implementer 都收到完整规格；模型选择不把架构或最终验收转移给 Implementer。
 
-The architect diagnoses failed acceptance before deciding whether to clarify a specification, request a Luna correction, or reassign to Astra. No fixed failure count or automatic Sol fallback is introduced. The architect inspects all changes and reruns key verification. High-risk work and explicit review requests receive a fresh Astra Independent reviewer after those checks; choosing Astra for implementation alone does not require additional review.
+Architect 在决定是澄清规格、请求一次 Luna 修正，还是改派给 Astra 之前，先诊断失败的验收。不引入固定的失败次数或自动的 Sol 回退。Architect 检视全部变更并重新运行关键验证。高风险工作和显式的评审请求，在那些检查之后得到一名新的 Astra 独立 Reviewer；仅仅为了实现而选择 Astra，并不要求额外评审。
 
-## User Stories
+## 用户故事
 
-1. As an Architect-mode user, I want a dedicated Astra Implementer, so that I can delegate demanding implementation through a supported native role.
-2. As an Architect-mode user, I want bounded work with little implementation judgment assigned to Luna, so that routine implementation can conserve my Codex subscription allowance.
-3. As an Architect-mode user, I want work requiring substantial judgment or cross-module understanding assigned to Astra, so that the default executor matches the work's demands.
-4. As an Architect-mode user, I want higher-risk implementation assigned directly to Astra, so that risk influences model selection before implementation begins.
-5. As an Architect-mode user, I want direct Astra selection without an unsuccessful Luna attempt, so that unnecessary attempts do not consume time or allowance.
-6. As a user, I want Sol used only when I explicitly select it, so that the default routing policy has two clear choices.
-7. As a user explicitly selecting Sol, I want the existing Sol role to continue using Sol, so that its name and runtime identity remain reliable.
-8. As an Architect-mode user, I want Astra implementation to default to `medium`, so that delegated implementation has a predictable reasoning allocation.
-9. As a user, I want to explicitly choose another supported Astra implementation effort, so that I can adjust the allocation when needed.
-10. As an Architect-mode user, I want Luna implementation to remain at `max`, so that the established Luna configuration is preserved.
-11. As a user explicitly selecting Sol, I want `high` by default and supported explicit effort adjustments, so that the retained role remains controllable.
-12. As a user, I want implementation defaults to leave my primary model and effort under my control, so that delegated settings do not restrict my own session.
-13. As an Astra user, I want Architect mode to continue requiring explicit authorization, so that installing an Astra Implementer does not change ordinary solo work.
-14. As an Implementer, I want a complete objective, ownership boundary, interfaces, constraints, and verification requirements, so that my assigned work is actionable.
-15. As an Implementer, I want material specification gaps resolved by the architect before dependent edits, so that I do not invent requirements.
-16. As an Architect-mode user, I want implementation and corrections performed by implementers, so that the architect remains responsible for design and acceptance.
-17. As a user, I want implementers to preserve concurrent and unrelated changes, so that delegated work respects shared ownership.
-18. As an Architect-mode user, I want scheduling to remain with the architect, so that implementers do not create additional implementation delegations.
-19. As an Architect-mode user, I want failed Luna acceptance diagnosed before reassignment, so that a tool failure or missing requirement is not mistaken for insufficient model capability.
-20. As an Architect-mode user, I want the architect to choose clarification, Luna correction, or Astra reassignment without a fixed retry count, so that the response follows the cause of failure.
-21. As an Architect-mode user, I want a replacement implementer to receive the actual current state and remaining gaps, so that reassignment preserves useful work and avoids conflicting edits.
-22. As a user, I want unavailability, budget pressure, waiting time, and implementation failure to avoid automatic Sol substitution, so that my explicit model-selection boundary remains effective.
-23. As a user, I want actual role, model, effort, and permission evidence checked for every delegated call, so that requested settings are not mistaken for observed behavior.
-24. As a user, I want missing, invalid, or conflicting evidence to keep affected acceptance pending, so that incomplete verification does not become a success claim.
-25. As an Architect-mode user, I want the architect to inspect every actual change and rerun key checks, so that a worker report alone cannot establish completion.
-26. As an Architect-mode user, I want ordinary Astra implementation to finish after the architect's checks when no review trigger applies, so that selecting Astra does not automatically add another model call.
-27. As an Architect-mode user, I want high-risk implementation to receive a fresh Astra Independent reviewer after the architect's checks, so that required review examines the actual deliverable.
-28. As a user, I want an explicit independent-review request honored even for ordinary work, so that I can request additional scrutiny.
-29. As an Architect-mode user, I want review effort determined from the primary architect's effort, so that the implementer's `medium` default does not lower the review floor.
-30. As an Architect-mode user, I want corrections after required review to receive fresh review, so that acceptance applies to the revised deliverable.
-31. As a user, I want the companion installer to install and check the Astra role, so that the role can be discovered in a fresh Codex task.
-32. As a user, I want selective Astra checks through the existing installer interface, so that I can verify that role without unrelated role conflicts blocking the check.
-33. As a user, I want repeated installation and checks to preserve identical files, so that routine maintenance is predictable.
-34. As a user, I want modified or unsafe destinations refused without partial mutation, so that an upgrade cannot overwrite my local changes.
-35. As a user, I want unrelated agents, existing Sol identities, and primary-session configuration preserved, so that adding Astra does not repurpose my environment.
-36. As a user, I want installer success distinguished from discovery and actual runtime routing, so that each availability claim has the appropriate evidence.
-37. As a user, I want runtime diagnostics to expose only the routing evidence needed for verification, so that prompts and unrelated sensitive content do not leak into reports.
-38. As a user, I want installation instructions, role descriptions, routing guidance, and verification tools to agree, so that the new default behavior is discoverable and consistent.
-39. As a user, I want any claimed quality or allowance improvement supported by representative accepted work, so that an `Astra-high` benchmark is not presented as proof of `Astra-medium` behavior.
+1. 作为 Architect 模式的用户，我希望有一名专用的 Astra Implementer，以便我能通过一个受支持的原生角色委派要求高的实现。
+2. 作为 Architect 模式的用户，我希望把实现判断很少的范围受控工作分配给 Luna，以便常规实现可以节省我的 Codex 订阅额度。
+3. 作为 Architect 模式的用户，我希望把需要大量判断或跨模块理解的工作分配给 Astra，以便默认执行者与该工作的要求相匹配。
+4. 作为 Architect 模式的用户，我希望把较高风险的实现直接分配给 Astra，以便风险在实现开始之前影响模型选择。
+5. 作为 Architect 模式的用户，我希望直接选择 Astra，而不必先有一次不成功的 Luna 尝试，以便不必要的尝试不消耗时间或额度。
+6. 作为用户，我希望只在我显式选择 Sol 时才使用它，以便默认路由策略有两个清楚的选择。
+7. 作为显式选择 Sol 的用户，我希望既有的 Sol 角色继续使用 Sol，以便它的名称和运行时身份保持可靠。
+8. 作为 Architect 模式的用户，我希望 Astra 实现默认使用 `medium`，以便委派的实现有可预期的推理等级分配。
+9. 作为用户，我希望显式选择另一个受支持的 Astra 实现推理等级，以便我能在需要时调整该分配。
+10. 作为 Architect 模式的用户，我希望 Luna 实现保持在 `max`，以便已确立的 Luna 配置被保留。
+11. 作为显式选择 Sol 的用户，我希望默认使用 `high`，并有受支持的显式推理等级调整，以便被保留的角色仍然可控。
+12. 作为用户，我希望实现默认值使我的主代理模型和推理等级仍由我控制，以便委派的设置不限制我自己的会话。
+13. 作为 Astra 用户，我希望 Architect 模式继续要求显式授权，以便安装一名 Astra Implementer 不改变普通的单独工作。
+14. 作为 Implementer，我希望有完整的目标、所有权边界、接口、约束和验证要求，以便分配给我的工作可以执行。
+15. 作为 Implementer，我希望实质性规格缺口在依赖它们的编辑之前由 Architect 解决，以便我不编造要求。
+16. 作为 Architect 模式的用户，我希望实现和修正由 Implementer 完成，以便 Architect 对设计和验收保持负责。
+17. 作为用户，我希望 Implementer 保留并发的变更和无关的变更，以便委派的工作尊重共享所有权。
+18. 作为 Architect 模式的用户，我希望调度仍留在 Architect 处，以便 Implementer 不创建额外的实现委派。
+19. 作为 Architect 模式的用户，我希望失败的 Luna 验收在改派之前得到诊断，以便工具失败或缺失的要求不被误认为模型能力不足。
+20. 作为 Architect 模式的用户，我希望 Architect 在没有固定重试次数的情况下选择澄清、Luna 修正或改派给 Astra，以便响应遵循失败的原因。
+21. 作为 Architect 模式的用户，我希望替换的 Implementer 收到实际的当前状态和剩余缺口，以便改派保留有用的工作并避免冲突的编辑。
+22. 作为用户，我希望不可用、预算压力、等待时间和实现失败都避免自动的 Sol 替代，以便我显式的模型选择边界仍然有效。
+23. 作为用户，我希望每一次委派调用都检查实际的角色、模型、推理等级和权限证据，以便所请求的设置不被误认为观察到的行为。
+24. 作为用户，我希望缺失的、无效的或冲突的证据使受影响的验收保持待定，以便不完整的验证不会变成一项成功声称。
+25. 作为 Architect 模式的用户，我希望 Architect 检视每一处实际变更并重新运行关键检查，以便仅凭一份 Worker 报告不能确立完成。
+26. 作为 Architect 模式的用户，我希望在没有评审触发条件适用时，普通的 Astra 实现在 Architect 的检查之后结束，以便选择 Astra 不自动增加另一次模型调用。
+27. 作为 Architect 模式的用户，我希望高风险实现在 Architect 的检查之后得到一名新的 Astra 独立 Reviewer，以便必需的评审检查实际交付物。
+28. 作为用户，我希望显式的独立评审请求即使对普通工作也得到尊重，以便我能请求额外的审视。
+29. 作为 Architect 模式的用户，我希望评审推理等级由主代理 Architect 的推理等级确定，以便 Implementer 的 `medium` 默认值不降低评审下限。
+30. 作为 Architect 模式的用户，我希望必需评审之后的修正得到新的评审，以便验收适用于修订后的交付物。
+31. 作为用户，我希望配套安装器安装并检查 Astra 角色，以便该角色能在一个新的 Codex 任务中被发现。
+32. 作为用户，我希望通过既有的安装器接口做选择性的 Astra 检查，以便我能验证该角色，而不会有无关的角色冲突挡住这次检查。
+33. 作为用户，我希望重复的安装和检查保留相同的文件，以便常规维护是可预期的。
+34. 作为用户，我希望已修改的或不安全的目标位置在没有部分改动的情况下被拒绝，以便一次升级不能覆盖写入我的本地变更。
+35. 作为用户，我希望无关代理、既有的 Sol 身份和主代理会话配置被保留，以便增加 Astra 不把我的环境改作他用。
+36. 作为用户，我希望安装器成功与发现以及实际运行时路由被区分开，以便每一项可用性声称都有适当的证据。
+37. 作为用户，我希望运行时诊断只暴露验证所需的路由证据，以便提示词和无关的敏感内容不泄漏进报告。
+38. 作为用户，我希望安装说明、角色描述、路由指导和验证工具彼此一致，以便新的默认行为可以被发现并且是一致的。
+39. 作为用户，我希望任何被声称的质量改进或额度改进都由有代表性的、已被验收的工作支持，以便一次 `Astra-high` 基准测试不被呈现为 `Astra-medium` 行为的证明。
 
-## Implementation Decisions
+## 实现决定
 
-- Add the native role `codex_advisor_astra_implementer`, fixed to `gpt-6-astra`, with the existing Implementer responsibility and reporting contract. Keep `codex_advisor_sol_implementer` fixed to `gpt-5.6-sol`; do not rename it or repurpose it as an Astra alias.
-- Pin the Astra model while leaving the role template's reasoning effort unset, following the existing adjustable-role pattern. The architect explicitly passes `medium` unless the user specifies another effort supported by the current host and model. Verify the actual setting. Do not automatically inherit the primary effort or increase effort after failure. Luna remains fixed at `max`; Sol defaults to explicitly requested `high` unless adjusted by the user.
-- Update orchestration guidance and role descriptions together. Default selection is Luna for bounded, fully specified work with little implementation judgment and clear acceptance checks, or Astra for substantial judgment, cross-module understanding, or higher risk. Neither file count alone nor a prior Luna failure determines the selection. Sol selection requires an explicit user request.
-- Preserve Architect-mode eligibility and authorization: an Astra primary session plus explicit authorization, with the existing task and session scope rules. New role availability does not authorize Architect mode. Advisor-mode consultation rules, Explorer selection, and directly used primary-session settings remain governed by their existing contracts.
-- Apply the complete five-part implementation packet and structured completion report to Astra. Keep architecture, specification clarification, scheduling, and final acceptance with the architect. Implementers own their assigned edits and corrections and do not delegate implementation further.
-- When Luna fails acceptance, require the architect to distinguish implementation reasoning problems from specification gaps, environment failures, and ownership conflicts. The architect chooses the appropriate clarification, Luna correction, or Astra reassignment. Do not import the Advisor-mode two-failure consultation trigger as an implementation retry threshold.
-- For reassignment, use the existing scheduling and actual-state handoff process: end the previous conflicting work, obtain its report and actual changes, inspect the current state, and supply updated ownership and remaining verification to the next implementer. Do not discard partial changes automatically or treat an earlier report as proof that the current state passes.
-- Do not add automatic Sol fallback, an automatic failure counter, a budget router, or a provider retry executor. If the required role or effort is unavailable, or observed evidence is invalid, missing, or conflicting, report the reason and keep affected acceptance pending. Explicit Sol selection must still satisfy the usual specification, evidence, and review requirements.
-- Preserve actual-diff inspection and rerun verification by the architect for every implementer, including corrections and combined parallel results. Missing reports, skipped checks, unresolved conflicts, or incomplete work cannot be concealed by another worker's success.
-- Preserve independent-review triggers: high-risk work or an explicit user request. Ordinary Astra implementation alone is not a new trigger. Required review uses fresh context after the architect's own checks and continues through corrections until a fresh review covers the revised deliverable. Resolve the review default and floor from the primary architect's effort using the existing deterministic selector, independently of the implementer's effort.
-- Extend the existing companion installer, role-to-template mapping, and integrity checks with the Astra Implementer. Full installation and full checking include the new role alongside the five existing roles. Add `astra` to the existing repeatable `--check-role` interface; this option performs a non-mutating selective check. Retain preflight refusal, idempotence, and preservation of unrelated files and primary configuration.
-- Maintain the installer's existing refusal behavior when updated role text differs from an installed copy, including a Sol description updated to explain explicit selection. Document the required inspection and explicit reconciliation rather than promising automatic replacement or deleting installed roles.
-- Extend the existing runtime-inspection interface with `--astra-effort EFFORT`, mapped to `codex_advisor_astra_implementer` and `gpt-6-astra`. The caller supplies the resolved expected effort, normally `medium`. Validate the actual model, native role, effort, and applicable evidence. Successful inspection returns the existing metadata JSON fields; invalid input or evidence exits nonzero with a bounded diagnostic. Preserve selector exclusivity and existing output fields. Do not accept Advisor or Independent reviewer evidence as implementation evidence merely because those roles also use Astra.
-- Keep runtime inspection limited to routing metadata. The caller checks the expected parent-thread association and the user's explicit Sol selection; the inspector must not read prompt content to infer authorization. Parser acceptance of an effort string does not establish that the current host and model support it.
-- Keep role mapping, argument validation, runtime parsing, and verification statuses deterministic in the existing scripts. Task interpretation, risk assessment, and failure diagnosis remain model judgments in the orchestration instructions. Extend the current mechanisms without adding dependencies or a second orchestration engine.
-- Update the plugin's user-facing descriptions, installation and invocation guidance, role contracts, and operations guidance to describe the added role and the new defaults. Keep the accepted architecture decision and the implementation documentation consistent when implementation ships.
+- 增加原生角色 `codex_advisor_astra_implementer`，固定为 `gpt-6-astra`，并带有既有的 Implementer 责任和报告契约。保持 `codex_advisor_sol_implementer` 固定为 `gpt-5.6-sol`；不要重命名它，也不要把它改作 Astra 的别名。
+- 固定 Astra 模型，同时让角色模板的推理等级保持未设置，遵循既有的可调整角色模式。除非用户指定当前宿主和模型所支持的另一个推理等级，否则 Architect 显式传入 `medium`。验证实际设置。不要自动继承主代理推理等级，也不要在失败之后提高推理等级。Luna 保持固定在 `max`；除非用户调整，否则 Sol 默认使用被显式请求的 `high`。
+- 一起更新编排指导和角色描述。默认选择是：对范围受控、规格完整、实现判断很少并且验收检查清楚的工作使用 Luna，或者对大量判断、跨模块理解或较高风险使用 Astra。单独的文件数量和先前的 Luna 失败都不决定该选择。选择 Sol 需要一次显式的用户请求。
+- 保留 Architect 模式的资格和授权：一个 Astra 主代理会话加上显式授权，并带有既有的任务范围规则和会话范围规则。新角色的可用性并不授权 Architect 模式。Advisor 模式的咨询规则、Explorer 的选择，以及被直接使用的主代理会话设置，仍由它们既有的契约管辖。
+- 把完整的五部分实现数据包和结构化完成报告应用于 Astra。把架构、规格澄清、调度和最终验收留在 Architect 处。Implementer 拥有分配给它们的编辑和修正，并且不进一步委派实现。
+- 当 Luna 未通过验收时，要求 Architect 把实现推理问题与规格缺口、环境失败和所有权冲突区分开。Architect 选择适当的澄清、Luna 修正或 Astra 改派。不要把 Advisor 模式的两次失败咨询触发条件引进来，当作实现重试阈值。
+- 对于改派，使用既有的调度过程和实际状态交接过程：结束先前冲突的工作，取得它的报告和实际变更，检视当前状态，并把更新后的所有权和剩余验证提供给下一名 Implementer。不要自动丢弃部分变更，也不要把一份更早的报告当作当前状态已经通过的证明。
+- 不要增加自动的 Sol 回退、一个自动的失败计数器、一个预算路由器，或一个提供方重试执行器。如果必需的角色或推理等级不可用，或者观察到的证据无效、缺失或冲突，就报告原因，并使受影响的验收保持待定。显式的 Sol 选择仍必须满足通常的规格要求、证据要求和评审要求。
+- 对每一名 Implementer 保留由 Architect 做的实际差异检视和重新运行验证，包括修正和合并后的并行结果。缺失的报告、被跳过的检查、未解决的冲突或不完整的工作，不能被另一名 Worker 的成功掩盖。
+- 保留独立评审触发条件：高风险工作或一次显式的用户请求。单独的普通 Astra 实现不是一条新的触发条件。必需的评审在 Architect 自己的检查之后使用新上下文，并持续通过各项修正，直到一次新的评审覆盖修订后的交付物。使用既有的确定性选择器，从主代理 Architect 的推理等级解析评审默认值和评审下限，并且独立于 Implementer 的推理等级。
+- 用 Astra Implementer 扩展既有的配套安装器、角色到模板的映射和完整性检查。完整安装和完整检查把这个新角色与既有的五个角色放在一起纳入。把 `astra` 加入既有的、可重复的 `--check-role` 接口；该选项执行一次不改动的选择性检查。保留预检拒绝、幂等，以及对无关文件和主代理配置的保留。
+- 当更新后的角色文本与一份已安装副本不同时，保持安装器既有的拒绝行为，包括一份被更新为说明显式选择的 Sol 描述。记录所要求的检视和显式调和，而不是承诺自动替换或删除已安装角色。
+- 用 `--astra-effort EFFORT` 扩展既有的运行时检视接口，映射到 `codex_advisor_astra_implementer` 和 `gpt-6-astra`。调用方提供已解析的预期推理等级，通常为 `medium`。验证实际的模型、原生角色、推理等级和适用的证据。成功的检视返回既有的元数据 JSON 字段；无效的输入或证据以非零状态退出，并带有一条有界的诊断。保留选择器的排他性和既有的输出字段。不要仅仅因为 Advisor 或独立 Reviewer 也使用 Astra，就把它们的证据接受为实现证据。
+- 把运行时检视限制为路由元数据。调用方检查预期的父线程关联和用户显式的 Sol 选择；检查器不得读取提示词内容来推断授权。解析器接受一个推理等级字符串，并不能确立当前宿主和模型支持它。
+- 使角色映射、参数验证、运行时解析和验证状态在既有脚本中保持确定性。任务解释、风险评估和失败诊断仍是编排说明中的模型判断。扩展当前机制，而不增加依赖或第二套编排引擎。
+- 更新该插件面向用户的描述、安装和调用指导、角色契约和操作指导，以描述所增加的角色和新的默认值。在实现交付时，使已被接受的架构决定和实现文档保持一致。
 
-## Testing Decisions
+## 测试决定
 
-- Use the installed plugin's complete workflow in a disposable Codex workspace as the primary acceptance boundary. Observe native discovery, actual delegated calls, model and effort evidence, scoped file changes, the architect's independent checks, required review, and completion or pending status. Reuse this existing boundary rather than adding a new application or test framework.
-- Use the existing repository verification entry point and public installation and runtime-inspection interfaces for deterministic checks that do not require model calls. Prior art includes disposable installation targets, clean and repeated installation, selective checks, refusal before partial mutation, TOML parsing, synthetic runtime records, effort mismatch, missing evidence, invalid thread identifiers, and payload-leak checks.
-- Test external outcomes. Documentation-wording checks can establish consistency, but cannot establish routing, authorization, implementation quality, or independent review. A meaningful negative case must fail when the intended boundary is violated, such as a Sol role being accepted as Astra, `high` being observed when `medium` was requested, or completion being claimed without required review evidence.
-- Extend installer behavior tests for full installation, selective Astra and full checks, exact model identity, unset adjustable Astra effort, preservation of the existing Luna constraint and Sol identity, idempotence, modified or unsafe destinations, and unrelated configuration. A missing Astra role must fail selective checking without writing files, while an unrelated role conflict must not prevent a valid selective Astra check. Include an existing Sol installation whose changed description causes the documented refusal instead of silent overwrite.
-- Extend runtime fixtures for the Astra Implementer at requested `medium` and an explicit supported adjustment. Include wrong model, wrong role, requested-versus-observed effort mismatch, missing or conflicting evidence, and Astra Advisor or Independent reviewer records presented as implementation evidence. Missing effort arguments and conflicting role selectors must fail. Retain existing privacy and invalid-input coverage.
-- Exercise the live workflow scenarios below in a fresh host task after disposable installation. Actual calls must establish host behavior; fixtures establish only parser behavior. Record role, model, effort, permissions, owned changes, verification, and the architect's response. Unrun or inaccessible scenarios remain explicitly unverified.
+- 把已安装插件在一次性 Codex 工作区中的完整工作流，用作主要的验收边界。观察原生发现、实际的委派调用、模型和推理等级证据、限定范围的文件变更、Architect 的独立检查、必需的评审，以及完成状态或待定状态。复用这条既有边界，而不是增加一个新的应用程序或测试框架。
+- 对不需要模型调用的确定性检查，使用既有的仓库验证入口，以及公开的安装接口和运行时检视接口。既有做法包括一次性安装目标、干净安装和重复安装、选择性检查、在部分改动之前的拒绝、TOML 解析、合成的运行时记录、推理等级不匹配、缺失的证据、无效的线程标识，以及载荷泄漏检查。
+- 测试外部结果。文档用词检查可以确立一致性，但不能确立路由、授权、实现质量或独立评审。一个有意义的否定情形必须在预期边界被违反时失败，例如一个 Sol 角色被接受为 Astra，在请求了 `medium` 时观察到 `high`，或者在没有必需评审证据时声称完成。
+- 扩展安装器行为测试，覆盖完整安装、选择性的 Astra 检查和完整检查、精确的模型身份、未设置的可调整 Astra 推理等级、对既有 Luna 约束和 Sol 身份的保留、幂等、已修改的或不安全的目标位置，以及无关配置。一个缺失的 Astra 角色必须使选择性检查失败并且不写文件，而一个无关的角色冲突不得阻止一次有效的选择性 Astra 检查。纳入一套既有的 Sol 安装，其已改变的描述引起所记录的拒绝，而不是静默覆盖写入。
+- 扩展运行时夹具，覆盖所请求的 `medium` 上的 Astra Implementer，以及一次显式的受支持调整。纳入错误的模型、错误的角色、所请求的推理等级与观察到的推理等级不匹配、缺失的或冲突的证据，以及被当作实现证据呈现的 Astra Advisor 记录或独立 Reviewer 记录。缺失的推理等级参数和冲突的角色选择器必须失败。保留既有的隐私覆盖和无效输入覆盖。
+- 在一次性安装之后，于一个新的宿主任务中演练下面的实机工作流场景。实际调用必须确立宿主行为；夹具只确立解析器行为。记录角色、模型、推理等级、权限、所拥有的变更、验证，以及 Architect 的响应。未运行的或不可达的场景保持明确的未验证。
 
-| Scenario | Required observation |
+| 场景 | 必需的观察 |
 |---|---|
-| Fresh disposable install and host task | The Astra Implementer is discoverable alongside the existing roles; discovery is recorded separately from installer success |
-| Bounded, fully specified work with little implementation judgment | Luna performs the scoped edit at observed `max`; the architect inspects the actual change and reruns key verification |
-| Work requiring substantial implementation judgment, with no independent-review trigger | Astra is selected directly, performs the scoped edit at observed `medium`, and may complete after the architect's checks without an automatically added reviewer |
-| Astra primary uses a higher effort than `medium` | The Astra Implementer still observes `medium` by default; primary settings remain unchanged |
-| User explicitly requests a supported Astra implementation effort | The requested effort is observed and verified rather than defeated by the role template |
-| User explicitly selects Sol | The native Sol role and model are observed, with default `high` or the user's supported adjustment; ordinary acceptance obligations still apply |
-| Astra role unavailable and no explicit Sol selection | The affected work remains pending with a reason; no automatic Sol substitute or completion claim appears |
-| Astra invocation fails after role discovery and no explicit Sol selection | The affected work remains pending with an explicit failure report and no automatic Sol substitute; a missing-role test does not count as evidence for this distinct failure path |
-| Astra model or effort evidence is missing or conflicting | The architect rejects the evidence as insufficient and leaves affected acceptance pending |
-| Luna reports a material specification gap before dependent edits | The architect resolves the specification before dependent work; changing model does not substitute for that clarification |
-| Luna's failed check is caused by an environment fault | The architect addresses or reports the environment fault; the failure alone does not trigger a capability-based reassignment |
-| Luna's implementation fails acceptance because the work needs more implementation judgment | The architect may reassign to Astra with current-state evidence and updated ownership, without waiting for a fixed count; a documented cause-based choice to correct with Luna is also valid |
-| Worker reports completion while an intended acceptance condition still fails | The architect's independent check exposes the failure; the report alone cannot complete the work |
-| High-risk work implemented by Astra at `medium` | A fresh Astra Independent reviewer examines the actual changes after the architect's checks; review effort follows the primary-based default and floor |
-| User explicitly requests independent review of ordinary work | A fresh Independent reviewer is used after the architect's checks regardless of the implementation model |
-| Required review requests corrections | An Implementer makes the corrections, the architect rechecks them, and fresh review covers the revised deliverable before completion |
-| Required review fails or cannot be evidenced | The affected completion remains pending; prior consultation or a different implementation model does not satisfy the review requirement |
+| 新的一次性安装和宿主任务 | Astra Implementer 可以与既有角色一起被发现；发现与安装器成功分开记录 |
+| 范围受控、规格完整且实现判断很少的工作 | Luna 以观察到的 `max` 执行限定范围的编辑；Architect 检视实际变更并重新运行关键验证 |
+| 需要大量实现判断的工作，并且没有独立评审触发条件 | Astra 被直接选择，以观察到的 `medium` 执行限定范围的编辑，并且可以在 Architect 的检查之后完成，而没有自动增加的 Reviewer |
+| Astra 主代理使用高于 `medium` 的推理等级 | Astra Implementer 默认仍然观察到 `medium`；主代理设置保持不变 |
+| 用户显式请求一个受支持的 Astra 实现推理等级 | 所请求的推理等级被观察到并得到验证，而不是被角色模板抵消 |
+| 用户显式选择 Sol | 观察到原生 Sol 角色和模型，带有默认 `high` 或用户受支持的调整；普通的验收义务仍然适用 |
+| Astra 角色不可用，并且没有显式的 Sol 选择 | 受影响的工作连同原因保持待定；不出现自动的 Sol 替代或完成声称 |
+| Astra 调用在角色发现之后失败，并且没有显式的 Sol 选择 | 受影响的工作连同一份显式的失败报告保持待定，并且没有自动的 Sol 替代；一次缺失角色测试不算作这条不同失败路径的证据 |
+| Astra 的模型证据或推理等级证据缺失或冲突 | Architect 以证据不充分为由拒绝该证据，并使受影响的验收保持待定 |
+| Luna 在依赖它们的编辑之前报告一个实质性规格缺口 | Architect 在依赖该规格的工作之前解决该规格；更换模型不能代替那次澄清 |
+| Luna 失败的检查是由环境故障引起的 | Architect 处理或报告该环境故障；仅凭这次失败并不触发基于能力的改派 |
+| Luna 的实现未通过验收，是因为该工作需要更多实现判断 | Architect 可以带着当前状态证据和更新后的所有权改派给 Astra，而不必等待一个固定次数；一次有记录的、基于原因的选择，即仍用 Luna 修正，也同样有效 |
+| Worker 报告完成，而一项预期的验收条件仍然失败 | Architect 的独立检查暴露该失败；仅凭该报告不能完成该工作 |
+| 由 Astra 以 `medium` 实现的高风险工作 | 一名新的 Astra 独立 Reviewer 在 Architect 的检查之后检查实际变更；评审推理等级遵循基于主代理的默认值和下限 |
+| 用户显式请求对普通工作做独立评审 | 在 Architect 的检查之后使用一名新的独立 Reviewer，不论实现模型是什么 |
+| 必需的评审请求修正 | 一名 Implementer 做出修正，Architect 重新检查它们，并且新的评审在完成之前覆盖修订后的交付物 |
+| 必需的评审失败或不能被证明 | 受影响的完成保持待定；先前的咨询或一个不同的实现模型并不满足该评审要求 |
 
-- Retain focused coverage of existing authorization, primary-effort freedom, role ownership, and scheduling safeguards through the current suite. Do not rerun unrelated model workflows merely to increase the number of passing checks.
-- Separate functional acceptance from outcome claims. This feature does not require reproducing the supplied benchmark or proving that `medium` is optimal. Any later claim of better completion quality or lower subscription consumption must compare representative delegated work using actual acceptance results, correction work, and observable allowance consumption. If allowance attribution is unavailable, report that limitation rather than substituting API-dollar estimates.
+- 通过当前套件保留对既有授权、主代理推理等级自由、角色所有权和调度保障的聚焦覆盖。不要仅仅为了增加通过检查的数量而重新运行无关的模型工作流。
+- 把功能验收与结果声称分开。本功能不要求复现所提供的基准测试，也不要求证明 `medium` 是最优的。以后任何关于更好完成质量或更低订阅消耗的声称，都必须用实际验收结果、修正工作和可观察的额度消耗，来比较有代表性的委派工作。如果额度归因不可用，就报告该限制，而不是用 API 美元估算来代替。
 
-## Out of Scope
+## 范围之外
 
-- Implementing or installing the plugin as part of publishing this specification.
-- Removing or renaming the Sol Implementer, or changing its model identity to Astra.
-- A model-neutral implementer whose backend silently switches between Astra and Sol.
-- Automatic Sol fallback for outages, failures, budget pressure, or latency.
-- Fixed retry counts, automatic reasoning-effort escalation, quota-based routing, a new retry executor, or an automatic model-selection benchmark system.
-- Lowering Luna implementation below `max`, automatically inheriting the primary's effort for Astra implementation, or changing the existing review-effort floor.
-- Changing Architect-mode authorization, Advisor-mode consultation, Explorer routing, or primary-session model configuration.
-- Making every Astra implementation require independent review, or treating Advisor consultation as independent final review.
-- Allowing Implementers to own architecture, final acceptance, or further implementation delegation.
-- Adding other hosts, provider routes, models, dependencies, or unrelated refactors.
-- Automatically overwriting modified installed roles, deleting installations, changing global configuration, or committing, pushing, or deploying this work.
-- A benchmark suite, a subscription-usage dashboard, or a guarantee of improved quality or lower allowance consumption.
+- 把实现或安装该插件作为发布本规格的一部分。
+- 移除或重命名 Sol Implementer，或把它的模型身份改为 Astra。
+- 一个模型中立的 Implementer，其后端在 Astra 与 Sol 之间静默切换。
+- 针对中断、失败、预算压力或延迟的自动 Sol 回退。
+- 固定的重试次数、自动的推理等级升级、基于配额的路由、一个新的重试执行器，或一个自动的模型选择基准测试系统。
+- 把 Luna 实现降到 `max` 以下、让 Astra 实现自动继承主代理的推理等级，或改变既有的评审推理等级下限。
+- 改变 Architect 模式的授权、Advisor 模式的咨询、Explorer 路由，或主代理会话的模型配置。
+- 使每一次 Astra 实现都要求独立评审，或把 Advisor 咨询当作独立的最终评审。
+- 允许 Implementer 拥有架构、最终验收或进一步的实现委派。
+- 增加其他宿主、提供方路由、模型、依赖，或无关的重构。
+- 自动覆盖写入已修改的已安装角色、删除安装、改变全局配置，或提交、推送或部署这项工作。
+- 一套基准测试、一个订阅使用情况仪表板，或对质量改进或额度消耗降低的保证。
 
-## Further Notes
+## 补充说明
 
-This feature implements [ADR-0002](../../docs/adr/0002-luna-astra-implementation-routing.md), which supersedes the implementation-routing and implementation-effort portions of [ADR-0001](../../docs/adr/0001-codex-native-dual-mode-orchestration.md). The project's existing Architect mode, Advisor mode, Implementer, and Independent reviewer definitions apply.
+本功能实现 [ADR-0002](../../docs/adr/0002-luna-astra-implementation-routing.md)，后者取代 [ADR-0001](../../docs/adr/0001-codex-native-dual-mode-orchestration.md) 中关于实现路由和实现推理等级的部分。本项目既有的 Architect 模式、Advisor 模式、Implementer 和独立 Reviewer 定义适用。
 
-The user-supplied DeepSWE observations and their verification limits are recorded in ADR-0002. Astra was evaluated at `high`; the chosen implementation default is `medium`. A supported setting is not evidence that its quality or allowance use has already been validated in this workflow.
+用户提供的 DeepSWE 观察及其验证限制记录在 ADR-0002 中。Astra 是在 `high` 上被评估的；所选的实现默认值是 `medium`。一个受支持的设置并不是它的质量或额度使用已经在这个工作流中得到验证的证据。
 
-This specification defines the implementation target; it does not establish installed availability, live routing, or completed acceptance. Implementation work must preserve the distinction between deterministic checks, observed host behavior, and unverified outcome assumptions.
+本规格定义实现目标；它并不确立已安装的可用性、实机路由或已完成的验收。实现工作必须保留确定性检查、观察到的宿主行为，以及未验证的结果假设之间的区别。

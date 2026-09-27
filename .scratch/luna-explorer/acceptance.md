@@ -1,89 +1,42 @@
-# Luna Explorer acceptance
+# Luna Explorer 验收
 
-Date: 2026-09-07. Implementation base: `113d5919b9c257060fbc43d869bed226a6e7c54b`.
-Scope: native Explorer availability, caller-selected effort, skill default selection,
-installation, and runtime evidence validation.
+日期：2026-09-07。实现基础：`113d5919b9c257060fbc43d869bed226a6e7c54b`。
+范围：原生 Explorer 的可用性、由调用方选择的推理等级、技能的默认选择、安装，以及运行时证据验证。
 
-## Deterministic verification
+## 确定性验证
 
-The installation test first failed because the expected Explorer template was absent.
-It passed after adding the role and installer support. The runtime test then failed
-because `--explorer-effort` was unknown, and passed after adding the inspector option.
-Both changes were tested through the existing public script interfaces.
+安装测试首先失败，原因是预期的 Explorer 模板不存在。在加入该角色和安装器支持之后，它通过了。运行时测试随后失败，原因是 `--explorer-effort` 未知，并在加入检查器选项之后通过。两项变更都通过既有的公开脚本接口得到测试。
 
-The complete `sh plugins/codex-advisor/scripts/verify.sh` suite passed. It covers
-all five role templates, installation and selective checks, refusal before partial
-writes, preservation, expected model and effort, missing or conflicting permissions,
-and restricted diagnostic output. Existing Luna Implementer max checks remain passing.
-Plugin validation, skill validation, and whitespace checks passed. Shell syntax and
-JSON/TOML parsing are the applicable static checks; this project has no typed application.
+完整的 `sh plugins/codex-advisor/scripts/verify.sh` 套件已通过。它覆盖全部五个角色模板、安装和选择性检查、在部分写入之前的拒绝、保留、预期的模型和推理等级、缺失的或冲突的权限，以及受限制的诊断输出。既有的 Luna Implementer max 检查仍然通过。插件验证、技能验证和空白检查已通过。Shell 语法和 JSON、TOML 解析是适用的静态检查；本项目没有带类型的应用程序。
 
-## Live verification
+## 实机验证
 
-Codex CLI `0.153.4` ran in temporary installed homes and disposable workspaces under
-`/tmp/codex-advisor-explorer.nPfxol`. Each home used the public marketplace/plugin
-installation commands and companion role installer before new tasks. The user's
-active installation and primary configuration were not changed. Temporary authentication
-copies were removed after the calls. Scenario prompts, events, final responses,
-workspace hashes, native rollouts, and projected observations remain under that root.
+Codex CLI `0.153.4` 在临时的已安装主目录和一次性工作区中运行，位于 `/tmp/codex-advisor-explorer.nPfxol` 之下。每个主目录都在新任务之前使用了公开的插件市场和插件安装命令，以及配套角色安装器。用户当前使用中的安装和主代理配置未被改变。临时认证副本在这些调用之后被移除。场景提示词、事件、最终响应、工作区散列、原生会话记录和投影后的观察仍位于该根目录之下。
 
-The fixture contains three source files. `api.preview` delegates to `receipt_total`,
-which computes `taxable_total(amount) + fee`; `taxable_total` multiplies by `1.2`.
-The independent expected answer is that the fee is not taxed and inputs `10, 3`
-produce `15`. Source locations and reported tool activity were inspected directly.
+该夹具包含三个源文件。`api.preview` 委派给 `receipt_total`，后者计算 `taxable_total(amount) + fee`；`taxable_total` 乘以 `1.2`。独立的预期答案是费用不被计税，并且输入 `10, 3` 产出 `15`。源位置和所报告的工具活动被直接检视。
 
-| Scenario | Observed result | Primary / child thread |
+| 场景 | 观察到的结果 | 主代理 / 子线程 |
 |---|---|---|
-| Astra outside skill, explicit medium | Native Luna Explorer at medium; fresh context; correct source explanation; no scoped mutations. | `01a07b33-06fc-77c0-9582-ae6b4050a47b` / `01a07b33-2a64-7452-9dff-a1e68901195d` |
-| Sol outside skill, description-based selection | Sol selected the native Luna Explorer at low with fresh context. Final citation-check run returned correct per-file references and no scoped mutations. | `01a07b3a-00a2-7112-9441-4f05ba878869` / `01a07b3a-2b0f-7213-bbf2-975bc932574e` |
-| Sol applying orchestration, default exploration selection | Skill selected the native Luna Explorer at medium; exact inspector validation passed; correct source explanation; no scoped mutations. | `01a07b35-dfba-7410-80b9-252e1c8d0d34` / `01a07b36-657e-7c31-b9f5-942c445fae38` |
-| Luna outside skill, explicit native role | Luna primary called the native Luna Explorer at medium with fresh context; correct source references and result; no scoped mutations. | `01a07b38-3791-79a1-a11c-e92601699d25` / `01a07b38-69dd-7670-ae16-1bde79703297` |
-| Explorer missing from isolated installation | Sol observed the missing selective role check, investigated directly, and returned the correct result. No child or expensive substitute was launched; no scoped mutations. | `01a07b38-b3bb-76f3-90f5-10ff698397ad` / none |
+| 技能之外的 Astra，显式 medium | 推理等级为 medium 的原生 Luna Explorer；新上下文；正确的源说明；没有限定范围的改动。 | `01a07b33-06fc-77c0-9582-ae6b4050a47b` / `01a07b33-2a64-7452-9dff-a1e68901195d` |
+| 技能之外的 Sol，基于描述的选择 | Sol 选择了推理等级为 low 的原生 Luna Explorer，并带有新上下文。最终的引用检查运行返回了正确的按文件引用，并且没有限定范围的改动。 | `01a07b3a-00a2-7112-9441-4f05ba878869` / `01a07b3a-2b0f-7213-bbf2-975bc932574e` |
+| Sol 应用编排，默认的探索选择 | 技能选择了推理等级为 medium 的原生 Luna Explorer；精确的检查器验证通过；正确的源说明；没有限定范围的改动。 | `01a07b35-dfba-7410-80b9-252e1c8d0d34` / `01a07b36-657e-7c31-b9f5-942c445fae38` |
+| 技能之外的 Luna，显式的原生角色 | Luna 主代理以新上下文调用了推理等级为 medium 的原生 Luna Explorer；正确的源引用和结果；没有限定范围的改动。 | `01a07b38-3791-79a1-a11c-e92601699d25` / `01a07b38-69dd-7670-ae16-1bde79703297` |
+| 隔离安装中缺少 Explorer | Sol 观察到缺失的选择性角色检查，直接做了调查，并返回了正确结果。没有启动子级或昂贵的替代；没有限定范围的改动。 | `01a07b38-b3bb-76f3-90f5-10ff698397ad` / 无 |
 
-For every successful native-role scenario above, the narrow inspector passed for
-the exact child UUID, `codex_advisor_luna_explorer`, `gpt-5.6-luna`, and requested
-effort. Parent linkage and fresh-context spawn arguments were inspected separately.
-Parent sessions retained their selected model and low effort. Child activity used
-source reads and, in some cases, bytecode-disabled fixture evaluation; no child
-delegated further. Actual permissions were `workspace-write` / `managed`, despite
-the template's read-only request. These checks establish observed read-only behavior
-within the fixture, not enforced isolation.
+对上面每一个成功的原生角色场景，窄检查器都针对精确的子级 UUID、`codex_advisor_luna_explorer`、`gpt-5.6-luna` 和所请求的推理等级通过了。父级关联和新上下文派发参数被分开检视。父级会话保留了它们所选的模型和 low 推理等级。子级活动使用了源读取，并且在某些情况下使用了禁用字节码的夹具求值；没有任何子级进一步委派。实际权限是 `workspace-write` / `managed`，尽管模板请求只读。这些检查确立的是在该夹具内观察到的只读行为，不是强制隔离。
 
-The final role differs from the earlier medium-call template only in more explicit
-fresh-context discovery wording and per-file citation validation. The final template
-was reinstalled and the affected low-effort selection/citation scenario rerun. Existing
-medium-call evidence establishes the unchanged model and effort configuration.
+最终角色与更早的 medium 调用模板的差别，只在于更明确的新上下文发现用词，以及按文件的引用验证。最终模板已被重新安装，并且受影响的低推理等级选择和引用场景已被重新运行。既有的 medium 调用证据确立未改变的模型和推理等级配置。
 
-## Evidence limits
+## 证据限制
 
-- An initial Sol call selected the new role but used full-history inheritance. Its
-  rollout included parent metadata, and the inspector correctly refused certification.
-  The role description now gives the exact fresh-context argument; subsequent Sol
-  calls used it and passed. No parser relaxation was introduced.
-- One earlier low-effort report used cumulative line numbers from a multi-file read.
-  The role now explicitly checks citations against each individual file. The final
-  low-effort report matched the fixture. This is a sampled quality check, not a
-  guarantee that every future model response contains accurate citations.
-- In an unrestricted role-selection scenario, a Luna primary chose the built-in
-  `explorer` instead of the plugin role. That built-in call created bytecode caches
-  and is not counted as plugin read-only acceptance. The explicit plugin-role case
-  passed. Outside-skill selection is optional, not a deterministic global default.
-- Some outside-skill parents reported the canonical task path instead of the UUID;
-  authoritative native records supplied the UUIDs above. Parent prose alone was not
-  used as model or permission evidence.
-- The missing-role scenario does not test a provider outage. Astra, Sol, and Luna
-  are representative callers; other host-supported primaries and all possible prompts
-  were not exhaustively exercised. No primary-model whitelist exists in the role.
-- Low and medium were observed live. Other inspector-recognized effort strings have
-  parser coverage only; they are not asserted to be supported by Luna or the account.
-- No quantified quota savings, global routing guarantee, or hard read-only isolation
-  claim is made. Recheck discovery, override behavior, and permission handling after
-  a host upgrade.
+- 一次初始的 Sol 调用选择了新角色，但使用了完整历史继承。它的会话记录包含父级元数据，并且检查器正确地拒绝了认证。该角色描述现在给出精确的新上下文参数；随后的 Sol 调用使用了它并通过。没有引入放宽解析器。
+- 一份更早的低推理等级报告使用了一次多文件读取中的累计行号。该角色现在显式地对照每一个单独文件检查引用。最终的低推理等级报告与该夹具相符。这是一次抽样的质量检查，不是对未来每一次模型响应都包含准确引用的保证。
+- 在一个不受限制的角色选择场景中，一个 Luna 主代理选择了内置的 `explorer`，而不是该插件角色。那次内置调用创建了字节码缓存，并且不被算作该插件的只读验收。显式的插件角色情形已通过。技能之外的选择是可选的，不是一个确定性的全局默认。
+- 某些技能之外的父级报告了规范的任务路径，而不是 UUID；权威的原生记录提供了上面的 UUID。父级散文单独没有被用作模型证据或权限证据。
+- 缺失角色场景并不测试提供方中断。Astra、Sol、Luna 是有代表性的调用方；其他宿主所支持的主代理以及全部可能的提示词没有被穷尽演练。该角色中不存在主代理模型白名单。
+- low、medium 已在实机上观察到。其他检查器所识别的推理等级字符串只有解析器覆盖；它们不被断言为 Luna 或该账户所支持。
+- 没有提出量化的配额节省、全局路由保证或硬性只读隔离声称。在宿主升级之后，重新检查发现、覆盖行为和权限处理。
 
-## Review
+## 评审
 
-Independent Standards and Spec reviews inspected the staged changes against the
-implementation base and reported zero findings in each axis. Final review includes
-the citation instruction and this acceptance record. The feature specification,
-existing glossary, and amended architecture decision accompany the implementation;
-unrelated untracked planning and instruction files remain outside the commit.
+独立的标准轴评审和规格轴评审对照实现基础检视了暂存变更，并在每一条轴上报告了零个发现。最终评审包括引用指令和本验收记录。功能规格、既有术语表和经修订的架构决定随实现一并提供；无关的、未跟踪的规划文件和说明文件仍在本次提交之外。

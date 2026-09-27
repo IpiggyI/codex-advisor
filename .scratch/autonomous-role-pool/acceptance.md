@@ -1,203 +1,110 @@
-# Autonomous role pool acceptance
+# 自主角色池验收
 
-Date: 2026-09-12. Implementation base and approved review baseline:
-`f170eef80734e9140231defcd87a91281549ba3d`.
-Scope: tickets 01–04, with dependencies 01 → 03 → 04 and independent ticket 02.
+日期：2026-09-12。实现基线与已批准的评审基线：
+`f170eef80734e9140231defcd87a91281549ba3d`。
+范围：工单 01–04，依赖关系为 01 → 03 → 04，工单 02 独立。
 
-## Tested source and host
+## 测试的源码与宿主
 
-Codex CLI `0.154.0` ran four disposable installations under
-`/tmp/codex-advisor-autonomy.k0ekgvjh`. Each used the public marketplace/plugin
-installation and companion role installer before starting a fresh task.
-The tested plugin source digest covers every regular file under
-`plugins/codex-advisor/`, sorted by its repository-relative path. SHA-256 receives
-each UTF-8 path, NUL, file bytes, and NUL in that order. The digest is
-`a8faf34269afc646cfd763aacc922fbc6889fcae00871b3dd9e5c214153560de`.
+Codex CLI `0.154.0` 在
+`/tmp/codex-advisor-autonomy.k0ekgvjh` 下运行了四套一次性安装。每一套都在开始一项新任务之前，使用了公开的市场与插件安装以及配套安装器。
+被测试的插件源码摘要覆盖 `plugins/codex-advisor/` 下的每一个常规文件，按仓库相对路径排序。SHA-256 按该顺序接收每一条 UTF-8 路径、NUL、文件字节和 NUL。摘要为
+`a8faf34269afc646cfd763aacc922fbc6889fcae00871b3dd9e5c214153560de`。
 
-The installed policies, role templates, installer, and runtime inspector matched
-the final source modulo trailing blank lines normalized after installation. The
-deterministic verifier's shared invalid-effort helper was refactored after live
-checks and its affected runtime group passed again. Historical acceptance
-records were preserved. No active installation, primary configuration, release,
-provider bridge, scheduler, or profile schema was changed.
+已安装的策略、角色模板、安装器和运行时检查器与最终源码一致，差异仅在于安装之后被规范化的尾部空行。确定性验证器中共用的无效推理等级辅助函数在实机检查之后做了重构，其受影响的运行时组再次通过。历史验收记录得以保留。没有改动任何正在使用的安装、主代理配置、发布、提供方桥接、调度器或配置档案模式。
 
-Each scenario directory contains its prompt, events, final response, workspace,
-and native rollouts under `home/sessions`. The local `audit.py` independently
-checks completed native calls, explicit spawn settings, parent association,
-working directory, thread reuse, and actual final bytes. Its allowlisted projection
-is `observed.json`; raw transcripts and credentials are not committed.
+每个场景目录都包含其提示词、事件、最终响应、工作区，以及 `home/sessions` 下的原生会话记录。本地的 `audit.py` 独立检查已完成的原生调用、显式的派发设置、父关联、工作目录、线程复用和实际的最终字节。其允许名单上的投影是 `observed.json`；原始记录文本和凭据不会被提交。
 
-| Scenario | Primary model / effort | Parent UUID |
+| 场景 | 主代理模型 / 推理等级 | 父 UUID |
 |---|---|---|
 | workers | Sol / medium | `01a0940e-a9b7-7300-aa89-47cc898affb0` |
 | explorers | Sol / medium | `01a0940e-a9b7-73b3-bb4d-04c9d74ff651` |
 | advice | Sol / max | `01a0940e-a9b7-7b00-9c76-4e3241f7cd5f` |
 | branches | Sol / medium | `01a09416-8d9c-75d0-8d0d-c13c97f48764` |
 
-Parent settings came from their own turn metadata, independently of child reports.
-Every child used explicit effort and `fork_turns: none`; runtime inspection
-matched role/model/effort, UUID, expected parent, workspace, and permissions.
-All observed children had `workspace-write` / `managed` permissions.
-No child delegated implementation further.
+父设置来自它们自己的回合元数据，独立于子报告。每个子调用都使用了显式推理等级和 `fork_turns: none`；运行时检查与角色、模型、推理等级、UUID、期望的父级、工作区和权限一致。所有观察到的子调用都具有 `workspace-write` / `managed` 权限。没有子调用再进一步委派实现。
 
-## Deterministic checks
+## 确定性检查
 
-The changed public checks first failed against the old behavior: Sol accepted
-unlisted low effort; the two new Explorer templates were absent; Luna Explorer
-accepted low; and primary-derived reviewer selection still succeeded.
-After the corresponding changes, focused installation/runtime checks passed.
-The full `sh plugins/codex-advisor/scripts/verify.sh` suite then passed once on
-the combined implementation. Shell syntax, TOML/JSON/YAML parsing, skill frontmatter,
-documentation links, and `git diff --check` passed.
+变更后的公开检查先对照旧行为失败了：Sol 接受了未列出的 low 推理等级；两个新的 Explorer 模板不存在；Luna Explorer 接受了 low；由主代理推导的 reviewer 选择仍然成功。在相应变更之后，聚焦的安装与运行时检查通过。完整的 `sh plugins/codex-advisor/scripts/verify.sh` 套件随后在合并后的实现上通过了一次。Shell 语法、TOML、JSON 与 YAML 解析、技能前言、文档链接和 `git diff --check` 通过。
 
-Coverage includes all eight installed identities, full/selective/repeated checks,
-refusal before partial writes, preservation of unrelated configuration, exact
-native allocation validation, obsolete reviewer-selector refusal, missing parent
-or cwd evidence, malformed/ambiguous/conflicting records, and payload filtering.
-Fixtures certify parser and refusal behavior, not successful advisory judgment or
-failure eligibility. No typed application or typechecker is shipped.
+覆盖包括全部八个已安装身份，完整、选择性与重复检查，在部分写入之前拒绝，无关配置的保留，精确的原生分配验证，对过时 reviewer 选择器的拒绝，缺失的父级或 cwd 证据，畸形、含糊或冲突的记录，以及载荷过滤。夹具证明的是解析器和拒绝行为，不是成功的咨询判断或失败资格。没有交付类型化的应用程序或类型检查器。
 
-## Tickets 01 and 03: work, recovery, and sessions
+## 工单 01 与 03：工作、恢复和会话
 
-The primary created and checked `direct.txt`, selected Luna autonomously for a
-bounded light outcome, dispatched standard workers for disjoint files, inspected
-actual outputs, and reran a combined exact-byte check with a negative control.
-The ordinary multi-step workflow completed without an Advisor or reviewer.
-Task specifications did not activate Architect mode.
+主代理创建并检查了 `direct.txt`，为一项有界的 light 结果自主选择了 Luna，为互不重叠的文件派发了 standard worker，检查了实际输出，并用一个阴性对照重新运行了合并的精确字节检查。普通的多步工作流在没有 Advisor 或 reviewer 的情况下完成。任务规格没有激活 Architect 模式。
 
-| Worker | Observed effort | Native UUID | Observed outcome |
+| worker | 观察到的推理等级 | 原生 UUID | 观察到的结果 |
 |---|---|---|---|
 | Luna light | max | `01a0940f-5f43-76b2-9ff7-05b565e12b87` | `light.txt = LIGHT\n` |
 | Sol standard | high | `01a0940f-affc-75b3-b208-a70783a1e65a` | `standard-high.txt = STANDARD-HIGH\n` |
-| Sol standard | xhigh | `01a0940f-e043-76d1-8b2a-141348128c42` | First attempt; `standard-xhigh.txt = STANDARD-XHIGH\n` |
-| Astra senior | medium | `01a09410-df2c-7f82-958f-70155aa93b4b` | Missing-gate inability; same-thread correction after environment repair |
-| Astra senior | high | `01a09412-d28c-7f92-a1ba-3e7ab3fdfee3` | New writer extends actual artifact after prior writer finishes |
-| Astra senior | medium | `01a09413-9f83-7743-b26c-c24cc06ef6f7` | New thread on effort decrease; useful prior changes preserved |
-| Astra senior | xhigh | `01a09414-8b65-7ed2-9f7f-95f816c8b6a7` | Eligible controlled same-work handoff; final verification line added |
+| Sol standard | xhigh | `01a0940f-e043-76d1-8b2a-141348128c42` | 首次尝试；`standard-xhigh.txt = STANDARD-XHIGH\n` |
+| Astra senior | medium | `01a09410-df2c-7f82-958f-70155aa93b4b` | 缺失门禁导致的无法完成；环境修复后在同一线程上修正 |
+| Astra senior | high | `01a09412-d28c-7f92-a1ba-3e7ab3fdfee3` | 前一个写入者结束后，新的写入者扩展实际产物 |
+| Astra senior | medium | `01a09413-9f83-7743-b26c-c24cc06ef6f7` | 推理等级降低时使用新线程；有用的先前变更得以保留 |
+| Astra senior | xhigh | `01a09414-8b65-7ed2-9f7f-95f816c8b6a7` | 符合资格的受控同一工作交接；追加了最终验证行 |
 
-The controlled gate belonged exclusively to the primary. Its absence produced a
-completed concrete inability report, with no invented pass or unauthorized gate
-creation. The primary diagnosed the environment, supplied `OPEN\n`, and resumed
-the same medium worker. Native metadata contains two completed turns at unchanged
-medium in that thread.
+受控门禁专属于主代理。它的缺失产生了一份已完成的、具体的无法完成报告，没有编造成功，也没有未经授权地创建门禁。主代理诊断了环境，提供了 `OPEN\n`，并恢复了同一个 medium worker。原生元数据包含该线程中两次已完成的回合，推理等级仍为未改变的 medium。
 
-An explicit Architect-mode phase then began under the Sol primary. All subsequent
-implementation edits were delegated. The real transition was medium
+随后在 Sol 主代理下开始了一个明确的 Architect 模式阶段。此后的全部实现编辑都被委派。实际的转换是 medium
 `01a09410-df2c-7f82-958f-70155aa93b4b` → high
 `01a09412-d28c-7f92-a1ba-3e7ab3fdfee3` → medium
-`01a09413-9f83-7743-b26c-c24cc06ef6f7`.
-Each successor received current bytes, scope, binding decisions, completed checks,
-the diagnosed failure, and remaining work after the earlier writer finished.
-The final exact content was `READY\nHIGH\nMEDIUM\nVERIFIED\n`.
+`01a09413-9f83-7743-b26c-c24cc06ef6f7`。
+每一个后继者都在较早的写入者结束之后收到了当前字节、范围、有约束力的决定、已完成的检查、已诊断的失败和剩余工作。最终的精确内容是 `READY\nHIGH\nMEDIUM\nVERIFIED\n`。
 
-The xhigh call carried relevant complete worker failure and its repaired environment
-cause; it was selected for the smoke route, not because the failure demonstrated
-weak reasoning. An unavailable Ruby command during the medium extension was
-handled with shell byte checks in that same attempt, without escalation.
-Git history was absent in these disposable workspaces; complete contents, inventories,
-hashes, and exact-byte checks supplied the actual-state evidence.
+这次 xhigh 调用携带了相关的 worker 完整失败及其已修复的环境原因；选择它是为了冒烟路由，而不是因为这次失败表明推理能力弱。medium 扩展期间一个不可用的 Ruby 命令，在同一次尝试中用 shell 字节检查处理，而没有升级。这些一次性工作区中没有 Git 历史；完整内容、清单、哈希和精确字节检查提供了实际状态证据。
 
-Existing scheduling evidence in [acceptance-05-06.md](../codex-advisor/acceptance-05-06.md)
-covers capacity, dependencies, conflicting ownership, and incomplete sibling output
-under the preserved native scheduling boundary. Current independent worker dispatch,
-sequential gated ownership, and combined checks supplement it. Historical effort
-and mode policies from that record are superseded, not reused as current acceptance.
+现有的调度证据见 [acceptance-05-06.md](../codex-advisor/acceptance-05-06.md)，覆盖容量、依赖、冲突的所有权，以及在保留的原生调度边界下不完整的兄弟输出。当前的独立 worker 派发、有门禁的顺序所有权，以及合并检查，是对它的补充。该记录中的历史推理等级和模式策略已被取代，不作为当前验收复用。
 
-## Ticket 02: exploration
+## 工单 02：探索
 
-Every Explorer inspected the same 105-byte `source.py`. Line 2 multiplies the
-amount by `1.2`; lines 4–5 add the fee afterward. All six cited the actual source
-and returned `total(10, 3) = 15`. Calling the multiplier tax was labeled as an
-interpretation of the question. The source scope and negative-search limits were
-explicit; no broader absence claim was needed.
+每个 Explorer 都检查了同一个 105 字节的 `source.py`。第 2 行把金额乘以 `1.2`；第 4–5 行在其后加上费用。全部六个都引用了实际来源，并返回 `total(10, 3) = 15`。把乘数称为税，被标明为对问题的一种解释。来源范围和否定搜索的限度是显式的；不需要更宽的不存在主张。
 
-| Explorer | Effort | Native UUID |
+| Explorer | 推理等级 | 原生 UUID |
 |---|---|---|
-| Sol, directly selected before any Luna | medium | `01a0940f-3056-7133-bef9-76897d394daf` |
+| 在任何 Luna 之前直接选择的 Sol | medium | `01a0940f-3056-7133-bef9-76897d394daf` |
 | Luna light | high | `01a09411-3bff-7773-a3c0-24690232fdf1` |
-| Luna preferred substantial | max | `01a09411-5513-7d31-a6e2-2b6a07d10969` |
+| 偏好用于较重探索的 Luna | max | `01a09411-5513-7d31-a6e2-2b6a07d10969` |
 | Sol | high | `01a09411-6d1a-7853-9530-976d4c974e5b` |
 | Astra | medium | `01a09411-84ed-78d3-9f8b-c9a87bb6e116` |
 | Astra | high | `01a09413-3a2f-7f52-859f-0d7f2c785ea9` |
 
-Each Explorer used one source-read command, `nl -ba source.py`. The source
-SHA-256 stayed
-`61468bd3f109c5b3c6db68082cc61ce2dbe3df6e0428fe3bc85bb8340d3a670f`;
-the final inventory contained only that file. The primary and root verifier checked
-citations, bytes, and the result independently.
+每个 Explorer 都使用了一条来源读取命令 `nl -ba source.py`。来源的 SHA-256 保持为
+`61468bd3f109c5b3c6db68082cc61ce2dbe3df6e0428fe3bc85bb8340d3a670f`；
+最终清单只包含该文件。主代理和根验证器独立检查了引用、字节和结果。
 
-## Ticket 04: advice and independent acceptance
+## 工单 04：建议与独立验收
 
-| Request | Effort | Native UUID | Observed outcome |
+| 请求 | 推理等级 | 原生 UUID | 观察到的结果 |
 |---|---|---|---|
-| Proactive decision advice | medium | `01a0940f-fd5e-7081-bf8c-6b2181829661` | Correct original fee explanation; advice reused while hashes/inputs held |
-| Invalidated premise | high | `01a09412-9a60-7000-b39e-b97d3875023a` | Correct revised fee explanation and result 15.6 |
-| Injected failed advice | medium | `01a09414-093e-77d0-b113-7db6102d3b54` | Deliberately unsupported old conclusion, refuted by source/calculation |
-| Same-question advisory recovery | xhigh | `01a09415-03de-7421-a388-c0951f0f5ae5` | Correct source-backed answer after relevant failed advice |
-| Declared high-risk acceptance | medium | `01a09417-3c05-7cd2-bd38-6d657ba5eb96` | Ready after primary checks, despite primary max |
-| Explicit revised-deliverable review | high | `01a09418-e36a-7ec1-9239-1e59c949693f` | New thread; ready after adding checked note |
-| Injected failed review | medium | `01a0941a-6035-7722-9c63-cb55c55a3790` | Unsupported old acceptance condition refuted |
-| Same-question review recovery | xhigh | `01a0941b-6760-79e0-8b2c-5225692d89de` | Fresh source-backed acceptance with advisory-failure evidence |
-| Uncovered decision and unclear failure cause | medium | `01a09417-40bf-7b62-9f58-030de5380ec1` | Required advice dispatched; missing failure facts identified without inventing a cause |
-| Incomplete artifact review | medium | `01a09419-1fe7-7fc1-9ecd-e55572372d8a` | Actual DRAFT/VERIFIED mismatch reported; acceptance blocked |
-| Corrected artifact review | medium | `01a0941a-4dec-79b1-8fa7-dc58726cec8a` | New thread at unchanged effort after primary correction and passed check |
+| 主动的决策建议 | medium | `01a0940f-fd5e-7081-bf8c-6b2181829661` | 对原始费用的解释正确；在哈希与输入仍然成立期间复用了建议 |
+| 被推翻的前提 | high | `01a09412-9a60-7000-b39e-b97d3875023a` | 修正后的费用解释正确，结果为 15.6 |
+| 注入的失败建议 | medium | `01a09414-093e-77d0-b113-7db6102d3b54` | 故意给出没有依据的旧结论，被来源与计算反驳 |
+| 同一问题的咨询恢复 | xhigh | `01a09415-03de-7421-a388-c0951f0f5ae5` | 在相关的失败建议之后，给出有来源依据的正确答案 |
+| 声明的高风险验收 | medium | `01a09417-3c05-7cd2-bd38-6d657ba5eb96` | 尽管主代理为 max，仍在主代理检查之后就绪 |
+| 显式的修订交付物评审 | high | `01a09418-e36a-7ec1-9239-1e59c949693f` | 新线程；在加入已检查的说明之后就绪 |
+| 注入的失败评审 | medium | `01a0941a-6035-7722-9c63-cb55c55a3790` | 没有依据的旧验收条件被反驳 |
+| 同一问题的评审恢复 | xhigh | `01a0941b-6760-79e0-8b2c-5225692d89de` | 带有咨询失败证据的、有来源依据的新验收 |
+| 未被覆盖的决定和不明的失败原因 | medium | `01a09417-40bf-7b62-9f58-030de5380ec1` | 已派发必要的建议；识别出缺失的失败事实，且没有编造原因 |
+| 不完整产物的评审 | medium | `01a09419-1fe7-7fc1-9ecd-e55572372d8a` | 报告了实际的 DRAFT 与 VERIFIED 不一致；验收被阻断 |
+| 修正后产物的评审 | medium | `01a0941a-4dec-79b1-8fa7-dc58726cec8a` | 主代理修正且检查通过后，在推理等级不变的情况下使用新线程 |
 
-The ordinary checkpoint needed no delivery consultation. Changing the source to
-`subtotal(amount + fee)` invalidated the earlier advice, leading to renewed
-judgment. The primary distinguished a hypothetical policy disagreement from factual
-evidence and did not turn advice into authorization.
+普通检查点不需要交付咨询。把来源改为 `subtotal(amount + fee)` 使较早的建议失效，从而产生重新作出的判断。主代理区分了假设性的策略分歧和事实证据，并且没有把建议变成授权。
 
-The two injected advisory conclusions were explicitly labeled test-double responses
-with no source support. The primary refuted them using the actual source and
-calculation, diagnosed the false premise, and handed that same-question evidence
-to fresh xhigh calls. These demonstrate controlled eligibility and dispatch,
-not spontaneous failures or evidence that more effort improved judgment.
+注入的两条咨询结论被显式标明为测试替身响应，没有来源支持。主代理用实际来源和计算反驳了它们，诊断出虚假前提，并把该同一问题的证据交给新的 xhigh 调用。这些演示的是受控的资格与派发，不是自发的失败，也不是更高推理等级改善了判断的证据。
 
-Independent acceptance used the distinct reviewer identity and actual complete
-contents after primary checks. In the branches scenario, the primary's deliberate
-`DRAFT\n` failed the exact `VERIFIED\n` condition; the first reviewer reproduced
-the failure. The primary corrected the bytes and passed verification before a
-different medium reviewer accepted. This establishes review freshness even without
-an effort change. The root independently verified all final fixture contents.
+独立验收使用了不同的 reviewer 身份，以及主代理检查之后的实际完整内容。在 branches 场景中，主代理有意写入的 `DRAFT\n` 未能满足精确的 `VERIFIED\n` 条件；第一名 reviewer 复现了该失败。在另一名 medium reviewer 接受之前，主代理修正了字节并通过了验证。这确立了评审的新鲜性，即使推理等级没有变化。根独立核实了全部最终夹具内容。
 
-Reviewer and Advisor activity consisted of source reads, inventories, hashes, and
-checks avoiding bytecode writes; the two injected failures used no tools. Scoped
-before/after checks showed no role-authored mutation. This establishes behavioral
-read-only operation under broader permissions, not hard isolation.
+Reviewer 和 Advisor 的活动包括来源读取、清单、哈希，以及避免字节码写入的检查；注入的两次失败没有使用工具。有范围的前后检查显示没有角色撰写的变更。这确立的是在更宽权限下的行为上的只读运行，不是硬隔离。
 
-## Controlled policy probes and limits
+## 受控的策略探查与限度
 
-Short primary probes returned the expected responses for ineligible initial Astra
-xhigh, intermediate debugging failures, unclear behavior requiring clarification,
-known reasoning failures allowing cause-based rework/takeover, worker failure
-being insufficient for Advisor xhigh, missing/conflicting required review leaving
-acceptance pending, invalid effort-changing resume, and advice reuse despite a
-failure count. These were supplied policy cases, not live provider failures.
+简短的主代理探查对以下情况返回了期望的响应：不符合资格的初始 Astra xhigh、中间的调试失败、需要澄清的不明行为、允许基于原因返工或接管的已知推理失败、不足以启用 Advisor xhigh 的 worker 失败、使验收保持待定的缺失或冲突的必要评审、无效的改变推理等级的恢复，以及尽管存在失败计数仍然复用建议。这些是提供的策略用例，不是现场的提供方失败。
 
-All advertised model/effort allocations were exercised. No primary/transport Cartesian
-matrix, real destructive migration, provider outage, hard read-only enforcement,
-or general task-quality evaluation was run. Remaining limits are those deliberate
-boundaries; simple route checks do not prove quality, long-run stability, or savings.
+所有对外说明的模型与推理等级分配都已演练。没有运行主代理与传输方式的笛卡尔矩阵、真实的破坏性迁移、提供方中断、硬只读强制，或一般的任务质量评估。剩余的限度就是这些有意的边界；简单的路由检查不能证明质量、长期稳定性或节省。
 
-Initial hosts saw WebSocket disconnects and native HTTPS fallback. The final branch
-host used the documented provider `supports_websockets=false` setting and omitted
-inherited outer thread-ID variables. This was confined to disposable host setup;
-actual UUIDs were obtained from native records rather than shell variables.
-See the [official configuration reference](https://developers.openai.com/codex/config-reference/).
-Temporary evidence paths may be removed by later system cleanup.
-All four primary scenarios exited successfully. Temporary authentication and
-connection-configuration copies were removed from their disposable homes afterward.
+最初的宿主出现了 WebSocket 断开和原生 HTTPS 回退。最终的分支宿主使用了文档中的提供方设置 `supports_websockets=false`，并省略了继承的外层线程标识变量。这仅限于一次性宿主的设置；实际的 UUID 来自原生记录，而不是 shell 变量。见[官方配置参考](https://developers.openai.com/codex/config-reference/)。临时证据路径可能被以后的系统清理删除。全部四个主代理场景都成功退出。临时的认证副本和连接配置副本随后从其一次性主目录中删除。
 
-## Code review
+## 代码评审
 
-The user approved the implementation base above. Review uses
-`git diff --cached f170eef80734e9140231defcd87a91281549ba3d`, adapting the usual
-HEAD comparison to the implement skill's review-before-commit order. Independent
-Standards review identified one minor duplication in the new invalid-effort fixture
-loops; a shared helper now retains the same role-specific invalid sets. The affected
-runtime group passed after that refactor. Spec review found zero deviations and
-independently checked initial Sol xhigh, direct Sol exploration, primary max with
-reviewer medium, and fresh same-effort review after correction. Fresh final Standards
-and Spec reviewers each reported zero findings on the revised staged result. They
-checked the helper, completion bookkeeping, native evidence, and reproducible source
-digest independently; neither changed files or repeated the model scenarios.
+用户批准了上面的实现基线。评审使用 `git diff --cached f170eef80734e9140231defcd87a91281549ba3d`，把通常的 HEAD 比较调整为实现技能中先评审后提交的顺序。独立的 Standards 评审在新的无效推理等级夹具循环中发现了一处轻微重复；一个共用辅助函数现在保留同一组按角色区分的无效集合。受影响的运行时组在该重构之后通过。Spec 评审发现零处偏离，并独立检查了初始 Sol xhigh、直接的 Sol 探索、主代理为 max 而 reviewer 为 medium，以及修正之后推理等级相同的新评审。新的最终 Standards 评审者和 Spec 评审者各自在修订后的暂存结果上报告了零项发现。他们独立检查了该辅助函数、完成情况的记账、原生证据和可复现的源码摘要；两者都没有改动文件，也没有重复模型场景。

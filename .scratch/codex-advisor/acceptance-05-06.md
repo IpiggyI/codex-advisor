@@ -1,124 +1,62 @@
-# Tickets 05 and 06 acceptance
+# 工单 05 与 06 的验收
 
-Date: 2026-09-06. Implementation base: `cc08d60e344bc4a0a01129c3a908806636542931`.
-Scope: direct Sol implementation and native parallel implementation scheduling.
+日期：2026-09-06。实现基础：`cc08d60e344bc4a0a01129c3a908806636542931`。
+范围：直接的 Sol 实现，以及原生的并行实现调度。
 
-## Deterministic verification
+## 确定性验证
 
-The new installation check first failed for the absent Sol template, then passed
-after adding the template and installer role. The new runtime check first failed
-for the absent `--sol-effort` option, then passed after its implementation.
-The installer suite covers all four active roles, selective non-mutating checks,
-exact bytes, refusal before partial installation, and preservation of unrelated
-configuration. Runtime fixtures cover Sol effort values and invalid input, wrong
-roles/models, missing and conflicting settings/permissions, and payload filtering.
-Existing Luna max and independent-review effort checks remain passing.
+新的安装检查首先因缺少 Sol 模板而失败，然后在加入该模板和安装器角色之后通过。新的运行时检查首先因缺少 `--sol-effort` 选项而失败，然后在其实现之后通过。安装器套件覆盖全部四个现行角色、选择性的不改动检查、精确字节、在部分安装之前的拒绝，以及无关配置的保留。运行时夹具覆盖 Sol 推理等级值和无效输入、错误的角色和模型、缺失的和冲突的设置与权限，以及载荷过滤。既有的 Luna max 检查和独立评审推理等级检查仍然通过。
 
-The complete `sh plugins/codex-advisor/scripts/verify.sh` suite passed, as did
-plugin validation, skill validation, and `git diff --check`. JSON, TOML, YAML,
-skill frontmatter, and Shell syntax checks are the applicable static verification;
-this repository has no typed application. No new dependency or scheduler service
-was introduced. Native host capacity and lifecycle interfaces perform scheduling.
+完整的 `sh plugins/codex-advisor/scripts/verify.sh` 套件已通过，插件验证、技能验证和 `git diff --check` 也已通过。JSON、TOML、YAML、技能前言和 Shell 语法检查是适用的静态验证；本仓库没有带类型的应用程序。没有引入新的依赖或调度器服务。原生宿主的容量接口和生命周期接口执行调度。
 
-## Ticket 05 live verification
+## 工单 05 的实机验证
 
-Codex CLI `0.153.4` ran in a disposable installed home at
-`/tmp/codex-advisor-05-06.ieyyf36b`. Marketplace/plugin installation and companion
-role installation ran before fresh tasks. Scenario prompts, JSONL events, final
-responses, and stderr use the scenario name below. Exact native rollouts are under
-`home/sessions`; `observed.jsonl` contains projected routing and timing evidence.
+Codex CLI `0.153.4` 在一套一次性的已安装主目录中运行，路径为 `/tmp/codex-advisor-05-06.ieyyf36b`。插件市场和插件的安装，以及配套角色安装，都在新任务之前运行。场景提示词、JSONL 事件、最终响应和 stderr 使用下面的场景名称。精确的原生会话记录位于 `home/sessions`；`observed.jsonl` 包含投影后的路由证据和计时证据。
 
-| Scenario | Observed result | Native threads |
+| 场景 | 观察到的结果 | 原生线程 |
 |---|---|---|
-| `sol-default` | Astra primary low selected Sol directly at high for deny-by-default authorization repair. Sol changed only `policy.py`; the architect inspected all contents, reran the check, and obtained fresh Astra high review. | Primary `01a074f5-3497-78c3-be44-a1282432a0a5`; Sol `01a074f6-1105-7623-8443-6a80da6f7f89`; reviewer `01a074f8-6f91-7182-8913-7e5c46c46ab2` |
-| `sol-adjusted` | The same higher-risk workflow honored explicit Sol medium while the Astra primary remained low. Architect checks and fresh Astra high review completed. | Primary `01a074f5-417c-7b12-b7f3-1f79fe8ac3f7`; Sol `01a074f6-0027-7c10-b479-cf6c022f73ec`; reviewer `01a074f7-aec8-7a60-98d3-a7055e8bc230` |
-| `sol-primary` | Direct Sol remained low, changed `calc.py` itself, passed the meaningful check, and obtained fresh Astra high readiness advice in Advisor mode. | Primary `01a074f5-72c5-7f52-bcbd-542d64063f1e`; Advisor `01a074f6-8764-7d12-ae68-304f96b5ba23` |
+| `sol-default` | 推理等级为 low 的 Astra 主代理，为默认拒绝的授权修复直接选择了推理等级为 high 的 Sol。Sol 只改了 `policy.py`；Architect 检视了全部内容，重新运行了检查，并取得了推理等级为 high 的新 Astra 评审。 | 主代理 `01a074f5-3497-78c3-be44-a1282432a0a5`；Sol `01a074f6-1105-7623-8443-6a80da6f7f89`；Reviewer `01a074f8-6f91-7182-8913-7e5c46c46ab2` |
+| `sol-adjusted` | 同一个较高风险工作流尊重了显式的 Sol medium，同时 Astra 主代理保持为 low。Architect 的检查和推理等级为 high 的新 Astra 评审已完成。 | 主代理 `01a074f5-417c-7b12-b7f3-1f79fe8ac3f7`；Sol `01a074f6-0027-7c10-b479-cf6c022f73ec`；Reviewer `01a074f7-aec8-7a60-98d3-a7055e8bc230` |
+| `sol-primary` | 直接使用的 Sol 保持为 low，自己改了 `calc.py`，通过了有意义的检查，并在 Advisor 模式中取得了推理等级为 high 的新 Astra 就绪建议。 | 主代理 `01a074f5-72c5-7f52-bcbd-542d64063f1e`；Advisor `01a074f6-8764-7d12-ae68-304f96b5ba23` |
 
-Actual patches, architect inspections and reruns, and reviewer reads/checks were
-inspected independently of final prose. Inspector calls for the exact child IDs
-passed with the requested role/model/effort and parent linkage. Implementers did
-not delegate further. Review calls used `fork_turns: none` after architect checks.
-Before/after scoped contents and inventory confirmed that `check.py` and `peer.txt`
-were preserved and review caused no scoped mutation. The root verifier also read
-all final implementations and reran their authoritative checks successfully.
+实际补丁、Architect 的检视和重新运行，以及 Reviewer 的读取和检查，都独立于最终散文而被检视。针对精确子级标识的检查器调用已通过，带有所请求的角色、模型和推理等级以及父级关联。Implementer 没有进一步委派。评审调用在 Architect 的检查之后使用了 `fork_turns: none`。限定范围的之前与之后内容和清单确认 `check.py` 和 `peer.txt` 被保留，并且评审没有造成限定范围的改动。根验证者还读取了全部最终实现，并成功地重新运行了它们的权威检查。
 
-The access-policy fixture checks 64 combinations (4 roles, 2 ownership states,
-4 actions, 2 suspension states). Its printed label incorrectly says 128; the
-observed coverage is 64, not that label. Primary effort freedom is demonstrated
-at low, and delegated Sol adjustment at medium; other recognized efforts have
-parser coverage only, not demonstrated host/account support.
+访问策略夹具检查 64 种组合（4 种角色、2 种所有权状态、4 种动作、2 种停用状态）。它打印的标签错误地写成 128；观察到的覆盖是 64，不是那个标签。主代理推理等级自由在 low 上得到展示，委派的 Sol 调整在 medium 上得到展示；其他已识别的推理等级只有解析器覆盖，没有得到展示的宿主或账户支持。
 
-A separate installed home at `/tmp/codex-advisor-05-06.3m5wiz2t` withheld only the
-Sol role. In `sol-unavailable`, primary `01a074ff-1f9a-74a2-b8d4-9c1e0bc94e5b`
-observed the selective check's exit 1 and missing-role error, invoked no substitute,
-and explicitly left implementation and acceptance pending. Exact workspace bytes
-remained unchanged. This covers missing-role refusal, not a provider outage.
+另一套已安装主目录位于 `/tmp/codex-advisor-05-06.3m5wiz2t`，只扣下了 Sol 角色。在 `sol-unavailable` 中，主代理 `01a074ff-1f9a-74a2-b8d4-9c1e0bc94e5b` 观察到选择性检查的退出码 1 和缺失角色错误，没有调用替代，并明确使实现和验收保持待定。精确的工作区字节保持不变。这覆盖缺失角色的拒绝，不覆盖提供方中断。
 
-## Ticket 06 live verification
+## 工单 06 的实机验证
 
-The final scheduling contracts were installed into a second disposable home at
-`/tmp/codex-advisor-05-06.1xmf5ytc`. Each scenario has its own workspace, prompt,
-JSONL log, final response, and native rollouts. All primary sessions ran Astra low;
-all ten implementation workers ran native Luna max with correct parent linkage.
-Every worker received ownership and verification requirements and returned a report.
-No implementation worker spawned additional implementation work.
+最终的调度契约被安装进第二套一次性主目录，路径为 `/tmp/codex-advisor-05-06.1xmf5ytc`。每个场景都有自己的工作区、提示词、JSONL 日志、最终响应和原生会话记录。全部主代理会话都运行 Astra low；全部十名实现 Worker 都运行原生 Luna max，并且父级关联正确。每一名 Worker 都收到了所有权和验证要求，并返回了一份报告。没有任何实现 Worker 派发额外的实现工作。
 
-| Scenario | Observation | Primary thread |
+| 场景 | 观察 | 主代理线程 |
 |---|---|---|
-| `parallel` | Two disjoint modules ran concurrently; both individual checks and the combined check passed after architect inspection. A user-requested fresh Astra high review then passed. | `01a074f7-808d-72c1-bc0a-fc1910807827` |
-| `dependent` | A completed, then the architect inspected and reran A's check before dispatching B with the verified prerequisite. The combined check passed. | `01a074f8-2042-74c2-a815-3fa9c547a12a` |
-| `conflict` | Two separate assignments owning `calc.py` ran sequentially despite available capacity. B preserved A's verified change. The combined check passed. | `01a074f9-797c-7190-bc56-0aee60428bcd` |
-| `capacity` | Invocation with `-c agents.max_threads=1` exposed two total agents, leaving one worker slot. The parent obtained and checked the first report, released that worker, and dispatched the next. Both checks and the combined check passed. | `01a074f7-b43d-7281-b89e-13e4cb3a3c1d` |
-| `incomplete` | Independent workers overlapped. Left completed; right reported partial because the immutable authoritative check required unavailable external certification. Parent inspection and reruns confirmed the gap and left whole-task acceptance pending. | `01a074f9-a537-7ab3-86aa-b4bf55ec101c` |
+| `parallel` | 两个互不相交的模块并发运行；在 Architect 检视之后，两项个别检查和合并检查都通过。随后一次用户请求的、推理等级为 high 的新 Astra 评审通过。 | `01a074f7-808d-72c1-bc0a-fc1910807827` |
+| `dependent` | A 完成，然后 Architect 检视并重新运行了 A 的检查，再带着已验证的前提派发 B。合并检查通过。 | `01a074f8-2042-74c2-a815-3fa9c547a12a` |
+| `conflict` | 两项各自拥有 `calc.py` 的分开分配尽管有可用容量，仍按顺序运行。B 保留了 A 已验证的变更。合并检查通过。 | `01a074f9-797c-7190-bc56-0aee60428bcd` |
+| `capacity` | 带有 `-c agents.max_threads=1` 的调用暴露了总共两个代理，留下一个 Worker 槽位。父级取得并检查了第一份报告，释放了该 Worker，然后派发下一份。两项检查和合并检查都通过。 | `01a074f7-b43d-7281-b89e-13e4cb3a3c1d` |
+| `incomplete` | 相互独立的 Worker 发生了重叠。左侧完成了；右侧报告了部分完成，因为不可变的权威检查要求不可用的外部认证。父级的检视和重新运行确认了该缺口，并使整个任务的验收保持待定。 | `01a074f9-a537-7ab3-86aa-b4bf55ec101c` |
 
-Native session start and task-complete timestamps establish actual scheduling:
+原生会话的开始时间戳和任务完成时间戳确立实际的调度：
 
-| Scenario | First worker interval (UTC) | Second worker interval (UTC) |
+| 场景 | 第一名 Worker 的区间（UTC） | 第二名 Worker 的区间（UTC） |
 |---|---|---|
-| `parallel` | 04:27:00.291 to 04:29:30.176 | 04:27:53.777 to 04:29:42.802 |
-| `dependent` | 04:27:37.380 to 04:30:09.496 | 04:30:43.721 to 04:32:03.633 |
-| `conflict` | 04:29:09.470 to 04:30:25.221 | 04:31:03.145 to 04:32:31.721 |
-| `capacity` | 04:27:09.822 to 04:30:05.048 | 04:30:34.121 to 04:31:59.639 |
-| `incomplete` | 04:29:25.701 to 04:31:23.388 | 04:29:56.944 to 04:31:35.385 |
+| `parallel` | 04:27:00.291 到 04:29:30.176 | 04:27:53.777 到 04:29:42.802 |
+| `dependent` | 04:27:37.380 到 04:30:09.496 | 04:30:43.721 到 04:32:03.633 |
+| `conflict` | 04:29:09.470 到 04:30:25.221 | 04:31:03.145 到 04:32:31.721 |
+| `capacity` | 04:27:09.822 到 04:30:05.048 | 04:30:34.121 到 04:31:59.639 |
+| `incomplete` | 04:29:25.701 到 04:31:23.388 | 04:29:56.944 到 04:31:35.385 |
 
-The parallel reviewer `01a074fb-68a8-71f0-9bb3-dc454c425bb1` started at
-04:30:28.547, after both worker reports and architect checks. It used a fresh
-context, read the actual files, and reran checks. The parent compared scoped state
-after review and accepted the combined result. Protected files and user edits
-remained unchanged in all five scenarios. The root verifier inspected every final
-module and reran all combined checks: four passed, and `incomplete` exited 1 for
-the expected external-certification gap. This expected refusal verifies the
-workflow; the disposable task itself remains unaccepted.
+并行 Reviewer `01a074fb-68a8-71f0-9bb3-dc454c425bb1` 于 04:30:28.547 开始，在两份 Worker 报告和 Architect 的检查之后。它使用了新上下文，读取了实际文件，并重新运行了检查。父级在评审之后比较了限定范围的状态，并接受了合并结果。在全部五个场景中，受保护文件和用户编辑保持不变。根验证者检视了每一个最终模块，并重新运行了全部合并检查：四项通过，并且 `incomplete` 因预期的外部认证缺口而以退出码 1 结束。这次预期的拒绝验证了该工作流；一次性任务本身仍未被验收。
 
-During the dependent scenario, the parent initially imposed an incorrect exact
-blank-line expectation on B's valid Python file. That verification command failed;
-the parent corrected the expectation, reran it, and verified the protected state.
-No implementation change was made for that verification-only mismatch.
+在依赖场景期间，父级最初对 B 的有效 Python 文件施加了一个不正确的精确空行预期。那条验证命令失败了；父级修正了该预期，重新运行了它，并验证了受保护状态。没有为那次仅涉及验证的不匹配做实现变更。
 
-## Evidence limits
+## 证据限制
 
-These runs establish observed native workflow behavior on the stated host version,
-not deterministic enforcement for every prompt. Recheck model/effort precedence,
-role discovery, and capacity behavior after host or configuration changes. The
-official custom-agent documentation endpoint returned HTTP 403; claims about this
-host are based on exercised calls. Fixtures prove parser/refusal behavior, not
-provider availability or live support for every accepted effort token.
+这些运行确立的是在所述宿主版本上观察到的原生工作流行为，不是对每一个提示词的确定性强制执行。在宿主或配置变更之后，重新检查模型与推理等级的优先级、角色发现和容量行为。官方自定义代理文档端点返回了 HTTP 403；关于这个宿主的声称基于所演练的调用。夹具证明解析器和拒绝行为，不证明提供方可用性，也不证明每一个已被接受的推理等级记号都有实机支持。
 
-Judgment agents received managed workspace-write permissions. Before/after scoped
-state and tool activity establish behavioral read-only review, not enforced
-isolation. Provider outages, host-capacity races, and enforced read-only isolation
-were not exercised. Temporary paths are local evidence, not release assets.
-Temporary authentication copies were removed from all three test homes after the
-runs. The user's active installation, configuration, and credentials were unchanged.
+判断代理收到了受管理的 workspace-write 权限。限定范围的之前与之后状态以及工具活动确立的是行为上的只读评审，不是强制隔离。提供方中断、宿主容量竞态和强制只读隔离没有被演练。临时路径是本地证据，不是发布资产。临时认证副本在运行之后从全部三个测试主目录中被移除。用户当前使用中的安装、配置和凭据未被改变。
 
-## Code review
+## 代码评审
 
-The code-review skill used independent read-only Standards and Spec agents against
-`git diff --cached cc08d60e344bc4a0a01129c3a908806636542931`, adapting its usual HEAD
-comparison to implement's review-before-commit order. Static review found no
-implementation or standards issues. The Spec reviewer independently confirmed
-ticket 05's live patches, routing, checks, review timing, and primary freedom. Its
-ticket 06 follow-up independently confirmed all ten Luna runtimes, actual overlap
-and sequencing, parent inspections and checks, incomplete-result handling, and
-the combined independent review. Both axes finished with zero implementation
-findings; no requested live acceptance scenario remains unrun.
+code-review 技能使用独立的只读标准轴代理和规格轴代理，对照 `git diff --cached cc08d60e344bc4a0a01129c3a908806636542931`，把它通常的 HEAD 比较适配为实现流程的先评审后提交顺序。静态评审没有发现实现问题或标准问题。规格轴 Reviewer 独立确认了工单 05 的实机补丁、路由、检查、评审时机和主代理自由。它针对工单 06 的后续独立确认了全部十次 Luna 运行时、实际重叠和按顺序执行、父级的检视和检查、不完整结果的处理，以及合并后的独立评审。两条轴都以零个实现发现结束；没有任何被请求的实机验收场景仍未运行。

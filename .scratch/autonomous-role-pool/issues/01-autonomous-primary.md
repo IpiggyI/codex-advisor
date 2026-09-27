@@ -1,38 +1,34 @@
-# 01: Autonomous Implementation and Delegation
+# 01：自主实现与委派
 
-**What to build:** Any primary model can complete ordinary work by implementing directly, delegating a bounded task to an appropriate worker, or combining both. The primary chooses the initial allocation, supplies an outcome-based contract, checks the actual result, and can finish ordinary multi-step work without a mandatory Advisor call. An explicit Architect-mode request makes implementation delegation-only for its authorized scope. This ticket delivers the initial worker execution path; ticket 03 adds failure recovery and reassignment.
+**要构建：** 任一主代理模型都可以通过直接实现、把一项有界任务委派给合适的 worker，或把两者结合起来，完成普通工作。主代理选择初始分配，提供基于结果的契约，检查实际结果，并且可以在没有强制 Advisor 调用的情况下完成普通的多步工作。明确的 Architect 模式请求使其已授权范围内的实现变为仅委派。本工单交付初始的 worker 执行路径；工单 03 增加失败恢复与重新分配。
 
-**Blocked by:** None (can start immediately).
+**Blocked by:** 无（可以立即开始）。
 
 **Status:** resolved
 
-- [x] Ordinary work allows direct implementation and delegation for any primary model. A midrange primary such as Sol is a user preference; the plugin neither selects it nor changes the primary's model or effort.
-- [x] The primary can adjust decomposition, order, and division of work within the user's authorization. A task artifact or model identity alone does not activate Architect mode.
-- [x] An explicit Architect-mode request works with any primary model and delegates every implementation edit and correction within its scope. Authorization lasts for the current task and its follow-ups unless the user explicitly grants session-wide scope; unrelated tasks and unaccepted proposals do not inherit it.
-- [x] The primary interprets and executes the user's requirements without unilaterally changing goals, scope, reserved decisions, acceptance conditions, or resource limits. It investigates mismatches with current code, seeks resolution for user-owned changes, and continues unaffected work.
-- [x] The worker role is the routing name for Implementer. Role responsibility is distinct from capability tier; the same ownership and reporting contract applies to all worker models.
-- [x] Initial worker routing is light: Luna at max; standard: Sol at high or xhigh; senior: Astra at medium or high. Sol xhigh is available on the first attempt without separate user selection. Astra xhigh is not an initial route without relevant failed-attempt evidence; its recovery path belongs to ticket 03.
-- [x] The primary explicitly selects an allowed effort within authorized resources without a permission question for each call. Focused work with sufficient evidence can use medium where allowed; conflicting evidence, alternatives, or cross-module constraints can justify high initially.
-- [x] Existing native worker identities retain their intended model pins. Luna worker remains fixed at max; adjustable workers honor the explicitly selected effort rather than overriding it or inheriting an unintended primary setting.
-- [x] Each worker receives an objective, owned scope, retained interfaces, reserved constraints, and meaningful verification. It can inspect the original task and relevant source rather than relying only on the primary's summary.
-- [x] Unspecified local implementation choices belong to the worker. Unclear expected behavior, conflicting requirements, or necessary changes to reserved interfaces are reported as contract gaps before dependent edits.
-- [x] Rework instructions identify the violated requirement, reproducible failure, expected behavior, and verification. Structural preference alone does not justify rework, and the worker owns its local debugging.
-- [x] Workers preserve unrelated and concurrent edits, perform their own implementation without further implementation delegation, and report actual changes, checks, judgment calls, and gaps.
-- [x] The primary retains scheduling: independent tasks may run within available capacity, while dependencies and conflicting ownership are sequenced. It checks the combined deliverable rather than treating one worker's success as completion of all work.
-- [x] The primary inspects actual changes, including new files and worker-authored acceptance tests, and reruns key verification before acceptance. A report, false completion claim, or skipped required check cannot establish success.
-- [x] Ordinary direct, delegated, and mixed multi-step work can complete after the primary's checks without mandatory delivery advice. High-risk work and explicit independent-review requests still require a fresh second reader after those checks; ticket 04 changes advisory routing and effort rules.
-- [x] A missing worker, unsupported allocation, or missing or conflicting runtime evidence leaves the affected work visibly pending without silent substitution. Evidence distinguishes native role, model, effort, thread, parent association, working directory, and observed permissions.
-- [x] Worker installation and selective checking remain idempotent. Modified or unsafe destinations are refused before partial mutation, with explicit reconciliation for changed installed templates. Unrelated agents and primary configuration remain intact, and diagnostics do not expose prompts or credentials.
-- [x] Current workflow instructions, worker descriptions, contracts, invocation guidance, glossary, architecture decisions, and public descriptions agree on this delivered behavior. Superseded Astra-only eligibility and explicit-Sol-selection decisions are identified without rewriting historical acceptance evidence or advertising unfinished routes.
-- [x] A small disposable scenario demonstrates direct work, autonomous worker selection, primary verification, and ordinary completion; a separate instruction demonstrates delegation-only Architect mode. Tiny native calls cover the initial worker allocations, including first-attempt Sol xhigh, with actual metadata and simple outcome checks.
-- [x] Reuse existing installation, runtime-evidence, and scheduling checks, adding only cases affected by this ticket. Controlled missing-role or invalid-evidence inputs exercise visible failure; no complex project or exhaustive primary, effort, and transport cross-product is required.
-- [x] Record each scoped route or branch with expected behavior, observed evidence, tested revision and host, and explicit gaps. Check the combined state with already completed sibling work, reuse valid evidence, and rerun only affected checks; documentation and validation are completed within this ticket.
-- [x] These checks establish routing behavior only. Quality, stability, and savings remain for later real-task experience. Use disposable installations; do not change the active user installation, publish a release, or add a scheduler, provider bridge, budget service, or profile schema.
+- [x] 普通工作允许任一主代理模型直接实现和委派。Sol 这样的中档主代理是用户偏好；插件既不选择它，也不改变主代理的模型或推理等级。
+- [x] 主代理可以在用户授权范围内调整分解、顺序和分工。仅有任务件或模型身份不会激活 Architect 模式。
+- [x] 明确的 Architect 模式请求适用于任一主代理模型，并委派其范围内的每一处实现编辑与修正。授权持续覆盖当前任务及其后续，除非用户明确授予会话级范围；无关任务和未被接受的提议不会继承该授权。
+- [x] 主代理解释并执行用户的要求，而不单方面改变目标、范围、保留决定、验收条件或资源限额。它调查与当前代码的不符之处，为用户拥有的变更寻求决议，并继续处理不受影响的工作。
+- [x] worker 角色是 Implementer 的路由名称。角色职责与能力档位不同；同一份所有权与报告契约适用于全部 worker 模型。
+- [x] 初始 worker 路由为 light：推理等级为 max 的 Luna；standard：推理等级为 high 或 xhigh 的 Sol；senior：推理等级为 medium 或 high 的 Astra。Sol 的 xhigh 在首次尝试即可使用，无需用户另行选择。没有相关的失败尝试证据时，Astra 的 xhigh 不是初始路由；其恢复路径属于工单 03。
+- [x] 主代理在已授权的资源内显式选择允许的推理等级，而不为每次调用询问许可。有充分证据的聚焦工作可以在允许的情况下使用 medium；冲突的证据、替代方案或跨模块约束可以在初始时证明 high 合理。
+- [x] 现有的原生 worker 身份保留其预定的模型固定。Luna worker 仍然固定为 max；可调的 worker 遵从显式选定的推理等级，而不是覆盖它，或继承一个并非本意的主代理设置。
+- [x] 每个 worker 收到目标、拥有的范围、须保留的接口、保留约束和有意义的验证。它可以查阅原始任务和相关来源，而不是只依赖主代理的摘要。
+- [x] 未规定的局部实现选择归 worker。预期行为不明、要求冲突，或对保留接口的必要变更，在依赖它们的编辑之前作为契约缺口报告。
+- [x] 返工指令指明被违反的要求、可复现的失败、期望行为和验证。仅有结构偏好不足以证明返工合理，并且 worker 拥有其局部调试。
+- [x] worker 保留无关的和并发的编辑，自行完成实现而不再进一步委派实现，并报告实际变更、检查、判断调用和缺口。
+- [x] 主代理保留调度：独立任务可以在可用容量内运行，而依赖关系和冲突的所有权则按顺序执行。它检查合并后的交付物，而不是把一个 worker 的成功当作全部工作的完成。
+- [x] 主代理检查实际变更，包括新文件和 worker 编写的验收测试，并在验收之前重新运行关键验证。报告、虚假的完成主张或被跳过的必要检查都不能确立成功。
+- [x] 普通的直接、委派和混合的多步工作，可以在主代理的检查之后完成，而无需强制的交付建议。高风险工作和明确的独立评审请求，在这些检查之后仍然需要一名新的第二阅读者；工单 04 改变咨询路由和推理等级规则。
+- [x] 缺失 worker、不受支持的分配，或缺失或冲突的运行时证据，会使受影响的工作明显保持待定，而没有静默替换。证据区分原生角色、模型、推理等级、线程、父关联、工作目录和观察到的权限。
+- [x] worker 的安装和选择性检查保持幂等。已修改或不安全的目标在部分变更之前被拒绝，并对已改变的已安装模板给出显式的调和。无关的代理和主代理配置保持完好，并且诊断不暴露提示词或凭据。
+- [x] 当前的工作流指令、worker 描述、契约、调用指导、术语表、架构决定和公开描述，对这项已交付的行为一致。已被取代的仅 Astra 资格和显式选择 Sol 的决定会被标明，而不改写历史验收证据，也不宣扬尚未完成的路由。
+- [x] 一个小型的一次性场景演示直接工作、自主的 worker 选择、主代理验证和普通完成；另一条指令演示仅委派的 Architect 模式。小型原生调用覆盖初始 worker 分配，包括首次尝试的 Sol xhigh，并带有实际元数据和简单的结果检查。
+- [x] 复用现有的安装、运行时证据和调度检查，只添加受本工单影响的用例。受控的缺失角色或无效证据输入用来演练可见的失败；不需要复杂项目，也不需要穷尽主代理、推理等级和传输方式的全组合。
+- [x] 为每条有范围的路由或分支记录期望行为、观察到的证据、测试的修订与宿主，以及显式的缺口。与已经完成的兄弟工作一起检查合并状态，复用有效证据，并且只重跑受影响的检查；文档和验证在本工单内完成。
+- [x] 这些检查只确立路由行为。质量、稳定性和节省留待以后的真实任务经验。使用一次性安装；不要改变用户正在使用的安装，不要发布版本，也不要添加调度器、提供方桥接、预算服务或配置档案模式。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-12. Public installation/runtime checks passed. Disposable Sol-primary
-work exercised direct edits, autonomous light-worker selection, both initial Sol
-efforts, senior worker calls, combined primary checks, ordinary completion, and an
-explicit delegation-only Architect phase. See [acceptance evidence](../acceptance.md)
-for exact native settings, state checks, and the deliberately limited smoke scope.
+于 2026-09-12 完成。公开的安装与运行时检查已通过。一次性的 Sol 主代理工作演练了直接编辑、自主的 light worker 选择、Sol 的两种初始推理等级、senior worker 调用、合并的主代理检查、普通完成，以及一个明确的仅委派 Architect 阶段。精确的原生设置、状态检查和有意限定的冒烟范围见[验收证据](../acceptance.md)。

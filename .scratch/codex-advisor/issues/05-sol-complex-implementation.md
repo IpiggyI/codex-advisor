@@ -1,31 +1,27 @@
-# 05: Direct Sol Implementation for Complex and Higher-Risk Work
+# 05：面向复杂工作与较高风险工作的直接 Sol 实现
 
 Status: resolved
 
-Blocked by: 04 - Independent Astra Review with a Primary-Effort Floor.
+Blocked by: 04 - 带有主代理推理等级下限的独立 Astra 评审。
 
-**What to build:** The Astra architect selects Sol directly when implementation requires substantial judgment or context, or carries higher risk. Sol's result passes the architect's acceptance checks and, when required, independent Astra review before completion.
+**要构建的内容：** 当实现需要大量判断或大量上下文，或者带有较高风险时，Astra Architect 直接选择 Sol。Sol 的结果在完成之前通过 Architect 的验收检查，并且在需要时通过独立的 Astra 评审。
 
-- [x] The fork offers a native Sol Implementer under its own identity and includes it in installation, selective checks, runtime inspection, and supported invocation instructions.
-- [x] Judgment-heavy, context-heavy, or higher-risk implementation can be assigned directly to `gpt-5.6-sol`; the workflow does not require a failed or corrected Luna attempt first.
-- [x] Sol defaults to `high` for Astra's Architect-mode delegated calls and honors explicit supported user adjustments, with actual runtime evidence confirming the selected effort.
-- [x] The Sol default is not imposed on a directly used Sol primary session, and the existing Luna delegated `max` constraint is preserved.
-- [x] Sol receives the same complete implementation specification, ownership requirements, evidence contract, and prohibition on further implementation delegation as Luna.
-- [x] Material ambiguity and scope conflicts are surfaced to the architect rather than used to justify unapproved architecture changes or silent expansion of ownership.
-- [x] The architect inspects all actual Sol-produced changes and reruns key verification; higher-risk work then completes the independent Astra review workflow from ticket 04.
-- [x] An invalid or unavailable delegated model or effort is reported explicitly and is not silently replaced or accepted as a valid Sol execution.
-- [x] Luna remains the choice for bounded, fully specified work. The final active fork contracts cover the Advisor, Luna Implementer, Sol Implementer, and Independent reviewer without an additional selectable Terra implementation lane.
-- [x] Installed-plugin scenarios show direct Sol selection, the default and an adjusted effort, primary-session effort freedom, ownership and verification evidence, and completion of a higher-risk task through independent review.
-- [x] The verification entry point and structured role checks describe the actual active contracts and no longer require obsolete upstream role inventory or route wording.
+- [x] 该分叉以自己的身份提供一名原生 Sol Implementer，并将其纳入安装、选择性检查、运行时检视和受支持的调用说明。
+- [x] 判断量大、上下文量大或较高风险的实现可以直接分配给 `gpt-5.6-sol`；该工作流不要求先有一次失败的或已修正的 Luna 尝试。
+- [x] 对 Astra 在 Architect 模式中的委派调用，Sol 默认推理等级为 `high`，并尊重显式的、受支持的用户调整，且有实际运行时证据确认所选推理等级。
+- [x] Sol 的默认值不被施加到一个被直接使用的 Sol 主代理会话上，并且既有的 Luna 委派 `max` 约束予以保留。
+- [x] Sol 收到与 Luna 相同的完整实现规格、所有权要求、证据契约，以及不得进一步委派实现的禁令。
+- [x] 实质性含糊和范围冲突被提交给 Architect，而不是被用来为未经批准的架构变更或所有权的静默扩大作辩护。
+- [x] Architect 检视全部由 Sol 产出的实际变更，并重新运行关键验证；较高风险的工作随后完成来自工单 04 的独立 Astra 评审工作流。
+- [x] 一个无效或不可用的委派模型或推理等级被显式报告，并且不被静默替换，也不被接受为一次有效的 Sol 执行。
+- [x] Luna 仍然是范围受控且规格完整的工作的选择。最终的现行分叉契约覆盖 Advisor、Luna Implementer、Sol Implementer 和独立 Reviewer，而没有额外的可选择 Terra 实现通道。
+- [x] 已安装插件的场景展示直接的 Sol 选择、默认推理等级和一次调整后的推理等级、主代理会话的推理等级自由、所有权和验证证据，以及一项较高风险任务经由独立评审而完成。
+- [x] 验证入口和结构化的角色检查描述实际的现行契约，并且不再要求过时的上游角色清单或路由用词。
 
-## Verification
+## 验证
 
-Use a disposable task with an existing meaningful verification check and enough implementation judgment to select Sol directly. Observe the selected role, model and effort, owned diff, architect verification, and independent Astra review for the higher-risk case. Distinguish parser-fixture success from live execution evidence.
+使用一项一次性任务，它带有一项既有的有意义验证检查，并且有足够的实现判断，从而直接选择 Sol。观察所选角色、模型和推理等级、所拥有的差异、Architect 的验证，以及较高风险情形的独立 Astra 评审。把解析器夹具的成功与实机执行证据区分开。
 
-## Acceptance
+## 验收
 
-Completed on 2026-09-06. Native Sol installation and runtime checks pass. Installed
-scenarios confirm direct Sol high and explicit medium execution, primary Sol low
-freedom, actual owned edits, architect checks, fresh Astra review for higher-risk
-work, and refusal when the Sol role is unavailable. Other recognized efforts have
-fixture coverage only. See [the acceptance record](../acceptance-05-06.md).
+已于 2026-09-06 完成。原生 Sol 的安装检查和运行时检查通过。已安装场景确认直接的 Sol high 执行和显式的 medium 执行、主代理 Sol 的 low 自由、实际拥有的编辑、Architect 的检查、较高风险工作的新 Astra 评审，以及在 Sol 角色不可用时的拒绝。其他已识别的推理等级只有夹具覆盖。见[验收记录](../acceptance-05-06.md)。
