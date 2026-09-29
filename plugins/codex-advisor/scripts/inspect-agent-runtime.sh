@@ -25,7 +25,6 @@ Role checks require observed model, effort, parent linkage, working directory, a
 permissions. Without --agent, emit generic routing evidence. This inspector
 does not certify host support, authorization, fresh invocation, task completion,
 or enforced isolation. Compare thread IDs and invocation evidence separately.
-Primary-derived review selection is retired.
 EOF
 }
 
@@ -102,10 +101,6 @@ while [ "$#" -gt 0 ]; do
     --effort)
       [ -z "$requested_effort" ] || fail "select exactly one --effort."
       requested_effort=$2; shift 2 ;;
-    --luna|--sol-effort|--astra-effort|--explorer-effort|--sol-explorer-effort|--astra-explorer-effort|--advisor-effort|--reviewer-effort)
-      fail "per-role options are retired; use --agent NAME [--effort EFFORT] THREAD_ID." ;;
-    --review-primary-effort|--select-review-effort)
-      fail "primary-derived review selection is retired; use --agent NAME [--effort EFFORT] THREAD_ID." ;;
     --help|-h) usage; exit 0 ;;
     --*) fail "unknown argument." ;;
     *) [ "$#" -eq 1 ] || fail "exactly one trailing THREAD_ID is required."

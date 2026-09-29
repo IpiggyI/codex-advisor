@@ -2,6 +2,8 @@
 
 Status: needs-triage
 
+2026-09-29：本文件的未决项已移入[第三轮清单](round-3-confirmation-checklist.md)，并以最新基线重新核对。本文件只保留已记录的裁定和当时的证据。
+
 记录日期：2026-09-13。
 审查的仓库版本：`7eca26d41f51c8d63ec4f62c2783fa9cc60c3146`。
 

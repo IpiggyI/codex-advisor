@@ -2,7 +2,6 @@ name = "ca_worker_rescue"
 description = "Worker, rescue tier: gpt-6-astra, the caller passes reasoning_effort. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
 model = "gpt-6-astra"
 
-# The caller selects effort; a role-level setting would override that choice.
 developer_instructions = """
 Implement the OBJECTIVE within FILES AND OWNERSHIP, keeping INTERFACES and
 CONSTRAINTS from the packet. Unspecified local implementation choices and ordinary

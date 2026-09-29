@@ -4,7 +4,6 @@ model = "gpt-6-astra"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
-# 本入口固定 effort；调用方不必覆盖。
 developer_instructions = """
 只作判断。不得写入、格式化、实现或把实现再委派出去。
 

@@ -1,0 +1,414 @@
+file	line	kind	destination_or_reason	text
+SKILL.md	2	S	verbatim→SKILL	name: orchestration description:
+SKILL.md	2	S	verbatim→SKILL	"Use when a primary agent is asked to delegate or is about to delegate work or to accept, rework, or escalate a delegated result, when the user author
+SKILL.md	2	S	verbatim→SKILL	Also use when a primary, worker, or Explorer lacks applicable selected posture or adoption instructions."
+SKILL.md	10	S	verbatim→SKILL	Any primary model may implement directly, delegate bounded work, or combine both.
+SKILL.md	10	S	verbatim→SKILL	Preserve the user's primary model and reasoning effort.
+SKILL.md	10	S	B05 delete; rule kept by "Preserve the user's primary model and reasoning effort"	A midrange primary is a preference, not a plugin requirement.
+SKILL.md	10	S	verbatim→SKILL	Choose decomposition, order, and division of work within the user's authorized goals, scope, reserved decisions, acceptance conditions, and resource l
+SKILL.md	10	S	verbatim→SKILL	Do not change those boundaries to make the task easier.
+SKILL.md	10	S	verbatim→SKILL	Investigate mismatches with current code, seek resolution for user-owned changes, and continue independent unaffected work.
+SKILL.md	18	S	verbatim→SKILL	Explicit Architect-mode authorization makes every implementation edit and correction delegated for its scope, for any primary model.
+SKILL.md	18	S	verbatim→SKILL	The primary owns design, contracts, scheduling, and acceptance and may write design and task artifacts.
+SKILL.md	18	S	verbatim→SKILL	Model identity, a ticket, a specification, or an unaccepted proposal does not activate this mode.
+SKILL.md	18	S	verbatim→SKILL	Record the authorizing request.
+SKILL.md	18	S	verbatim→SKILL	It lasts for this task and follow-ups; unrelated tasks need new authorization unless the user explicitly granted session-wide scope.
+SKILL.md	27	S	B01d: replaced by SKILL "Read references by event" map	Before a delegated call, read the relevant packet in [role-contracts.md](references/role-contracts.md), the installation, invocation, evidence, and pe
+SKILL.md	27	S	verbatim→SKILL	Every model name, effort option, default, candidate order, consultation mapping, and acceptance mapping lives in the routing profile.
+SKILL.md	27	S	verbatim→SKILL	Respect host capacity, explicit user exclusions, and resource limits.
+SKILL.md	27	S	verbatim→SKILL	Select a dial explicitly without asking permission for each routine allocation.
+SKILL.md	36	S	verbatim→SKILL	Choose the role by the output you need: evidence is an Explorer, a change is a worker, and independent acceptance is an Advisor.
+SKILL.md	36	S	verbatim→SKILL	New work starts in `mainstay`.
+SKILL.md	36	S	verbatim→SKILL	It may start in `crux` when a key difficulty is already identified or interacting constraints must be handled.
+SKILL.md	36	S	verbatim→SKILL	There is no usage quota.
+SKILL.md	36	S	verbatim→SKILL	`rescue` is never a first-round choice unless the user declares it.
+SKILL.md	36	S	B05 delete	The narrower admission rule recorded for possible future use is not enabled.
+SKILL.md	43	S	verbatim→SKILL	Inside a role-and-tier cell, take the first candidate at its default.
+SKILL.md	43	S	verbatim→SKILL	Take a later candidate when the outcome depends more on judgment the packet cannot capture.
+SKILL.md	43	S	verbatim→SKILL	A capability tier is set by its models; effort is a finer grade inside the tier.
+SKILL.md	49	S	verbatim→SKILL	Give every worker an objective, owned scope, retained interfaces, reserved constraints, and meaningful verification.
+SKILL.md	49	S	verbatim→SKILL	Include the original task and source references so the worker can inspect them.
+SKILL.md	49	S	verbatim→SKILL	Unspecified local implementation choices belong to the worker.
+SKILL.md	49	S	verbatim→SKILL	Expected-behavior ambiguity, conflicting requirements, or required changes to reserved interfaces are contract gaps to resolve before dependent edits.
+SKILL.md	55	S	merged→SKILL "Workers own implementation and ordinary debugging and do not delegate it further"	Workers do their own debugging and implementation without further implementation delegation.
+SKILL.md	55	S	B01b dup of role-contracts Worker packet FILES/RETURN; SKILL says the packet carries the rest	They preserve concurrent and unrelated edits and report actual changes, checks, judgment calls, and gaps.
+SKILL.md	55	S	merged→SKILL "Checks that span other work packages ... stay in your plan"; worker half = rc VERIFICATION field	A worker runs the verification its packet specifies and whatever its own debugging needs; acceptance checks that span other work packages or the whole
+SKILL.md	55	S	moved→recovery.md R1 paragraph ("structural preference alone does not justify it")	Rework identifies the violated requirement, reproducible failure, expected behavior, and verification; structural preference alone is insufficient.
+SKILL.md	63	S	verbatim→SKILL	Check dependencies, ownership (including generated files and check side effects), and actual available slots before dispatch.
+SKILL.md	63	S	verbatim→SKILL	Decide ticket boundaries, dispatch count, and verification batches separately: combine checks that share costly setup while the scope stays understand
+SKILL.md	63	S	merged→SKILL same sentence + ops 199-203 "updating the next packet with actual state"	Independent delegated tasks may run concurrently; sequence dependencies, conflicting ownership, and excess capacity.
+SKILL.md	63	S	verbatim→SKILL	Do not split a shared file into nominally independent owners or nest workers to evade capacity.
+SKILL.md	63	S	verbatim→SKILL	Collect each report and inspect the combined result.
+SKILL.md	63	S	merged→SKILL "Failed, blocked, missing, or incomplete work and its dependents stay pending; a successful sibling does not complete them"	A successful sibling does not complete failed or missing work.
+SKILL.md	75	S	verbatim→rec	A complete worker attempt includes implementation, ordinary debugging, and verification, then failed acceptance or a concrete inability to finish the 
+SKILL.md	75	S	verbatim→rec	Intermediate failing tests and individual tool errors are not complete failed attempts.
+SKILL.md	79	S	merged→recovery.md "Diagnose before acting" (with ops 133-134 "before choosing repair, clarification, or a ladder step")	Diagnose environment problems, missing facts, contract gaps, reasoning failures, and executor suitability.
+SKILL.md	79	S	verbatim→rec	Repair environment problems first.
+SKILL.md	79	S	verbatim→rec	A contract gap (unclear expected behavior, conflicting requirements, a reserved interface) is a corrected contract on the same thread, not a ladder st
+SKILL.md	79	S	verbatim→rec	Primary takeover is available in ordinary work;
+SKILL.md	79	S	verbatim→rec	Architect mode keeps edits delegated.
+SKILL.md	86	S	verbatim→rec	After a failed acceptance, issue R1: a rework ticket in the same thread at the same dial.
+SKILL.md	86	S	moved→recovery.md R1 paragraph	Rework names the violated requirement, reproducible failure, expected behavior, and verification; it contains no fix.
+SKILL.md	86	S	verbatim→rec	When rework also fails and the diagnosis attributes the cause to capability, the attempt and rework together count as one capability failure.
+SKILL.md	92	S	moved→recovery.md ("with the handoff below")	After a capability failure, move the work to the next tier in a fresh thread with the current-state handoff.
+SKILL.md	92	S	verbatim→rec	Do not switch to another model in the same tier unless no other choice exists.
+SKILL.md	92	S	verbatim→rec	The next dial's model level cannot be lower than the failed dial's unless no other choice exists; if the model stays the same, use a higher effort.
+SKILL.md	92	S	verbatim→rec	Above that floor, choose by the difficulty the failure exposed.
+SKILL.md	98	S	verbatim→rec	The path is `mainstay` -> `crux` -> `rescue` -> the user.
+SKILL.md	98	S	verbatim→rec	`rescue` is reached only through `crux` or a user declaration; work that starts in `crux` reaches `rescue` after one `crux` capability failure.
+SKILL.md	98	S	verbatim→rec	R3 remains a guard: raise the same model at most once.
+SKILL.md	98	S	verbatim→rec	Under R4, a major execution problem such as repeated tool failures, runaway execution, or touching a reserved item may skip rework and counts as one c
+SKILL.md	105	S	merged→recovery.md "Hand off actual state" (ops 160-162 wording)	Stop the previous conflicting writer, inspect actual state, and preserve useful changes before reassignment.
+SKILL.md	105	S	moved→recovery.md handoff template (pointer no longer needed)	Follow the current-state handoff in the operations reference.
+SKILL.md	105	S	moved→recovery.md Diagnose section	Environment problems and contract gaps do not move work along the path.
+SKILL.md	109	S	moved→recovery.md "Keep or replace the thread" (+ "with explicit settings" from ops 155)	Every delegated effort change, upward or downward, requires a new native thread.
+SKILL.md	109	S	moved→recovery.md threads section	Model changes and role reassignments also require new matching entries.
+SKILL.md	109	S	moved→recovery.md threads section (+ follow-up keeps task_name, ops 92)	Same-model, same-effort worker rework may reuse its thread.
+SKILL.md	109	S	moved→independent-acceptance.md "fresh Advisor thread" + "fresh review ... in a new thread, even when entry and effort are unchanged"	Independent acceptance always starts fresh, including review after corrections.
+SKILL.md	109	S	moved→recovery.md threads section	Never report a resume with a changed prompt as a new session.
+SKILL.md	109	S	moved→recovery.md ("Compare real IDs and settings" + lifecycle-policy sentence)	Compare actual IDs and settings; this is an explicit lifecycle policy, not a universal claim about cache behavior or savings.
+SKILL.md	118	S	reworded→SKILL consultation para (tool name from ops 254 added)	Process consultation takes no packet and is callable with zero arguments by the primary, any worker, and any Explorer.
+SKILL.md	118	S	verbatim→SKILL	It carries the caller's current effective context automatically, including the unfinished turn and the effective history after compaction.
+SKILL.md	118	S	kept in SKILL; B03c "actual"→"host-recorded"	The advisor runs without tools and returns exactly one plan, correction, or stop signal with its actual model and effort.
+SKILL.md	118	S	kept in SKILL, merged with ops 305-307 caller-failure rule into one sentence	An unsupported reconstruction or failed consultation returns an explicit failure, never fabricated advice.
+SKILL.md	126	S	verbatim→SKILL	A complete consultation attempt returns one allowed result that answers the decision in context with a supportable conclusion.
+SKILL.md	126	S	verbatim→SKILL	It fails when it returns no allowed result or source and verification evidence materially invalidate its conclusion.
+SKILL.md	126	S	verbatim→SKILL	Mere disagreement, an intermediate tool error, or worker failure is not such a failure.
+SKILL.md	131	S	verbatim→SKILL	Use the selected consultation posture and adoption blocks already in context.
+SKILL.md	131	S	verbatim→SKILL	The server selects the advisor dial.
+SKILL.md	131	S	verbatim→SKILL	If either block is missing or inapplicable, read the consultation mapping in the routing profile and [consult-posture.md](references/consult-posture.m
+SKILL.md	131	S	kept in SKILL + B05 executable part of ops 356-357 ("no hook blocks completion automatically")	Follow both blocks exactly.
+SKILL.md	131	S	verbatim→SKILL	The advisor has no escalation path of its own.
+SKILL.md	131	S	verbatim→SKILL	Consultation does not grant authorization and does not replace fact checking or independent acceptance.
+SKILL.md	142	S	B06 remove	A complete advisory attempt fails when it does not answer its specified question or source and verification evidence materially invalidate its conclus
+SKILL.md	142	S	B06 remove	Mere disagreement, intermediate tool errors, and worker failure alone are not complete advisory failures.
+SKILL.md	147	S	verbatim→SKILL	Inspect all actual changes yourself, including new files, corrections, and worker-authored acceptance tests.
+SKILL.md	147	S	verbatim→SKILL	Check that tests can fail for the intended requirement and that the evidence describes the current deliverable.
+SKILL.md	147	S	verbatim→SKILL	A report, false completion claim, skipped required check, or missing runtime evidence cannot establish success.
+SKILL.md	153	S	verbatim→SKILL	Primary checks are the checks you own and confirm.
+SKILL.md	153	S	merged→SKILL "Name one executor per verification batch ..." (ops 208-210 detail added)	Run them yourself or assign them to an executor that receives the complete batch requirements and reports executor, scope, command, exit status, outpu
+SKILL.md	153	S	verbatim→SKILL	Reuse a result while the relevant code, artifacts, checks, inputs, and environment still support it.
+SKILL.md	153	S	verbatim→SKILL	A changed executor or a new session is not by itself a reason to run a check again; a changed dependency, an evidence gap, an unexplained failure, or 
+SKILL.md	162	S	verbatim→SKILL	Ordinary direct, delegated, and mixed multi-step work may complete after primary checks.
+SKILL.md	162	S	verbatim→SKILL	Step count, file count, primary identity, or use of a particular tier alone does not require independent acceptance.
+SKILL.md	166	S	moved→independent-acceptance.md "Decide whether it is required"; SKILL keeps event line + sanctioned invariant (B01c)	High-risk delivery and explicit independent-review requests each require independent acceptance after primary checks, for any primary model: send the 
+SKILL.md	166	S	moved→independent-acceptance.md (merged with ops 244-245 list); SKILL invariant restates as guardrail	A consultation, a worker's self-review, and a delegated check run cannot satisfy independent acceptance.
+SKILL.md	171	S	B01b: pointer→IA "by the acceptance mapping in the routing profile"	Choose the acceptance dial from the routing profile.
+SKILL.md	171	S	B01b: acceptance mapping lives only in routing-profile.md	Work produced in one tier uses that tier's Advisor entry; work produced by several tiers uses the highest tier involved.
+SKILL.md	171	S	B01b: acceptance mapping lives only in routing-profile.md	For primary-authored work, use the lowest advisor dial that is not weaker than the primary's dial; if none qualifies, use the strongest advisor dial.
+SKILL.md	171	S	B01b: acceptance mapping lives only in routing-profile.md	A primary whose exact model identity is absent from the routing profile also uses the strongest advisor dial.
+SKILL.md	171	S	B01b: routing-profile acceptance mapping (dial) + IA pending list (status)	A low-confidence verdict leaves acceptance pending and goes to the user; it does not trigger an automatic review at another dial.
+SKILL.md	179	S	moved→IA "Check the review"	Check routing, fresh invocation, tool activity, and scoped before/after state.
+SKILL.md	179	S	moved→IA "Correct and review again"	Resolve material findings, reverify corrections, and obtain a fresh review of the revised deliverable even at an unchanged dial.
+SKILL.md	179	S	moved→IA pending paragraph (merged with ops 248-250, rc 126-127)	Unavailable required execution, unsupported settings, absent or conflicting evidence, or unresolved material findings leave affected acceptance explic
+SKILL.md	179	S	verbatim→ia	Report the gap without silent substitution; independent unaffected work can continue.
+operations.md	5	S	verbatim→ops	The plugin supplies `codex-advisor:orchestration`; the companion installer supplies thirteen tier-named native entries.
+operations.md	5	S	verbatim→ops	Resolve scripts from the installed skill:
+operations.md	8	CODE	verbatim→ops	skill_dir=<directory-containing-SKILL.md> installer="$skill_dir/../../scripts/install-agents.sh" runtime_inspector="$skill_dir/../../scripts/inspect-a
+operations.md	15	S	verbatim→ops	Run a non-mutating selective check before the first use of each required entry.
+operations.md	15	S	verbatim→ops	Cache success for the current task only; recheck after installation/configuration changes.
+operations.md	15	S	reworded→ops: table replaced by one selector sentence (B01b)	Use `--check` for all entries, or repeat `--check-role` with selectors from the table below.
+operations.md	15	S	verbatim→ops	Selective checks ignore unrelated installed files.
+operations.md	15	S	verbatim→ops	A failure leaves the affected call pending until the installation is reconciled; independent work may continue.
+operations.md	22	S	verbatim→maint	For development, install the marketplace/plugin in a temporary `CODEX_HOME`, install entries into its `agents` directory, and start a fresh host task.
+operations.md	22	S	verbatim→maint	An empty temporary `--target-dir` checks installation without touching active settings.
+operations.md	22	S	verbatim→maint	Copy only required connection/authentication settings, keep credentials out of reports, and remove temporary credential copies after testing.
+operations.md	28	S	moved→maint "Companion installer"; B02c retire clause removed	The installer is manifest-driven: the manifest is the set of templates shipped beside it, and the retire list names the entry files of earlier version
+operations.md	28	S	moved→maint; B02c retire clause removed, "deletes nothing" added (new behaviour)	A missing or differing manifest destination is written and reported as installed; an identical one is reported as unchanged; a present retire file is 
+operations.md	28	S	verbatim→maint	Nothing else is read or written, including upstream Sol Advisor files, unrelated agents, and the primary configuration.
+operations.md	28	S	verbatim→maint	Writes are atomic per file.
+operations.md	28	S	moved→maint; B02c residue clause removed	`--check` writes nothing and fails on drift (a differing or missing manifest file) or residue (a present retire file), listing each.
+operations.md	28	S	verbatim→maint	Symlinked destinations or ancestors, non-regular destinations, non-directory ancestors, dot segments, and the filesystem root are refused before any w
+operations.md	28	S	verbatim→maint	Relative targets resolve against the current directory.
+operations.md	28	S	verbatim→ops	Installed entries are written only by the installer; do not hand-edit them.
+operations.md	43	S	B01b dup of SKILL Allocate section + event map	Use the skill's allocation mechanism and the dials in [routing-profile.md](routing-profile.md) within user resources.
+operations.md	43	S	B01b dup of SKILL "Any primary model may ... delegate"	Any primary can select these entries.
+operations.md	43	S	B01b dup of routing-profile candidate order (› usage order) and entry descriptions	The name states role and tier; inside a tier with two models, `_m` is the default candidate and `_h` the stronger alternative.
+operations.md	43	S	verbatim→ops	Explorer and Advisor entries are also callable without loading the skill; installation alone does not create a global routing default.
+operations.md	50	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Responsibility | Native entry | Install selector | Effort |
+operations.md	51	ROW	verbatim→rp	|---|---|---|---|
+operations.md	52	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Explorer, `mainstay`, default candidate | `ca_explorer_mainstay_m` | `explorer-mainstay-m` | caller |
+operations.md	53	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Explorer, `mainstay`, stronger alternative | `ca_explorer_mainstay_h` | `explorer-mainstay-h` | caller |
+operations.md	54	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Explorer, `crux`, default candidate | `ca_explorer_crux_m` | `explorer-crux-m` | `max` |
+operations.md	55	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Explorer, `crux`, stronger alternative | `ca_explorer_crux_h` | `explorer-crux-h` | `xhigh` |
+operations.md	56	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Explorer, `rescue` | `ca_explorer_rescue` | `explorer-rescue` | caller |
+operations.md	57	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Worker, `mainstay`, default candidate | `ca_worker_mainstay_m` | `worker-mainstay-m` | `max` |
+operations.md	58	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Worker, `mainstay`, stronger alternative | `ca_worker_mainstay_h` | `worker-mainstay-h` | `high` |
+operations.md	59	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Worker, `crux`, default candidate | `ca_worker_crux_m` | `worker-crux-m` | caller |
+operations.md	60	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Worker, `crux`, stronger alternative | `ca_worker_crux_h` | `worker-crux-h` | caller |
+operations.md	61	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Worker, `rescue` | `ca_worker_rescue` | `worker-rescue` | caller |
+operations.md	62	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Advisor, `mainstay` | `ca_advisor_mainstay` | `advisor-mainstay` | caller |
+operations.md	63	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Advisor, `crux` | `ca_advisor_crux` | `advisor-crux` | `high` |
+operations.md	64	ROW	B01b: entry table deleted; selector sentence in ops; dials in routing-profile table	| Advisor, `rescue` | `ca_advisor_rescue` | `advisor-rescue` | `xhigh` |
+operations.md	66	S	B01b dup of routing-profile notation + "Every entry pins its model"	Every entry pins its model; a value in the Effort column is pinned in the template, "caller" means the caller passes it.
+operations.md	66	S	verbatim→ops	The template's `model` and `model_reasoning_effort` take precedence over spawn values, so a pinned entry cannot reach another effort.
+operations.md	66	S	B01b dup of SKILL "Preserve the user's primary model" / "explicit user exclusions" + ops "Never edit ... primary settings"	Keep primary settings unchanged and respect explicit model exclusions.
+operations.md	73	S	kept in ops, merged with rc 5 ("an Explorer call always starts a new thread")	Use the native spawn interface with fresh context.
+operations.md	73	S	verbatim→ops	Pass `reasoning_effort` when the entry leaves effort to the caller; a pinned entry takes none.
+operations.md	73	S	verbatim→ops	On every fresh spawn, set `task_name` to a short name that distinguishes this thread from its siblings.
+operations.md	73	S	verbatim→ops	The first line of `message` is that same name, verbatim plain text with no Markdown marker, then a blank line, then the role packet:
+operations.md	79	CODE	verbatim→ops	agent_type: ca_worker_crux_m fork_turns: none reasoning_effort: <listed-effort> task_name: wire_http_checks message: <short name, blank line, five-par
+operations.md	87	S	verbatim→ops	Replace entry, effort, short name, and packet for the selected role.
+operations.md	87	S	verbatim→ops	Use `fork_turns: none` for an explicit packet without copied conversation; per-spawn `model` and `reasoning_effort` are honoured only with it.
+operations.md	87	S	verbatim→ops	For a caller-selected entry, always pass an effort listed in the routing profile, even the default; otherwise host inheritance may select it.
+operations.md	87	S	verbatim→ops	Never edit entry files or primary settings to adjust effort.
+operations.md	87	S	moved→recovery.md threads ("follow-up, which keeps the thread's task_name"); new-thread half = ops "On every fresh spawn, set task_name"	Follow-up on the same thread keeps that name; a new thread gets its own.
+operations.md	95	S	verbatim→ops	Require an accepted native call and actual routing evidence.
+operations.md	95	S	verbatim→ops	Recognized inspector inputs do not prove host/account support.
+operations.md	95	S	kept in ops (colon moved to B03b sentence)	Public spawn/details metadata is authoritative; use the narrow inspector for omitted fields without overriding contradictions:
+operations.md	99	CODE	verbatim→ops	sh "$runtime_inspector" --agent ca_worker_crux_m --effort <listed-effort> <native-thread-id> sh "$runtime_inspector" --sessions-dir /absolute/path/to/
+operations.md	105	S	verbatim→ops	`--agent` names the entry.
+operations.md	105	S	verbatim→ops	The inspector reads the expected model and any pinned effort from the shipped template of that name, resolved beside the script.
+operations.md	105	S	verbatim→ops	For a caller-selected entry, `--effort` is required and is the expected effort.
+operations.md	105	S	verbatim→ops	For a pinned entry, omit `--effort` or pass a value equal to the pin; a different value is rejected.
+operations.md	105	S	verbatim→ops	The inspector does not judge whether an effort is allowed; the routing profile does.
+operations.md	105	S	kept in ops + "for every dispatch"	Validate role, model, effort, thread, parent association, working directory, and observed permissions.
+operations.md	105	S	kept in ops (joined with previous by ";")	Compare parent ID and working directory with the expected task.
+operations.md	105	S	kept in ops ("It reads exactly one ...")	The inspector reads exactly one UUID-matched rollout and emits allowlisted metadata only, rejecting absent, ambiguous, malformed, or conflicting evide
+operations.md	105	S	verbatim→ops	Generic inspection without `--agent` does not certify a role contract.
+operations.md	116	S	verbatim→ops	The inspector does not certify user authorization, complete failed attempts, escalation eligibility, fresh invocation, quality, or enforced isolation.
+operations.md	116	S	verbatim→ops	Check those against task evidence and native events.
+operations.md	116	S	verbatim→ops	Never infer actual settings from role self-reports or dump prompts and credentials to establish them.
+operations.md	116	S	verbatim→ops	Missing entries, unsupported settings, contradictions, or absent evidence leave affected work explicitly pending without a silent substitute.
+operations.md	116	S	verbatim→ops	Direct independent investigation may continue.
+operations.md	124	S	verbatim→ops	The generic interface is `--agent NAME [--effort EFFORT] THREAD_ID`.
+operations.md	124	S	B05/B02d delete	Earlier review-selection and per-role options fail with a diagnostic that names `--agent`.
+operations.md	124	S	B01b→IA "Choose the Advisor entry and its dial by the acceptance mapping"	Choose the acceptance entry through the routing profile.
+operations.md	130	S	B01b dup of SKILL 75-77 → recovery.md "Count a complete attempt"	Count a complete worker attempt only after implementation, ordinary debugging, and verification result in failed acceptance or concrete inability to c
+operations.md	130	S	B01b dup → recovery.md	An intermediate failing test or tool error is not such an attempt.
+operations.md	130	S	B01b dup → recovery.md Diagnose (its "before choosing repair, clarification, or a ladder step" kept)	Diagnose environment, missing facts, contract, reasoning, and executor suitability before choosing repair, clarification, or a ladder step.
+operations.md	130	S	B01b dup → recovery.md ("not a capability failure"; env/contract "do not move work along the path")	Do not infer weak capability from an environment or contract problem; a contract gap is a corrected contract on the same thread, not a ladder step.
+operations.md	138	S	B01b dup → recovery.md ladder	The skill's escalation ladder governs a failed acceptance.
+operations.md	138	S	B01b dup → recovery.md R1	R1 is a rework ticket in the same thread at the same dial.
+operations.md	138	S	verbatim→rec	When rework also fails and the diagnosis attributes the cause to capability, the attempt and rework together count as one capability failure.
+operations.md	138	S	B01b dup → recovery.md	Move the work to the next tier in a fresh thread with the handoff below.
+operations.md	138	S	B01b dup → recovery.md	Do not switch models inside the failed tier unless no other choice exists.
+operations.md	138	S	verbatim→rec	The next dial's model level cannot be lower than the failed dial's unless no other choice exists; if the model stays the same, use a higher effort.
+operations.md	138	S	B01b dup → recovery.md R3	R3 keeps the same-model raise to at most once.
+operations.md	138	S	B01b dup → recovery.md R4	Under R4, a major execution problem may skip rework and counts as one capability failure.
+operations.md	148	S	verbatim→rec	The path is `mainstay` -> `crux` -> `rescue` -> the user.
+operations.md	148	S	B01b dup → recovery.md path	`rescue` is reached only through `crux` or a user declaration.
+operations.md	148	S	B01b dup → recovery.md path	Work that starts in `crux` reaches `rescue` after one `crux` capability failure.
+operations.md	148	S	B01b dup → recovery.md	Environment problems and contract gaps do not move work along this path.
+operations.md	153	S	B01b dup → recovery.md threads	Same-model, same-effort worker correction may use native follow-up/resume.
+operations.md	153	S	B01b dup → recovery.md threads ("with explicit settings" kept)	Any effort change in either direction, model change, or role reassignment uses a new native thread with explicit settings and the matching entry.
+operations.md	153	S	split: Explorer→ops Dispatch "an Explorer call always starts a new thread"; Advisor/IA fresh→independent-acceptance.md	Exploration and advice calls start fresh; independent acceptance always starts fresh, including after corrections at an unchanged dial.
+operations.md	153	S	moved→recovery.md threads	A resumed thread with different requested effort does not satisfy this policy.
+operations.md	160	S	verbatim→rec	Before replacing a writer, finish or stop its conflicting activity and obtain available evidence.
+operations.md	160	S	verbatim→rec	Inspect actual scoped changes and preserve useful partial results and unrelated edits.
+operations.md	160	S	moved→recovery.md ("alongside its role packet")	Give the successor this compact handoff alongside the role contract:
+operations.md	165	CODE	verbatim→rec	OBJECTIVE AND BINDING DECISIONS <Original task, authorized scope, ownership, retained interfaces, and constraints.> CURRENT STATE <Actual changed/new 
+operations.md	181	S	B01b dup of SKILL consultation para	The advisor used by process consultation has no escalation path of its own.
+operations.md	181	S	B01b dup of SKILL consultation para (explicit failure; only success counts; not independent acceptance)	A failed consultation returns an explicit failure and cannot count as advice or acceptance.
+operations.md	181	S	B01b dup → routing-profile acceptance mapping + IA pending list	A low-confidence independent-acceptance verdict leaves acceptance pending and goes to the user; it does not trigger an automatic review at another dia
+operations.md	186	S	verbatim→rec	Record predecessor/successor IDs, observed efforts, and new-spawn versus follow-up events.
+operations.md	186	S	moved→recovery.md ("Compare real IDs and settings, not labels or prose")	Compare real IDs, not labels or prose.
+operations.md	186	S	verbatim→rec	Missing or contradictory transition evidence leaves the transition unverified.
+operations.md	186	S	B01b dup → recovery.md lifecycle-policy sentence	Fresh sessions are an explicit policy, not a claim that all hosts invalidate caches or that savings are guaranteed.
+operations.md	193	S	split: deps/ownership/generated/side effects = SKILL "Check dependencies, ownership ..."; starting state + acceptance checks → ops Schedule	Record dependencies, owned files/modules, generated outputs, verification side effects, acceptance checks, and scoped starting state.
+operations.md	193	S	kept in ops Schedule (joined sentence)	Identify concurrent or user edits to preserve.
+operations.md	193	S	kept in ops; nesting clause = SKILL "nest workers to evade capacity"	Establish available slots from host limits and active agents; do not create nested workers to evade them.
+operations.md	193	S	verbatim→ops	If capacity is unknown, use one worker until established; if none is available, retain work as pending and report the wait.
+operations.md	199	S	B01b dup of SKILL scheduling	Dispatch independent delegated tasks with disjoint ownership within capacity.
+operations.md	199	S	B01b dup of SKILL "keep a real check where dependent work rests on its result"	Sequence dependent tasks after inspecting prerequisite results and checking the premise the dependent work rests on; do not accumulate unverified prem
+operations.md	199	S	merged→SKILL "update each sequenced packet with the actual state its predecessor left"	Sequence shared ownership after the earlier writer finishes, updating the next packet with actual state.
+operations.md	199	S	verbatim→ops	Release finished agents through the host lifecycle when needed after retaining their reports and evidence.
+operations.md	206	S	B01b dup of SKILL "Decide ticket boundaries, dispatch count, and verification batches separately"	Form verification batches separately from ticket and dispatch boundaries.
+operations.md	206	S	B01b dup of SKILL	Combine checks that share costly setup while the scope stays understandable and a failure stays locatable.
+operations.md	206	S	merged→SKILL Accept "Name one executor per verification batch ..."	Name one executor per batch: the primary, or a delegate that receives the complete batch requirements, the merged changes, and the evidence already co
+operations.md	206	S	verbatim→ops	A delegated check run uses a Worker entry; the read-only Explorer and Advisor entries take only checks that write nothing.
+operations.md	213	S	B01b dup of SKILL "Collect each report"	Collect changes, checks, judgment calls, and gaps from every worker.
+operations.md	213	S	merged→SKILL scheduling paragraph; "independent work may continue" = SKILL Own the task	Failed, blocked, absent, or incomplete work and its dependents stay pending; independent work may continue.
+operations.md	213	S	B01b dup of SKILL "Inspect all actual changes yourself ..."	Inspect the complete combined diff yourself, including new files and worker-authored tests.
+operations.md	213	S	merged→SKILL "Run each batch once, then reconcile ..."	Run each verification batch once through its executor, then reconcile coverage, actual output, and the current combined state before acceptance.
+operations.md	213	S	B01b dup of SKILL Accept reuse sentence	Reuse a result while the relevant code, artifacts, checks, inputs, and environment still support it; check again for a changed dependency, an evidence
+operations.md	213	S	verbatim→ops	Claim parallel execution only when native events or activity show overlapping worker lifetimes; requests alone establish intent.
+operations.md	226	S	B01b dup of SKILL consultation para	Process consultation takes no packet.
+operations.md	226	S	B01b dup of SKILL consultation para (posture blocks carry the triggers)	Invoke it with zero arguments at the triggers in the full or reduced posture selected by exact caller/advisor model identity.
+operations.md	226	S	B01b dup of SKILL consultation para	Use the consultation mapping in the routing profile and the canonical posture and adoption rules in [consult-posture.md](consult-posture.md).
+operations.md	226	S	B01b dup of SKILL consultation para	Consultation returns a plan, correction, stop signal, or explicit failure.
+operations.md	226	S	B01b dup of SKILL "Consultation does not grant authorization ..."	It grants no authorization and never substitutes for independent acceptance.
+operations.md	233	S	B01b dup of SKILL "Ordinary ... work may complete after primary checks"	After primary diff inspection and checks, ordinary work may complete without independent acceptance.
+operations.md	233	S	B01b dup → IA "Decide whether it is required" + "Send the acceptance packet"	High-risk work or an explicit independent-review request requires the acceptance packet on an Advisor entry in a fresh thread.
+operations.md	233	S	B01b: acceptance mapping only in routing-profile.md	Work produced in one tier uses that tier's Advisor entry; work produced by several tiers uses the highest tier involved.
+operations.md	233	S	B01b: acceptance mapping only in routing-profile.md	Primary-authored work uses the lowest advisor dial not weaker than the primary's dial; if none qualifies, use the strongest advisor dial.
+operations.md	233	S	B01b: acceptance mapping only in routing-profile.md	A primary whose exact model id is absent from the routing profile also uses the strongest advisor dial.
+operations.md	233	S	verbatim→ia	Risk follows consequences, reversibility, and difficulty checking correctness, not step/file count or model.
+operations.md	243	S	moved→IA "capture the scoped state and send this packet to a fresh Advisor thread" + "Check the review"	Capture scoped state, spawn a fresh Advisor thread, validate settings and tool activity, and check its actual complete-diff inspection and findings.
+operations.md	243	S	moved→IA "Decide whether it is required" (merged list)	Consultation, exploration, a worker's self-review, and a delegated check run cannot substitute.
+operations.md	243	S	moved→IA "Correct and review again"	Resolve material findings, inspect and reverify corrections, then obtain fresh independent acceptance of the revised deliverable even at an unchanged 
+operations.md	243	S	verbatim→ia	Ordinary mode allows primary corrections;
+operations.md	243	S	verbatim→ia	Architect mode delegates them.
+operations.md	243	S	moved→IA pending paragraph	Missing required review, a low-confidence verdict, or unresolved material findings leaves completion pending and goes to the user.
+operations.md	254	S	caller rule→SKILL consultation para ("the codex_advisor MCP server's process_consultation tool ... call it with {}")	Call the `codex_advisor` MCP server's `process_consultation` tool with `{}`.
+operations.md	254	S	caller rule→SKILL ("The primary, any worker, and any Explorer call it")	The primary, workers, and explorers use the same call.
+operations.md	254	S	caller rule→SKILL ("takes no packet, summary, prompt, path, or dial")	There is no summary, prompt, path, or dial argument.
+operations.md	254	S	verbatim→maint	The installed `.mcp.json` starts Python 3 from the plugin root through `scripts/run-python.sh`.
+operations.md	254	S	verbatim→maint	The launcher requires a POSIX shell and selects a working Python 3.11 or later from `python3`, `python`, or `py -3`, with UTF-8 protocol output and by
+operations.md	254	S	verbatim→maint	An unusable interpreter is rejected before starting the component.
+operations.md	254	S	verbatim→maint	The component requires the qualified versioned Codex plugin-cache layout; an unknown layout fails explicitly.
+operations.md	254	S	ADR-0006 host fact row 1 → maint links ADR-0006; maint keeps "caller identity in the MCP metadata"	Codex supplies caller thread, session, turn, and item identity in MCP metadata.
+operations.md	254	S	moved→maint (reworded: "matching the caller identity in the MCP metadata")	The component reads exactly one matching rollout snapshot and stops before the unfinished consultation item, including when that item is the host's co
+operations.md	266	S	ADR-0006 host facts (lines 67-69, fact row 2) → maint link, not copied (A02a)	The snapshot retains all effective raw messages, roles, images, opaque reasoning, and paired tool calls/results, including truncated output as the cal
+operations.md	266	S	ADR-0006 (lines 60-63) → maint link; caller half = SKILL "effective history after compaction"	Compaction replaces earlier history with `replacement_history`; no turn window, summary fallback, or recovery of removed history is used.
+operations.md	266	S	ADR-0006 "Production must validate ... reject" → maint link	Unsupported rollback, content, incomplete pairings, missing replacement history, or inconsistent identity returns failure.
+operations.md	266	S	verbatim→maint	The caller's tool inventory is not forwarded.
+operations.md	273	S	B01b dup of routing-profile consultation mapping; maint "applies the routing profile's consultation mapping to the caller's host-recorded dial"	The routing profile selects the caller tier's consultation dial.
+operations.md	273	S	B01b dup of routing-profile consultation mapping	For a primary, it selects the lowest advisor dial not weaker than the actual caller dial, or the strongest advisor dial if none qualifies or the model
+operations.md	273	S	verbatim→maint	The component uses native Codex authentication and never reads, copies, or transmits credentials.
+operations.md	273	S	ADR-0006 (lines 65-67, fact row 3) → maint link; "exactly one structured plan, correction, or stop" kept in maint	It creates a fresh ephemeral App Server thread with source base instructions, injects the effective raw history and consultant guidance, and requests 
+operations.md	281	S	verbatim→maint	Before passing any caller context, a native discovery process enumerates every configured MCP server name through all inventory pages and then termina
+operations.md	281	S	verbatim→maint	Discovery can start configured servers but receives no caller context; tool/resource descriptions are discarded.
+operations.md	281	S	moved→maint ("the temporary model catalog and settings"; qualification in ADR-0006 fact row 4)	A second native process disables every discovered name, verifies that MCP capabilities and hooks are empty, and disables built-in tools through a temp
+operations.md	281	S	verbatim→maint	Every actual inference request must prove the expected model and effort, an empty `additional_tools.tools` or explicit top-level `tools=[]`, and no no
+operations.md	281	S	verbatim→maint	Every request must also retain the complete caller history in order; silent automatic compaction is a context failure.
+operations.md	281	S	verbatim→maint	Missing trace evidence, a nonempty tool inventory, or any dial mismatch fails the consultation.
+operations.md	293	S	verbatim→maint	Within the caller's existing session record, the tool-call event is **started**.
+operations.md	293	S	verbatim→maint	A returned MCP `structuredContent.status` of `succeeded`, with `isError=false`, means the output has exactly one valid `kind` and nonempty `advice`, a
+operations.md	293	S	caller rule→SKILL "A `stop` is a successful result: halt and escalate as advised."	A valid `stop` is success: the caller must halt and escalate as advised.
+operations.md	293	S	verbatim→maint	The result includes `callerThreadId` and `advisorThreadId`.
+operations.md	293	S	verbatim→maint	A returned `status=failed`, with `isError=true`, carries `code`, `message`, `expected`, and `actual` where observed; it contains no advice.
+operations.md	293	S	verbatim→maint	The text content repeats that same structured object so the caller and session hooks can read the identical outcome.
+operations.md	293	S	caller rule→SKILL "Only a successful terminal result counts as consultation."	A call without a terminal result has started but has not succeeded.
+operations.md	293	S	caller rule→SKILL (same sentence)	Only a successful result satisfies the caller's consultation requirement.
+operations.md	305	S	moved→maint ("all end in that failure result"); pending consequence in SKILL	Errors, aborts, cancellation, context overflow, empty or malformed output, and mismatches leave the work pending.
+operations.md	305	S	caller rule→SKILL one sentence (ruling); also in tool description (scripts worker)	The caller states the failure in its next visible reply; it must not present the failure as advice or declare consultation complete.
+operations.md	305	S	verbatim→maint	No automatic retry is made.
+operations.md	305	S	verbatim→maint	MCP cancellation terminates the native process tree and returns failure.
+operations.md	305	S	verbatim→maint	The native execution deadline is 180 seconds.
+operations.md	305	S	verbatim→maint	Catalogs, request traces, captured outputs, logs, and SQLite state stay in one temporary directory and are deleted when the call finishes or is cancel
+operations.md	305	S	verbatim→maint	The component writes no session markers, repository files, or credential files.
+operations.md	314	S	verbatim→maint	On Windows, consultation requires a native `codex.exe` on PATH or a unique native executable in the official npm package layout beside the discovered 
+operations.md	314	S	verbatim→maint	It does not execute `.cmd` wrappers with configuration arguments.
+operations.md	314	S	verbatim→maint	Windows Job Objects contain the native process tree; unavailable or failed containment and cleanup APIs return an explicit failure.
+operations.md	320	S	verbatim→maint	The two-stage isolation adds one native initialization per call.
+operations.md	320	S	verbatim→maint	Normal caller startup must already have initialized its Codex home; consultation does not bootstrap a fresh home.
+operations.md	320	S	verbatim→maint	Requalify after host rollout, metadata, catalog, trace, or cache-layout changes.
+operations.md	320	S	moved→maint; path updated per B07 (tests/verify.sh)	Run `sh plugins/codex-advisor/scripts/verify.sh --consultation` for deterministic MCP-boundary checks with a substitute native executable.
+operations.md	320	S	verbatim→maint	These checks do not establish live routing or installed-host behavior.
+operations.md	329	S	verbatim→maint	The plugin loads `hooks/hooks.json` from the default plugin location.
+operations.md	329	S	moved→maint Hooks ("the user reviews and trusts ...")	After first installation, review and trust its hooks in `/hooks`.
+operations.md	329	S	moved→maint Hooks (merged)	Review them again after an update changes a hook definition.
+operations.md	329	S	verbatim→maint	Installation does not grant trust; the host skips untrusted hooks and prints a startup warning pointing to `/hooks`.
+operations.md	329	S	moved→maint, rewritten for B03(b): no trust read/modify; confirmation line makes a skipped hook visible as silence	The plugin does not modify trust state or add its own untrusted-hook detector.
+operations.md	335	S	verbatim→maint	`SessionStart` injects the exact selected canonical posture block and adoption block, including on resume and compaction.
+operations.md	335	S	verbatim→maint	It compares the session's exact model id with the advisor model read from the routing profile.
+operations.md	335	S	verbatim→maint	The profile currently assigns one model to every advisor dial, so selection needs no inferred effort.
+operations.md	335	S	verbatim→maint	If that ceases to hold, missing selection evidence leaves the work pending.
+operations.md	335	S	verbatim→maint	Native delegate identity excludes a second posture injection; entries carry their own posture.
+operations.md	335	S	verbatim→maint	Missing session identity also leaves the work pending.
+operations.md	343	S	kept in ops "Read the dispatch check" (reworded)	`PostToolUse` on native spawn automatically compares each `ca_*` dispatch with its shipped template model and pinned effort, or the explicitly passed 
+operations.md	343	S	kept in ops (joined by ";")	A pinned effort takes precedence over a spawn argument.
+operations.md	343	S	B03(b): replaced by confirmation-line text in ops	Matching dispatches are silent.
+operations.md	343	S	kept in ops (reworded)	Missing caller effort, mismatches, or missing/conflicting evidence add a message to the spawning session that the affected work remains pending.
+operations.md	343	S	B03(b)/B03b: replaced by ops "Run the inspector yourself when ..."	No manual inspector run is needed for this comparison.
+operations.md	343	S	moved→maint; B03c "actual"→"host-recorded"	The hook joins the native response's task path and the parent transcript identity to one child session header, then reads its actual turn model and ef
+operations.md	343	S	verbatim→maint	It waits at most two seconds for child evidence to appear.
+operations.md	343	S	verbatim→maint	A later unobserved write is never treated as a successful verification.
+operations.md	353	S	verbatim→maint	These hooks write no files or persistent state, including Python bytecode.
+operations.md	353	S	verbatim→maint	They do not read configuration or credentials.
+operations.md	353	S	verbatim→maint	The host-provided transcript directory must use the qualified `sessions` layout; changed host event or transcript schemas need renewed qualification.
+operations.md	353	S	B05 delete	There is no primary `Stop` or worker `SubagentStop` hook.
+operations.md	353	S	B05 executable part → SKILL "no hook blocks completion automatically"	Callers follow their consultation posture without automatic finish blocking.
+operations.md	353	S	verbatim→maint	Consultation result validation is provided by the consultation component.
+operations.md	362	S	verbatim→ops	Explorer and Advisor entries request read-only access.
+operations.md	362	S	verbatim→ops	The host may reapply broader parent permissions.
+operations.md	362	S	verbatim→ops	Record actual sandbox policy and permission profile; inspect tool activity and exact before/after scoped files and artifacts.
+operations.md	366	S	verbatim→ops	- Claim enforced isolation only when the host enforces it and observations agree.
+operations.md	367	S	verbatim→ops	- Under broader permissions, proceed only if hard isolation is not required, the packet prohibits edits, and scoped state confirms no mutation.
+operations.md	367	S	verbatim→ops	Report behavioral read-only operation under the observed permissions.
+operations.md	370	S	verbatim→ops	- Missing/conflicting permissions, unavailable required isolation, or observed mutation prevents affected acceptance and must be reported.
+operations.md	373	S	verbatim→ops	Unchanged scoped files do not establish absence of writes outside that scope.
+operations.md	377	S	moved→maint (repo-root clause in intro)	From the repository root, select checks by the behavior the change touches.
+operations.md	377	S	verbatim→maint	While editing one area, run its focused group:
+operations.md	380	CODE	moved→maint; path updated per B07 (tests/verify.sh)	sh plugins/codex-advisor/scripts/verify.sh --installation sh plugins/codex-advisor/scripts/verify.sh --runtime sh plugins/codex-advisor/scripts/verify
+operations.md	387	S	moved→maint; B02c retire set removed	The installation group covers the installer, the thirteen entry templates, the manifest, the routing profile's names/models/pins against those templat
+operations.md	387	S	verbatim→maint	It also checks canonical posture equality, advisor exclusion, and same-role identity outside the posture section, with negative fixtures.
+operations.md	387	S	moved→maint; B02c retired-entry fixture removed, untouched-files check added	It includes negative fixtures for a model mismatch and a missing retired entry.
+operations.md	387	S	verbatim→maint	The runtime group drives the inspector from all thirteen templates and covers its options, template-derived expectations, rejection paths, and emitted
+operations.md	387	S	verbatim→maint	The consultation group exercises the MCP boundary with a substitute native executable: complete context, routing, actual request validation, isolation
+operations.md	387	S	moved→maint; B03(b) confirmation line added	The hooks group runs shipped commands with pinned JSON events, checking canonical injection, delegate exclusion, all entry dials, delayed child eviden
+operations.md	387	S	moved→maint ("confirmation lines included")	Every surfacing case also rejects a disabled hook as a negative proof.
+operations.md	387	S	verbatim→maint	It does not establish installed-host trust or live dispatch behavior.
+operations.md	387	S	verbatim→maint	A template change reaches installation and runtime groups, so it takes the unqualified run.
+operations.md	387	S	verbatim→maint	Documentation changes have no group here: check structure, links, and whether the text still matches actual behavior.
+operations.md	405	S	verbatim→maint	Run the unqualified verifier once on the final state.
+operations.md	405	S	verbatim→maint	It contains all four groups, so it replaces the focused runs instead of following them:
+operations.md	408	CODE	moved→maint; path updated per B07 (tests/verify.sh)	sh plugins/codex-advisor/scripts/verify.sh git diff --check
+operations.md	413	S	verbatim→maint	The public scripts check safe installation, role allocations, bounded diagnostics, and evidence consistency.
+operations.md	413	S	verbatim→maint	Shell syntax and JSON/TOML parsing are the applicable static checks; this project has no typed application.
+operations.md	413	S	verbatim→maint	Fixtures establish parser and refusal behavior, not model behavior.
+operations.md	418	S	verbatim→maint	For a route change, use a temporary `CODEX_HOME`, install through the public installer, and spawn every affected entry once.
+operations.md	418	S	verbatim→maint	Pass an effort only when the entry leaves it to the caller, then run the inspector for that child.
+operations.md	418	S	moved→maint; B02c "removal of seeded retired files" removed	Record the entry, effort passed, observed model and effort, sandbox and permission, child thread, inspector exit, and removal of seeded retired files.
+operations.md	418	S	verbatim→maint	These live checks establish dispatch and wiring; they do not establish general quality, cost, or stability.
+operations.md	425	S	verbatim→maint	Select tiny disposable native scenarios from ordinary direct/delegated/mixed completion, explicit Architect delegation, tiered exploration, complete v
+operations.md	425	S	verbatim→maint	Exercise the scenarios the change can break and record the rest as not exercised.
+operations.md	425	S	verbatim→maint	Reuse actual calls and metadata across checks; after a correction, repeat the affected checks rather than the whole set.
+operations.md	425	S	verbatim→maint	Record expected and observed behavior, native settings, IDs, sources, permissions, tested revision and host, and unexercised paths in the feature acce
+role-contracts.md	5	S	B01b dup → ops Dispatch (new thread; pass effort when entry leaves it)	Any primary may use an Explorer entry with a fresh thread and, unless the entry pins its effort, an explicit effort.
+role-contracts.md	5	S	pointer → rc intro + SKILL event map	Use [operations.md](operations.md) to install, invoke, and validate the selected route.
+role-contracts.md	9	CODE	verbatim→rc	QUESTION <Specific source question, definitions, callers, or behavior to trace.> SCOPE <Absolute workspace path, source boundary, exclusions, and know
+role-contracts.md	26	S	verbatim→rc	Check citations and actual routing independently.
+role-contracts.md	26	S	verbatim→rc	A negative search establishes absence only in the examined scope.
+role-contracts.md	26	S	verbatim→rc	Insufficient findings may lead to direct primary investigation or another authorized allocation; disclose any unverified call.
+role-contracts.md	26	S	verbatim→rc	Exploration is neither implementation nor independent final acceptance.
+role-contracts.md	33	S	verbatim→rc	All Worker entries use the same five-part outcome contract.
+role-contracts.md	33	S	verbatim→rc	Role responsibility is independent of tier.
+role-contracts.md	33	S	B01b dup of SKILL Own the task + "Unspecified local implementation choices belong to the worker"	The primary retains decomposition, scheduling, and acceptance; unspecified local implementation choices belong to the worker.
+role-contracts.md	37	CODE	verbatim→rc	OBJECTIVE <Observable outcome, acceptance conditions, original task reference, and sources.> FILES AND OWNERSHIP <Absolute workspace path, exact owned
+role-contracts.md	69	S	B01b dup → recovery.md R1	For rework, identify the violated requirement, reproducible failure, expected behavior, and verification.
+role-contracts.md	69	S	B01b dup → recovery.md R1	Structural preference alone does not justify rework.
+role-contracts.md	69	S	B01b dup of SKILL "Workers own implementation and ordinary debugging"	The worker owns ordinary debugging.
+role-contracts.md	69	S	handoff→recovery.md; inspection/verification = SKILL Accept ("including ... corrections", "rework covers the failed scenario ...", reuse sentence)	Use the operations handoff for reassignment; after any correction the primary inspects the actual changes and verifies the failed scenario and the sco
+role-contracts.md	78	S	moved→IA "Select the Advisor"	One Advisor entry per tier answers the acceptance packet.
+role-contracts.md	78	S	moved→IA	It runs read-only in a fresh thread.
+role-contracts.md	78	S	B01b: acceptance mapping only in routing-profile.md	Select its dial by the accepted work: use the work's tier, the highest tier involved for work built by several tiers, or the lowest advisor dial not w
+role-contracts.md	78	S	B01b: acceptance mapping only in routing-profile.md	If no advisor dial qualifies, or the primary's exact model id is absent from the routing profile, use the strongest advisor dial.
+role-contracts.md	78	S	B01b → routing-profile acceptance mapping + IA pending list	A low-confidence verdict leaves acceptance pending and goes to the user; it does not trigger an automatic review at another dial.
+role-contracts.md	86	S	B01b dup of SKILL consultation para	Process consultation takes no packet.
+role-contracts.md	86	S	B01b dup of SKILL consultation para	It is a separate zero-argument call governed by the routing profile and [consult-posture.md](consult-posture.md), and it never substitutes for indepen
+role-contracts.md	92	S	moved→IA "Send the acceptance packet" (+ "capture the scoped state")	After inspecting the deliverable and completing the checks you own, send the acceptance packet to a fresh Advisor thread.
+role-contracts.md	92	S	merged→IA "Decide whether it is required" non-substitute list	An earlier consultation, worker report, or delegated check run cannot satisfy it.
+role-contracts.md	96	CODE	moved→IA packet; SETTINGS field: "the accepted work's tier or the primary-derived dial rule" → "the acceptance-mapping case that selected it" (B01b)	REVIEW SCOPE <Absolute workspace, binding task contract, acceptance conditions, and high-risk or explicit-review trigger. Identify the exact baseline 
+role-contracts.md	125	S	merged→IA "Check the review"	The primary verifies fresh invocation, routing, cited findings, tool activity, and before/after state.
+role-contracts.md	125	S	merged→IA pending paragraph	Missing evidence, a low-confidence verdict, or material findings leave required acceptance pending.
+role-contracts.md	125	S	merged→IA "Correct and review again"	After corrections and primary re-verification, review the revised deliverable in a new thread even if entry and effort remain unchanged.
+routing-profile.md	3	S	verbatim→rp	Declared 2026-09-26.
+routing-profile.md	3	S	verbatim→rp	The dials below are anchored to GPT-6 Luna, GPT-6 Sol, and GPT-6 Astra.
+routing-profile.md	3	S	B04: corrected in place (lines 4-8)	This file is the only place where effort options, defaults, and candidate order are written;
+routing-profile.md	3	S	B04: corrected in place	`SKILL.md` and entry descriptions do not repeat them.
+routing-profile.md	8	S	verbatim→rp	Notation:
+routing-profile.md	8	S	verbatim→rp	`model[a*, b]`.
+routing-profile.md	8	S	verbatim→rp	Every listed effort is allowed and `*` marks the default.
+routing-profile.md	8	S	verbatim→rp	Where a cell lists two candidates, `›` separates them in usage order.
+routing-profile.md	8	S	verbatim→rp	A single bare effort is pinned in the entry; an entry with several efforts leaves effort to the caller.
+routing-profile.md	13	ROW	verbatim→rp	| Role | `mainstay` | `crux` | `rescue` |
+routing-profile.md	14	ROW	verbatim→rp	|---|---|---|---|
+routing-profile.md	15	ROW	verbatim→rp	| Explorer | `ca_explorer_mainstay_m` gpt-6-luna[high*, xhigh] › `ca_explorer_mainstay_h` gpt-6-sol[medium*, high] | `ca_explorer_crux_m` gpt-6-luna[m
+routing-profile.md	16	ROW	verbatim→rp	| Worker | `ca_worker_mainstay_m` gpt-6-luna[max] › `ca_worker_mainstay_h` gpt-6-sol[high] | `ca_worker_crux_m` gpt-6-sol[xhigh*, max] › `ca_worker_cr
+routing-profile.md	17	ROW	verbatim→rp	| Advisor | `ca_advisor_mainstay` gpt-6-astra[low*, medium] | `ca_advisor_crux` gpt-6-astra[high] | `ca_advisor_rescue` gpt-6-astra[xhigh] |
+routing-profile.md	21	S	verbatim→rp	Six entries pin `model_reasoning_effort` because their cell has one effort:
+routing-profile.md	21	S	verbatim→rp	`ca_explorer_crux_m`, `ca_explorer_crux_h`, `ca_worker_mainstay_m`, `ca_worker_mainstay_h`, `ca_advisor_crux`, and `ca_advisor_rescue`.
+routing-profile.md	21	S	B01b: dispatch clause → ops ("fork_turns: none", "always pass an effort listed in the routing profile"); rest kept	The other seven omit it; the caller passes an effort listed for that entry with `fork_turns` set to none.
+routing-profile.md	21	S	verbatim→rp	Every entry pins its model.
+routing-profile.md	29	S	verbatim→rp	A `mainstay` entry consults at gpt-6-astra[low].
+routing-profile.md	29	S	verbatim→rp	A `crux` entry consults at gpt-6-astra[high].
+routing-profile.md	29	S	verbatim→rp	A `rescue` entry consults at gpt-6-astra[xhigh].
+routing-profile.md	29	S	verbatim→rp	The Advisor has no consultation ladder of its own.
+routing-profile.md	33	S	verbatim→rp	A primary consults at the lowest Advisor dial that is not weaker than the primary's dial.
+routing-profile.md	33	S	verbatim→rp	If no Advisor dial is not weaker, use gpt-6-astra[xhigh].
+routing-profile.md	33	S	verbatim→rp	A primary whose exact model id is absent from this profile also uses gpt-6-astra[xhigh].
+routing-profile.md	40	S	verbatim→rp	Work from one tier uses that tier's Advisor entry:
+routing-profile.md	40	S	verbatim→rp	`ca_advisor_mainstay`, `ca_advisor_crux`, or `ca_advisor_rescue`.
+routing-profile.md	40	S	verbatim→rp	Work built by several tiers uses the highest tier involved.
+routing-profile.md	40	S	verbatim→rp	Primary-authored work uses the lowest Advisor dial that is not weaker than the primary's dial.
+routing-profile.md	40	S	verbatim→rp	If none qualifies, or the primary's exact model id is absent from this profile, use `ca_advisor_rescue` at its pinned effort.
+routing-profile.md	40	S	verbatim→rp	A low-confidence verdict leaves acceptance pending and goes to the user; it does not trigger another Advisor dial.
+routing-profile.md	48	S	verbatim→rp	For "not weaker", compare model first: gpt-6-luna < gpt-6-sol < gpt-6-astra.
+routing-profile.md	48	S	verbatim→rp	Compare effort second: low < medium < high < xhigh < max.
+routing-profile.md	54	S	verbatim→rp	This profile assumes that a model change gains more capability than an effort increase, and that `xhigh` is a distinct capability jump.
+routing-profile.md	54	S	verbatim→rp	The next model generation change invalidates both assumptions and requires re-evaluation.
+routing-profile.md	60	S	moved→maint "Adjust a routing value"	Re-check the declared assumptions and the account's callable dials.
+routing-profile.md	60	S	moved→maint "Adjust a routing value"	Then change the affected template's `model` or `model_reasoning_effort` and this table together, run `sh plugins/codex-advisor/scripts/verify.sh`, and
+routing-profile.md	60	S	verbatim→maint	Model-generation changes stay confined to the profile and templates unless the role or tier contract also changes.

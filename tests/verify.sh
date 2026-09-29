@@ -2,14 +2,15 @@
 # Exercise the public installer with disposable destinations.
 set -eu
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
+repo_root=$(CDPATH= cd "$script_dir/.." && pwd)
+plugin_scripts="$repo_root/plugins/codex-advisor/scripts"
 case "${1-}" in ''|--installation|--runtime|--consultation|--hooks) ;; *) printf '%s\n' 'Unknown verification group' >&2; exit 2 ;; esac
 if [ -z "${1-}" ] || [ "${1-}" = --installation ]; then
-sh "$script_dir/run-python.sh" - "$script_dir" <<'PY'
+sh "$plugin_scripts/run-python.sh" - "$plugin_scripts" <<'PY'
 import json
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -223,40 +224,6 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     for args in [('--check-role',), ('--check-role', 'unknown')]:
         install(target, *args, ok=False)
         assert snapshot(root) == installed
-    copy = root / 'plugin-copy'
-    (copy / 'scripts').mkdir(parents=True)
-    (copy / 'agents').mkdir()
-    shutil.copy2(installer, copy / 'scripts')
-    for path in (plugin / 'agents').iterdir():
-        if path.is_file() and not path.is_symlink():
-            shutil.copy2(path, copy / 'agents')
-    extra_name = 'codex-advisor-extra.toml'
-    (copy / 'agents' / extra_name).write_text('name = "extra"\n')
-    (copy / 'agents' / 'retire.txt').write_text('retired-agent.toml\nlegacy-extra.toml\n')
-    copied = copy / 'scripts' / 'install-agents.sh'
-    residue_target = root / 'residue-agents'
-    residue_target.mkdir()
-    copied_first = run_install(copied, residue_target)
-    assert f'INSTALLED: {residue_target / extra_name}' in copied_first.stdout
-    (residue_target / 'retired-agent.toml').write_text('old\n')
-    (residue_target / 'legacy-extra.toml').write_text('old2\n')
-    (residue_target / 'unrelated.toml').write_text('keep\n')
-    before = snapshot(residue_target)
-    residue_check = run_install(copied, residue_target, '--check', ok=False)
-    assert str(residue_target / 'retired-agent.toml') in residue_check.stderr
-    assert str(residue_target / 'legacy-extra.toml') in residue_check.stderr
-    assert snapshot(residue_target) == before
-    selective = run_install(copied, residue_target, '--check-role', sample_stem)
-    assert 'CHECK PASSED' in selective.stdout
-    assert snapshot(residue_target) == before
-    removed = run_install(copied, residue_target)
-    assert f'REMOVED: {residue_target / "retired-agent.toml"}' in removed.stdout
-    assert f'REMOVED: {residue_target / "legacy-extra.toml"}' in removed.stdout
-    assert not (residue_target / 'retired-agent.toml').exists()
-    assert not (residue_target / 'legacy-extra.toml').exists()
-    assert (residue_target / 'unrelated.toml').read_text() == 'keep\n'
-    assert (residue_target / extra_name).read_text() == 'name = "extra"\n'
-    run_install(copied, residue_target, '--check')
     default_home = root / 'default-home'
     default_home.mkdir()
     (default_home / 'config.toml').write_text('model = "user-choice"\n')
@@ -295,76 +262,23 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     upgraded = install(previous_install)
     assert f'INSTALLED: {previous_install / worker_name}' in upgraded.stdout
     assert (previous_install / worker_name).read_bytes() == templates[worker_name]
-    retire_names = [
-        line.strip()
-        for line in (plugin / 'agents' / 'retire.txt').read_text().splitlines()
-        if line.strip() and not line.startswith('#')
-    ]
-    new_entries = sorted(templates)
-    historical_adr = (repo / 'docs/adr/0004-tier-named-entries-first-round-pool.md').read_text()
-    historical_names = set(re.findall(
-        r'`(ca_(?:explorer|worker|advisor)_[a-z0-9_]+)`',
-        historical_adr,
-    ))
-    expected_previous_entries = {
-        name.replace('_', '-') + '.toml' for name in historical_names
-    }
-    assert len(expected_previous_entries) == 11, sorted(expected_previous_entries)
-
-    def require_retire_set(names):
-        assert len(names) == len(set(names)) == 19, names
-        assert sum(name.startswith('codex-advisor-') for name in names) == 8, names
-        previous_entries = {name for name in names if name.startswith('ca-')}
-        assert previous_entries == expected_previous_entries, sorted(
-            previous_entries ^ expected_previous_entries
-        )
-        assert not (set(names) & set(new_entries)), sorted(set(names) & set(new_entries))
-
-    require_retire_set(retire_names)
-    try:
-        require_retire_set(retire_names[:-1])
-    except AssertionError:
-        pass
-    else:
-        raise AssertionError('retire check accepted a fixture missing one previous entry')
-    wrong_retire_names = retire_names[:-1] + ['ca-fixture-typo.toml']
-    try:
-        require_retire_set(wrong_retire_names)
-    except AssertionError:
-        pass
-    else:
-        raise AssertionError('retire check accepted a wrong previous entry')
-    assert len(new_entries) == expected_entries, new_entries
-    assert all(name.startswith('ca-') and name.endswith('.toml') for name in new_entries)
-    legacy_target = root / 'legacy-010'
-    legacy_target.mkdir()
-    for name in retire_names:
-        (legacy_target / name).write_text('old\n')
-    (legacy_target / 'unrelated-legacy.toml').write_text('keep\n')
-    legacy_run = install(legacy_target)
-    assert legacy_run.stdout.count('INSTALLED:') == expected_entries
-    assert legacy_run.stdout.count('REMOVED:') == len(retire_names)
-    for name in new_entries:
-        assert f'INSTALLED: {legacy_target / name}' in legacy_run.stdout
-        assert (legacy_target / name).read_bytes() == templates[name]
-    for name in retire_names:
-        assert f'REMOVED: {legacy_target / name}' in legacy_run.stdout
-        assert not (legacy_target / name).exists()
-    leftover = sorted(p.name for p in legacy_target.iterdir())
-    assert leftover == sorted(new_entries + ['unrelated-legacy.toml'])
-    assert (legacy_target / 'unrelated-legacy.toml').read_text() == 'keep\n'
-    install(legacy_target, '--check')
-    retired_link_target = root / 'retired-symlink'
-    retired_link_target.mkdir()
-    retired_link_name = retire_names[0]
-    (retired_link_target / retired_link_name).symlink_to(root / 'absent')
-    before = snapshot(retired_link_target)
-    retired_link = install(retired_link_target, ok=False)
-    assert f'unsafe destination: {retired_link_target / retired_link_name}' in retired_link.stderr
-    assert snapshot(retired_link_target) == before
-    retired_link_check = install(retired_link_target, '--check', ok=False)
-    assert f'residue: {retired_link_target / retired_link_name}' in retired_link_check.stderr
-    assert snapshot(retired_link_target) == before
+    former_target = root / 'former-entries'
+    former_target.mkdir()
+    for name in ('codex-advisor-luna-explorer.toml', 'ca-worker-light.toml'):
+        (former_target / name).write_text('old\n')
+    (former_target / 'ca-advisor-senior.toml').symlink_to(root / 'absent')
+    (former_target / 'unrelated-legacy.toml').write_text('keep\n')
+    kept = snapshot(former_target)
+    former_run = install(former_target)
+    assert former_run.stdout.count('INSTALLED:') == expected_entries
+    assert 'REMOVED:' not in former_run.stdout
+    assert [state for state in snapshot(former_target) if state[0] not in templates] == kept
+    install(former_target, '--check')
+    assert sorted(p.name for p in (plugin / 'agents').iterdir()) == sorted(templates)
+    usage = subprocess.run(['sh', str(installer), '--help'], capture_output=True, text=True)
+    assert usage.returncode == 0, usage.stderr
+    assert ("overwrite this plugin's own files and leave everything else untouched."
+            in ' '.join(usage.stdout.split())), usage.stdout
     link = root / 'linked-target'
     link.symlink_to(target, target_is_directory=True)
     before = snapshot(root)
@@ -380,12 +294,12 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-verify.') as tmp:
     missing_flag = subprocess.run(['sh', str(installer), '--target-dir'],
                                   capture_output=True, text=True)
     assert missing_flag.returncode != 0 and 'ERROR:' in missing_flag.stderr
-print('PASS: profile/template equality, negative model fixture, exact retire set, negative retire fixtures')
-print('PASS: fork metadata, overwrite, unchanged, retire, check drift/residue, preservation, refusals')
+print('PASS: profile/template equality, negative model fixture')
+print('PASS: fork metadata, overwrite, unchanged, check drift, former names and unrelated files untouched, refusals')
 PY
 fi
 if [ -z "${1-}" ] || [ "${1-}" = --runtime ]; then
-sh "$script_dir/run-python.sh" - "$script_dir" <<'PY'
+sh "$plugin_scripts/run-python.sh" - "$plugin_scripts" <<'PY'
 import json
 from pathlib import Path
 import subprocess
@@ -405,10 +319,10 @@ ALLOWLIST = {
     'model_provider', 'model', 'effort', 'sandbox_policy_type',
     'permission_profile_type', 'cwd',
 }
-RETIRED_AGENT_OPTIONS = (
+FORMER_OPTIONS = (
     '--luna', '--sol-effort', '--astra-effort', '--explorer-effort',
     '--sol-explorer-effort', '--astra-explorer-effort', '--advisor-effort',
-    '--reviewer-effort',
+    '--reviewer-effort', '--review-primary-effort', '--select-review-effort',
 )
 READONLY_TOKENS = ('explorer', 'advisor')
 
@@ -475,15 +389,10 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
         assert set(evidence) == ALLOWLIST, (reason, evidence)
         return evidence
 
-    for option in RETIRED_AGENT_OPTIONS:
+    for option in FORMER_OPTIONS:
         result = run_inspect(option)
         assert result.returncode != 0 and not result.stdout
-        assert 'ERROR:' in result.stderr and '--agent' in result.stderr, result.stderr
-        assert secret not in result.stdout + result.stderr
-    for option in ('--review-primary-effort', '--select-review-effort'):
-        result = run_inspect(option)
-        assert result.returncode != 0 and not result.stdout
-        assert 'retired' in result.stderr and '--agent' in result.stderr, result.stderr
+        assert result.stderr == 'ERROR: unknown argument.\n', result.stderr
 
     names = [data['name'] for _, data in templates]
     for path, data in templates:
@@ -593,14 +502,14 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-runtime-test.') as tmp:
     bad = subprocess.run(['sh', str(inspector), '../invalid'],
                          capture_output=True, text=True)
     assert bad.returncode != 0 and not bad.stdout
-print('PASS: generic inspector, table-driven templates, retired options, payload filtering')
+print('PASS: generic inspector, table-driven templates, former options as unknown arguments, payload filtering')
 PY
 fi
-for script in "$script_dir"/*.sh; do sh -n "$script"; done
+for script in "$plugin_scripts"/*.sh "$script_dir"/*.sh; do sh -n "$script"; done
 if [ -z "${1-}" ] || [ "${1-}" = --consultation ]; then
-    sh "$script_dir/run-python.sh" "$script_dir/verify-consultation.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation.py"
 fi
 if [ -z "${1-}" ] || [ "${1-}" = --hooks ]; then
-    sh "$script_dir/run-python.sh" "$script_dir/verify-hooks.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-hooks.py"
 fi
 printf '%s\n' 'VERIFY PASSED: selected deterministic checks (no live routing claim)'

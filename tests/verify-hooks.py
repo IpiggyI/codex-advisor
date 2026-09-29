@@ -14,8 +14,9 @@ import threading
 import time
 import tomllib
 
-PLUGIN = Path(__file__).resolve().parent.parent
-FIXTURE = json.loads((PLUGIN / 'scripts/fixtures/hooks.json').read_text())
+HERE = Path(__file__).resolve().parent
+PLUGIN = HERE.parent / 'plugins/codex-advisor'
+FIXTURE = json.loads((HERE / 'fixtures/hooks.json').read_text())
 MANIFEST = json.loads((PLUGIN / 'hooks/hooks.json').read_text())
 REFERENCES = PLUGIN / 'skills/orchestration/references'
 CANONICAL = (REFERENCES / 'consult-posture.md').read_text()
@@ -52,6 +53,20 @@ def pending(event, plugin=PLUGIN):
         pass
     else:
         raise AssertionError('Surfacing assertion accepted a disabled hook')
+
+
+def confirmed(event, model, effort):
+    line = (f"Codex Advisor: {event['tool_input']['agent_type']} identity, model, and effort match the host "
+            f"record at {model}[{effort}]; working directory and permissions were not checked.")
+    def require_confirmed(value):
+        assert value == line, value
+    require_confirmed(run(event))
+    try:
+        require_confirmed(run(event, disabled=True))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('Confirmation assertion accepted a disabled hook')
 
 
 def block(name):
@@ -143,11 +158,11 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
         rows[0]['payload']['source']['subagent']['thread_spawn']['agent_role'] = role
         rows[1]['payload'] = {'model': template['model'], 'effort': effort}
         write(child, rows)
-        assert run(event) is None, role
+        confirmed(event, template['model'], effort)
         if 'model_reasoning_effort' in template:
             overridden = copy.deepcopy(event)
             overridden['tool_input']['reasoning_effort'] = 'low' if effort != 'low' else 'high'
-            assert run(overridden) is None, role
+            confirmed(overridden, template['model'], effort)
         for key in ('model', 'effort'):
             bad = copy.deepcopy(rows)
             bad[1]['payload'][key] = 'wrong'
@@ -158,10 +173,11 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
             missing = copy.deepcopy(event)
             del missing['tool_input']['reasoning_effort']
             pending(missing)
-    print('PASS: all 13 entries, silent match, wrong model/effort, omitted caller effort; disabled negatives')
+    print('PASS: all 13 entries, confirmation line on match, wrong model/effort, omitted caller effort; disabled negatives')
 
     write(child, FIXTURE['child'])
-    assert run(dispatch) is None
+    fixture_turn = FIXTURE['child'][1]['payload']
+    confirmed(dispatch, fixture_turn['model'], fixture_turn['effort'])
     for mutation in ('missing-turn', 'missing-effort', 'conflicting-turn', 'wrong-parent',
                      'wrong-path', 'wrong-role', 'wrong-session', 'source-parent', 'source-role',
                      'duplicate-header'):
@@ -202,7 +218,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
     pending(dispatch)
     writer = threading.Thread(target=lambda: (time.sleep(0.3), write(child, FIXTURE['child'])))
     writer.start()
-    assert run(dispatch) is None
+    confirmed(dispatch, fixture_turn['model'], fixture_turn['effort'])
     writer.join()
     assert run({**dispatch, 'tool_input': {'agent_type': 'default'}}) is None
     assert sorted(p.name for p in sessions.iterdir()) == ['rollout-child.jsonl', 'rollout-parent.jsonl']

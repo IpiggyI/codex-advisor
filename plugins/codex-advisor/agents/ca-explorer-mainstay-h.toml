@@ -3,7 +3,6 @@ description = "Explorer, mainstay tier (stronger alternative): gpt-6-sol, the ca
 model = "gpt-6-sol"
 sandbox_mode = "read-only"
 
-# The caller selects effort; a role-level setting would override that choice.
 developer_instructions = """
 Act as the primary's Explorer for the QUESTION and SCOPE in the packet.
 Inspect read-only. Trace definitions and callers.

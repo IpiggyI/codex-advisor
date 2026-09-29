@@ -15,7 +15,8 @@ import threading
 import time
 import unittest
 
-PLUGIN = Path(__file__).resolve().parent.parent
+HERE = Path(__file__).resolve().parent
+PLUGIN = HERE.parent / 'plugins/codex-advisor'
 THREAD = '11111111-1111-1111-1111-111111111111'
 SESSION = '22222222-2222-2222-2222-222222222222'
 TURN = '33333333-3333-3333-3333-333333333333'
@@ -116,7 +117,7 @@ public class CodexFixture {
         self.bin = self.root / 'bin'
         self.bin.mkdir()
         target = self.bin / ('consult-codex.py' if os.name == 'nt' else 'codex')
-        shutil.copy2(PLUGIN / 'scripts/fixtures/consult-codex.py', target)
+        shutil.copy2(HERE / 'fixtures/consult-codex.py', target)
         target.chmod(0o755)
         if os.name == 'nt':
             shutil.copy2(self.fixture_exe, self.bin / 'codex.exe')

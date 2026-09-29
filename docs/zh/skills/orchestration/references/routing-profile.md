@@ -1,8 +1,9 @@
 # 路由配置
 
 声明于 2026-09-26。下列拨档锚定于 GPT-6 Luna、GPT-6 Sol 和 GPT-6 Astra。
-本文件是写入 effort 选项、默认值和候选顺序的唯一位置；`SKILL.md` 和入口描述
-不重复这些值。
+本文件是每个模型、允许的 effort、默认值和候选顺序的来源。每个入口模板把自己的
+模型和任何固定 effort 复制到其字段中。模板描述写出模型；单元格有两个候选时，
+描述写出候选位置；effort 固定时，描述写出该 effort。skill 正文不重复其中任何一项。
 
 记法为 `model[a*, b]`。列出的每个 effort 都可用，`*` 标记默认值。一个单元格
 列出两个候选项时，`›` 按使用顺序分隔候选项。单个不带星号的 effort 固定在
@@ -19,8 +20,7 @@
 六个入口因所在单元格只有一个 effort 而固定 `model_reasoning_effort`：
 `ca_explorer_crux_m`、`ca_explorer_crux_h`、`ca_worker_mainstay_m`、
 `ca_worker_mainstay_h`、`ca_advisor_crux` 和 `ca_advisor_rescue`。其余七个
-入口省略该字段；调用方从该入口列出的 effort 中选择一个传入，并把 `fork_turns`
-设为 none。每个入口都固定自己的模型。
+入口省略该字段，把 effort 留给调用方。每个入口都固定自己的模型。
 
 ## 咨询映射
 
@@ -49,10 +49,3 @@ low < medium < high < xhigh < max。
 
 本配置假设更换模型带来的能力增益大于提高 effort，并假设 `xhigh` 是一次独立的
 能力跃升。下一次模型换代会使这两个假设失效，并要求重新评估。
-
-## 调整数值
-
-先重新检查声明的假设和账户可调用的拨档。然后同时修改受影响模板的 `model` 或
-`model_reasoning_effort` 与本表，运行 `sh plugins/codex-advisor/scripts/verify.sh`，
-并对每个受影响入口重跑实时路由检查。除非角色或档位契约也发生变化，模型换代
-只修改本配置和模板。

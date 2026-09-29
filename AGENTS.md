@@ -20,6 +20,10 @@ Every `plugins/codex-advisor/**/*.md` and every native entry `plugins/codex-advi
 
 From plugin version `0.1.0` onward, each `plugin.json` version has `docs/releases/<version>.html`: that version's description plus the delta from the previous version. See `docs/agents/version-manual.md`.
 
+### Plugin maintenance
+
+`plugins/codex-advisor/` holds only what runtime callers and delegates read. The procedure for changing the plugin lives in `docs/agents/plugin-maintenance.md`.
+
 ### Plugin release & local update
 
-Installed marketplaces on WSL and Windows point at GitHub (`IpiggyI/codex-advisor`), not this working tree. Push to `origin` first, then on each side: `codex plugin marketplace upgrade codex-advisor`, reinstall `codex-advisor@codex-advisor`, and run the companion installer. An unpushed commit never reaches the plugin.
+Installed marketplaces on WSL and Windows point at GitHub (`IpiggyI/codex-advisor`), not this working tree. Push to `origin` first, then on each side: `codex plugin marketplace upgrade codex-advisor`, reinstall `codex-advisor@codex-advisor`, and run the companion installer; then ask the user to review `/hooks` in a fresh task on each side when a hook definition is new or changed. An unpushed commit never reaches the plugin.

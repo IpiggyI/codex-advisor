@@ -1,10 +1,10 @@
 # Native role contracts
 
-## Explorer
+Send the selected packet as the body of the spawn `message` described in
+[operations.md](operations.md). The Advisor acceptance packet is in
+[independent-acceptance.md](independent-acceptance.md).
 
-Any primary may use an Explorer entry with a fresh thread and, unless the entry
-pins its effort, an explicit effort. Use [operations.md](operations.md) to install,
-invoke, and validate the selected route.
+## Explorer
 
 ~~~text
 QUESTION
@@ -31,8 +31,7 @@ Exploration is neither implementation nor independent final acceptance.
 ## Worker
 
 All Worker entries use the same five-part outcome contract. Role responsibility is
-independent of tier. The primary retains decomposition, scheduling, and acceptance;
-unspecified local implementation choices belong to the worker.
+independent of tier.
 
 ~~~text
 OBJECTIVE
@@ -65,65 +64,3 @@ VERIFICATION: <commands, exit status, and relevant observed output>
 JUDGMENT CALLS: <local decisions within the contract>
 GAPS: <ambiguity, conflicts, risks, and unverified results>
 ~~~
-
-For rework, identify the violated requirement, reproducible failure, expected
-behavior, and verification. Structural preference alone does not justify rework.
-The worker owns ordinary debugging. Use the operations handoff for reassignment;
-after any correction the primary inspects the actual changes and verifies the
-failed scenario and the scope it affects, reusing evidence the correction leaves
-valid.
-
-## Advisor
-
-One Advisor entry per tier answers the acceptance packet. It runs read-only in a
-fresh thread. Select its dial by the accepted work: use the work's tier, the highest
-tier involved for work built by several tiers, or the lowest advisor dial not weaker
-than the primary's dial for primary-authored work. If no advisor dial qualifies,
-or the primary's exact model id is absent from the routing profile, use the strongest
-advisor dial. A low-confidence verdict leaves acceptance pending and goes to the
-user; it does not trigger an automatic review at another dial.
-
-Process consultation takes no packet. It is a separate zero-argument call governed
-by the routing profile and [consult-posture.md](consult-posture.md), and it never
-substitutes for independent acceptance.
-
-### Independent acceptance
-
-After inspecting the deliverable and completing the checks you own, send the
-acceptance packet to a fresh Advisor thread. An earlier consultation, worker report,
-or delegated check run cannot satisfy it.
-
-~~~text
-REVIEW SCOPE
-<Absolute workspace, binding task contract, acceptance conditions, and high-risk
-or explicit-review trigger. Identify the exact baseline and current deliverable.>
-
-ACTUAL CHANGES
-<All changed and new files, reproducible diff command or before/after contents,
-ownership boundaries, and unrelated changes to preserve. Inspect the actual
-complete diff, including untracked files, before judging readiness.>
-
-PRIMARY VERIFICATION
-<Checks the primary owns for this acceptance: executor, scope, command, exit
-status, relevant output, evidence location, and unverified items. Separate worker
-claims from results the primary organized and confirmed.>
-
-SETTINGS AND PERMISSIONS
-<Selected Advisor entry and, where the entry leaves it open, the explicit effort;
-the accepted work's tier or the primary-derived dial rule; requested isolation,
-and scoped state captured before review.>
-Remain read-only. Do not write, format, implement, or delegate implementation.
-Use checks that preserve scoped state; disclose unavailable checks.
-
-RETURN
-READINESS: <ready, changes required, or unverified, with reason>
-FINDINGS: <severity, exact source references, evidence, and impact>
-VERIFICATION: <checks inspected or run, commands, status, and relevant output>
-GAPS: <missing evidence, unchecked conditions, and residual risks>
-~~~
-
-The primary verifies fresh invocation, routing, cited findings, tool activity, and
-before/after state. Missing evidence, a low-confidence verdict, or material findings
-leave required acceptance pending. After corrections and primary re-verification,
-review the revised deliverable in a new thread even if entry and effort remain
-unchanged.

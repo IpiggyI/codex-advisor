@@ -1,9 +1,11 @@
 # Routing profile
 
 Declared 2026-09-26. The dials below are anchored to GPT-6 Luna, GPT-6 Sol,
-and GPT-6 Astra. This file is the only place where effort options, defaults,
-and candidate order are written; `SKILL.md` and entry descriptions do not
-repeat them.
+and GPT-6 Astra. This file is the source of every model, allowed effort,
+default, and candidate order. Each entry template copies its own model and any
+pinned effort into its fields. Its description names the model, the candidate
+position where a cell has two, and the effort where it is pinned. The skill text
+repeats none of them.
 
 Notation: `model[a*, b]`. Every listed effort is allowed and `*` marks the
 default. Where a cell lists two candidates, `›` separates them in usage order.
@@ -21,8 +23,7 @@ leaves effort to the caller.
 Six entries pin `model_reasoning_effort` because their cell has one effort:
 `ca_explorer_crux_m`, `ca_explorer_crux_h`, `ca_worker_mainstay_m`,
 `ca_worker_mainstay_h`, `ca_advisor_crux`, and `ca_advisor_rescue`. The other
-seven omit it; the caller passes an effort listed for that entry with
-`fork_turns` set to none. Every entry pins its model.
+seven omit it and leave effort to the caller. Every entry pins its model.
 
 ## Consultation mapping
 
@@ -54,11 +55,3 @@ low < medium < high < xhigh < max.
 This profile assumes that a model change gains more capability than an effort
 increase, and that `xhigh` is a distinct capability jump. The next model
 generation change invalidates both assumptions and requires re-evaluation.
-
-## Adjust a value
-
-Re-check the declared assumptions and the account's callable dials. Then change
-the affected template's `model` or `model_reasoning_effort` and this table
-together, run `sh plugins/codex-advisor/scripts/verify.sh`, and repeat the live
-route check for every affected entry. Model-generation changes stay confined to
-the profile and templates unless the role or tier contract also changes.

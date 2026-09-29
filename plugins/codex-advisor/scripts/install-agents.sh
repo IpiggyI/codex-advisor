@@ -9,23 +9,21 @@ usage() {
   cat <<'EOF'
 Usage: install-agents.sh [--target-dir PATH] [--check] [--check-role ROLE ...]
 
-Install Codex Advisor's native templates: overwrite this plugin's own files,
-remove retired names, and leave everything else untouched.
+Install Codex Advisor's native templates: overwrite this plugin's own files
+and leave everything else untouched.
 The default target is "$CODEX_HOME/agents", or "$HOME/.codex/agents".
   --target-dir PATH  Use an explicit destination directory.
-  --check            Report drift (differing or missing manifest files) and
-                     residue (present retire files) without writing.
+  --check            Report drift (differing or missing manifest files) without
+                     writing.
   --check-role ROLE  Check a template by filename stem minus the plugin prefix
                      (for example explorer-mainstay-m, advisor-rescue);
-                     repeatable; implies --check. Retire files are not part of
-                     a selective check.
+                     repeatable; implies --check.
   --help            Show this help text.
 EOF
 }
 
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
 template_dir=$script_dir/../agents
-retire_list=$template_dir/retire.txt
 target_dir=${CODEX_HOME:-${HOME:?HOME or CODEX_HOME is required}/.codex}/agents
 check_only=0
 selected=''
@@ -48,19 +46,6 @@ while [ "$#" -gt 0 ]; do
     *) fail "unknown argument: $1" ;;
   esac
 done
-
-# Exact basenames to delete if present. Later tickets edit retire.txt.
-retired_files=''
-if [ -L "$retire_list" ]; then
-  fail "unsafe retire list: $retire_list"
-fi
-if [ -f "$retire_list" ]; then
-  while IFS= read -r line || [ -n "$line" ]; do
-    case "$line" in ''|'#'*) continue ;; esac
-    case "$line" in */*|*..*) fail "invalid retire name: $line" ;; esac
-    retired_files="$retired_files $line"
-  done < "$retire_list"
-fi
 
 if [ -n "$selected" ]; then
   for role in $selected; do
@@ -129,14 +114,6 @@ for path in "$template_dir"/*.toml; do
 done
 
 if [ "$check_only" -eq 1 ]; then
-  if [ -z "$selected" ] && [ -n "$retired_files" ]; then
-    for name in $retired_files; do
-      destination=$target_dir/$name
-      if [ -e "$destination" ] || [ -L "$destination" ]; then
-        note_problem "residue: $destination"
-      fi
-    done
-  fi
   [ "$check_problems" -eq 0 ] || exit 1
   printf '%s\n' "CHECK PASSED: selected templates match exactly."
   exit 0
@@ -149,11 +126,6 @@ for path in "$template_dir"/*.toml; do
   name=${path##*/}
   preflight_dest "$name"
 done
-if [ -n "$retired_files" ]; then
-  for name in $retired_files; do
-    preflight_dest "$name"
-  done
-fi
 
 for path in "$template_dir"/*.toml; do
   name=${path##*/}
@@ -174,15 +146,5 @@ for path in "$template_dir"/*.toml; do
   fi
   printf '%s\n' "INSTALLED: $destination"
 done
-
-if [ -n "$retired_files" ]; then
-  for name in $retired_files; do
-    destination=$target_dir/$name
-    if [ -f "$destination" ] && [ ! -L "$destination" ]; then
-      rm -f "$destination" || fail "could not remove $destination"
-      printf '%s\n' "REMOVED: $destination"
-    fi
-  done
-fi
 
 printf '%s\n' "INSTALL PASSED: shipped templates match exactly."

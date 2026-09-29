@@ -74,10 +74,6 @@ handles credentials.
 
 These facts were established on 2026-09-26 with Codex CLI `0.157.0`:
 
-The maintenance sources are the [mechanism decision](../../.scratch/tiers-and-advisor-consult/spec.md#机制决定由工单-01-填写),
-the [decision ledger](../../.scratch/tiers-and-advisor-consult/sources.md#24-决定台账),
-and the [P6 probe record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p6-已授权的延续与选定机制).
-
 | Host fact | Evidence boundary | Invalidation check |
 |---|---|---|
 | Host MCP `_meta` supplies caller thread, session, turn, item, model, and effort identity to a zero-property tool call. | One primary route and the qualified worker and Explorer routes in the ticket 01 probes. | Requalify after MCP metadata or tool-call schema changes. |
@@ -86,6 +82,10 @@ and the [P6 probe record](../../.scratch/tiers-and-advisor-consult/acceptance.md
 | The custom startup catalog plus the qualified disable settings produced an actual empty request tool set at the assigned dial. | The host inference-request trace, not an advisor statement or refused tool attempt. | Requalify after model catalog, configuration, tool registry, or request-trace format changes; missing trace evidence is failure. |
 | A relative MCP script path with `cwd="."` resolved to the installed plugin root, and caller-home discovery worked for the versioned cache layout. | The temporary installed-plugin probe. | Requalify after plugin path resolution or cache-layout changes; unsupported layouts fail explicitly. |
 | Shipped custom-agent model and pinned-effort precedence held in the tested pinned cases; caller effort held where the template left effort open. | Ticket 01 P3. Full-history routing evidence remained conflicting and is not generalized. | Re-run precedence checks after host, template schema, or spawn semantics change. |
+
+The maintenance sources are the [mechanism decision](../../.scratch/tiers-and-advisor-consult/spec.md#机制决定由工单-01-填写),
+the [decision ledger](../../.scratch/tiers-and-advisor-consult/sources.md#24-决定台账),
+and the [P6 probe record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p6-已授权的延续与选定机制).
 
 Production must validate identity binding, the consultation boundary, supported item
 shapes, tool pairing, truncation, context overflow, cancellation, result shape, and
@@ -102,22 +102,13 @@ Trust is keyed to the current hook hash, and an untrusted hook is skipped. This 
 the one user step that the installation-only delivery rule from ADR-0004 cannot
 remove. Temporary automated checks may use the user-approved trust bypass.
 
-The user-trust and untrusted-skip paths were exercised on 2026-09-26 in the correct
-temporary `CODEX_HOME`. At the host startup dialog titled "Hooks need review", the
-user selected "Trust all and continue"; the subsequent no-bypass exec, thread
-`01a0d9e1-e5d5-7fa0-9f66-56fbd8cc2b9b`, returned `HOOK_USER_TRUST_30941`, wrote the
-matching `SessionStart` receipt, and exited 0. After the fixture hook hash changed
-and the plugin was removed and added again, the primary selected "Continue without
-trusting" in the startup review dialog. Thread
-`01a0d9e3-0490-7a80-9788-0e3802b681aa` returned `MISSING`, wrote no new receipt,
-and the `/hooks` overview showed `SessionStart` as Installed 1, Active 0, Review 1
-with "1 hook needs review before it can run". The user made the trust choice and
-the primary made the skip choice in startup review dialogs; this probe does not
-claim that the user entered `/hooks`.
+The user-trust and untrusted-skip paths were exercised on 2026-09-26 in a temporary
+`CODEX_HOME`: a trusted hook ran, and after its hash changed the untrusted hook was
+skipped. Both choices were made in startup review dialogs; this probe does not
+claim that the user entered `/hooks`. The detailed sequence is in the
+[P7 trust record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p7-用户信任的执行与不受信任跳过).
 Revalidate this boundary if the host's hook discovery, startup review, hash trust,
 overview, warning, or event semantics change.
-The detailed sequence belongs in the
-[P7 trust record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p7-用户信任的执行与不受信任跳过).
 
 ## What this supersedes
 

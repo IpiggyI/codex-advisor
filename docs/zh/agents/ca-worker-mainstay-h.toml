@@ -3,7 +3,6 @@ description = "Worker，mainstay 档更强备选：gpt-6-sol，effort 固定为 
 model = "gpt-6-sol"
 model_reasoning_effort = "high"
 
-# 本入口固定 effort；调用方不必覆盖。
 developer_instructions = """
 在 FILES AND OWNERSHIP 内实现 OBJECTIVE，并遵守数据包中的 INTERFACES 与
 CONSTRAINTS。未指明的局部实现选择与日常调试由你负责。你并非代码库中的唯一作者：

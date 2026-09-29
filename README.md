@@ -13,9 +13,12 @@ See the [Chinese version manual](docs/releases/0.3.0.html) for a complete guide.
 ## Install
 
 Use Codex with plugins, native custom agents, MCP, and hooks; Python 3.11 or
-later; a POSIX shell; and `jq`. The consultation protocol and hook metadata are
-qualified on Codex 0.157.0. Host schema or cache-layout changes need renewed
-qualification rather than an assumed compatibility guarantee.
+later; a POSIX shell; and `jq`. On Windows, consultation also needs the native
+`codex.exe`; see
+[plugin maintenance](docs/agents/plugin-maintenance.md#process-consultation-component).
+The consultation protocol and hook metadata are qualified on Codex 0.157.0. Host
+schema or cache-layout changes need renewed qualification rather than an assumed
+compatibility guarantee.
 
 ~~~sh
 codex plugin marketplace add https://github.com/IpiggyI/codex-advisor.git
@@ -27,8 +30,8 @@ sh "$plugin_dir/scripts/install-agents.sh" --check
 
 The companion installer writes thirteen entries under `$CODEX_HOME/agents`, or
 `~/.codex/agents` when unset. It overwrites this plugin's differing files and
-removes nineteen retired filenames from 0.1.0 and 0.2.0. It leaves unrelated
-agents and primary configuration alone. Installed entries are not hand-edited.
+deletes nothing. It leaves unrelated agents and primary configuration alone.
+Installed entries are not hand-edited.
 
 Start a fresh interactive task and review the plugin's two hooks in `/hooks`.
 Installing or enabling a plugin does not trust hooks. Until you trust them, the
@@ -76,71 +79,59 @@ acceptance. A ticket, selected model, or unaccepted proposal does not activate i
 ## Admission and recovery
 
 Work normally starts in `mainstay`. It may start in `crux` when a key difficulty
-is identified or interacting constraints need joint handling. The narrower
-alternative admission rule is recorded but disabled. `rescue` requires a
-capability failure in `crux` or your explicit declaration.
+is identified or interacting constraints need joint handling. `rescue` requires
+a capability failure in `crux` or your explicit declaration. See
+[allocation](plugins/codex-advisor/skills/orchestration/SKILL.md#allocate-by-role-and-capability-tier).
 
-After failed acceptance, issue same-thread, same-dial rework that states the
-violated requirement, reproduction, expected behavior, and verification. A
-complete attempt plus failed rework counts as one capability failure only when
-the cause is capability. Environment problems, missing facts, contract gaps,
-and intermediate test failures do not advance the ladder.
-
-The path is `mainstay` to `crux` to `rescue` to the user. Do not switch models
-inside a failed tier or lower the model level unless no other choice exists.
-If the model stays the same, raise effort; one model can be raised at most once.
-A major execution problem may skip rework and count as one capability failure.
-Every model, effort, or role change starts a fresh matching thread.
+After failed acceptance, the primary issues rework in the same thread at the
+same dial. Only a capability failure moves work along the path `mainstay` to
+`crux` to `rescue` to the user; environment problems and contract gaps do not.
+[Recovery](plugins/codex-advisor/skills/orchestration/references/recovery.md#climb-the-escalation-ladder)
+holds the counting rules, the ladder, and the handoff.
 
 ## Process consultation and posture
 
 Call `process_consultation` with `{}`. The primary, workers, and explorers use
-the same interface. It reconstructs the caller's full effective context,
-including the unfinished turn, from the host record. Compaction replaces old
-history with its replacement history; no caller summary or recent-turn window
-is substituted. A fresh native advisor has no tools and returns a `plan`,
-`correction`, or `stop`, with validated actual model and effort. Unsupported
-context or execution failure returns explicit failure, never fabricated advice.
+the same interface. It reconstructs the caller's effective context from the host
+record, and a fresh advisor without tools returns a `plan`, `correction`, or
+`stop`. A failed consultation returns an explicit failure, never fabricated
+advice, and the work stays pending. See
+[consultation](plugins/codex-advisor/skills/orchestration/SKILL.md#consult-at-decision-points).
 
-Exact caller/advisor model identity selects the canonical posture. Different
-models use the full posture: consult before substantive work, when stuck,
-before changing approach, and before declaring done; reconcile conflicting
-evidence and advice. Same-model callers use the reduced posture: on a multi-step
-task, consult before committing to an approach and before declaring done.
-Save deliverables before the final consultation. Restate the key guidance in
-the next visible reply before continuing. See the
-[canonical posture](plugins/codex-advisor/skills/orchestration/references/consult-posture.md)
-for all conditions and short-task exceptions.
-
-Adopt advice by default. Explain deviations supported by failed execution or
-primary-source evidence. Reject conflicts with user constraints or authorization
-directly. Before rejecting a different-model advisor for a reasoning flaw, make
-one reconciliation call; same-model callers may reject with a stated reason.
-Advice grants no authorization, veto, or new requirement. Only successful
-consultation counts; failure leaves work pending until success or user release.
+Exact caller/advisor model identity selects the full or reduced posture. The
+posture says when to consult; the adoption rules say how to adopt, deviate from,
+or reject advice. Advice grants no authorization. See the
+[canonical posture](plugins/codex-advisor/skills/orchestration/references/consult-posture.md).
 
 ## Hooks and acceptance
 
 `SessionStart` injects the primary's selected posture and adoption rules, also
-on resume. Delegates carry their posture in their entry instructions.
-`PostToolUse` automatically checks each native dispatch against its template and
-explicit caller effort. Matching dispatches are silent; mismatches or missing
-proof leave work pending and inform the spawning session. A manual inspector
-is not needed for that comparison. No primary or worker finish hook blocks
-completion, and these hooks keep no state or observation log.
+on resume. Delegates carry their posture in their entry instructions. On a
+matching `ca_*` dispatch, `PostToolUse` adds one confirmation line:
+
+~~~text
+Codex Advisor: {role} identity, model, and effort match the host record at {model}[{effort}]; working directory and permissions were not checked.
+~~~
+
+Missing caller effort, a mismatch, or missing evidence leaves work pending and
+informs the spawning session. For a `ca_*` dispatch, no message means the hook
+did not run, for example because it is untrusted in `/hooks`, so the dispatch is
+unchecked. The inspector remains the check for working directory and observed
+permissions. No primary or worker finish hook blocks completion, and these hooks
+keep no state. See the
+[dispatch check](plugins/codex-advisor/skills/orchestration/references/operations.md#read-the-dispatch-check).
 
 Independent acceptance remains separate from consultation. After primary checks,
 high-risk work or an explicit review request requires a packet-based read-only
-review in a fresh Advisor thread. Work from one tier uses that tier's Advisor;
-mixed-tier work uses the highest tier involved. Primary-authored work uses the
-lowest Advisor dial not weaker than the primary, or the strongest if none
-qualifies or the exact primary model is unknown. Low confidence remains pending
-and goes to the user; it does not trigger an automatic review at another dial.
+review in a fresh Advisor thread. The
+[acceptance mapping](plugins/codex-advisor/skills/orchestration/references/routing-profile.md#acceptance-mapping)
+selects the Advisor; see
+[independent acceptance](plugins/codex-advisor/skills/orchestration/references/independent-acceptance.md).
 
 The primary inspects all changes and owns verification, whether it executes
-checks or assigns a checker. Reuse valid evidence. After material corrections,
-reverify and obtain a fresh required review. Read-only role instructions do not
-prove enforced isolation; the host may apply broader permissions.
+checks or assigns a checker. Read-only role instructions do not prove enforced
+isolation; the host may apply broader permissions. See
+[acceptance](plugins/codex-advisor/skills/orchestration/SKILL.md#accept-the-actual-deliverable).
 
 ## Check and update
 
@@ -160,42 +151,19 @@ change. Trust belongs to the current hook hash; an update cannot grant it.
 WSL and Windows are separate installations. Use the matching native Codex and
 home for each; Windows shell examples require Git Bash and its dependencies.
 
-`--check` reports differing or missing templates and retained retired names
-without writing. For a targeted metadata investigation:
+`--check` reports differing or missing templates without writing. For a
+targeted metadata investigation:
 
 ~~~sh
 sh "$plugin_dir/scripts/inspect-agent-runtime.sh" --agent ca_worker_mainstay_m <thread-id>
 ~~~
 
-Caller-effort entries also require `--effort <the effort you passed>`. See
-[native operations](plugins/codex-advisor/skills/orchestration/references/operations.md)
-for verification groups, metadata, lifecycle limits, and temporary checks.
-Route checks establish observed dispatch, not quality, cost, or stability.
-
-## Upgrade from 0.2.0
-
-The installer removes all eleven names below. Select replacements by the new
-role/tier contract and routing profile; this is not a promise of identical dials.
-The eight 0.1.0 filenames remain retired as well.
-
-| Retired entry | Replacement |
-|---|---|
-| `ca_explorer_light` | `ca_explorer_mainstay_m` |
-| `ca_explorer_standard_m` | `ca_explorer_crux_m` |
-| `ca_explorer_standard_h` | `ca_explorer_mainstay_h` or `ca_explorer_crux_h` |
-| `ca_explorer_senior` | `ca_explorer_rescue` |
-| `ca_worker_light` | `ca_worker_mainstay_m` |
-| `ca_worker_standard_m` | `ca_worker_mainstay_h` or `ca_worker_crux_m` |
-| `ca_worker_standard_h` | `ca_worker_crux_h` |
-| `ca_worker_senior` | `ca_worker_rescue` |
-| `ca_advisor_light` | `ca_advisor_mainstay` |
-| `ca_advisor_standard` | `ca_advisor_mainstay` or `ca_advisor_crux` |
-| `ca_advisor_senior` | `ca_advisor_rescue` |
-
-The old decision packet is replaced by zero-argument consultation. Independent
-acceptance keeps its packet but follows the new allocation rule. The former
-light/standard first-round pool and senior gate are replaced by model-based
-tiers and the capability-failure ladder described above.
+Caller-effort entries also require `--effort <the effort you passed>`.
+[Native operations](plugins/codex-advisor/skills/orchestration/references/operations.md#validate-routing-evidence)
+says when to run the inspector. Maintainers find verification groups, live route
+checks, native scenarios, and installer and hook internals in
+[plugin maintenance](docs/agents/plugin-maintenance.md). Route checks establish
+observed dispatch, not quality, cost, or stability.
 
 ## Attribution
 

@@ -30,7 +30,7 @@ The authoritative mapping from each role and capability tier to its native entri
 _Avoid_: Repeating model names, effort options, defaults, candidate order, or dial mappings in the orchestration doctrine; a hand-edited installed copy.
 
 **Companion installer**:
-The plugin script that writes the shipped native entries onto `$CODEX_HOME/agents`, overwriting this plugin's own files, deleting retired entry names, and touching nothing else.
+The plugin script that writes the shipped native entries onto `$CODEX_HOME/agents`, overwriting this plugin's own files and touching nothing else.
 _Avoid_: Hand-editing installed entries; expecting the installer to preserve a hand-edited copy.
 
 **Capability tier**:
@@ -62,7 +62,7 @@ A read-only evidence role available to any primary that investigates scoped ques
 _Avoid_: Assigning implementation or counting exploration as independent acceptance.
 
 **Complete attempt**:
-An executor's attempt through its assigned work and ordinary checks, ending in accepted completion, failed acceptance, or concrete inability. An advisory attempt must answer its specified question with a supportable conclusion. A consultation attempt must return an allowed result that answers the decision in context with a supportable conclusion.
+An executor's attempt through its assigned work and ordinary checks, ending in accepted completion, failed acceptance, or concrete inability. A consultation attempt must return an allowed result that answers the decision in context with a supportable conclusion.
 _Avoid_: Counting intermediate test or tool failures, or mere disagreement with advice, as complete failed attempts.
 
 **Process consultation**:

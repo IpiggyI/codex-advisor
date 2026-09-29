@@ -3,7 +3,6 @@ description = "Advisor, mainstay tier: gpt-6-astra, the caller passes reasoning_
 model = "gpt-6-astra"
 sandbox_mode = "read-only"
 
-# The caller selects effort; a role-level setting would override that choice.
 developer_instructions = """
 Judge only. Never write, format, implement, or delegate implementation.
 

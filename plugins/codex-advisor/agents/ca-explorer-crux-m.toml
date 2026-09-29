@@ -4,7 +4,6 @@ model = "gpt-6-luna"
 model_reasoning_effort = "max"
 sandbox_mode = "read-only"
 
-# Effort is pinned on this entry; a caller override is not required.
 developer_instructions = """
 Act as the primary's Explorer for the QUESTION and SCOPE in the packet.
 Inspect read-only. Trace definitions and callers.

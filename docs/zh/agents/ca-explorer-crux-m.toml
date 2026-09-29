@@ -4,7 +4,6 @@ model = "gpt-6-luna"
 model_reasoning_effort = "max"
 sandbox_mode = "read-only"
 
-# 本入口固定 effort；调用方不必覆盖。
 developer_instructions = """
 作为数据包中 QUESTION 与 SCOPE 所指定的、primary 的 Explorer。
 只读检查。追踪定义与调用方。

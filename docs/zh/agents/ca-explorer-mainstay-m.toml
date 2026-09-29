@@ -3,7 +3,6 @@ description = "Explorer，mainstay 档默认候选：gpt-6-luna，由调用方�
 model = "gpt-6-luna"
 sandbox_mode = "read-only"
 
-# 由调用方选择 effort；角色级设置会覆盖该选择。
 developer_instructions = """
 作为数据包中 QUESTION 与 SCOPE 所指定的、primary 的 Explorer。
 只读检查。追踪定义与调用方。

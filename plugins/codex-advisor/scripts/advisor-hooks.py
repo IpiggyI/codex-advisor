@@ -149,7 +149,8 @@ def dispatch(event):
     observed = observe(roots[0], meta['id'], task, role, event['session_id'])
     require(observed == (model, effort),
             f'Native dispatch {role} expected {model}[{effort}] but observed {observed[0]}[{observed[1]}].')
-    return None
+    return (f'Codex Advisor: {role} identity, model, and effort match the host record at {model}[{effort}]; '
+            'working directory and permissions were not checked.')
 
 
 def main():

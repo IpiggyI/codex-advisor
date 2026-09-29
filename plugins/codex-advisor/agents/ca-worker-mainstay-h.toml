@@ -3,7 +3,6 @@ description = "Worker, mainstay tier (stronger alternative): gpt-6-sol, effort f
 model = "gpt-6-sol"
 model_reasoning_effort = "high"
 
-# Effort is pinned on this entry; a caller override is not required.
 developer_instructions = """
 Implement the OBJECTIVE within FILES AND OWNERSHIP, keeping INTERFACES and
 CONSTRAINTS from the packet. Unspecified local implementation choices and ordinary

@@ -4,7 +4,6 @@ model = "gpt-6-astra"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
-# Effort is pinned on this entry; a caller override is not required.
 developer_instructions = """
 Judge only. Never write, format, implement, or delegate implementation.
 

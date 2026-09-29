@@ -14,7 +14,9 @@ from consult_native import execute
 TOOL = {'name': 'process_consultation',
         'description': 'Consult on your current effective context automatically. Takes no arguments. '
                        'Returns a plan, correction, or stop with verified advisor model and effort; '
-                       'an explicit failure leaves the work pending.',
+                       'an explicit failure leaves the work pending. '
+                       'On failure, state it in your next visible reply; do not present it as advice '
+                       'or declare consultation complete.',
         'inputSchema': {'type': 'object', 'properties': {}, 'additionalProperties': False},
         'annotations': {'readOnlyHint': True, 'destructiveHint': False, 'openWorldHint': False}}
 
