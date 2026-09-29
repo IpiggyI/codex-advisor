@@ -844,3 +844,50 @@ B01d：把 `SKILL.md` 第 27–30 行改为事件对照，实际措辞用英文�
 - 中文孪生中"拨档"与 "dial"、"Architect 模式"与 "Architect mode" 的用词不统一。这早于本轮。
 - 英文 `SKILL.md` 咨询段中 "advisor" 的大小写与别处不一致。`recovery.md` 没有给 R2 标号。两处都早于本轮。
 - 说明书侧栏的"中文孪生与检查"与正文标题"中文镜像与检查"不一致。这早于本轮。
+
+### 2026-09-29 发布与部署记录
+
+用户于 2026-09-29 授权推送并部署。
+
+**推送：** `git push origin main`。`origin/main` 从 `09c21c8` 更新到 `4b3c85e`。
+
+**部署：** 两端都按 README「Check and update」执行以下命令：
+
+```sh
+codex plugin marketplace upgrade codex-advisor
+codex plugin remove codex-advisor@codex-advisor
+codex plugin add codex-advisor@codex-advisor
+plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "codex-advisor@codex-advisor") | .source.path')"
+sh "$plugin_dir/scripts/install-agents.sh"
+sh "$plugin_dir/scripts/install-agents.sh" --check
+```
+
+- WSL：Codex CLI `0.157.1`，`CODEX_HOME=/home/hyy/.codex`。
+- Windows：从 WSL 调用 Git Bash（`/mnt/c/Program Files/Git/bin/bash.exe -l -s`），Codex CLI `0.158.0`。
+  - `WSLENV` 会把 WSL 的 `CODEX_HOME` 原样传给 Windows 进程。Git Bash 把它解析为不存在的 `C:/Program Files/Git/home/hyy/.codex`，Codex 因此报错 "failed to resolve CODEX_HOME"。
+  - 注册表中没有用户级或系统级的 `CODEX_HOME`。所以命令开头先执行 `unset CODEX_HOME`，Codex 使用默认的 `C:\Users\Shy\.codex`。
+- 结果：
+  - 两端的插件都是 `0.3.0`，市场克隆都指向 `4b3c85e`。
+  - 缓存中只有 `0.3.0`，只带七个运行时脚本，含 `hooks/hooks.json` 和两个新参考文件。
+  - 十三个入口都是 `INSTALL PASSED` 和 `CHECK PASSED`，并与仓库模板逐字节一致。
+- 剩余风险：Windows 的 Codex CLI 是 `0.158.0`，README 写的认证版本是 `0.157.0`。本轮没有重新认证。
+
+**A01a：** 用户于 2026-09-29 授权"直接删除"，没有做备份。
+- 删除前，两端的 `agents` 目录各有 24 个文件：十三个新入口，以及下面十一个 `0.2.0` 入口。
+- 十一个旧文件中，八个与 `09c21c8` 的模板逐字节一致。三个 Advisor 入口与 `f812f9b` 的模板逐字节一致，说明它们曾从本地检出安装。所以删除的内容都能从 git 历史取回。
+- 命令：对两端的下列文件名逐个执行 `rm -- <agents 目录>/<文件名>`，共删除 22 个文件。
+  - `ca-advisor-light.toml`、`ca-advisor-senior.toml`、`ca-advisor-standard.toml`；
+  - `ca-explorer-light.toml`、`ca-explorer-senior.toml`、`ca-explorer-standard-h.toml`、`ca-explorer-standard-m.toml`；
+  - `ca-worker-light.toml`、`ca-worker-senior.toml`、`ca-worker-standard-h.toml`、`ca-worker-standard-m.toml`。
+- 删除后，两端的 `agents` 目录各只剩十三个新入口，没有其他文件。再次运行 `--check`，两端都是 `CHECK PASSED`。
+
+**待办的状态：** 上面「待办」中的第 1–3 项已经完成：提交 `4b3c85e`、推送并部署、A01a。仍然待办：
+1. A05：两端在新任务中通过 `/hooks` 信任两个钩子。
+2. A06：在新的 Claude Code 会话中确认 `AGENTS.md` 经导入加载。
+3. B04 的宿主显示探查。
+4. B01 的三个行为场景和 B03 的真实宿主信任场景。
+
+**A05 和 A06，2026-09-29：**
+- A05 已完成。用户报告两端的钩子都已信任。两端的 `config.toml` 都有 `hooks.state."codex-advisor@codex-advisor:hooks/hooks.json:session_start:0:0"` 和 `…:post_tool_use:0:0` 两条 `trusted_hash`，两端的哈希相同。`0.2.0` 没有钩子，所以这些条目是为 `0.3.0` 的钩子建立的。
+- A06 已完成。在本仓库中运行 Claude Code `2.1.283` 的无头会话，禁用读文件和执行命令的工具，要求它原样引用「Plugin maintenance」一节。它逐字给出了这一节的正文，而这段文字只存在于 `AGENTS.md`；`CLAUDE.md` 只有 `@AGENTS.md`。所以导入已生效。调试日志不记录加载了哪些指令文件，不能作为佐证。
+- 仍然待办：B04 的宿主显示探查；B01 的三个行为场景；B03 的真实宿主场景。钩子已信任，现在可以观察一次正确派发是否出现确认行。
