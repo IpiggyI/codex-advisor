@@ -21,10 +21,11 @@ MANIFEST = json.loads((PLUGIN / 'hooks/hooks.json').read_text())
 REFERENCES = PLUGIN / 'skills/orchestration/references'
 CANONICAL = (REFERENCES / 'consult-posture.md').read_text()
 PROFILE = (REFERENCES / 'routing-profile.md').read_text()
-ADVISORS = set(re.findall(r'`ca_advisor_[a-z0-9_]+`\s+([^\s\[]+)\[', PROFILE))
-assert len(ADVISORS) == 1
-ADVISOR = next(iter(ADVISORS))
+POSTURES = {'gpt-6.1-sol': 'reduced', 'gpt-6-astra': 'reduced', 'gpt-6-sol': 'full', 'gpt-5.6-terra': 'full'}
 assert set(MANIFEST['hooks']) == {'SessionStart', 'PostToolUse'}
+for hook in (hook for groups in MANIFEST['hooks'].values() for group in groups for hook in group['hooks']):
+    # Windows runs hook commands in PowerShell, which reads the plugin root as $env:PLUGIN_ROOT.
+    assert hook.get('commandWindows') == hook['command'].replace('$PLUGIN_ROOT', '$env:PLUGIN_ROOT'), hook
 
 
 def run(event, disabled=False, plugin=PLUGIN):
@@ -115,8 +116,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
     write(parent, [FIXTURE['parent']])
     session = {**FIXTURE['session'], 'transcript_path': str(parent)}
     dispatch = {**FIXTURE['dispatch'], 'transcript_path': str(parent)}
-    for model in (ADVISOR, 'gpt-6-sol', 'gpt-5.6-terra'):
-        variant = 'reduced' if model == ADVISOR else 'full'
+    for model, variant in POSTURES.items():
         for source in ('startup', 'resume', 'compact', 'clear'):
             event = {**session, 'model': model, 'source': source}
             assert run(event) == block(variant) + '\n\n' + block('adoption')
@@ -131,16 +131,24 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
     (copy_plugin / 'scripts').mkdir(parents=True)
     copy_refs = copy_plugin / 'skills/orchestration/references'
     copy_refs.mkdir(parents=True)
-    (copy_plugin / 'scripts/advisor-hooks.py').write_bytes((PLUGIN / 'scripts/advisor-hooks.py').read_bytes())
-    (copy_plugin / 'scripts/run-python.sh').write_bytes((PLUGIN / 'scripts/run-python.sh').read_bytes())
-    (copy_refs / 'routing-profile.md').write_text(PROFILE.replace(
-        '`ca_advisor_rescue` ' + ADVISOR, '`ca_advisor_rescue` fixture-other-model'))
+    for script in ('advisor-hooks.py', 'consult_context.py', 'run-python.sh'):
+        (copy_plugin / 'scripts' / script).write_bytes((PLUGIN / 'scripts' / script).read_bytes())
+    effort_dependent = PROFILE.replace('gpt-6.1-sol[xhigh*, max]', 'gpt-6.1-sol[xhigh]')
+    assert effort_dependent != PROFILE
+    (copy_refs / 'routing-profile.md').write_text(effort_dependent)
     (copy_refs / 'consult-posture.md').write_text(CANONICAL)
-    pending(session, plugin=copy_plugin)
+    pending({**session, 'model': 'gpt-6.1-sol'}, plugin=copy_plugin)
+    for broken, reason in ((PROFILE.replace('uses gpt-6.1-sol[xhigh]', 'uses gpt-6.1-sol[low]'), 'not an Advisor dial'),
+                           (PROFILE.replace('gpt-6-luna < ', ''), 'missing from the ordering')):
+        assert broken != PROFILE
+        (copy_refs / 'routing-profile.md').write_text(broken)
+        pending({**session, 'model': 'gpt-5.6-terra'}, plugin=copy_plugin)
+        assert reason in run({**session, 'model': 'gpt-5.6-terra'}, plugin=copy_plugin)
     (copy_refs / 'routing-profile.md').write_text(PROFILE)
     (copy_refs / 'consult-posture.md').write_text('missing canonical blocks')
     pending(session, plugin=copy_plugin)
-    print('PASS: exact canonical full/reduced/adoption, unknown model, resume, delegate exclusion')
+    print('PASS: exact canonical full/reduced/adoption, unknown model, resume, delegate exclusion, '
+          'invalid fallback or ordering')
 
     templates = [tomllib.loads(path.read_text()) for path in (PLUGIN / 'agents').glob('*.toml')]
     for template in templates:
@@ -173,7 +181,8 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
             missing = copy.deepcopy(event)
             del missing['tool_input']['reasoning_effort']
             pending(missing)
-    print('PASS: all 13 entries, confirmation line on match, wrong model/effort, omitted caller effort; disabled negatives')
+    print('PASS: all %d entries, confirmation line on match, wrong model/effort, omitted caller effort; '
+          'disabled negatives' % len(templates))
 
     write(child, FIXTURE['child'])
     fixture_turn = FIXTURE['child'][1]['payload']

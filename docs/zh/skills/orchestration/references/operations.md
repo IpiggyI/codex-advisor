@@ -4,13 +4,13 @@
 
 ## 检查入口
 
-插件提供 `codex-advisor:orchestration`；配套安装器提供十三个按档位命名的 native 入口。从已安装 skill 解析脚本：
+插件提供 `codex-advisor:orchestration`；配套安装器提供十七个按档位命名的 native 入口。从已安装 skill 解析脚本：
 
 ~~~sh
 skill_dir=<directory-containing-SKILL.md>
 installer="$skill_dir/../../scripts/install-agents.sh"
 runtime_inspector="$skill_dir/../../scripts/inspect-agent-runtime.sh"
-sh "$installer" --check-role advisor-mainstay
+sh "$installer" --check-role advisor-mainstay-m
 ~~~
 
 首次使用每个必要入口前，先做一次不改文件的选择性检查。成功结果只缓存到当前任务；安装或配置变更后重新检查。用 `--check` 检查全部入口，或用选择器重复 `--check-role`：选择器是去掉 `ca_`、并把下划线换成连字符的入口名，因此 `ca_worker_crux_m` 变为 `worker-crux-m`。选择性检查忽略无关的已安装文件。失败时，受影响的调用保持待定，直到安装被核对；独立工作可以继续。
@@ -40,9 +40,9 @@ message: <短名称，空一行，再接 role-contracts.md 中的五段 worker �
 要求一次被接受的 native 调用和实际路由证据。可识别的检查器输入不能证明宿主/账户支持。对每次派发核验角色、模型、effort、线程、父关联、工作目录和观察到的权限；把父标识和工作目录与预期任务比较。公开的 spawn/details 元数据是权威来源；对其中省略的字段使用窄检查器，且不得覆盖矛盾。`ca_*` 派发没有显示钩子消息时，以及 native 元数据省略了工作目录或权限时（钩子从不检查这两项），亲自运行检查器：
 
 ~~~sh
-sh "$runtime_inspector" --agent ca_worker_crux_m --effort <listed-effort> <native-thread-id>
+sh "$runtime_inspector" --agent ca_worker_crux_h --effort <listed-effort> <native-thread-id>
 sh "$runtime_inspector" --sessions-dir /absolute/path/to/sessions --agent ca_explorer_rescue --effort <listed-effort> <native-thread-id>
-sh "$runtime_inspector" --agent ca_advisor_crux <native-thread-id>
+sh "$runtime_inspector" --agent ca_advisor_crux_h <native-thread-id>
 ~~~
 
 通用接口是 `--agent NAME [--effort EFFORT] THREAD_ID`。`--agent` 指定入口。检查器从脚本旁解析出的同名分发模板中读取预期模型和任何钉死的 effort。对调用方选择的入口，`--effort` 必须传入，它就是预期 effort。对钉死的入口，省略 `--effort`，或传入与钉死值相等的值；不同的值会被拒绝。检查器不判断某个 effort 是否被允许；这由 routing profile 决定。检查器恰好读取一份 UUID 匹配的 rollout，只发出白名单元数据，并拒绝缺失、歧义、畸形或冲突的证据。不带 `--agent` 的泛化检查不能证明角色契约。

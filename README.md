@@ -5,16 +5,19 @@ Codex Advisor is a Codex-only fork of
 Any primary can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Version 0.3.0 supplies thirteen native entries across `mainstay`, `crux`, and
+Version 0.3.1 supplies seventeen native entries across `mainstay`, `crux`, and
 `rescue`, a single routing profile, zero-argument process consultation, and
 hooks for posture injection and automatic dispatch verification.
-See the [Chinese version manual](docs/releases/0.3.0.html) for a complete guide.
+See the [Chinese version manual](docs/releases/0.3.1.html) for a complete guide.
 
 ## Install
 
 Use Codex with plugins, native custom agents, MCP, and hooks; Python 3.11 or
-later; a POSIX shell; and `jq`. On Windows, consultation also needs the native
-`codex.exe`; see
+later; a POSIX shell; and `jq`. On Windows, the hooks and the MCP server start
+through `sh`, so Git for Windows' `bin` directory, for example
+`C:\Program Files\Git\bin`, must be on PATH; see
+[Windows launch](docs/agents/plugin-maintenance.md#windows-launch). Consultation
+on Windows also needs the native `codex.exe`; see
 [plugin maintenance](docs/agents/plugin-maintenance.md#process-consultation-component).
 The consultation protocol and hook metadata are qualified on Codex 0.157.0. Host
 schema or cache-layout changes need renewed qualification rather than an assumed
@@ -28,7 +31,7 @@ test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && 
 sh "$plugin_dir/scripts/install-agents.sh" --check
 ~~~
 
-The companion installer writes thirteen entries under `$CODEX_HOME/agents`, or
+The companion installer writes seventeen entries under `$CODEX_HOME/agents`, or
 `~/.codex/agents` when unset. It overwrites this plugin's differing files and
 deletes nothing. It leaves unrelated agents and primary configuration alone.
 Installed entries are not hand-edited.
@@ -58,8 +61,8 @@ further delegate implementation. Explorers return read-only evidence and gaps.
 | Role | `mainstay` | `crux` | `rescue` |
 |---|---|---|---|
 | Explorer | `ca_explorer_mainstay_m` / `ca_explorer_mainstay_h` | `ca_explorer_crux_m` / `ca_explorer_crux_h` | `ca_explorer_rescue` |
-| Worker | `ca_worker_mainstay_m` / `ca_worker_mainstay_h` | `ca_worker_crux_m` / `ca_worker_crux_h` | `ca_worker_rescue` |
-| Advisor | `ca_advisor_mainstay` | `ca_advisor_crux` | `ca_advisor_rescue` |
+| Worker | `ca_worker_mainstay_m` / `ca_worker_mainstay_h` | `ca_worker_crux_m` / `ca_worker_crux_h` | `ca_worker_rescue_m` / `ca_worker_rescue_h` |
+| Advisor | `ca_advisor_mainstay_m` / `ca_advisor_mainstay_h` | `ca_advisor_crux_m` / `ca_advisor_crux_h` | `ca_advisor_rescue_m` / `ca_advisor_rescue_h` |
 
 Models, allowed efforts, defaults, and candidate order live only in the
 [routing profile](plugins/codex-advisor/skills/orchestration/references/routing-profile.md).

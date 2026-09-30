@@ -90,7 +90,7 @@ A group of acceptance checks with one named executor, formed separately from tic
 _Avoid_: Accumulating unverified premises that dependent work rests on; moving a worker's ordinary debugging into the batch.
 
 **Independent acceptance**:
-A fresh-thread, packet-based review of the actual deliverable after primary checks, required for high-risk work or an explicit review request. Its advisor dial follows the accepted work's tier or, for primary-authored work, the lowest advisor dial not weaker than the primary.
+A fresh-thread, packet-based review of the actual deliverable after primary checks, required for high-risk work or an explicit review request. Its advisor dial follows the accepted work's tier and the strongest dial that built it or, for primary-authored work, the lowest advisor dial not weaker than the primary.
 _Avoid_: Reusing process consultation, worker self-review, a delegated check run, or an earlier review thread after corrections; an automatic higher-dial review after a low-confidence verdict.
 
 **Current-state handoff**:

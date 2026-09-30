@@ -1,7 +1,6 @@
-name = "ca_advisor_crux"
-description = "Advisor，crux 档：gpt-6-astra，effort 固定为 high。针对验收数据包的只读判断；以 fork_turns none 生成新线程。"
-model = "gpt-6-astra"
-model_reasoning_effort = "high"
+name = "ca_advisor_mainstay_m"
+description = "Advisor，mainstay 档默认候选：gpt-6.1-sol，由调用方传入 reasoning_effort。针对验收数据包的只读判断；以 fork_turns none 生成新线程。"
+model = "gpt-6.1-sol"
 sandbox_mode = "read-only"
 
 developer_instructions = """

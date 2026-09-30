@@ -9,6 +9,7 @@ import time
 import tomllib
 
 sys.dont_write_bytecode = True
+from consult_context import Failure, advisor_dial, load_profile
 
 PLUGIN = Path(__file__).resolve().parent.parent
 REFERENCES = PLUGIN / 'skills/orchestration/references'
@@ -47,11 +48,12 @@ def posture(event):
     _, meta = parent(event)
     if meta.get('parent_thread_id') or meta.get('agent_role') or isinstance(meta.get('source'), dict):
         return None
-    profile = (REFERENCES / 'routing-profile.md').read_text(encoding='utf-8')
-    models = set(re.findall(r'`ca_advisor_[a-z0-9_]+`\s+([^\s\[]+)\[', profile))
-    require(len(models) == 1, 'Advisor model selection needs evidence unavailable at session start.')
+    profile = load_profile(PLUGIN)
     require(isinstance(event.get('model'), str) and event['model'], 'The session model is missing.')
-    variant = 'reduced' if event['model'] == next(iter(models)) else 'full'
+    # Session start supplies no effort, so the advisor model must be the same at every effort.
+    models = {advisor_dial(profile, event['model'], effort)[0] for effort in profile[2]}
+    require(len(models) == 1, 'Advisor model selection depends on an effort that session start does not supply.')
+    variant = 'reduced' if event['model'] == models.pop() else 'full'
     canonical = (REFERENCES / 'consult-posture.md').read_text(encoding='utf-8')
     blocks = []
     for name in (variant, 'adoption'):
@@ -162,8 +164,9 @@ def main():
         return
     try:
         context = posture(event) if kind == 'SessionStart' else dispatch(event)
-    except (Pending, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
-        reason = str(error) if isinstance(error, Pending) else 'Hook input or runtime evidence could not be read.'
+    except (Pending, Failure, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+        reason = (str(error) if isinstance(error, (Pending, Failure))
+                  else 'Hook input or runtime evidence could not be read.')
         context = 'Codex Advisor: affected work remains pending. ' + reason
     if context:
         print(json.dumps({'hookSpecificOutput': {'hookEventName': kind, 'additionalContext': context}}))

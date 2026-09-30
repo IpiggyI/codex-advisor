@@ -405,19 +405,25 @@ def route_case(model, effort, role, expected):
         records, meta, _ = fixture(model, effort, role)
         result = self.call(records, meta)
         self.assertEqual(result['status'], 'succeeded', result)
-        self.assertEqual(result['actual'], {'model': 'gpt-6-astra', 'effort': expected})
+        self.assertEqual(result['actual'], dict(zip(('model', 'effort'), expected)))
         self.assertEqual(result['expected'], result['actual'])
     return test
 
 
 for name, values in {
-    'mainstay': ('gpt-6-luna', 'max', 'ca_worker_mainstay_m', 'low'),
-    'crux': ('gpt-6-sol', 'xhigh', 'ca_explorer_crux_h', 'high'),
-    'rescue': ('gpt-6-astra', 'high', 'ca_worker_rescue', 'xhigh'),
-    'primary_astra': ('gpt-6-astra', 'xhigh', None, 'xhigh'),
-    'primary_sol': ('gpt-6-sol', 'high', None, 'low'),
-    'primary_unknown': ('gpt-5.6-terra', 'high', None, 'xhigh'),
-    'primary_medium': ('gpt-6-astra', 'medium', None, 'medium'),
+    'mainstay': ('gpt-6-luna', 'max', 'ca_worker_mainstay_m', ('gpt-6.1-sol', 'medium')),
+    'mainstay_sol_6_1': ('gpt-6.1-sol', 'high', 'ca_worker_mainstay_h', ('gpt-6.1-sol', 'high')),
+    'crux': ('gpt-6.1-sol', 'xhigh', 'ca_explorer_crux_h', ('gpt-6.1-sol', 'xhigh')),
+    'crux_astra': ('gpt-6-astra', 'low', 'ca_worker_crux_h', ('gpt-6-astra', 'high')),
+    'rescue': ('gpt-6-astra', 'high', 'ca_worker_rescue_h', ('gpt-6-astra', 'xhigh')),
+    'rescue_sol_6_1': ('gpt-6.1-sol', 'max', 'ca_worker_rescue_m', ('gpt-6.1-sol', 'max')),
+    'primary_astra': ('gpt-6-astra', 'xhigh', None, ('gpt-6-astra', 'xhigh')),
+    'primary_astra_max': ('gpt-6-astra', 'max', None, ('gpt-6-astra', 'xhigh')),
+    'primary_sol': ('gpt-6-sol', 'high', None, ('gpt-6.1-sol', 'medium')),
+    'primary_sol_6_1': ('gpt-6.1-sol', 'high', None, ('gpt-6.1-sol', 'high')),
+    'primary_sol_6_1_max': ('gpt-6.1-sol', 'max', None, ('gpt-6.1-sol', 'max')),
+    'primary_unknown': ('gpt-5.6-terra', 'high', None, ('gpt-6.1-sol', 'xhigh')),
+    'primary_medium': ('gpt-6-astra', 'medium', None, ('gpt-6-astra', 'medium')),
 }.items():
     setattr(Boundary, 'test_route_' + name, route_case(*values))
 

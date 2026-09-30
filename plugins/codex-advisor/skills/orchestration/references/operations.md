@@ -6,13 +6,13 @@ independent acceptance.
 ## Check the entry
 
 The plugin supplies `codex-advisor:orchestration`; the companion installer supplies
-thirteen tier-named native entries. Resolve scripts from the installed skill:
+seventeen tier-named native entries. Resolve scripts from the installed skill:
 
 ~~~sh
 skill_dir=<directory-containing-SKILL.md>
 installer="$skill_dir/../../scripts/install-agents.sh"
 runtime_inspector="$skill_dir/../../scripts/inspect-agent-runtime.sh"
-sh "$installer" --check-role advisor-mainstay
+sh "$installer" --check-role advisor-mainstay-m
 ~~~
 
 Run a non-mutating selective check before the first use of each required entry.
@@ -77,9 +77,9 @@ no hook message, and when native metadata omits the working directory or
 permissions, which the hook never checks:
 
 ~~~sh
-sh "$runtime_inspector" --agent ca_worker_crux_m --effort <listed-effort> <native-thread-id>
+sh "$runtime_inspector" --agent ca_worker_crux_h --effort <listed-effort> <native-thread-id>
 sh "$runtime_inspector" --sessions-dir /absolute/path/to/sessions --agent ca_explorer_rescue --effort <listed-effort> <native-thread-id>
-sh "$runtime_inspector" --agent ca_advisor_crux <native-thread-id>
+sh "$runtime_inspector" --agent ca_advisor_crux_h <native-thread-id>
 ~~~
 
 The generic interface is `--agent NAME [--effort EFFORT] THREAD_ID`. `--agent`

@@ -66,7 +66,7 @@ def parse_profile(text):
 def require_profile_templates(profile_text, template_data):
     profile_set, table_dials = parse_profile(profile_text)
     shipped_set = set(template_data)
-    assert len(profile_set) == 13, sorted(profile_set)
+    assert len(profile_set) == 17, sorted(profile_set)
     assert profile_set == shipped_set, sorted(profile_set ^ shipped_set)
     assert set(table_dials) == shipped_set, sorted(set(table_dials) ^ shipped_set)
     for name, (model, inner) in table_dials.items():
@@ -80,6 +80,17 @@ def require_profile_templates(profile_text, template_data):
 require_profile_templates(profile, shipped)
 profile_set, table_dials = parse_profile(profile)
 expected_entries = len(profile_set)
+sys.path.insert(0, str(scripts))
+from consult_context import advisor_dial, load_profile
+routing = load_profile(plugin)
+
+def assigned_advisor(name):
+    # The advisor model an Explorer or Worker entry consults at every effort its cell allows.
+    model, inner = table_dials[name]
+    advisors = {advisor_dial(routing, model, effort.strip().rstrip('*'), name.split('_')[2])[0]
+                for effort in inner.split(',')}
+    assert len(advisors) == 1, name
+    return advisors.pop()
 
 canonical = (plugin / 'skills/orchestration/references/consult-posture.md').read_text()
 section_re = re.compile(r'\n<!-- process-consultation:start -->\n.*?\n<!-- process-consultation:end -->\n', re.S)
@@ -96,8 +107,7 @@ def require_postures(entries):
         if role == 'advisor':
             assert not sections and 'consult-posture:' not in body, name
         else:
-            advisor_model = table_dials['ca_advisor_' + name.split('_')[2]][0]
-            variant = 'reduced' if data['model'] == advisor_model else 'full'
+            variant = 'reduced' if data['model'] == assigned_advisor(name) else 'full'
             expected = ('\n<!-- process-consultation:start -->\n' + posture_block(variant) +
                         '\n\n' + posture_block('adoption') + '\n<!-- process-consultation:end -->\n')
             assert sections == [expected], name
@@ -109,7 +119,7 @@ def require_postures(entries):
 
 require_postures(shipped)
 full_name = next(name for name, data in shipped.items() if name.startswith('ca_worker_') and
-                 data['model'] != table_dials['ca_advisor_' + name.split('_')[2]][0])
+                 data['model'] != assigned_advisor(name))
 advisor_name = next(name for name in shipped if name.startswith('ca_advisor_'))
 for mutation in ('one-character', 'wrong-variant', 'advisor-section'):
     changed = {name: dict(data) for name, data in shipped.items()}

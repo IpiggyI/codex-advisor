@@ -106,9 +106,10 @@ ADR-0006 records the trust boundary and the probe that exercised it.
 
 `SessionStart` injects the exact selected canonical posture block and adoption
 block, including on resume and compaction. It compares the session's exact model
-id with the advisor model read from the routing profile. The profile currently
-assigns one model to every advisor dial, so selection needs no inferred effort.
-If that ceases to hold, missing selection evidence leaves the work pending.
+id with the advisor model that the routing profile's consultation mapping
+selects for it. The event carries no effort, so the hook applies the mapping at
+every effort; if the selected advisor model depends on effort, missing selection
+evidence leaves the work pending.
 Native delegate identity excludes a second posture injection; entries carry their
 own posture. Missing session identity also leaves the work pending.
 
@@ -127,6 +128,21 @@ must use the qualified `sessions` layout; changed host event or transcript schem
 need renewed qualification. Consultation result validation is provided by the
 consultation component.
 
+## Windows launch
+
+The hooks and the MCP server start `sh` with `scripts/run-python.sh`. On Windows
+both commands look up `sh` on PATH, so Git for Windows' `bin` directory, which
+holds `sh.exe`, must be on PATH; its `cmd` directory holds no `sh`.
+
+On Windows, Codex runs a hook's `commandWindows` in place of `command`, through
+PowerShell. Each `commandWindows` is its `command` with `$PLUGIN_ROOT` written
+as `$env:PLUGIN_ROOT`; the hooks group checks this equality. When `CODEX_HOME`
+is set, the host passes `PLUGIN_ROOT` in the `\\?\` form, which `sh` cannot open,
+and the hooks fail. Without PowerShell, the host runs hook commands through
+`cmd.exe`, which does not expand `$env:PLUGIN_ROOT`, and the hooks fail too.
+[ADR-0010](../adr/0010-windows-launch-through-git-sh.md) records the host facts
+behind these rules and when to re-check them.
+
 ## Verify a change
 
 Select checks by the behavior the change touches. While editing one area, run its
@@ -139,12 +155,12 @@ sh tests/verify.sh --consultation
 sh tests/verify.sh --hooks
 ~~~
 
-The installation group covers the installer, the thirteen entry templates, the
+The installation group covers the installer, the seventeen entry templates, the
 manifest, and the routing profile's names/models/pins against those templates. It
 also checks canonical posture equality, advisor exclusion, and same-role identity
 outside the posture section, with negative fixtures. It includes a negative fixture
 for a model mismatch and checks that other files in the target stay untouched.
-The runtime group drives the inspector from all thirteen templates and covers its
+The runtime group drives the inspector from all seventeen templates and covers its
 options, template-derived expectations, rejection paths, and emitted metadata.
 The consultation group exercises the MCP boundary with a substitute native
 executable: complete context, routing, actual request validation, isolation,
@@ -200,4 +216,7 @@ and the account's callable dials. Then change the affected template's `model` or
 `model_reasoning_effort` and the routing profile's table together, run
 `sh tests/verify.sh`, and repeat the live route check for
 every affected entry. Model-generation changes stay confined to the profile and
-templates unless the role or tier contract also changes.
+templates unless the role or tier contract also changes. Each model in the
+ordering must reach one Advisor model at every effort, and each entry one Advisor
+model at every effort it allows: `SessionStart` sees no effort, and an entry
+carries a single posture.

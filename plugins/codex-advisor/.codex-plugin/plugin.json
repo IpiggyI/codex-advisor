@@ -1,7 +1,7 @@
 {
   "name": "codex-advisor",
-  "version": "0.3.0",
-  "description": "Thirteen native explorer, worker, and advisor entries across mainstay, crux, and rescue tiers, with context-aware process consultation, posture and dispatch hooks, and independent acceptance.",
+  "version": "0.3.1",
+  "description": "Seventeen native explorer, worker, and advisor entries across mainstay, crux, and rescue tiers, with context-aware process consultation, posture and dispatch hooks, and independent acceptance.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
   "license": "MIT",
   "keywords": ["codex", "orchestration", "advisor", "explorer", "worker", "mainstay", "crux", "rescue", "consultation", "hooks"],
@@ -10,7 +10,7 @@
   "interface": {
     "displayName": "Codex Advisor",
     "shortDescription": "Delegate by tier, consult with current context, and verify native dispatches automatically.",
-    "longDescription": "Any primary can implement, delegate, or combine both within user goals and resources. Thirteen native entries use mainstay, crux, and rescue tiers with dials in one routing profile. Capability failures advance through the tiers after rework. Zero-argument process consultation supplies current effective context to a tool-free advisor. User-trusted hooks inject consultation posture and check native dispatch settings. Independent acceptance remains a fresh-thread review. Explicit Architect mode delegates implementation; primary settings remain user-owned and missing evidence leaves work pending.",
+    "longDescription": "Any primary can implement, delegate, or combine both within user goals and resources. Seventeen native entries use mainstay, crux, and rescue tiers with dials in one routing profile. Capability failures advance through the tiers after rework. Zero-argument process consultation supplies current effective context to a tool-free advisor. User-trusted hooks inject consultation posture and check native dispatch settings. Independent acceptance remains a fresh-thread review. Explicit Architect mode delegates implementation; primary settings remain user-owned and missing evidence leaves work pending.",
     "developerName": "Daniel McAteer",
     "category": "Productivity",
     "capabilities": ["Interactive", "Write"],

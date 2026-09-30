@@ -8,7 +8,7 @@
 
 ## 选择 Advisor
 
-按 [routing profile](routing-profile.md#验收映射) 中的验收映射，选择 Advisor 入口及其 dial。每个档位一个 Advisor 入口，在新线程中只读回答验收数据包。
+按 [routing profile](routing-profile.md#验收映射) 中的验收映射，选择 Advisor 入口及其 dial。一个 Advisor 入口在新线程中只读回答验收数据包。
 
 ## 发送验收数据包
 

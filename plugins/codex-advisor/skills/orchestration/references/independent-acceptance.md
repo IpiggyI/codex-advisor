@@ -14,8 +14,8 @@ cannot satisfy independent acceptance.
 ## Select the Advisor
 
 Choose the Advisor entry and its dial by the acceptance mapping in the
-[routing profile](routing-profile.md#acceptance-mapping). One Advisor entry per
-tier answers the acceptance packet, read-only, in a fresh thread.
+[routing profile](routing-profile.md#acceptance-mapping). One Advisor entry
+answers the acceptance packet, read-only, in a fresh thread.
 
 ## Send the acceptance packet
 

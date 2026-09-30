@@ -4,6 +4,7 @@
       "hooks": [{
         "type": "command",
         "command": "sh \"$PLUGIN_ROOT/scripts/run-python.sh\" \"$PLUGIN_ROOT/scripts/advisor-hooks.py\"",
+        "commandWindows": "sh \"$env:PLUGIN_ROOT/scripts/run-python.sh\" \"$env:PLUGIN_ROOT/scripts/advisor-hooks.py\"",
         "timeout": 10,
         "additionalContextLimit": 12000
       }]
@@ -13,6 +14,7 @@
       "hooks": [{
         "type": "command",
         "command": "sh \"$PLUGIN_ROOT/scripts/run-python.sh\" \"$PLUGIN_ROOT/scripts/advisor-hooks.py\"",
+        "commandWindows": "sh \"$env:PLUGIN_ROOT/scripts/run-python.sh\" \"$env:PLUGIN_ROOT/scripts/advisor-hooks.py\"",
         "timeout": 10,
         "additionalContextLimit": 4000
       }]

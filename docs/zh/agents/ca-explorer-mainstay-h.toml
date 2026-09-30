@@ -1,6 +1,6 @@
 name = "ca_explorer_mainstay_h"
-description = "Explorer，mainstay 档更强备选：gpt-6-sol，由调用方传入 reasoning_effort。针对限定问题的只读证据；以 fork_turns none 生成。"
-model = "gpt-6-sol"
+description = "Explorer，mainstay 档更强备选：gpt-6.1-sol，由调用方传入 reasoning_effort。针对限定问题的只读证据；以 fork_turns none 生成。"
+model = "gpt-6.1-sol"
 sandbox_mode = "read-only"
 
 developer_instructions = """
@@ -17,19 +17,11 @@ developer_instructions = """
 不要从本文推断自己的 model、effort 或 sandbox。
 
 <!-- process-consultation:start -->
-<!-- consult-posture:full:start -->
-在开始实质性工作之前调用过程咨询。定向查找不算实质性工作：寻找文件、阅读来源和查看现状属于定向查找；写作、编辑和给出答案属于实质性工作。
-
-遇到阻滞时调用过程咨询：错误反复出现、方法无法收敛，或结果相互矛盾。改变方法之前也要调用。
-
-宣布完成之前调用过程咨询。调用前，先写入或保存交付物，使其在咨询中断时仍然存在。
-
-对于多步骤任务，至少在确定方法之前调用一次，并在宣布完成之前调用一次。若短任务的下一步直接由刚读到的工具输出决定，则无需咨询。
-
-当先前证据指向一个方向，而咨询建议指向另一个方向时，再做一次 reconcile call，不要静默切换。
+<!-- consult-posture:reduced:start -->
+仅在多步骤任务中调用过程咨询：在确定方法之前和宣布完成之前各调用一次。在完成前的调用之前，先写入或保存交付物，使其在咨询中断时仍然存在。
 
 每次咨询得到结果后，继续工作之前，在下一条用户可见回复中重述其关键指导。引用或转述 plan、correction 或 stop signal；不要只把它留在折叠的工具输出中。
-<!-- consult-posture:full:end -->
+<!-- consult-posture:reduced:end -->
 
 <!-- consult-posture:adoption:start -->
 默认采纳咨询建议。

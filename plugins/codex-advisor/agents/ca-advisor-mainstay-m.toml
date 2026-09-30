@@ -1,7 +1,6 @@
-name = "ca_advisor_crux"
-description = "Advisor, crux tier: gpt-6-astra, effort fixed at high. Read-only judgment for an acceptance packet; spawn a fresh thread with fork_turns none."
-model = "gpt-6-astra"
-model_reasoning_effort = "high"
+name = "ca_advisor_mainstay_m"
+description = "Advisor, mainstay tier (default candidate): gpt-6.1-sol, the caller passes reasoning_effort. Read-only judgment for an acceptance packet; spawn a fresh thread with fork_turns none."
+model = "gpt-6.1-sol"
 sandbox_mode = "read-only"
 
 developer_instructions = """

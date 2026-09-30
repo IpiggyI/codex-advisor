@@ -12,10 +12,11 @@ import tomllib
 root = Path(os.environ['CONSULT_FIXTURE_ROOT'])
 scenario = os.environ.get('CONSULT_FIXTURE_CASE', 'plan')
 if sys.argv[1:] == ['debug', 'models', '--bundled']:
-    print(json.dumps({'models': [{'slug': 'gpt-6-astra', 'shell_type': 'local',
+    print(json.dumps({'models': [{'slug': slug, 'shell_type': 'local',
           'tool_mode': 'code_mode_only',
           'apply_patch_tool_type': 'freeform', 'experimental_supported_tools': ['clock'],
-          'supports_search_tool': True, 'use_tools_instructions': True}]}))
+          'supports_search_tool': True, 'use_tools_instructions': True}
+          for slug in ('gpt-6-astra', 'gpt-6.1-sol')]}))
     sys.exit(0)
 assert sys.argv[1] == 'app-server'
 settings = {}

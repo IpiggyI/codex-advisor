@@ -16,7 +16,7 @@ The default target is "$CODEX_HOME/agents", or "$HOME/.codex/agents".
   --check            Report drift (differing or missing manifest files) without
                      writing.
   --check-role ROLE  Check a template by filename stem minus the plugin prefix
-                     (for example explorer-mainstay-m, advisor-rescue);
+                     (for example explorer-mainstay-m, advisor-rescue-h);
                      repeatable; implies --check.
   --help            Show this help text.
 EOF

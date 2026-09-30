@@ -173,7 +173,7 @@ def reconstruct(home, meta):
             'source': session.get('source'), 'thread': meta['threadId']}
 
 
-def route(plugin, caller):
+def load_profile(plugin):
     profile = (plugin / 'skills/orchestration/references/routing-profile.md').read_text(encoding='utf-8')
     rows = dict((name, (model, [e.strip().rstrip('*') for e in efforts.split(',')]))
                 for name, model, efforts in re.findall(
@@ -181,23 +181,42 @@ def route(plugin, caller):
     ordering = re.search(r'compare model first:\s*([^\n]+)\. Compare effort second:\s*([^\n]+)\.', profile)
     require(ordering is not None, 'profile', 'Routing profile ordering is unavailable.')
     models = ordering[1].split(' < ')
-    efforts = ordering[2].split(' < ')
-    advisors = [dial for name, dial in rows.items() if name.startswith('ca_advisor_')]
-    dials = [(model, effort) for model, allowed in advisors for effort in allowed]
+    require(all(model in models for model, _ in rows.values()),
+            'profile', 'A routing profile model is missing from the ordering.')
+    unknown = re.search(r'absent\s+from\s+this\s+profile\s+uses\s+(gpt-[^\s\[]+)\[([a-z]+)\]', profile)
+    advisors = {(model, effort) for name, (model, allowed) in rows.items()
+                if name.startswith('ca_advisor_') for effort in allowed}
+    require(unknown is not None and (unknown[1], unknown[2]) in advisors,
+            'profile', 'Routing profile fallback for an unknown model is not an Advisor dial.')
+    return rows, models, ordering[2].split(' < '), (unknown[1], unknown[2])
+
+
+def advisor_dial(profile, model, effort, tier=None):
+    # The lowest Advisor dial not weaker than the caller, else the strongest; a tier limits it to one cell.
+    # Only a primary can carry a model absent from the ordering; it takes the profile's declared fallback.
+    rows, models, efforts, unknown = profile
+    dials = [(candidate, level) for name, (candidate, allowed) in rows.items()
+             if name.startswith('ca_advisor_') and tier in (None, name.split('_')[2]) for level in allowed]
     require(bool(dials), 'profile', 'No advisor dials are configured.')
     dials.sort(key=lambda d: (models.index(d[0]), efforts.index(d[1])))
+    if model not in models:
+        return unknown
+    rank = (models.index(model), efforts.index(effort))
+    return next((d for d in dials if (models.index(d[0]), efforts.index(d[1])) >= rank), dials[-1])
+
+
+def route(plugin, caller):
+    profile = load_profile(plugin)
+    rows, _, efforts, _ = profile
     role = caller['role']
     if role:
         require(role in rows and role.startswith(('ca_worker_', 'ca_explorer_')),
                 'route', 'Caller role is not a supported consultation entry.')
         require(caller['model'] == rows[role][0] and caller['effort'] in rows[role][1],
                 'route', 'Caller entry actual dial is outside its routing profile.')
-        model, allowed = rows['ca_advisor_' + role.split('_')[2]]
-        return {'model': model, 'effort': allowed[0]}
-    require(not isinstance(caller['source'], dict), 'route', 'A delegate is missing its entry identity.')
-    require(caller['effort'] in efforts, 'route', 'Caller effort is not in the qualified ordering.')
-    chosen = dials[-1]
-    if caller['model'] in models:
-        rank = (models.index(caller['model']), efforts.index(caller['effort']))
-        chosen = next((d for d in dials if (models.index(d[0]), efforts.index(d[1])) >= rank), chosen)
+        chosen = advisor_dial(profile, caller['model'], caller['effort'], role.split('_')[2])
+    else:
+        require(not isinstance(caller['source'], dict), 'route', 'A delegate is missing its entry identity.')
+        require(caller['effort'] in efforts, 'route', 'Caller effort is not in the qualified ordering.')
+        chosen = advisor_dial(profile, caller['model'], caller['effort'])
     return dict(zip(('model', 'effort'), chosen))
