@@ -27,3 +27,22 @@ From plugin version `0.1.0` onward, each `plugin.json` version has `docs/release
 ### Plugin release & local update
 
 Installed marketplaces on WSL and Windows point at GitHub (`IpiggyI/codex-advisor`), not this working tree. Push to `origin` first, then on each side: `codex plugin marketplace upgrade codex-advisor`, reinstall `codex-advisor@codex-advisor`, and run the companion installer; then ask the user to review `/hooks` in a fresh task on each side when a hook definition is new or changed. An unpushed commit never reaches the plugin.
+
+### Wording of shipped text
+
+Text that ships under `plugins/codex-advisor/**`, together with its `docs/zh/**` twins, states settled results: the rules and facts its reader acts on. This covers prose, skill and entry descriptions, manifest and hook descriptions, code comments and user-facing messages. Write "The models show no clear difference in speed.", not a remark on what the text lists. A "because" clause that explains why a rule holds stays. How the text came to be goes to a coordination artifact:
+- what the text lists or omits, why a file exists, and which rule replaced which → an ADR;
+- retired names → `_Avoid_` in `CONTEXT.md`;
+- dated observations and unverified status → the issue file or ADR.
+
+`python3 tests/test_shipped_wording.py` fails on known phrasings of this kind; a pass does not prove the rule as a whole.
+
+### Canonical notation for the user's declarations
+
+The user often declares models and dials in loose notation: `6-sol`, `sol`, `GPT-6.1 Sol`, `astra[low, medium]`, `[low* medium]`. Every artifact writes them in canonical form, with no note on the original spelling:
+- models as the full id an entry template's `model` carries (`gpt-6-luna`, `gpt-6.1-sol`, `gpt-6-astra`);
+- dials as `model[a*, b]` (the routing profile's notation line); a multi-effort dial without `*` gets it on the first listed effort.
+
+Verbatim quotes of the user in specs and discussion records stay as written. Ask only when a loose name fits more than one model.
+
+The same test checks shipped text and `README.md`: the routing profile's anchor list equals the template models in both twins, every dial uses a template model and canonical brackets, and no known loose model name appears.

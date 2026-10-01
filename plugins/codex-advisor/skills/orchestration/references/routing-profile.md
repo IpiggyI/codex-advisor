@@ -1,7 +1,7 @@
 # Routing profile
 
-Declared 2026-09-30. The dials below are anchored to GPT-6 Luna, GPT-6.1 Sol,
-and GPT-6 Astra. This file is the source of every model, allowed effort,
+Declared 2026-09-30. The dials below are anchored to `gpt-6-luna`,
+`gpt-6.1-sol`, and `gpt-6-astra`. This file is the source of every model, allowed effort,
 default, and candidate order. Each entry template copies its own model and any
 pinned effort into its fields. Its description names the model, the candidate
 position where a cell has two, and the effort where it is pinned. The skill text

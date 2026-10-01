@@ -179,6 +179,7 @@ so it replaces the focused runs instead of following them:
 
 ~~~sh
 sh tests/verify.sh
+python3 tests/test_shipped_wording.py
 git diff --check
 ~~~
 
