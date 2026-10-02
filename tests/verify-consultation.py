@@ -419,13 +419,52 @@ for name, values in {
     'rescue_sol_6_1': ('gpt-6.1-sol', 'max', 'ca_worker_rescue_m', ('gpt-6.1-sol', 'max')),
     'primary_astra': ('gpt-6-astra', 'xhigh', None, ('gpt-6-astra', 'xhigh')),
     'primary_astra_max': ('gpt-6-astra', 'max', None, ('gpt-6-astra', 'xhigh')),
-    'primary_sol': ('gpt-6-sol', 'high', None, ('gpt-6.1-sol', 'medium')),
+    'primary_sol': ('gpt-6-sol', 'high', None, ('gpt-6.1-sol', 'xhigh')),
     'primary_sol_6_1': ('gpt-6.1-sol', 'high', None, ('gpt-6.1-sol', 'high')),
     'primary_sol_6_1_max': ('gpt-6.1-sol', 'max', None, ('gpt-6.1-sol', 'max')),
     'primary_unknown': ('gpt-5.6-terra', 'high', None, ('gpt-6.1-sol', 'xhigh')),
     'primary_medium': ('gpt-6-astra', 'medium', None, ('gpt-6-astra', 'medium')),
 }.items():
     setattr(Boundary, 'test_route_' + name, route_case(*values))
+
+
+def segment_case(mutation, expected=None):
+    def test(self):
+        path = self.plugin / 'skills/orchestration/references/routing-profile.md'
+        original = path.read_text()
+        changed = mutation(original)
+        self.assertNotEqual(original, changed)
+        path.write_text(changed)
+        records, meta, _ = fixture('gpt-6-luna', 'max')
+        result = self.call(records, meta)
+        if expected is None:
+            self.assertEqual(result['status'], 'failed', result)
+            self.assertEqual(result['code'], 'profile', result)
+            self.assertNotIn('advice', result)
+            self.assertFalse((self.root / 'injected.json').exists())
+        else:
+            self.assertEqual(result['status'], 'succeeded', result)
+            self.assertEqual(result['actual'], dict(zip(('model', 'effort'), expected)))
+    return test
+
+
+SEGMENT_ROWS = ('| `gpt-6-luna` | `starter` |\n'
+                '| — | `midrange` |\n'
+                '| `gpt-6.1-sol` | `premium` |\n'
+                '| `gpt-6-astra` | `flagship` |\n')
+for name, mutation, expected in [
+    ('missing_table', lambda p: p.replace(SEGMENT_ROWS, ''), None),
+    ('missing_model', lambda p: p.replace('| `gpt-6-luna` | `starter` |\n', ''), None),
+    ('duplicate_model', lambda p: p.replace(SEGMENT_ROWS, SEGMENT_ROWS + '| `gpt-6-luna` | `premium` |\n'), None),
+    ('unknown_segment', lambda p: p.replace('| `gpt-6-luna` | `starter` |', '| `gpt-6-luna` | `unknown` |'), None),
+    ('row_order', lambda p: p.replace(SEGMENT_ROWS, ''.join(reversed(SEGMENT_ROWS.splitlines(keepends=True)))),
+     ('gpt-6.1-sol', 'medium')),
+    ('same_segment', lambda p: p.replace('| `gpt-6.1-sol` | `premium` |', '| `gpt-6.1-sol` | `starter` |'),
+     ('gpt-6.1-sol', 'max')),
+    ('changed_segment', lambda p: p.replace('| `gpt-6-luna` | `starter` |', '| `gpt-6-luna` | `flagship` |'),
+     ('gpt-6-astra', 'xhigh')),
+]:
+    setattr(Boundary, 'test_segments_' + name, segment_case(mutation, expected))
 
 
 def outcome_case(scenario, code):

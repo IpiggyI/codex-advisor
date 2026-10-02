@@ -173,36 +173,48 @@ def reconstruct(home, meta):
             'source': session.get('source'), 'thread': meta['threadId']}
 
 
+def model_segments(profile):
+    segments = ('starter', 'midrange', 'premium', 'flagship')
+    placements = re.findall(r'^\|\s*`(gpt-[^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*$', profile, re.M)
+    require(bool(placements), 'profile', 'Routing profile model segments are unavailable.')
+    models = {}
+    for model, segment in placements:
+        require(segment in segments, 'profile', 'Routing profile model segment is unknown.')
+        require(model not in models, 'profile', 'A routing profile model has duplicate segments.')
+        models[model] = segments.index(segment)
+    return models
+
+
 def load_profile(plugin):
     profile = (plugin / 'skills/orchestration/references/routing-profile.md').read_text(encoding='utf-8')
     rows = dict((name, (model, [e.strip().rstrip('*') for e in efforts.split(',')]))
                 for name, model, efforts in re.findall(
                     r'`(ca_[a-z0-9_]+)`\s+(gpt-[^\s\[]+)\[([^\]]+)\]', profile))
-    ordering = re.search(r'compare model first:\s*([^\n]+)\. Compare effort second:\s*([^\n]+)\.', profile)
-    require(ordering is not None, 'profile', 'Routing profile ordering is unavailable.')
-    models = ordering[1].split(' < ')
+    models = model_segments(profile)
+    ordering = re.search(r'Compare effort second:\s*([^\n]+)\.', profile)
+    require(ordering is not None, 'profile', 'Routing profile effort ordering is unavailable.')
     require(all(model in models for model, _ in rows.values()),
-            'profile', 'A routing profile model is missing from the ordering.')
+            'profile', 'A routing profile model is missing from the segment table.')
     unknown = re.search(r'absent\s+from\s+this\s+profile\s+uses\s+(gpt-[^\s\[]+)\[([a-z]+)\]', profile)
     advisors = {(model, effort) for name, (model, allowed) in rows.items()
                 if name.startswith('ca_advisor_') for effort in allowed}
     require(unknown is not None and (unknown[1], unknown[2]) in advisors,
             'profile', 'Routing profile fallback for an unknown model is not an Advisor dial.')
-    return rows, models, ordering[2].split(' < '), (unknown[1], unknown[2])
+    return rows, models, ordering[1].split(' < '), (unknown[1], unknown[2])
 
 
 def advisor_dial(profile, model, effort, tier=None):
     # The lowest Advisor dial not weaker than the caller, else the strongest; a tier limits it to one cell.
-    # Only a primary can carry a model absent from the ordering; it takes the profile's declared fallback.
+    # Only a primary can carry a model absent from the segment table; it takes the fallback dial.
     rows, models, efforts, unknown = profile
     dials = [(candidate, level) for name, (candidate, allowed) in rows.items()
              if name.startswith('ca_advisor_') and tier in (None, name.split('_')[2]) for level in allowed]
     require(bool(dials), 'profile', 'No advisor dials are configured.')
-    dials.sort(key=lambda d: (models.index(d[0]), efforts.index(d[1])))
+    dials.sort(key=lambda d: (models[d[0]], efforts.index(d[1])))
     if model not in models:
         return unknown
-    rank = (models.index(model), efforts.index(effort))
-    return next((d for d in dials if (models.index(d[0]), efforts.index(d[1])) >= rank), dials[-1])
+    rank = (models[model], efforts.index(effort))
+    return next((d for d in dials if (models[d[0]], efforts.index(d[1])) >= rank), dials[-1])
 
 
 def route(plugin, caller):

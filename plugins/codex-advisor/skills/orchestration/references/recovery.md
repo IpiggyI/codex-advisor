@@ -29,7 +29,8 @@ to capability, the attempt and rework together count as one capability failure.
 
 After a capability failure, move the work to the next tier in a fresh thread with
 the handoff below. Do not switch to another model in the same tier unless no other
-choice exists. The next dial's model level cannot be lower than the failed dial's
+choice exists. The next dial's model segment in the
+[routing profile](routing-profile.md#model-segments) cannot be lower than the failed dial's
 unless no other choice exists; if the model stays the same, use a higher effort.
 Above that floor, choose by the difficulty the failure exposed.
 

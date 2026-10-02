@@ -21,6 +21,9 @@ NOTATION = 'AGENTS.md "Canonical notation for the user\'s declarations"'
 # stating a result: what it lists or omits, why it exists, what it replaced,
 # and dated or unverified observations.
 WORDING_PATTERNS = [
+    (r"\bDeclared\s+\d{4}-\d{2}-\d{2}", re.I),
+    (r"\b(?:skill|body) text repeats none\b", re.I),
+    (r"\b(?:its|template) description names the model\b", re.I),
     (r"\b(?:is|are) not listed\b", 0),
     (r"\bnot persisted\b", 0),
     (r"\bthis file carries\b", re.I),
@@ -40,6 +43,8 @@ WORDING_PATTERNS = [
     (r"\bapply as written\b", re.I),
     (r"\bratchet\b", re.I),
     (r"不列[：:]", 0),
+    (r"声明于\s*\d{4}-\d{2}-\d{2}", 0),
+    (r"正文不重复其中任何一项|描述写出模型", 0),
     (r"不写进本(?:档案|文件)", 0),
     (r"本文件承载", 0),
     (r"存在的全部理由", 0),
@@ -109,6 +114,11 @@ def profile_anchors(rel):
     return re.findall(r"`([^`]+)`", match.group(1) or match.group(2))
 
 
+def profile_segments(rel):
+    text = "\n".join(read_lines(rel))
+    return re.findall(r"^\|\s*`(gpt-[^`]+)`\s*\|\s*`([^`]+)`\s*\|\s*$", text, re.M)
+
+
 def check_dial(model, efforts, anchors):
     items = [e for e in re.split(r"[ ,]+", efforts) if e]
     problems = []
@@ -134,6 +144,7 @@ def main():
         failed += 1
 
     models = template_models()
+    segments = profile_segments(PLUGIN + "/" + PROFILE)
     for rel in (PLUGIN + "/" + PROFILE, "docs/zh/" + PROFILE):
         anchors = profile_anchors(rel)
         if set(anchors) != models or len(anchors) != len(models):
@@ -141,6 +152,16 @@ def main():
                  % (rel, anchors, sorted(models), NOTATION))
         else:
             print("PASS  profile anchors: %s" % rel)
+            passed += 1
+        placements = profile_segments(rel)
+        assigned = dict(placements)
+        if (not placements or len(assigned) != len(placements) or
+                not models.issubset(assigned) or
+                any(segment not in ("starter", "midrange", "premium", "flagship")
+                    for segment in assigned.values()) or assigned != dict(segments)):
+            fail("%s model segments must be unique, cover template models, and match both twins" % rel)
+        else:
+            print("PASS  model segments: %s" % rel)
             passed += 1
 
     # README.md carries upgrade history, so it gets the notation checks only.

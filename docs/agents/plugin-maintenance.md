@@ -218,6 +218,10 @@ and the account's callable dials. Then change the affected template's `model` or
 `sh tests/verify.sh`, and repeat the live route check for
 every affected entry. Model-generation changes stay confined to the profile and
 templates unless the role or tier contract also changes. Each model in the
-ordering must reach one Advisor model at every effort, and each entry one Advisor
+segment table must reach one Advisor model at every effort, and each entry one Advisor
 model at every effort it allows: `SessionStart` sees no effort, and an entry
 carries a single posture.
+
+A segment-only change updates the segment table without changing entry models
+or efforts. Re-check the affected consultation mappings and canonical postures;
+if a selected Advisor dial changes, repeat the affected live route checks.

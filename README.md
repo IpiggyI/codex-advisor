@@ -64,8 +64,10 @@ further delegate implementation. Explorers return read-only evidence and gaps.
 | Worker | `ca_worker_mainstay_m` / `ca_worker_mainstay_h` | `ca_worker_crux_m` / `ca_worker_crux_h` | `ca_worker_rescue_m` / `ca_worker_rescue_h` |
 | Advisor | `ca_advisor_mainstay_m` / `ca_advisor_mainstay_h` | `ca_advisor_crux_m` / `ca_advisor_crux_h` | `ca_advisor_rescue_m` / `ca_advisor_rescue_h` |
 
-Models, allowed efforts, defaults, and candidate order live only in the
+Model segments, models, allowed efforts, defaults, and candidate order live only in the
 [routing profile](plugins/codex-advisor/skills/orchestration/references/routing-profile.md).
+Model segments run from `starter` through `midrange` and `premium` to `flagship`;
+they rank models independently of the three task tiers.
 Each entry pins its model. A single-effort entry pins effort; otherwise the
 caller must pass `reasoning_effort`. Use a fresh thread with `fork_turns: none`.
 

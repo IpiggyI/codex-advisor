@@ -50,7 +50,7 @@ holds even before its reference is read.
 
 ## Allocate by role and capability tier
 
-Every model name, effort option, default, candidate order, consultation mapping,
+Every model segment, model name, effort option, default, candidate order, consultation mapping,
 and acceptance mapping lives in the routing profile. Respect host capacity, explicit
 user exclusions, and resource limits. Select a dial explicitly without asking
 permission for each routine allocation.
@@ -62,7 +62,9 @@ constraints must be handled. There is no usage quota. `rescue` is never a first-
 choice unless the user declares it.
 
 Inside a role-and-tier cell, take the first candidate at its default. Take a later
-candidate when the outcome depends more on judgment the packet cannot capture.
+candidate when the task needs its higher model segment or depends more on judgment
+the packet cannot capture. Compare model segments through the routing profile's
+[segment table](references/routing-profile.md#model-segments).
 A capability tier is set by its models; effort is a finer grade inside the tier.
 
 ## Delegate outcomes and retain scheduling

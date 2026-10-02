@@ -139,7 +139,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
     (copy_refs / 'consult-posture.md').write_text(CANONICAL)
     pending({**session, 'model': 'gpt-6.1-sol'}, plugin=copy_plugin)
     for broken, reason in ((PROFILE.replace('uses gpt-6.1-sol[xhigh]', 'uses gpt-6.1-sol[low]'), 'not an Advisor dial'),
-                           (PROFILE.replace('gpt-6-luna < ', ''), 'missing from the ordering')):
+                           (PROFILE.replace('| `gpt-6-luna` | `starter` |\n', ''), 'missing from the segment table')):
         assert broken != PROFILE
         (copy_refs / 'routing-profile.md').write_text(broken)
         pending({**session, 'model': 'gpt-5.6-terra'}, plugin=copy_plugin)
@@ -148,7 +148,7 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
     (copy_refs / 'consult-posture.md').write_text('missing canonical blocks')
     pending(session, plugin=copy_plugin)
     print('PASS: exact canonical full/reduced/adoption, unknown model, resume, delegate exclusion, '
-          'invalid fallback or ordering')
+          'invalid fallback or segment table')
 
     templates = [tomllib.loads(path.read_text()) for path in (PLUGIN / 'agents').glob('*.toml')]
     for template in templates:

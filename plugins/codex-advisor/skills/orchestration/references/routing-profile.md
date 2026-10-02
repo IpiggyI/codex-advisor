@@ -1,11 +1,8 @@
 # Routing profile
 
-Declared 2026-09-30. The dials below are anchored to `gpt-6-luna`,
-`gpt-6.1-sol`, and `gpt-6-astra`. This file is the source of every model, allowed effort,
-default, and candidate order. Each entry template copies its own model and any
-pinned effort into its fields. Its description names the model, the candidate
-position where a cell has two, and the effort where it is pinned. The skill text
-repeats none of them.
+The native-entry dials are anchored to `gpt-6-luna`, `gpt-6.1-sol`, and
+`gpt-6-astra`. Choose models, allowed efforts, defaults, and candidate order
+from the table below.
 
 Notation: `model[a*, b]`. Every listed effort is allowed and `*` marks the
 default. Where a cell lists two candidates, `›` separates them in usage order.
@@ -17,6 +14,23 @@ leaves effort to the caller.
 | Explorer | `ca_explorer_mainstay_m` gpt-6-luna[high*, xhigh] › `ca_explorer_mainstay_h` gpt-6.1-sol[medium*, high] | `ca_explorer_crux_m` gpt-6-luna[max] › `ca_explorer_crux_h` gpt-6.1-sol[xhigh] | `ca_explorer_rescue` gpt-6-astra[medium*, high] |
 | Worker | `ca_worker_mainstay_m` gpt-6-luna[max] › `ca_worker_mainstay_h` gpt-6.1-sol[medium*, high] | `ca_worker_crux_m` gpt-6.1-sol[xhigh] › `ca_worker_crux_h` gpt-6-astra[low*, medium] | `ca_worker_rescue_m` gpt-6.1-sol[max] › `ca_worker_rescue_h` gpt-6-astra[high*, xhigh] |
 | Advisor | `ca_advisor_mainstay_m` gpt-6.1-sol[medium*, high] › `ca_advisor_mainstay_h` gpt-6-astra[low*, medium] | `ca_advisor_crux_m` gpt-6.1-sol[high*, xhigh] › `ca_advisor_crux_h` gpt-6-astra[high] | `ca_advisor_rescue_m` gpt-6.1-sol[xhigh*, max] › `ca_advisor_rescue_h` gpt-6-astra[xhigh] |
+
+## Model segments
+
+Model capability is ranked by segment, from low to high: `starter`,
+`midrange`, `premium`, `flagship`. Segments describe models; `mainstay`,
+`crux`, and `rescue` describe task allocation. Models in the same segment have
+the same capability rank. A generation change requires re-evaluating the
+affected model's segment.
+
+| Model | Segment |
+|---|---|
+| `gpt-6-luna` | `starter` |
+| — | `midrange` |
+| `gpt-6.1-sol` | `premium` |
+| `gpt-6-astra` | `flagship` |
+
+A dash means no model is assigned to that segment.
 
 ## Pinned and caller-selected effort
 
@@ -48,12 +62,11 @@ the primary's exact model id is absent from this profile, use
 `ca_advisor_crux_m` at `xhigh`. A low-confidence verdict leaves acceptance
 pending and goes to the user; it does not trigger another Advisor dial.
 
-For "not weaker", compare model first:
-gpt-6-luna < gpt-6-sol < gpt-6.1-sol < gpt-6-astra. Compare effort second:
+For "not weaker", compare model segment first. Compare effort second:
 low < medium < high < xhigh < max.
 
 ## Declared assumptions
 
-This profile assumes that a model change gains more capability than an effort
+Assume that moving to a higher model segment gains more capability than an effort
 increase, and that `xhigh` is a distinct capability jump. The next model
 generation change invalidates both assumptions and requires re-evaluation.

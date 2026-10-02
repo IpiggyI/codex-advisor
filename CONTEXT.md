@@ -26,7 +26,7 @@ A shipped Codex custom agent named by role and tier, such as `ca_explorer_mainst
 _Avoid_: Naming an entry by model; treating an entry as a tier or role of its own.
 
 **Routing profile**:
-The authoritative mapping from each role and capability tier to its native entries and dials, plus the mappings for process consultation and independent acceptance.
+The authoritative mapping from each role and capability tier to its native entries and dials, model segments, and the mappings for process consultation and independent acceptance.
 _Avoid_: Repeating model names, effort options, defaults, candidate order, or dial mappings in the orchestration doctrine; a hand-edited installed copy.
 
 **Companion installer**:
@@ -35,7 +35,11 @@ _Avoid_: Hand-editing installed entries; expecting the installer to preserve a h
 
 **Capability tier**:
 An ordered allocation level for one delegated call, set by its models, with effort as a finer grade inside it. The three tiers are `mainstay`, `crux`, and `rescue`.
-_Avoid_: Treating effort as a tier; light, standard, or senior as current tier names.
+_Avoid_: Treating effort or a model segment as a tier; light, standard, or senior as current tier names.
+
+**Model segment**:
+A model's capability position, ordered from `starter` through `midrange` and `premium` to `flagship`. Models in the same segment share a capability rank; the routing profile assigns each model its segment.
+_Avoid_: Treating a model generation or reasoning effort as a segment; inferring a segment from a native entry's task tier.
 
 **Mainstay**:
 The default capability tier for new work and the tier intended to finish most tasks.
@@ -50,7 +54,7 @@ The standby capability tier reached through crux after a capability failure or b
 _Avoid_: Senior gate; selecting rescue at first round without a user declaration.
 
 **Escalation ladder**:
-The recovery sequence after failed acceptance: same-dial rework; one diagnosed capability failure moves work to the next tier without lowering model level or switching models inside the failed tier unless no other choice exists; rescue failure returns the work to the user. The same model is raised at most once, and a major execution problem may skip rework.
+The recovery sequence after failed acceptance: same-dial rework; one diagnosed capability failure moves work to the next tier without lowering model segment or switching models inside the failed tier unless no other choice exists; rescue failure returns the work to the user. The same model is raised at most once, and a major execution problem may skip rework.
 _Avoid_: Switching models inside one tier after capability failure when another choice exists; treating an environment problem or contract gap as a capability failure.
 
 **Dial**:
