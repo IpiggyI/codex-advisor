@@ -1,6 +1,6 @@
 {
   "name": "codex-advisor",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Seventeen native explorer, worker, and advisor entries across mainstay, crux, and rescue tiers, with context-aware process consultation, posture and dispatch hooks, and independent acceptance.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
   "license": "MIT",

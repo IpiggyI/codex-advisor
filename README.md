@@ -5,10 +5,10 @@ Codex Advisor is a Codex-only fork of
 Any primary can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Version 0.3.1 supplies seventeen native entries across `mainstay`, `crux`, and
+Version 0.3.2 supplies seventeen native entries across `mainstay`, `crux`, and
 `rescue`, a single routing profile, zero-argument process consultation, and
 hooks for posture injection and automatic dispatch verification.
-See the [Chinese version manual](docs/releases/0.3.1.html) for a complete guide.
+See the [Chinese version manual](docs/releases/0.3.2.html) for a complete guide.
 
 ## Install
 
