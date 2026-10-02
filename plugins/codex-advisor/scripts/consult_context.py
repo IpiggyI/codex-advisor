@@ -6,10 +6,11 @@ from pathlib import Path
 
 
 class Failure(Exception):
-    def __init__(self, code, message, actual=None):
+    def __init__(self, code, message, actual=None, details=None):
         super().__init__(message)
         self.code = code
         self.actual = actual
+        self.details = details or {}
 
 
 def require(condition, code, message):
@@ -110,6 +111,23 @@ def validate_items(items):
     require(not pending, 'pairing', 'Parallel or unfinished tool calls remain before consultation.')
 
 
+def validate_retained(payload):
+    # These host-owned events are model-invisible; answers remain in tool results.
+    kind = payload.get('type')
+    require(isinstance(payload.get('turn_id'), str), 'snapshot', 'Retained event turn identity is missing.')
+    if kind == 'verified_answer':
+        require(isinstance(payload.get('call_id'), str) and isinstance(payload.get('questions'), list),
+                'snapshot', 'Invalid retained answer identity or questions.')
+        require(all(isinstance(question, dict) and
+                    all(isinstance(question.get(key), str) for key in ('question', 'answer'))
+                    for question in payload['questions']), 'snapshot', 'Invalid retained question or answer.')
+    elif kind == 'delivered_assistant_message':
+        require(isinstance(payload.get('text'), str) and isinstance(payload.get('complete'), bool),
+                'snapshot', 'Invalid retained assistant message.')
+    else:
+        raise Failure('snapshot', 'Unqualified retained context event.', details={'eventType': kind})
+
+
 def reconstruct(home, meta):
     turn = identity(meta)
     paths = list((home / 'sessions').rglob('*' + meta['threadId'] + '*.jsonl'))
@@ -148,6 +166,8 @@ def reconstruct(home, meta):
         elif kind == 'inter_agent_communication_metadata':
             require(set(payload) == {'trigger_turn'} and isinstance(payload['trigger_turn'], bool),
                     'snapshot', 'Unqualified delegate communication metadata.')
+        elif kind == 'retained_context':
+            validate_retained(payload)
         elif kind == 'response_item':
             if payload.get('id') == meta['itemId']:
                 require(payload.get('type') in ('function_call', 'custom_tool_call'),
@@ -159,8 +179,9 @@ def reconstruct(home, meta):
             items.append(payload)
         else:
             require(kind != 'rollback', 'rollback', 'Rollback reconstruction is not qualified.')
-            require(kind in ('session_meta', 'world_state', 'token_usage_record'),
-                    'snapshot', 'Unqualified rollout event type.')
+            if kind not in ('session_meta', 'world_state', 'token_usage_record'):
+                raise Failure('snapshot', 'Unqualified rollout event type.',
+                              details={'recordIndex': index, 'recordType': kind})
     require(boundary and current is not None, 'identity', 'The active consultation boundary is missing.')
     require(current.get('turn_id') == turn['turn_id'] and started == turn['turn_id'],
             'identity', 'The consultation item does not belong to the host active turn.')
@@ -200,13 +221,18 @@ def load_profile(plugin):
                 if name.startswith('ca_advisor_') for effort in allowed}
     require(unknown is not None and (unknown[1], unknown[2]) in advisors,
             'profile', 'Routing profile fallback for an unknown model is not an Advisor dial.')
-    return rows, models, ordering[1].split(' < '), (unknown[1], unknown[2])
+    efforts = ordering[1].split(' < ')
+    aliases = dict(re.findall(r'^\|\s*`([a-z]+)`\s*\|\s*`([a-z]+)`\s*\|\s*$', profile, re.M))
+    require(all(alias not in efforts and value in efforts for alias, value in aliases.items()),
+            'profile', 'Routing profile host effort mapping is invalid.')
+    return rows, models, efforts, (unknown[1], unknown[2]), aliases
 
 
 def advisor_dial(profile, model, effort, tier=None):
     # The lowest Advisor dial not weaker than the caller, else the strongest; a tier limits it to one cell.
     # Only a primary can carry a model absent from the segment table; it takes the fallback dial.
-    rows, models, efforts, unknown = profile
+    rows, models, efforts, unknown, aliases = profile
+    effort = aliases.get(effort, effort)
     dials = [(candidate, level) for name, (candidate, allowed) in rows.items()
              if name.startswith('ca_advisor_') and tier in (None, name.split('_')[2]) for level in allowed]
     require(bool(dials), 'profile', 'No advisor dials are configured.')
@@ -219,7 +245,7 @@ def advisor_dial(profile, model, effort, tier=None):
 
 def route(plugin, caller):
     profile = load_profile(plugin)
-    rows, _, efforts, _ = profile
+    rows, _, efforts, _, aliases = profile
     role = caller['role']
     if role:
         require(role in rows and role.startswith(('ca_worker_', 'ca_explorer_')),
@@ -229,6 +255,9 @@ def route(plugin, caller):
         chosen = advisor_dial(profile, caller['model'], caller['effort'], role.split('_')[2])
     else:
         require(not isinstance(caller['source'], dict), 'route', 'A delegate is missing its entry identity.')
-        require(caller['effort'] in efforts, 'route', 'Caller effort is not in the qualified ordering.')
+        if caller['effort'] not in efforts and caller['effort'] not in aliases:
+            raise Failure('route', 'Caller effort is not in the qualified ordering.',
+                          details={'caller': {'model': caller['model'], 'effort': caller['effort']},
+                                   'allowedEfforts': efforts + list(aliases)})
         chosen = advisor_dial(profile, caller['model'], caller['effort'])
     return dict(zip(('model', 'effort'), chosen))

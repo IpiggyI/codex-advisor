@@ -65,6 +65,12 @@ pending and goes to the user; it does not trigger another Advisor dial.
 For "not weaker", compare model segment first. Compare effort second:
 low < medium < high < xhigh < max.
 
+Host modes use their underlying reasoning effort for comparison:
+
+| Host effort | Comparison effort |
+|---|---|
+| `ultra` | `xhigh` |
+
 ## Declared assumptions
 
 Assume that moving to a higher model segment gains more capability than an effort

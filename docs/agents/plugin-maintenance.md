@@ -51,6 +51,12 @@ forwarded. The server applies the routing profile's consultation mapping to the
 caller's host-recorded dial. The component uses native Codex authentication and
 never reads, copies, or transmits credentials.
 
+The routing profile maps host modes to comparison efforts. The current `ultra`
+mode compares as `xhigh`. Qualified `retained_context` events are model-invisible
+host bookkeeping: verified answers remain in their original tool results, and
+compaction supplies the model-visible replacement history. Unknown event variants
+still fail explicitly.
+
 Before passing any caller context, a native discovery process enumerates every
 configured MCP server name through all inventory pages and then terminates with
 its child processes. Discovery can start configured servers but receives no
@@ -59,8 +65,11 @@ disables every discovered name, verifies that MCP capabilities and hooks are emp
 and disables built-in tools through the temporary model catalog and settings.
 Every actual inference request must prove the expected model and effort, an empty
 `additional_tools.tools` or explicit top-level `tools=[]`, and no nonempty tool
-inventory at either location. Every request must also retain the complete caller
-history in order; silent automatic compaction is a context failure. Missing trace
+inventory at either location. The temporary catalog sizes the tool-output byte
+limit from the actual caller history so injection cannot shorten an existing result.
+Every request must also retain the complete caller history in order; silent
+automatic compaction is a context failure. Comparison permits removal of empty
+text blocks from tool results and transport-only item fields. Missing trace
 evidence, a nonempty tool inventory, or any dial mismatch fails the consultation.
 
 The advisor is asked for exactly one structured `plan`, `correction`, or `stop`.
@@ -70,11 +79,16 @@ means the output has exactly one valid `kind` and nonempty `advice`, and every
 observed request matched `expected` and `actual` model/effort. The result includes
 `callerThreadId` and `advisorThreadId`. A returned `status=failed`, with
 `isError=true`, carries `code`, `message`, `expected`, and `actual` where observed;
-it contains no advice. The text content repeats that same structured object so
-the caller and session hooks can read the identical outcome.
+it contains no advice. Optional `details` locate the failing record or history
+item and retain qualified native error codes and HTTP status without copying
+history or native error text. Text content leads with readable advice or the
+failure reason; `structuredContent` carries the machine-readable outcome.
 
 Errors, aborts, cancellation, context overflow, empty or malformed output, and
-mismatches all end in that failure result. No automatic retry is made. MCP
+mismatches all end in that failure result. Native `willRetry=true` notifications
+wait for the same turn's terminal result within the existing deadline. The
+component starts no additional consultation attempt. Failed inference also checks
+available request traces to report observed model and effort. MCP
 cancellation terminates the native process tree and returns failure. The native
 execution deadline is 180 seconds. Catalogs, request traces, captured outputs,
 logs, and SQLite state stay in one temporary directory and are deleted when the
@@ -93,6 +107,11 @@ bootstrap a fresh home. Requalify after host rollout, metadata, catalog, trace,
 or cache-layout changes. Run `sh tests/verify.sh
 --consultation` for deterministic MCP-boundary checks with a substitute native
 executable. These checks do not establish live routing or installed-host behavior.
+Run `python3 tests/verify-consultation-host.py` with the native Codex executable
+available for real request construction against an unauthenticated loopback
+endpoint. It covers long function/custom-tool results, empty text blocks, and
+recovery after a completed message precedes a stream failure, in a temporary home
+without contacting a model provider.
 
 ## Hooks
 

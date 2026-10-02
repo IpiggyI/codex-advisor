@@ -21,6 +21,17 @@ TOOL = {'name': 'process_consultation',
         'annotations': {'readOnlyHint': True, 'destructiveHint': False, 'openWorldHint': False}}
 
 
+def result_text(result):
+    if result['status'] == 'succeeded':
+        actual = result['actual']
+        return (result['advice'].strip() + '\n\n' + result['kind'] + ' | ' +
+                actual['model'] + '[' + actual['effort'] + ']')
+    text = 'Consultation failed: ' + result['message'] + '\nCode: ' + result['code']
+    if result.get('details'):
+        text += '\nDetails: ' + json.dumps(result['details'], ensure_ascii=False)
+    return text
+
+
 class MCP:
     def __init__(self):
         self.output_lock = threading.Lock()
@@ -30,7 +41,7 @@ class MCP:
     def send(self, message):
         with self.output_lock:
             try:
-                print(json.dumps({'jsonrpc': '2.0', **message}), flush=True)
+                print(json.dumps({'jsonrpc': '2.0', **message}, ensure_ascii=False), flush=True)
             except BrokenPipeError:
                 self.cancel_all()
 
@@ -51,13 +62,15 @@ class MCP:
         except Failure as error:
             result = {'status': 'failed', 'code': error.code, 'message': str(error),
                       'expected': expected, 'actual': error.actual}
+            if error.details:
+                result['details'] = error.details
         except Exception:
             # Native output and source history may contain sensitive content.
             result = {'status': 'failed', 'code': 'internal',
                       'message': 'Consultation encountered an unsupported host response or local I/O failure.',
                       'expected': expected, 'actual': None}
         self.send({'id': request['id'], 'result': {'isError': result['status'] == 'failed',
-                   'structuredContent': result, 'content': [{'type': 'text', 'text': json.dumps(result)}]}})
+                   'structuredContent': result, 'content': [{'type': 'text', 'text': result_text(result)}]}})
 
     def dispatch(self, request):
         method, request_id = request.get('method'), request.get('id')
@@ -109,4 +122,6 @@ class MCP:
 
 
 if __name__ == '__main__':
+    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8')
     MCP().run()

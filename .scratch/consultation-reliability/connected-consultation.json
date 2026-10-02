@@ -1,0 +1,15 @@
+{
+  "status": "succeeded",
+  "advice": "两侧安装和独立验收已完成。接着用新启动的安装版进程验证一次认证模型咨询，记录实际模型、强度和结果，并注明验证侧。随后更新验收记录，分别报告安装状态与旧会话恢复状态。若现有客户端没有可用重载入口，明确恢复尚未验证，并给出退出后通过 `codex resume` 恢复原会话的操作。保留备份，说明本地修复暂时领先于 GitHub。",
+  "kind": "plan",
+  "actual": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "expected": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "advisorThreadId": "01a0fe70-e176-7e60-9307-d3e46211cb44",
+  "callerThreadId": "01a0fe2b-10c2-7a63-b1a7-7e722a3e87a7"
+}

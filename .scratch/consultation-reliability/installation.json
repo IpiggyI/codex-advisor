@@ -1,0 +1,40 @@
+{
+  "version": "0.3.2",
+  "installedAt": "20261002T210452.830311Z",
+  "sides": {
+    "wsl": {
+      "target": "/home/hyy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.2",
+      "backup": "/home/hyy/.codex/backups/codex-advisor/consultation-repair-20261002T210452.830311Z",
+      "before": {
+        "scripts/consult_context.py": "032ee00a10bd283c6453adf8ae0b162b066619e6ed5c42ee4b2de1970600415e",
+        "scripts/consult_native.py": "8c3633f8182c5e0a77593b7d3f3660178825cd170bb3fc6bcb705a70743d536e",
+        "skills/orchestration/references/routing-profile.md": "251670392e2981c844d8eedbdee5818c925df998e19ac0e577d539fbf4b65d8a",
+        "scripts/process-consultation.py": "566d01e609fc989b2e399ce9e77b3cd420c0fa07986a63fbd9fbdcb43798d982"
+      },
+      "after": {
+        "scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+        "scripts/consult_native.py": "11609b9892c77de88575220f9a15afd1846c6bd6f38148903c08158084e227b6",
+        "skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654",
+        "scripts/process-consultation.py": "7dce504a160416fae5239bfcb48a493225ee40dbe0545ef7d29823d116fef3ef"
+      },
+      "verifiedFiles": 35
+    },
+    "windows": {
+      "target": "/mnt/c/Users/Shy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.2",
+      "backup": "/mnt/c/Users/Shy/.codex/backups/codex-advisor/consultation-repair-20261002T210452.830311Z",
+      "before": {
+        "scripts/consult_context.py": "032ee00a10bd283c6453adf8ae0b162b066619e6ed5c42ee4b2de1970600415e",
+        "scripts/consult_native.py": "8c3633f8182c5e0a77593b7d3f3660178825cd170bb3fc6bcb705a70743d536e",
+        "skills/orchestration/references/routing-profile.md": "251670392e2981c844d8eedbdee5818c925df998e19ac0e577d539fbf4b65d8a",
+        "scripts/process-consultation.py": "566d01e609fc989b2e399ce9e77b3cd420c0fa07986a63fbd9fbdcb43798d982"
+      },
+      "after": {
+        "scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+        "scripts/consult_native.py": "11609b9892c77de88575220f9a15afd1846c6bd6f38148903c08158084e227b6",
+        "skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654",
+        "scripts/process-consultation.py": "7dce504a160416fae5239bfcb48a493225ee40dbe0545ef7d29823d116fef3ef"
+      },
+      "verifiedFiles": 35
+    }
+  }
+}

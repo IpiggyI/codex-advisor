@@ -1,0 +1,24 @@
+{
+  "isError": false,
+  "structuredContent": {
+    "status": "succeeded",
+    "advice": "本次调用结束后，记录新启动安装版进程的实际模型、强度、建议呈现和验证侧；成功后无需重复咨询。更新验收记录，分别说明双侧安装已完成、旧会话恢复仍未验证，以及本地修复暂时领先于 GitHub。现有连接仍使用旧代码，若没有可用重载入口，交付时给出退出客户端后用 `codex resume` 恢复原会话的操作，保留历史和安装备份。",
+    "kind": "plan",
+    "actual": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "expected": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "advisorThreadId": "01a0fe71-b772-79b1-a388-f0087638e980",
+    "callerThreadId": "01a0fe2b-10c2-7a63-b1a7-7e722a3e87a7"
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "本次调用结束后，记录新启动安装版进程的实际模型、强度、建议呈现和验证侧；成功后无需重复咨询。更新验收记录，分别说明双侧安装已完成、旧会话恢复仍未验证，以及本地修复暂时领先于 GitHub。现有连接仍使用旧代码，若没有可用重载入口，交付时给出退出客户端后用 `codex resume` 恢复原会话的操作，保留历史和安装备份。\n\nplan | gpt-6-astra[xhigh]"
+    }
+  ]
+}

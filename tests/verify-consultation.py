@@ -95,7 +95,7 @@ public class CodexFixture {
     }
 }
 '''
-        script = "Add-Type -TypeDefinition @'\n" + source + "\n'@ -OutputType ConsoleApplication -OutputAssembly '" + str(cls.fixture_exe).replace("'", "''") + "'"
+        script = "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new(); Add-Type -TypeDefinition @'\n" + source + "\n'@ -OutputType ConsoleApplication -OutputAssembly '" + str(cls.fixture_exe).replace("'", "''") + "'"
         encoded = base64.b64encode(script.encode('utf-16le')).decode('ascii')
         result = subprocess.run(['powershell.exe', '-NoProfile', '-EncodedCommand', encoded],
                                 capture_output=True, text=True, timeout=30)
@@ -169,7 +169,13 @@ public class CodexFixture {
         response = self.responses.get(timeout=15)
         self.assertEqual(response['id'], 1)
         result = response['result']
-        self.assertEqual(json.loads(result['content'][0]['text']), result['structuredContent'])
+        text = result['content'][0]['text']
+        self.assertNotIn('\\u', text)
+        if result['structuredContent']['status'] == 'succeeded':
+            self.assertTrue(text.startswith(result['structuredContent']['advice']))
+        else:
+            self.assertTrue(text.startswith('Consultation failed: '))
+            self.assertIn(result['structuredContent']['message'], text)
         self.assertEqual(result['isError'], result['structuredContent']['status'] == 'failed')
         self.assertFalse(list((self.root / 'tmp').iterdir()), 'consultation temporary state survived')
         after = {str(p.relative_to(self.home)): p.read_bytes()
@@ -241,6 +247,51 @@ public class CodexFixture {
         self.assertEqual(result['code'], 'context', result)
         self.assertEqual(result['actual'], result['expected'])
         self.assertEqual(json.loads((self.root / 'injected.json').read_text())[:-1], history)
+
+    def test_retained_verified_answer_preserves_tool_result(self):
+        records, meta, _ = fixture()
+        answer = json.dumps({'answers': {'constraint': {'answers': ['保留全部内容']}}}, ensure_ascii=False)
+        records[-2]['payload']['output'] = answer
+        records[-2:-2] = [
+            {'type': 'retained_context', 'payload': {'type': 'verified_answer', 'turn_id': TURN,
+             'call_id': 'tool1', 'questions': [{'question': 'Which constraint?', 'answer': '保留全部内容'}],
+             'acceptance_order': 12}}]
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded', result)
+        injected = json.loads((self.root / 'injected.json').read_text())
+        self.assertEqual(injected[-2]['output'], answer)
+
+    def test_retained_assistant_message_is_model_invisible(self):
+        records, meta, _ = fixture()
+        records.insert(3, {'type': 'retained_context', 'payload': {
+            'type': 'delivered_assistant_message', 'turn_id': TURN, 'text': 'HOST_ONLY_RECORD',
+            'complete': True, 'acceptance_order': 12}})
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded', result)
+        self.assertNotIn('HOST_ONLY_RECORD', (self.root / 'injected.json').read_text())
+
+    def test_empty_tool_text_blocks_are_lossless(self):
+        records, meta, _ = fixture()
+        records[-2]['payload']['output'] = [{'type': 'input_text', 'text': '保留内容'},
+                                          {'type': 'input_text', 'text': ''}]
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded', result)
+
+    def test_terminal_error_retains_observed_dial_and_safe_details(self):
+        records, meta, _ = fixture()
+        result = self.call(records, meta, 'terminal-event')
+        self.assertEqual(result['status'], 'failed', result)
+        self.assertEqual(result['actual'], result['expected'])
+        self.assertEqual(result['details'], {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503})
+        self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
+
+    def test_context_failure_locates_first_difference(self):
+        records, meta, _ = fixture()
+        result = self.call(records, meta, 'changed-text')
+        self.assertEqual(result['code'], 'context')
+        self.assertEqual(result['details']['sourceIndex'], 0)
+        self.assertEqual(result['details']['itemType'], 'message')
+        self.assertNotIn('EARLIEST_CONSTRAINT', json.dumps(result))
 
     def test_cancellation_terminates_tree(self):
         records, meta, _ = fixture()
@@ -419,9 +470,11 @@ for name, values in {
     'rescue_sol_6_1': ('gpt-6.1-sol', 'max', 'ca_worker_rescue_m', ('gpt-6.1-sol', 'max')),
     'primary_astra': ('gpt-6-astra', 'xhigh', None, ('gpt-6-astra', 'xhigh')),
     'primary_astra_max': ('gpt-6-astra', 'max', None, ('gpt-6-astra', 'xhigh')),
+    'primary_astra_ultra': ('gpt-6-astra', 'ultra', None, ('gpt-6-astra', 'xhigh')),
     'primary_sol': ('gpt-6-sol', 'high', None, ('gpt-6.1-sol', 'xhigh')),
     'primary_sol_6_1': ('gpt-6.1-sol', 'high', None, ('gpt-6.1-sol', 'high')),
     'primary_sol_6_1_max': ('gpt-6.1-sol', 'max', None, ('gpt-6.1-sol', 'max')),
+    'primary_sol_6_1_ultra': ('gpt-6.1-sol', 'ultra', None, ('gpt-6.1-sol', 'xhigh')),
     'primary_unknown': ('gpt-5.6-terra', 'high', None, ('gpt-6.1-sol', 'xhigh')),
     'primary_medium': ('gpt-6-astra', 'medium', None, ('gpt-6-astra', 'medium')),
 }.items():
@@ -488,6 +541,7 @@ def outcome_case(scenario, code):
 
 
 for scenario, code in {'correction': None, 'stop': None, 'error': 'executor', 'abort': 'executor',
+                       'retry-event': None, 'wrong-error-thread': 'executor',
                        'overflow': 'executor', 'empty': 'empty', 'bad-output': 'output',
                        'wrong-model': 'mismatch', 'wrong-effort': 'mismatch', 'earlier-mismatch': 'mismatch',
                        'tools': 'tools', 'top-tools': None, 'nonempty-top-tools': 'tools', 'missing-inventory': 'tools',
@@ -520,6 +574,8 @@ for name, mutation, code in [
     ('rollback', lambda r, m: r.insert(-1, {'type': 'event_msg', 'payload': {'type': 'thread_rolled_back'}}), 'rollback'),
     ('parallel', lambda r, m: (r.pop(-2), None)[1], 'pairing'),
     ('unsupported', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': {'type': 'audio'}}), 'unsupported_content'),
+    ('retained_kind', lambda r, m: r.insert(-1, {'type': 'retained_context', 'payload': {'type': 'unknown', 'turn_id': TURN}}), 'snapshot'),
+    ('retained_answer', lambda r, m: r.insert(-1, {'type': 'retained_context', 'payload': {'type': 'verified_answer', 'turn_id': TURN, 'call_id': 'tool1', 'questions': [{'question': 'q', 'answer': None}]}}), 'snapshot'),
     ('audio', lambda r, m: r[3]['payload']['content'].append({'type': 'input_audio'}), 'unsupported_content'),
     ('agent_author', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), author='')}), 'unsupported_content'),
     ('agent_recipient', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), recipient=None)}), 'unsupported_content'),

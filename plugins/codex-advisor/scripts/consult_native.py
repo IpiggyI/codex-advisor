@@ -201,7 +201,8 @@ def check_cancel(cancel, deadline):
     require(time.monotonic() < deadline, 'timeout', 'The native consultation deadline expired.')
 
 
-def catalog(env, root, cancel, deadline, model):
+def catalog(env, root, cancel, deadline, caller_dial):
+    model, caller = caller_dial
     process = launch(['codex', 'debug', 'models', '--bundled'], env, root)
     try:
         while True:
@@ -219,6 +220,11 @@ def catalog(env, root, cancel, deadline, model):
         entry.pop('tool_mode', None)
         entry.update(shell_type='disabled', apply_patch_tool_type=None,
                      experimental_supported_tools=[], supports_search_tool=False)
+        # Injection must preserve tool results the caller already received.
+        output_bytes = [len(json.dumps(item['output'], ensure_ascii=False).encode('utf-8'))
+                        for item in caller['items'] if item.get('type') in
+                        ('function_call_output', 'custom_tool_call_output')]
+        entry['truncation_policy'] = {'mode': 'bytes', 'limit': max(output_bytes, default=1)}
         for key in entry:
             if 'instruction' in key and isinstance(entry[key], bool):
                 entry[key] = False
@@ -358,13 +364,37 @@ def verify_isolation(server, root, names):
             'isolation', 'Native hooks could not be proven disabled.')
 
 
+def native_failure(error, message):
+    info = error.get('codexErrorInfo') if isinstance(error, dict) else None
+    codes = ('contextWindowExceeded sessionBudgetExceeded usageLimitExceeded rateLimitExceeded '
+             'flexUnavailable serverOverloaded cyberPolicy misalignmentPolicyViolation tooManyDenials '
+             'internalServerError unauthorized badRequest threadRollbackFailed sandboxError other').split()
+    details = {}
+    if isinstance(info, str) and info in codes:
+        details['nativeCode'] = info
+    elif isinstance(info, dict):
+        for code in ('httpConnectionFailed', 'responseStreamConnectionFailed',
+                     'responseStreamDisconnected', 'responseTooManyFailedAttempts'):
+            if isinstance(info.get(code), dict):
+                details['nativeCode'] = code
+                status = info[code].get('httpStatusCode')
+                if type(status) is int and 100 <= status <= 599:
+                    details['httpStatusCode'] = status
+    return Failure('executor', message, details=details)
+
+
 def completion(server, thread, turn):
     finals = []
     while True:
         message = server.pending.pop(0) if server.pending else server.receive()
         method, params = message.get('method'), message.get('params', {})
         if method == 'error':
-            raise Failure('executor', 'Native consultation reported an inference error.')
+            require(params.get('threadId') == thread and params.get('turnId') == turn,
+                    'executor', 'Native error identity mismatch.')
+            if params.get('willRetry') is True:
+                finals.clear()
+                continue
+            raise native_failure(params.get('error'), 'Native consultation reported an inference error.')
         if method in ('item/completed', 'turn/completed'):
             require(params.get('threadId') == thread and params.get('turnId', turn) == turn,
                     'executor', 'Native completion identity mismatch.')
@@ -374,8 +404,9 @@ def completion(server, thread, turn):
                 finals.append(item.get('text', ''))
         if method == 'turn/completed':
             result = params.get('turn', {})
-            require(result.get('id') == turn and result.get('status') == 'completed' and not result.get('error'),
-                    'executor', 'Native consultation aborted or failed, including possible context overflow.')
+            require(result.get('id') == turn, 'executor', 'Native completion identity mismatch.')
+            if result.get('status') != 'completed' or result.get('error'):
+                raise native_failure(result.get('error'), 'Native consultation aborted or failed.')
             require(len(finals) == 1 and isinstance(finals[0], str) and finals[0].strip(),
                     'empty', 'Consultation must return exactly one nonempty final message.')
             try:
@@ -392,18 +423,23 @@ def completion(server, thread, turn):
 def comparable(item):
     # The host removes item IDs, attribution metadata, and optional nulls from
     # requests. Tool call_id, roles, content, and encrypted reasoning stay exact.
-    return {key: value for key, value in item.items()
-            if key not in ('id', 'internal_chat_message_metadata_passthrough') and value is not None}
+    value = {key: value for key, value in item.items()
+             if key not in ('id', 'internal_chat_message_metadata_passthrough') and value is not None}
+    if item.get('type') in ('function_call_output', 'custom_tool_call_output') and isinstance(value.get('output'), list):
+        value['output'] = [block for block in value['output'] if block != {'type': 'input_text', 'text': ''}]
+    return value
 
 
 def verify_history(request, caller):
-    source = iter(caller['items'])
-    wanted = next(source, None)
+    source = iter(enumerate(caller['items']))
+    index, wanted = next(source, (0, None))
     for item in request.get('input', []):
         if wanted is not None and comparable(item) == comparable(wanted):
-            wanted = next(source, None)
-    require(wanted is None, 'context',
-            'Actual advisor request omitted or changed effective caller history, including possible automatic compaction.')
+            index, wanted = next(source, (index + 1, None))
+    if wanted is not None:
+        raise Failure('context', 'Actual advisor request omitted or changed effective caller history.',
+                      details={'sourceIndex': index, 'itemType': wanted['type'],
+                               'sourceItems': len(caller['items']), 'requestItems': len(request.get('input', []))})
 
 
 def verify_requests(root, thread, expected, caller):
@@ -445,26 +481,41 @@ def execute(home, caller, expected, cancel):
         root = Path(directory)
         env = dict(os.environ, CODEX_HOME=str(home), CODEX_ROLLOUT_TRACE_ROOT=str(root / 'trace'))
         values = configuration(root, expected)
-        values['model_catalog_json'] = str(catalog(env, root, cancel, deadline, expected['model']))
+        values['model_catalog_json'] = str(catalog(env, root, cancel, deadline, (expected['model'], caller)))
         names = server_names(env, root, values, cancel, deadline)
         values['mcp_servers'] = sorted(names)
         server = Server(env, root, values, cancel, deadline)
+        thread, execution_error = None, None
         try:
-            server.initialize()
-            verify_isolation(server, root, names)
-            started = server.call('thread/start', {'model': expected['model'], 'cwd': str(root),
-                                  'ephemeral': True, 'approvalPolicy': 'never', 'sandbox': 'read-only',
-                                  'baseInstructions': caller['base'], 'developerInstructions': ''})
-            thread = started['thread']['id']
-            server.call('thread/inject_items', {'threadId': thread, 'items': caller['items'] + [
-                {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}]})
-            started_turn = server.call('turn/start', {'threadId': thread, 'model': expected['model'],
-                                       'effort': expected['effort'], 'outputSchema': SCHEMA,
-                                       'input': [{'type': 'text', 'text': 'Return process consultation for the caller now.'}]})
-            advice = completion(server, thread, started_turn['turn']['id'])
-        finally:
-            server.close()
-        actual = verify_requests(root, thread, expected, caller)
+            try:
+                server.initialize()
+                verify_isolation(server, root, names)
+                started = server.call('thread/start', {'model': expected['model'], 'cwd': str(root),
+                                      'ephemeral': True, 'approvalPolicy': 'never', 'sandbox': 'read-only',
+                                      'baseInstructions': caller['base'], 'developerInstructions': ''})
+                thread = started['thread']['id']
+                server.call('thread/inject_items', {'threadId': thread, 'items': caller['items'] + [
+                    {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}]})
+                started_turn = server.call('turn/start', {'threadId': thread, 'model': expected['model'],
+                                           'effort': expected['effort'], 'outputSchema': SCHEMA,
+                                           'input': [{'type': 'text', 'text': 'Return process consultation for the caller now.'}]})
+                advice = completion(server, thread, started_turn['turn']['id'])
+            finally:
+                server.close()
+        except Failure as error:
+            execution_error = error
+        try:
+            actual = verify_requests(root, thread, expected, caller)
+        except Failure as error:
+            if execution_error is None:
+                raise
+            execution_error.actual = error.actual
+            execution_error.details['requestVerification'] = error.code
+        else:
+            if execution_error is not None:
+                execution_error.actual = actual
+        if execution_error is not None:
+            raise execution_error
         return {'status': 'succeeded', **advice, 'actual': actual, 'expected': expected,
                 'advisorThreadId': thread, 'callerThreadId': caller['thread']}
 

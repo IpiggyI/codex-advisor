@@ -40,6 +40,7 @@ assert 'tool_mode' not in catalog
 assert catalog['shell_type'] == 'disabled' and catalog['apply_patch_tool_type'] is None
 assert catalog['experimental_supported_tools'] == [] and catalog['supports_search_tool'] is False
 assert catalog['use_tools_instructions'] is False
+assert catalog['truncation_policy']['mode'] == 'bytes'
 assert settings['history']['persistence'] == 'none'
 assert settings['features']['skip_host_skill_discovery'] is True
 assert all(v is False for k, v in settings['features'].items() if k != 'skip_host_skill_discovery')
@@ -85,6 +86,9 @@ for line in sys.stdin:
                   'reasoningEffort': settings['model_reasoning_effort']}
     elif method == 'thread/inject_items':
         assert params['threadId'] == thread
+        for item in params['items']:
+            if item.get('type') in ('function_call_output', 'custom_tool_call_output'):
+                assert catalog['truncation_policy']['limit'] >= len(json.dumps(item['output'], ensure_ascii=False).encode('utf-8'))
         (root / 'injected.json').write_text(json.dumps(params['items']))
     elif method == 'turn/start':
         assert params['threadId'] == thread
@@ -116,6 +120,8 @@ for line in sys.stdin:
             agent['content'][1]['encrypted_content'] = 'modified-opaque-bytes'
         for value in request['input']:
             value.pop('internal_chat_message_metadata_passthrough', None)
+            if value.get('type') in ('function_call_output', 'custom_tool_call_output') and isinstance(value.get('output'), list):
+                value['output'] = [block for block in value['output'] if block != {'type': 'input_text', 'text': ''}]
         if scenario == 'wrong-model':
             request['model'] = 'wrong-model'
         if scenario == 'wrong-effort':
@@ -142,8 +148,13 @@ for line in sys.stdin:
             event['payload']['request_payload']['path'] = 'payloads/2.json'
             with (trace / 'events.jsonl').open('a') as stream:
                 stream.write(json.dumps(event) + '\n')
+        if scenario in ('retry-event', 'terminal-event', 'wrong-error-thread'):
+            emit({'method': 'error', 'params': {'threadId': 'wrong-thread' if scenario == 'wrong-error-thread' else thread,
+                  'turnId': turn, 'willRetry': scenario == 'retry-event',
+                  'error': {'message': 'PRIVATE_NATIVE_ERROR', 'additionalDetails': 'PRIVATE_NATIVE_DETAILS',
+                            'codexErrorInfo': {'responseStreamDisconnected': {'httpStatusCode': 503}}}}})
         advice = {'kind': scenario if scenario in ('plan', 'correction', 'stop') else 'plan',
-                  'advice': 'Keep the earliest constraint and apply the next bounded change.'}
+                  'advice': '保留最早约束，并执行下一项修改。'}
         text = json.dumps(advice)
         if scenario == 'empty':
             text = ''

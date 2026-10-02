@@ -1,0 +1,12 @@
+{
+  "docs/agents/plugin-maintenance.md": "63a9d6d10bacfe0590ec249dc2a13829ef725b2d24a543659ae08fe1f14e50eb",
+  "docs/zh/skills/orchestration/references/routing-profile.md": "216f4a5d2646b4523a5bce724732aa74ad49de79d825b8ca54519754f8109f31",
+  "plugins/codex-advisor/scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+  "plugins/codex-advisor/scripts/consult_native.py": "11609b9892c77de88575220f9a15afd1846c6bd6f38148903c08158084e227b6",
+  "plugins/codex-advisor/scripts/process-consultation.py": "7dce504a160416fae5239bfcb48a493225ee40dbe0545ef7d29823d116fef3ef",
+  "plugins/codex-advisor/skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654",
+  "tests/fixtures/consult-codex.py": "d2eaf25dd320c4747eab22bd36ddd89f91600f19351929a0bd8e7dc54dcde02e",
+  "tests/verify-consultation.py": "438473a331dc484f9daf7b8f957a87db4ad1be349224426d36b1d1b02c202d9e",
+  "tests/verify-consultation-host.py": "b6667fbaafe5474b668c2e544e3959ad8a6e327487492bd7dab3d3208de53083",
+  ".scratch/consultation-reliability/acceptance.md": "1563f40d1c1293dec87a22b21bbdbf5d52a9eec52015f9cbad2625b4144a6003"
+}
