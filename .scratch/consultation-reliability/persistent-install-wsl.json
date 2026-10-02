@@ -1,0 +1,190 @@
+{
+  "platform": "linux",
+  "sourceCommit": "75b3de0db02a30089fc19a2ccd0a4da70089ae7e",
+  "installedRoot": "/home/hyy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.2",
+  "backup": "/home/hyy/.codex/backups/codex-advisor/persistent-install-20261002T223204.342185Z",
+  "commands": [
+    {
+      "command": [
+        "/home/hyy/.nvm/versions/node/v24.19.0/bin/codex",
+        "plugin",
+        "marketplace",
+        "list",
+        "--json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/home/hyy/.nvm/versions/node/v24.19.0/bin/codex",
+        "plugin",
+        "marketplace",
+        "upgrade",
+        "codex-advisor",
+        "--json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/home/hyy/.codex/.tmp/marketplaces/codex-advisor",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/home/hyy/.nvm/versions/node/v24.19.0/bin/codex",
+        "plugin",
+        "add",
+        "codex-advisor@codex-advisor",
+        "--json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/usr/bin/sh",
+        "./scripts/install-agents.sh",
+        "--target-dir",
+        "/home/hyy/.codex/agents"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/usr/bin/sh",
+        "./scripts/install-agents.sh",
+        "--target-dir",
+        "/home/hyy/.codex/agents",
+        "--check"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/home/hyy/.nvm/versions/node/v24.19.0/bin/codex",
+        "plugin",
+        "add",
+        "codex-advisor@codex-advisor",
+        "--json"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/usr/bin/sh",
+        "./scripts/install-agents.sh",
+        "--target-dir",
+        "/home/hyy/.codex/agents",
+        "--check"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "marketplace": {
+    "name": "codex-advisor",
+    "root": "/home/hyy/.codex/.tmp/marketplaces/codex-advisor",
+    "marketplaceSource": {
+      "sourceType": "git",
+      "source": "https://github.com/IpiggyI/codex-advisor.git"
+    }
+  },
+  "beforeFiles": {
+    ".mcp.json": "265cfc54db474835b6597091b73965959e0907b1a8653b1a5feed686c6b9546b",
+    "scripts/inspect-agent-runtime.sh": "efa7e4799eee9ece6dc0b6e3dfff199e566df35fc2b9d2652d19f6d36c3fc555",
+    "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39",
+    "scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+    "scripts/process-consultation.py": "7dce504a160416fae5239bfcb48a493225ee40dbe0545ef7d29823d116fef3ef",
+    "scripts/advisor-hooks.py": "810df4fe6abbf27caaacf40350b055eb1159bffe9e02aba56931821ca77feaed",
+    "scripts/install-agents.sh": "2bb7a5d1fd137e9cb29d962a026e5d5d074bc47d758a7855bf5efd563fe1b220",
+    "scripts/consult_native.py": "11609b9892c77de88575220f9a15afd1846c6bd6f38148903c08158084e227b6",
+    "agents/ca-advisor-mainstay-h.toml": "b7c56a944cca6529c71e2862958c3eaf592dc8f5e973d96f642d0e1e8ea963df",
+    "agents/ca-explorer-rescue.toml": "8bbcd9613a99a785209f1c495266aa0e0d1d3c43b68cb29a234e77ace86d6fd3",
+    "agents/ca-advisor-crux-m.toml": "581f2dcb4cfd221cabb38a76ca030fb70dcfb237c4a5220780fbd9301a7015ec",
+    "agents/ca-explorer-mainstay-m.toml": "8f6af21bb2f9b5ae4690fdd03e86c11715097dae9f489e3615d73a8e6ba2f287",
+    "agents/ca-worker-mainstay-m.toml": "fc25236c754d18bb9a573f605340ff5ea7da35b690079147794c4bcbf9da1d6f",
+    "agents/ca-explorer-crux-h.toml": "b273c0fa6a12eb380803fe744fc951bc02fe31fc11d9dc8c9118f39b5745f658",
+    "agents/ca-worker-crux-m.toml": "efbca0ccc81f62e100da807205d86bcdfbfd84905969d9f96c4b1f32d1c538df",
+    "agents/ca-worker-rescue-h.toml": "971c65fad61c9077f3541ecf5ee2b64f5ca37d42a3097721a4dbcfd10fe8c61d",
+    "agents/ca-worker-crux-h.toml": "b03924f4a0b875c0c0d228b83a02b7b2564027a4d9db321c7938aa27c87459b1",
+    "agents/ca-advisor-rescue-m.toml": "5730881ef7dbf8aa6a3f20f40c71c84b5fb322ee7eb7705fdbb53c7673d8da18",
+    "agents/ca-explorer-mainstay-h.toml": "751e7a65d7db111a6f61ff4ba99a8f12185cbd2d5f9b335c0d7a14b916a9a7c8",
+    "agents/ca-advisor-crux-h.toml": "90e852d4c289508c81f3e2e2a178a9dcafeeb3748570a65418546ef4e9574954",
+    "agents/ca-explorer-crux-m.toml": "ba2f4fbbadaff0a3659b746ecc69fc2b3faafadd092d709e5decc86f0b41af4f",
+    "agents/ca-advisor-rescue-h.toml": "a1af5a5f886751c39cbf6803b6a21ff9beb6286863e36bd09c76293ec93a37e8",
+    "agents/ca-worker-rescue-m.toml": "befa78cd3d9122043128d6e8c6dc6a23f12065536ad1d178ae7bda4c3050b94c",
+    "agents/ca-worker-mainstay-h.toml": "b4fa78bdef87af0cd4bea001657997896624e2fd7dca8e60d9ea804465c3524a",
+    "agents/ca-advisor-mainstay-m.toml": "6f02a91bde12c77db1472a7a5dd99781fd29f77d04de30f44a4b63688947e551",
+    "hooks/hooks.json": "d8bd5371b7319194450b48b690218c4fe7b3da983f07b87679cd84dc81af4d89",
+    ".codex-plugin/plugin.json": "5a5c739b3ab950d65ab5002f43be497c237c0a842162c249d7e29f271686665b",
+    "skills/orchestration/SKILL.md": "0e738f78c52749ff8adec8a76a57400428c842a202dd932c44e3f8614e37e188",
+    "skills/orchestration/references/independent-acceptance.md": "a3f2aa9eacb4de4d80d2cf19945bf6fd819743c88f08d158eaf302e89bc6fe0f",
+    "skills/orchestration/references/consult-posture.md": "5a21124701f569698486e3f94c7d85e2679a28e5247fd7b1ac1f7c0b231d6185",
+    "skills/orchestration/references/recovery.md": "86b91170f86958f76a79228f38ac495087dc2146973ecf00990d5dcbd85496c0",
+    "skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654",
+    "skills/orchestration/references/role-contracts.md": "4bcce0398ee855ca0a8bd82585dc0491e231bcc0ddd63ae82ba78b82bed851da",
+    "skills/orchestration/references/operations.md": "0f8b38ec43d01b1d2d8a75d5f8993a7e39f37ca5ac4cee4ff24895f87649eabd",
+    "skills/orchestration/agents/openai.yaml": "a67cd928c2dd3e58ababfd86311d22fc24130c2148b2df5c8fc5acdfad17bc38"
+  },
+  "marketplaceCommit": "75b3de0db02a30089fc19a2ccd0a4da70089ae7e",
+  "firstInstallFiles": 36,
+  "companionEntries": 17,
+  "reinstallFiles": 36,
+  "preservedFailureCount": 4,
+  "existingFailureRowsPreserved": 0,
+  "ultraRoute": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "installedMcpChecks": {
+    "initialization": true,
+    "toolDiscovery": true,
+    "readOnlyHint": false,
+    "disabledWithoutHistoryOrInference": true,
+    "readableFailure": true
+  },
+  "afterFiles": {
+    ".mcp.json": "265cfc54db474835b6597091b73965959e0907b1a8653b1a5feed686c6b9546b",
+    "scripts/inspect-agent-runtime.sh": "efa7e4799eee9ece6dc0b6e3dfff199e566df35fc2b9d2652d19f6d36c3fc555",
+    "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39",
+    "scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+    "scripts/consult_limits.py": "cedc4ba3207075cd08cb549c2a229dffedfa79538d79abaaa40fa2e90272e3f5",
+    "scripts/process-consultation.py": "a3420ac54ace5a7cbd6289c6648ec9f728639c9cad5532bcfb40d25cf52d786e",
+    "scripts/advisor-hooks.py": "810df4fe6abbf27caaacf40350b055eb1159bffe9e02aba56931821ca77feaed",
+    "scripts/install-agents.sh": "2bb7a5d1fd137e9cb29d962a026e5d5d074bc47d758a7855bf5efd563fe1b220",
+    "scripts/consult_native.py": "11609b9892c77de88575220f9a15afd1846c6bd6f38148903c08158084e227b6",
+    "agents/ca-advisor-mainstay-h.toml": "b7c56a944cca6529c71e2862958c3eaf592dc8f5e973d96f642d0e1e8ea963df",
+    "agents/ca-explorer-rescue.toml": "a52b1dc2b77aef04e037f3ed6d30b23ebcab7856a6f1955c4793129f9da89891",
+    "agents/ca-advisor-crux-m.toml": "581f2dcb4cfd221cabb38a76ca030fb70dcfb237c4a5220780fbd9301a7015ec",
+    "agents/ca-explorer-mainstay-m.toml": "d140b2fbdb70a8d0a2ba1fe691663c2611bcd5a970ad921afab4f9536e6b49c5",
+    "agents/ca-worker-mainstay-m.toml": "14f147b456862fdd3de0f74a86366f7f1abf2d7cc8071c336fc9584e3550a9cd",
+    "agents/ca-explorer-crux-h.toml": "9bf8fe63fb783bdd033e291b9f8a6d91ac7859e53aae23ab2b5ad50f252cc703",
+    "agents/ca-worker-crux-m.toml": "bd9271e2d9bd26d511c6a55b18b67c5be492122b0a6dbe493647a08914a7dafc",
+    "agents/ca-worker-rescue-h.toml": "14d861d7f92221bbccb796e4d959eca6d7258a9775eb9bb50da81cfbaac4dff4",
+    "agents/ca-worker-crux-h.toml": "6994351736941e6de1e1cb6932fffcbe5443dab7efa1b9ff7611548c77d6141b",
+    "agents/ca-advisor-rescue-m.toml": "5730881ef7dbf8aa6a3f20f40c71c84b5fb322ee7eb7705fdbb53c7673d8da18",
+    "agents/ca-explorer-mainstay-h.toml": "4bb6c3ee1f290aff81947e37730b456e270baaf54bff45390e6f5bcfb8ffdcf3",
+    "agents/ca-advisor-crux-h.toml": "90e852d4c289508c81f3e2e2a178a9dcafeeb3748570a65418546ef4e9574954",
+    "agents/ca-explorer-crux-m.toml": "af0423f3078cd3064aa7c6756f5cfa1aa7d598320e95f87cb929b9d70fea0b58",
+    "agents/ca-advisor-rescue-h.toml": "a1af5a5f886751c39cbf6803b6a21ff9beb6286863e36bd09c76293ec93a37e8",
+    "agents/ca-worker-rescue-m.toml": "bb58261493f2d567c0f83f7bcde0cff21d1ae8d141a3cc21f10301d29b7599eb",
+    "agents/ca-worker-mainstay-h.toml": "f872d625fcd007ee44d99ec027900f14d1b071be94296afe4e173bbd50008d7d",
+    "agents/ca-advisor-mainstay-m.toml": "6f02a91bde12c77db1472a7a5dd99781fd29f77d04de30f44a4b63688947e551",
+    "hooks/hooks.json": "d8bd5371b7319194450b48b690218c4fe7b3da983f07b87679cd84dc81af4d89",
+    ".codex-plugin/plugin.json": "5a5c739b3ab950d65ab5002f43be497c237c0a842162c249d7e29f271686665b",
+    "skills/orchestration/SKILL.md": "23df68ca19d18dcb45d4d1967719adae659b6ac73b2f300151da54957cd44a15",
+    "skills/orchestration/references/independent-acceptance.md": "a3f2aa9eacb4de4d80d2cf19945bf6fd819743c88f08d158eaf302e89bc6fe0f",
+    "skills/orchestration/references/consult-posture.md": "936aa3294d39b67ca2787d06b2ec265caa08a7bd34a0929ae05dfaa3cd85bbc9",
+    "skills/orchestration/references/recovery.md": "86b91170f86958f76a79228f38ac495087dc2146973ecf00990d5dcbd85496c0",
+    "skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654",
+    "skills/orchestration/references/role-contracts.md": "4bcce0398ee855ca0a8bd82585dc0491e231bcc0ddd63ae82ba78b82bed851da",
+    "skills/orchestration/references/operations.md": "0f8b38ec43d01b1d2d8a75d5f8993a7e39f37ca5ac4cee4ff24895f87649eabd",
+    "skills/orchestration/agents/openai.yaml": "a67cd928c2dd3e58ababfd86311d22fc24130c2148b2df5c8fc5acdfad17bc38"
+  },
+  "status": "passed",
+  "probeRowRemoved": true
+}

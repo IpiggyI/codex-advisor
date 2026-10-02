@@ -1,0 +1,26 @@
+{
+  "isError": false,
+  "structuredContent": {
+    "status": "succeeded",
+    "advice": "保存本次安装版咨询的实际模型、强度和结果，核对两侧最终文件哈希，再提交并推送安装验收记录。复用已有有效检查，无需再次请求授权。向用户报告两侧文件已更新，并明确 Windows 采用逐文件原子更新，真实目录的标准重装仍受占用阻塞；Windows 认证模型调用和旧会话恢复仍未验证。最后请用户退出对应客户端后重新打开原会话，验证实际咨询是否恢复。",
+    "kind": "plan",
+    "actual": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "expected": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "advisorThreadId": "01a0fec6-99c6-7663-954c-6ef971b90e6f",
+    "callerThreadId": "01a0fe2b-10c2-7a63-b1a7-7e722a3e87a7",
+    "failureCount": 0,
+    "consultationDisabled": false
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "保存本次安装版咨询的实际模型、强度和结果，核对两侧最终文件哈希，再提交并推送安装验收记录。复用已有有效检查，无需再次请求授权。向用户报告两侧文件已更新，并明确 Windows 采用逐文件原子更新，真实目录的标准重装仍受占用阻塞；Windows 认证模型调用和旧会话恢复仍未验证。最后请用户退出对应客户端后重新打开原会话，验证实际咨询是否恢复。\n\nplan | gpt-6-astra[xhigh]"
+    }
+  ]
+}

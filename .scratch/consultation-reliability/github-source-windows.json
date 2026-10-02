@@ -1,0 +1,1 @@
+{"platform": "win32", "source": "https://github.com/IpiggyI/codex-advisor.git", "files": 36, "freshInstall": true, "reinstall": true, "preservedFailureCount": 4, "ultraRoute": {"model": "gpt-6-astra", "effort": "xhigh"}}
