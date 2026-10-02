@@ -42,6 +42,12 @@ signal; do not leave it only in collapsed tool output.
 <!-- consult-posture:full:end -->
 
 <!-- consult-posture:adoption:start -->
+When a result has `consultationDisabled: true`, stop calling process consultation
+for this thread, including before completion and for reconciliation. Report it as
+unavailable and continue authorized work and required checks. The fourth cumulative
+failed call disables consultation for the thread; restarting it does not reset the
+count. Required user approvals and independent acceptance still apply.
+
 Adopt consultation advice by default.
 
 Deviate with a stated reason when following a step fails empirically or primary-source

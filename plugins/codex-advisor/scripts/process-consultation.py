@@ -8,7 +8,8 @@ import sys
 import threading
 
 sys.dont_write_bytecode = True
-from consult_context import Failure, caller_home, reconstruct, route
+from consult_context import Failure, caller_home, identity, reconstruct, route
+from consult_limits import FAILURE_LIMIT, STOP_CALLING, failure_count, limit_result
 from consult_native import execute
 
 TOOL = {'name': 'process_consultation',
@@ -16,9 +17,10 @@ TOOL = {'name': 'process_consultation',
                        'Returns a plan, correction, or stop with verified advisor model and effort; '
                        'an explicit failure leaves the work pending. '
                        'On failure, state it in your next visible reply; do not present it as advice '
-                       'or declare consultation complete.',
+                       'or declare consultation complete. When consultationDisabled is true, stop calling '
+                       'in this thread and continue authorized work with consultation marked unavailable.',
         'inputSchema': {'type': 'object', 'properties': {}, 'additionalProperties': False},
-        'annotations': {'readOnlyHint': True, 'destructiveHint': False, 'openWorldHint': False}}
+        'annotations': {'readOnlyHint': False, 'destructiveHint': False, 'openWorldHint': False}}
 
 
 def result_text(result):
@@ -50,12 +52,16 @@ class MCP:
             cancel.set()
 
     def consultation(self, request, cancel):
-        expected = None
+        expected = home = thread = None
         try:
             params = request.get('params', {})
+            home = caller_home(self.plugin)
+            identity(params.get('_meta'))
+            thread = params['_meta']['threadId']
+            if failure_count(home, thread) >= FAILURE_LIMIT:
+                raise Failure('disabled', 'Consultation is disabled after four failed calls. ' + STOP_CALLING)
             if params.get('name') != TOOL['name'] or params.get('arguments', {}) != {}:
                 raise Failure('arguments', 'Process consultation accepts only an empty argument object.')
-            home = caller_home(self.plugin)
             caller = reconstruct(home, params.get('_meta'))
             expected = route(self.plugin, caller)
             result = execute(home, caller, expected, cancel)
@@ -69,6 +75,7 @@ class MCP:
             result = {'status': 'failed', 'code': 'internal',
                       'message': 'Consultation encountered an unsupported host response or local I/O failure.',
                       'expected': expected, 'actual': None}
+        result = limit_result(result, home, thread)
         self.send({'id': request['id'], 'result': {'isError': result['status'] == 'failed',
                    'structuredContent': result, 'content': [{'type': 'text', 'text': result_text(result)}]}})
 

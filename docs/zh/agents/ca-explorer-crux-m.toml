@@ -33,6 +33,8 @@ developer_instructions = """
 <!-- consult-posture:full:end -->
 
 <!-- consult-posture:adoption:start -->
+结果包含 `consultationDisabled: true` 时，停止本线程的所有过程咨询，包括完成前咨询和协调咨询。报告咨询不可用，继续已授权的工作与必要检查。同一线程累计第 4 次调用失败后停用咨询；重新打开该线程不会清零。用户审批和独立验收要求仍然有效。
+
 默认采纳咨询建议。
 
 遵循某一步骤实际失败，或第一手来源证据反驳某项具体主张时，可以偏离建议，但要说明理由。自测通过不能证明建议错误。

@@ -131,17 +131,22 @@ public class CodexFixture {
         self.process = None
 
     def tearDown(self):
+        self.stop()
+        self.temp.cleanup()
+
+    def stop(self):
         if self.process:
             self.process.stdin.close()
             self.process.wait(timeout=10)
             self.process.stdout.close()
             self.process.stderr.close()
-        self.temp.cleanup()
+            self.process = None
 
     def start(self, records, scenario='plan', bad_layout=False):
+        self.stop()
         sessions = self.home / 'sessions/2026/09/26'
         sessions.mkdir(parents=True, exist_ok=True)
-        (sessions / ('rollout-' + THREAD + '.jsonl')).write_text(
+        (sessions / ('rollout-' + records[0]['payload']['id'] + '.jsonl')).write_text(
             ''.join(json.dumps(r) + '\n' for r in records))
         self.before = {str(p.relative_to(self.home)): p.read_bytes()
                        for p in self.home.rglob('*') if p.is_file()}
@@ -180,7 +185,10 @@ public class CodexFixture {
         self.assertFalse(list((self.root / 'tmp').iterdir()), 'consultation temporary state survived')
         after = {str(p.relative_to(self.home)): p.read_bytes()
                  for p in self.home.rglob('*') if p.is_file()}
-        self.assertEqual(self.before, after, 'component modified CODEX_HOME')
+        counter = str(Path('codex-advisor') / 'consultation-failures.sqlite3')
+        self.assertEqual({k: v for k, v in self.before.items() if k != counter},
+                         {k: v for k, v in after.items() if k != counter},
+                         'component modified files outside its failure counter')
         return result['structuredContent']
 
     def call(self, records, meta, scenario='plan', arguments=None, bad_layout=False):
@@ -201,7 +209,7 @@ public class CodexFixture {
         tool = self.responses.get(timeout=5)['result']['tools'][0]
         self.assertEqual(tool['name'], 'process_consultation')
         self.assertEqual(tool['inputSchema'], {'type': 'object', 'properties': {}, 'additionalProperties': False})
-        self.assertEqual(tool['annotations'], {'readOnlyHint': True, 'destructiveHint': False, 'openWorldHint': False})
+        self.assertEqual(tool['annotations'], {'readOnlyHint': False, 'destructiveHint': False, 'openWorldHint': False})
 
     def test_earliest_unfinished_images_reasoning_and_truncation(self):
         records, meta, history = fixture()
@@ -292,6 +300,93 @@ public class CodexFixture {
         self.assertEqual(result['details']['sourceIndex'], 0)
         self.assertEqual(result['details']['itemType'], 'message')
         self.assertNotIn('EARLIEST_CONSTRAINT', json.dumps(result))
+
+    def test_four_failures_disable_resumed_thread_before_native_execution(self):
+        records, meta, _ = fixture('gpt-6-astra', 'unknown')
+        for count in range(1, 5):
+            result = self.call(records, meta)
+            self.assertEqual(result['code'], 'route')
+            self.assertEqual(result['failureCount'], count)
+            self.assertEqual(result['consultationDisabled'], count == 4)
+        records, meta, _ = fixture('gpt-6-astra', 'ultra')
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'disabled')
+        self.assertTrue(result['consultationDisabled'])
+        self.assertEqual(result['failureCount'], 4)
+        self.assertIn('Stop calling process_consultation', result['message'])
+        self.assertFalse((self.root / 'injected.json').exists())
+
+    def test_success_does_not_reset_cumulative_failures(self):
+        failed, failed_meta, _ = fixture('gpt-6-astra', 'unknown')
+        self.call(failed, failed_meta)
+        records, meta, _ = fixture('gpt-6-astra', 'ultra')
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded')
+        self.assertEqual(result['failureCount'], 1)
+        result = self.call(failed, failed_meta)
+        self.assertEqual(result['failureCount'], 2)
+        self.assertFalse(result['consultationDisabled'])
+
+    def test_failure_limit_is_scoped_to_thread_not_root_session(self):
+        failed, failed_meta, _ = fixture('gpt-6-astra', 'unknown')
+        for _ in range(4):
+            self.call(failed, failed_meta)
+        records, meta, _ = fixture('gpt-6-astra', 'ultra')
+        new_thread = '44444444-4444-4444-4444-444444444444'
+        records[0]['payload']['id'] = new_thread
+        meta['threadId'] = meta['x-codex-turn-metadata']['thread_id'] = new_thread
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded')
+        self.assertEqual(result['failureCount'], 0)
+        self.assertFalse(result['consultationDisabled'])
+
+    def test_unreadable_failure_state_prevents_native_execution(self):
+        state = self.home / 'codex-advisor/consultation-failures.sqlite3'
+        state.parent.mkdir(parents=True)
+        state.write_bytes(b'corrupt database')
+        records, meta, _ = fixture()
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'failure_state')
+        self.assertTrue(result['consultationDisabled'])
+        self.assertFalse((self.root / 'injected.json').exists())
+
+    def test_unqualified_identity_disables_without_writing_a_counter(self):
+        records, _, _ = fixture()
+        result = self.call(records, {})
+        self.assertEqual(result['code'], 'identity')
+        self.assertTrue(result['consultationDisabled'])
+        self.assertFalse((self.home / 'codex-advisor').exists())
+        self.assertFalse((self.root / 'injected.json').exists())
+
+    def test_native_errors_reach_limit_without_another_model_request(self):
+        records, meta, _ = fixture()
+        for count in range(1, 5):
+            result = self.call(records, meta, 'terminal-event')
+            self.assertEqual(result['code'], 'executor')
+            self.assertEqual(result['failureCount'], count)
+        trace = self.root / 'advisor-calls.jsonl'
+        previous = trace.read_bytes()
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'disabled')
+        self.assertEqual(trace.read_bytes(), previous)
+
+    def test_parallel_failure_updates_are_atomic_and_bounded(self):
+        script = '''
+import json, sys
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+from consult_limits import failure_count
+with ThreadPoolExecutor(max_workers=8) as pool:
+    counts = list(pool.map(lambda _: failure_count(Path(sys.argv[2]), sys.argv[3], True), range(12)))
+print(json.dumps(sorted(counts)))
+'''
+        result = subprocess.run([sys.executable, '-B', '-c', script, str(self.plugin / 'scripts'),
+                                 str(self.home), THREAD], capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), [1, 2, 3] + [4] * 9)
+        records, meta, _ = fixture()
+        self.assertEqual(self.call(records, meta)['code'], 'disabled')
 
     def test_cancellation_terminates_tree(self):
         records, meta, _ = fixture()

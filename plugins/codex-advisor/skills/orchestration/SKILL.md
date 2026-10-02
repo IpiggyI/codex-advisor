@@ -123,9 +123,10 @@ compaction. The advisor runs without tools and returns exactly one plan,
 correction, or stop signal with its host-recorded model and effort. A `stop` is a
 successful result: halt and escalate as advised. Only a successful terminal result
 counts as consultation. An unsupported reconstruction or failed consultation returns
-an explicit failure, never fabricated advice; the work stays pending, and the caller
-states the failure in its next visible reply without presenting it as advice or
-declaring consultation complete.
+an explicit failure, never fabricated advice. The caller states the failure in its
+next visible reply without presenting it as advice or declaring consultation complete.
+The adoption block governs continued work when the per-thread failure limit disables
+consultation; user approvals and independent acceptance remain required.
 
 A complete consultation attempt returns one allowed result that answers the decision
 in context with a supportable conclusion. It fails when it returns no allowed result

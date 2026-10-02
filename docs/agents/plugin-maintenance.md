@@ -15,6 +15,12 @@ temporary `--target-dir` checks installation without touching active settings.
 Copy only required connection/authentication settings, keep credentials out of
 reports, and remove temporary credential copies after testing.
 
+A managed plugin cache is installed output. Reinstallation replaces local edits
+with files from the configured marketplace source. Deliver fixes through that
+source, or through an explicitly selected local marketplace. Verify a fresh install
+and a reinstall against the intended source; a cache copy alone does not establish
+that an update persists.
+
 ## Companion installer
 
 The installer is manifest-driven: the manifest is the set of templates shipped
@@ -84,6 +90,23 @@ item and retain qualified native error codes and HTTP status without copying
 history or native error text. Text content leads with readable advice or the
 failure reason; `structuredContent` carries the machine-readable outcome.
 
+Calls with a qualified host thread identity report `failureCount` and
+`consultationDisabled`. The fourth cumulative failed call disables further
+consultation for that thread. Successful calls do not reset the count. A disabled
+thread receives `code=disabled` before reconstruction or native execution; the
+caller stops consultation and continues authorized work with consultation marked
+unavailable. User approvals and independent acceptance still apply.
+
+Counts are stored atomically by thread ID in
+`$CODEX_HOME/codex-advisor/consultation-failures.sqlite3`. The file contains only
+thread IDs and bounded counts. Resuming a thread or restarting its MCP process keeps
+the limit; another thread, including a child thread, has an independent count.
+The MCP tool declares `readOnlyHint=false` because failed calls update this state.
+Calls whose cache layout or host identity cannot be qualified disable consultation
+without assigning a counter to an unverified thread. Unavailable or malformed
+counter storage disables consultation with
+`code=failure_state` instead of starting an unbounded attempt.
+
 Errors, aborts, cancellation, context overflow, empty or malformed output, and
 mismatches all end in that failure result. Native `willRetry=true` notifications
 wait for the same turn's terminal result within the existing deadline. The
@@ -91,9 +114,9 @@ component starts no additional consultation attempt. Failed inference also check
 available request traces to report observed model and effort. MCP
 cancellation terminates the native process tree and returns failure. The native
 execution deadline is 180 seconds. Catalogs, request traces, captured outputs,
-logs, and SQLite state stay in one temporary directory and are deleted when the
-call finishes or is cancelled. The component writes no session markers, repository
-files, or credential files.
+logs, and native SQLite state stay in one temporary directory and are deleted when
+the call finishes or is cancelled. Only the bounded failure counters persist. The
+component writes no repository files, caller history, or credential files.
 
 On Windows, consultation requires a native `codex.exe` on PATH or a unique native
 executable in the official npm package layout beside the discovered Codex shim.
