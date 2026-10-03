@@ -1,0 +1,17 @@
+{
+  "baseline": "ab4f9bc91f169eef2cc0f9d2edd59ce91968d84d",
+  "files": {
+    "plugins/codex-advisor/scripts/consult_native.py": "2403d634b11886c2b5bb0e661463d3287cd7fee89727cb2b79a7c0033542e712",
+    "tests/verify-consultation.py": "f97e9a6393f6223094928658c8670b1749a79e121dada78b47bfc6f4169c0030",
+    "tests/fixtures/consult-codex.py": "fa7aaf05b6ea6d7dca8bace9904ccbc7c1ae006488cf50291d9c04af0a70dfcf",
+    "tests/verify-consultation-host.py": "5a8c454ce30fa7e6a428b4abafa19729aca5f21b7a926ca729dfd1d9cc31f349",
+    "docs/agents/plugin-maintenance.md": "256cefaf5845127e10f77a40a17efcef68b45954acc9eb81f33d06d484b02fa5",
+    ".scratch/consultation-reliability/acceptance.md": "663c41ac3f54b8b967e8c4062ce54e11622c09580a04d1b019b16cea1141545b",
+    ".scratch/consultation-reliability/replay-image-history.py": "c1395d36841321c1364560527a9034aaf36f88f46f92cf6558e892d456223dc7",
+    ".scratch/consultation-reliability/image-replay.json": "ae6e8dd1760f8f016870e3db2d36ab5dd013b4291f78d11b3016f8e8e3c11713",
+    ".scratch/consultation-reliability/verify-images-wsl.log": "45f3c985bbe09000c60e2dc1365c61dc239d227425e0b2f18eb226efd75881ae",
+    ".scratch/consultation-reliability/verify-images-host.log": "7d4aa3f0f1f4083bbf28ee0b82fa1d9a4de7e8f276bf64376841c1bf70e86b3d",
+    ".scratch/consultation-reliability/image-regression-before.log": "ded53642991510535b265b59faf5863bc4303876cf58eb0f8efa32c3d830befd",
+    ".scratch/consultation-reliability/image-boundary-before.log": "e2eaf0a515d912ea9756e58352aa62516da67a77a017d4397628e1bca685d2c9"
+  }
+}

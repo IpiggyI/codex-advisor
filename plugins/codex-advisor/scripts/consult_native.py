@@ -420,21 +420,30 @@ def completion(server, thread, turn):
             return advice
 
 
-def comparable(item):
+def comparable(item, omit_image_detail=False):
     # The host removes item IDs, attribution metadata, and optional nulls from
     # requests. Tool call_id, roles, content, and encrypted reasoning stay exact.
     value = {key: value for key, value in item.items()
              if key not in ('id', 'internal_chat_message_metadata_passthrough') and value is not None}
     if item.get('type') in ('function_call_output', 'custom_tool_call_output') and isinstance(value.get('output'), list):
         value['output'] = [block for block in value['output'] if block != {'type': 'input_text', 'text': ''}]
+    if omit_image_detail:
+        # Responses Lite omits supported image detail hints after image preparation.
+        for key in ('content', 'output'):
+            if isinstance(value.get(key), list):
+                value[key] = [{field: data for field, data in block.items() if field != 'detail'}
+                              if block.get('type') == 'input_image' and
+                              block.get('detail') in ('auto', 'high', 'original') else block
+                              for block in value[key]]
     return value
 
 
-def verify_history(request, caller):
+def verify_history(request, caller, omit_image_detail=False):
     source = iter(enumerate(caller['items']))
     index, wanted = next(source, (0, None))
     for item in request.get('input', []):
-        if wanted is not None and comparable(item) == comparable(wanted):
+        if wanted is not None and (comparable(item) == comparable(wanted) or
+                                  (omit_image_detail and comparable(item) == comparable(wanted, True))):
             index, wanted = next(source, (index + 1, None))
     if wanted is not None:
         raise Failure('context', 'Actual advisor request omitted or changed effective caller history.',
@@ -443,6 +452,7 @@ def verify_history(request, caller):
 
 
 def verify_requests(root, thread, expected, caller):
+    model = json.loads((root / 'models.json').read_text(encoding='utf-8'))['models'][0]
     observed = []
     for trace in sorted((root / 'trace').rglob('*.jsonl')):
         for line in trace.read_text(encoding='utf-8').splitlines():
@@ -466,7 +476,7 @@ def verify_requests(root, thread, expected, caller):
                         (inventories or request.get('tools') == []) and
                         all(item.get('tools') == [] for item in inventories),
                         'tools', 'Actual consultation request did not prove an empty tool set.')
-                verify_history(request, caller)
+                verify_history(request, caller, model.get('use_responses_lite') is True)
             except Failure as error:
                 error.actual = actual
                 raise

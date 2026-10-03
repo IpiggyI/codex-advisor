@@ -15,7 +15,9 @@ if sys.argv[1:] == ['debug', 'models', '--bundled']:
     print(json.dumps({'models': [{'slug': slug, 'shell_type': 'local',
           'tool_mode': 'code_mode_only',
           'apply_patch_tool_type': 'freeform', 'experimental_supported_tools': ['clock'],
-          'supports_search_tool': True, 'use_tools_instructions': True}
+          'supports_search_tool': True, 'use_tools_instructions': True,
+          'use_responses_lite': False if scenario == 'image-omit-nonlite' else
+                                None if scenario == 'image-omit-unknown-mode' else True}
           for slug in ('gpt-6-astra', 'gpt-6.1-sol')]}))
     sys.exit(0)
 assert sys.argv[1] == 'app-server'
@@ -122,6 +124,24 @@ for line in sys.stdin:
             value.pop('internal_chat_message_metadata_passthrough', None)
             if value.get('type') in ('function_call_output', 'custom_tool_call_output') and isinstance(value.get('output'), list):
                 value['output'] = [block for block in value['output'] if block != {'type': 'input_text', 'text': ''}]
+            content = value.get('content', value.get('output'))
+            if not isinstance(content, list):
+                continue
+            images = [block for block in content if block.get('type') == 'input_image']
+            if not images:
+                continue
+            if catalog.get('use_responses_lite') is True or scenario.startswith('image-omit-'):
+                for block in images:
+                    block.pop('detail', None)
+            if scenario == 'image-changed':
+                images[0]['image_url'] = 'data:image/png;base64,CHANGED'
+            elif scenario == 'image-dropped':
+                content.remove(images[0])
+            elif scenario == 'image-reordered':
+                first, last = content.index(images[0]), content.index(images[-1])
+                content[first], content[last] = content[last], content[first]
+            elif scenario == 'image-detail-changed':
+                images[0]['detail'] = 'low'
         if scenario == 'wrong-model':
             request['model'] = 'wrong-model'
         if scenario == 'wrong-effort':

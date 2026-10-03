@@ -1,0 +1,46 @@
+{
+  "thread": "01a1024a-3921-7050-bac0-3ec98508bab0",
+  "rolloutSha256": "7258a5ba553b4a85a5e886affb2c8f0b59ae581776408be92e828b1529bc4506",
+  "results": [
+    {
+      "boundaryLine": 30,
+      "sourceItems": 13,
+      "requestItems": 19,
+      "status": "succeeded",
+      "actual": {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    },
+    {
+      "boundaryLine": 161,
+      "sourceItems": 67,
+      "requestItems": 73,
+      "status": "succeeded",
+      "actual": {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    },
+    {
+      "boundaryLine": 181,
+      "sourceItems": 74,
+      "requestItems": 80,
+      "status": "succeeded",
+      "actual": {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    },
+    {
+      "boundaryLine": 216,
+      "sourceItems": 87,
+      "requestItems": 93,
+      "status": "succeeded",
+      "actual": {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    }
+  ]
+}

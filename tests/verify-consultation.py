@@ -615,6 +615,41 @@ for name, mutation, expected in [
     setattr(Boundary, 'test_segments_' + name, segment_case(mutation, expected))
 
 
+def image_case(tool_type, scenario, detail, code):
+    def test(self):
+        records, meta, _ = fixture()
+        records[-4]['payload'] = item('Before image check')
+        content = [{'type': 'input_text', 'text': 'Before images'},
+                   {'type': 'input_image', 'image_url': 'data:image/png;base64,FIRST', 'detail': detail},
+                   {'type': 'input_text', 'text': 'Between images'},
+                   {'type': 'input_image', 'image_url': 'data:image/png;base64,SECOND', 'detail': detail}]
+        if tool_type == 'message':
+            records[3]['payload']['content'] = content
+        else:
+            records[-3]['payload'] = {'type': tool_type, 'name': 'fixture', 'call_id': 'tool1',
+                                     ('input' if tool_type == 'custom_tool_call' else 'arguments'): '{}'}
+            records[-2]['payload'] = {'type': tool_type + '_output', 'call_id': 'tool1', 'output': content}
+        result = self.call(records, meta, scenario)
+        self.assertEqual(result['status'], 'failed' if code else 'succeeded', result)
+        if code:
+            self.assertEqual(result['code'], code, result)
+            self.assertEqual(result['actual'], result['expected'])
+    return test
+
+
+for image_type in ('message', 'function_call', 'custom_tool_call'):
+    for scenario, detail, code in [('plan', 'high', None), ('plan', 'auto', None), ('plan', 'original', None),
+                                   ('image-changed', 'high', 'context'),
+                                   ('image-dropped', 'high', 'context'),
+                                   ('image-reordered', 'high', 'context'),
+                                   ('image-detail-changed', 'high', 'context'),
+                                   ('image-omit-nonlite', 'original', 'context'),
+                                   ('image-omit-unknown-mode', 'original', 'context'),
+                                   ('image-omit-low', 'low', 'context')]:
+        setattr(Boundary, 'test_image_' + image_type + '_' + scenario.replace('-', '_') + '_' + detail,
+                image_case(image_type, scenario, detail, code))
+
+
 def outcome_case(scenario, code):
     def test(self):
         records, meta, _ = fixture()

@@ -75,7 +75,11 @@ inventory at either location. The temporary catalog sizes the tool-output byte
 limit from the actual caller history so injection cannot shorten an existing result.
 Every request must also retain the complete caller history in order; silent
 automatic compaction is a context failure. Comparison permits removal of empty
-text blocks from tool results and transport-only item fields. Missing trace
+text blocks from tool results and transport-only item fields. When the selected
+native catalog enables `use_responses_lite`, comparison also permits omission of
+the supported image `detail` hints (`auto`, `high`, and `original`) from messages
+and tool results. Image URLs, bytes, text, and ordering must still match exactly;
+other detail changes and omission without that catalog setting fail. Missing trace
 evidence, a nonempty tool inventory, or any dial mismatch fails the consultation.
 
 The advisor is asked for exactly one structured `plan`, `correction`, or `stop`.
@@ -132,7 +136,8 @@ or cache-layout changes. Run `sh tests/verify.sh
 executable. These checks do not establish live routing or installed-host behavior.
 Run `python3 tests/verify-consultation-host.py` with the native Codex executable
 available for real request construction against an unauthenticated loopback
-endpoint. It covers long function/custom-tool results, empty text blocks, and
+endpoint. It covers long function/custom-tool results, empty text blocks, image
+detail normalization in user messages and both tool-result types, and
 recovery after a completed message precedes a stream failure, in a temporary home
 without contacting a model provider.
 

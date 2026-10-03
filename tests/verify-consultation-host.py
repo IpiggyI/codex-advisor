@@ -16,6 +16,8 @@ from consult_native import execute
 
 ADVICE = '保留全部上下文。'
 EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
+IMAGE = ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1Pe'
+         'AAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC')
 
 
 class Endpoint(http.server.BaseHTTPRequestHandler):
@@ -92,6 +94,34 @@ class NativeHistory(unittest.TestCase):
     def test_function_output_is_not_truncated(self):
         output = 'BEGIN\n' + 'line ' * 20000 + '\nEND'
         self.assertEqual(self.consult(output, 'function_call'), output)
+
+    def consult_images(self, tool_type=None):
+        content = [{'type': 'input_text', 'text': 'BEFORE_IMAGES'}] + [
+            {'type': 'input_image', 'image_url': IMAGE, 'detail': detail}
+            for detail in ('high', 'auto', 'original')]
+        content.append({'type': 'input_text', 'text': 'AFTER_IMAGES'})
+        if tool_type:
+            actual = self.consult(content, tool_type)
+        else:
+            caller = {'base': 'Keep the caller history intact.', 'thread': 'local-test',
+                      'items': [{'type': 'message', 'role': 'user', 'content': content}]}
+            result = execute(self.home, caller, EXPECTED, threading.Event())
+            self.assertEqual(result['status'], 'succeeded')
+            self.assertEqual(result['actual'], EXPECTED)
+            self.assertEqual(result['advice'], ADVICE)
+            actual = next(item['content'] for item in self.endpoint.requests[-1]['input']
+                          if item.get('role') == 'user' and item['content'][0] == content[0])
+        self.assertEqual(actual, [{key: value for key, value in block.items() if key != 'detail'}
+                                  for block in content])
+
+    def test_user_images_retain_content_when_host_omits_detail(self):
+        self.consult_images()
+
+    def test_function_images_retain_content_when_host_omits_detail(self):
+        self.consult_images('function_call')
+
+    def test_custom_tool_images_retain_content_when_host_omits_detail(self):
+        self.consult_images('custom_tool_call')
 
     def test_retry_discards_answer_from_interrupted_stream(self):
         self.endpoint.disconnect_first = True
