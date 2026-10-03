@@ -1,0 +1,26 @@
+{
+  "isError": false,
+  "structuredContent": {
+    "status": "succeeded",
+    "advice": "核验本次安装版新进程的结构化结果与实际档位。成功后保存真实调用证据，补齐安装记录，核对差异只含本任务文件，再提交并推送证据；现有授权已覆盖，无需再次确认。复用有效检查，不必重复咨询。最终分别报告两侧正常重装及图片检查通过、WSL 新进程真实咨询结果，以及 Windows 认证调用和旧连接重载未验证。原线程失败计数保持 4，不解除持久停用。",
+    "kind": "plan",
+    "actual": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "expected": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "advisorThreadId": "01a1028c-c47f-7490-8be1-0c9f1f1a377b",
+    "callerThreadId": "01a10258-a72d-7190-b5cf-c5201bdea381",
+    "failureCount": 0,
+    "consultationDisabled": false
+  },
+  "content": [
+    {
+      "type": "text",
+      "text": "核验本次安装版新进程的结构化结果与实际档位。成功后保存真实调用证据，补齐安装记录，核对差异只含本任务文件，再提交并推送证据；现有授权已覆盖，无需再次确认。复用有效检查，不必重复咨询。最终分别报告两侧正常重装及图片检查通过、WSL 新进程真实咨询结果，以及 Windows 认证调用和旧连接重载未验证。原线程失败计数保持 4，不解除持久停用。\n\nplan | gpt-6-astra[xhigh]"
+    }
+  ]
+}
