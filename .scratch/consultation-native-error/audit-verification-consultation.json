@@ -1,0 +1,26 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "保持运行代码和测试冻结，完成 Windows 剩余检查及真实认证完整链。记录 README 的单独变化，核对其余文件摘要，保留已通过且仍有效的检查结果。核验两侧日志、临时资源清理和原线程计数后，更新验收记录，交给新的独立 Advisor 审查完整差异。解决阻断发现并复验受影响范围，再做完成前咨询。交付时明确区分本地修复、隔离安装验证与尚未执行的真实安装更新；不要承诺未来绝无故障。\n\nplan | gpt-6-astra[xhigh]"
+    }
+  ],
+  "structuredContent": {
+    "status": "succeeded",
+    "advice": "保持运行代码和测试冻结，完成 Windows 剩余检查及真实认证完整链。记录 README 的单独变化，核对其余文件摘要，保留已通过且仍有效的检查结果。核验两侧日志、临时资源清理和原线程计数后，更新验收记录，交给新的独立 Advisor 审查完整差异。解决阻断发现并复验受影响范围，再做完成前咨询。交付时明确区分本地修复、隔离安装验证与尚未执行的真实安装更新；不要承诺未来绝无故障。",
+    "kind": "plan",
+    "actual": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "expected": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "advisorThreadId": "01a107ed-8065-7f22-9380-bcac7734ed6c",
+    "callerThreadId": "01a1079e-58d4-7e50-81c6-0f4e17fb1887",
+    "failureCount": 0,
+    "consultationDisabled": false
+  },
+  "isError": false
+}

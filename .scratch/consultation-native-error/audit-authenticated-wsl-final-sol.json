@@ -1,0 +1,25 @@
+{
+  "platform": "posix",
+  "outerThread": "01a107f3-e349-79b2-879f-202ea3377c9e",
+  "consultation": {
+    "status": "succeeded",
+    "kind": "plan",
+    "actual": {
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "expected": {
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    "advisorThreadId": "01a107f3-e6e3-77a1-b8a0-d021f40a2b9d",
+    "callerThreadId": "01a107f3-e349-79b2-879f-202ea3377c9e",
+    "failureCount": 0,
+    "consultationDisabled": false
+  },
+  "outerModelEndpoint": "loopback",
+  "innerModelEndpoint": "configured-provider",
+  "temporaryInstallation": true,
+  "credentialFilesCopied": false,
+  "authentication": "existing-api-key-file-symlink"
+}

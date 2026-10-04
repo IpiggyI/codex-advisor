@@ -1,0 +1,17 @@
+{
+  "status": "succeeded",
+  "advice": "根因已有原始历史和单变量对照支持。先完成独立验收，核对结论引用与八个交付文件的快照，再更新验收记录。明确区分三层证据：真实宿主启动环境探针成功、原始历史认证重放成功、实际插件完整咨询链恢复；前两项尚不能证明第三项。若不补完整链验证，就保留其未验证状态。修复范围仅覆盖已确认的 S2A_API_KEY，不能概括为任意提供者认证均已解决。最终说明此前测试遗漏了哪条启动边界、此次如何覆盖，以及发布安装尚未执行。保留原线程停用计数，不承诺未来不会出现其他原因的故障。",
+  "kind": "plan",
+  "actual": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "expected": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "advisorThreadId": "01a107c5-4ebe-7a63-997e-553eb3597b6d",
+  "callerThreadId": "01a1079e-58d4-7e50-81c6-0f4e17fb1887",
+  "failureCount": 0,
+  "consultationDisabled": false
+}

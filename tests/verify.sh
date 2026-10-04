@@ -518,6 +518,10 @@ fi
 for script in "$plugin_scripts"/*.sh "$script_dir"/*.sh; do sh -n "$script"; done
 if [ -z "${1-}" ] || [ "${1-}" = --consultation ]; then
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-lifecycle.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-limits.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-native.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-process.py"
 fi
 if [ -z "${1-}" ] || [ "${1-}" = --hooks ]; then
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-hooks.py"

@@ -1,0 +1,25 @@
+{
+  "platform": "nt",
+  "outerThread": "01a107f8-2d96-7c80-aba1-e3fd2ff9d107",
+  "consultation": {
+    "status": "succeeded",
+    "kind": "stop",
+    "actual": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "expected": {
+      "model": "gpt-6-astra",
+      "effort": "xhigh"
+    },
+    "advisorThreadId": "01a107f8-329a-7110-836d-466e442440ac",
+    "callerThreadId": "01a107f8-2d96-7c80-aba1-e3fd2ff9d107",
+    "failureCount": 0,
+    "consultationDisabled": false
+  },
+  "outerModelEndpoint": "loopback",
+  "innerModelEndpoint": "configured-provider",
+  "temporaryInstallation": true,
+  "credentialFilesCopied": false,
+  "authentication": "environment"
+}

@@ -200,7 +200,8 @@ public class CodexFixture {
     def test_schema_and_annotations(self):
         config = json.loads((self.plugin / '.mcp.json').read_text())
         self.assertEqual(config, {'mcpServers': {'codex_advisor': {
-            'command': 'sh', 'args': ['./scripts/run-python.sh', './scripts/process-consultation.py'], 'cwd': '.'}}})
+            'command': 'sh', 'args': ['./scripts/run-python.sh', './scripts/process-consultation.py'],
+            'cwd': '.', 'env_vars': ['S2A_API_KEY']}}})
         manifest = json.loads((self.plugin / '.codex-plugin/plugin.json').read_text())
         self.assertEqual(manifest['mcpServers'], './.mcp.json')
         records, _, _ = fixture()
@@ -292,6 +293,41 @@ public class CodexFixture {
         self.assertEqual(result['actual'], result['expected'])
         self.assertEqual(result['details'], {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503})
         self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
+
+    def test_missing_environment_error_has_actionable_cause(self):
+        records, meta, _ = fixture()
+        for scenario in ('missing-env-event', 'missing-env-turn'):
+            with self.subTest(scenario=scenario):
+                result = self.call(records, meta, scenario)
+                self.assertEqual(result['status'], 'failed', result)
+                self.assertEqual(result['code'], 'executor')
+                self.assertIsNone(result['actual'])
+                self.assertEqual(result['expected'], {'model': 'gpt-6.1-sol', 'effort': 'xhigh'})
+                self.assertEqual(result['details'], {'nativeCode': 'other',
+                                 'reason': 'missing_environment_variable',
+                                 'environmentVariable': 'S2A_API_KEY', 'requestVerification': 'trace'})
+                self.assertIn('S2A_API_KEY', result['message'])
+                self.assertIn('env_vars', result['message'])
+                self.assertNotIn('advice', result)
+                self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
+
+    def test_untrusted_missing_environment_messages_stay_generic(self):
+        records, meta, _ = fixture()
+        for message in ('Missing environment variable: `S2A_API_KEY`.\nPRIVATE_NATIVE_VALUE',
+                        'Missing environment variable: `S2A_API_KEY=PRIVATE_NATIVE_VALUE`.',
+                        'Missing environment variable: `' + 'X' * 129 + '`.',
+                        'PRIVATE_NATIVE_VALUE: Missing environment variable: `S2A_API_KEY`.'):
+            with self.subTest(message=message):
+                self.env['CONSULT_FIXTURE_NATIVE_MESSAGE'] = message
+                result = self.call(records, meta, 'missing-env-event')
+                self.assertEqual(result['status'], 'failed', result)
+                self.assertEqual(result['code'], 'executor')
+                self.assertTrue(result['message'].startswith('Native consultation reported an inference error.'))
+                self.assertEqual(result['details'], {'nativeCode': 'other', 'requestVerification': 'trace'})
+                self.assertNotIn('advice', result)
+                self.assertNotIn('S2A_API_KEY', json.dumps(result))
+                self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
+                self.assertNotIn('X' * 129, json.dumps(result))
 
     def test_context_failure_locates_first_difference(self):
         records, meta, _ = fixture()
@@ -665,7 +701,11 @@ def outcome_case(scenario, code):
                 self.assertIsNotNone(result['actual'])
                 self.assertNotEqual(result['expected'], result['actual'])
             if scenario in ('tools', 'nonempty-top-tools', 'missing-inventory',
-                            'lost-context', 'changed-context', 'changed-text'):
+                            'lost-context', 'changed-context', 'changed-text',
+                            'lost-base', 'changed-base', 'base-role', 'base-reordered',
+                            'nonlite-lost-base', 'nonlite-changed-base',
+                            'lost-guidance', 'changed-guidance', 'guidance-role', 'guidance-reordered',
+                            'lost-invocation', 'changed-invocation', 'invocation-role', 'invocation-reordered'):
                 self.assertEqual(result['actual'], result['expected'])
     return test
 
@@ -677,6 +717,13 @@ for scenario, code in {'correction': None, 'stop': None, 'error': 'executor', 'a
                        'tools': 'tools', 'top-tools': None, 'nonempty-top-tools': 'tools', 'missing-inventory': 'tools',
                        'no-trace': 'trace', 'tool-request': 'tools',
                        'lost-context': 'context', 'changed-context': 'context', 'changed-text': 'context',
+                       'lost-base': 'context', 'changed-base': 'context', 'base-role': 'context',
+                       'base-reordered': 'context', 'nonlite-plan': None,
+                       'nonlite-lost-base': 'context', 'nonlite-changed-base': 'context',
+                       'lost-guidance': 'context', 'changed-guidance': 'context',
+                       'guidance-role': 'context', 'guidance-reordered': 'context',
+                       'lost-invocation': 'context', 'changed-invocation': 'context',
+                       'invocation-role': 'context', 'invocation-reordered': 'context',
                        'mcp-leak': 'isolation', 'hook-leak': 'isolation'}.items():
     setattr(Boundary, 'test_outcome_' + scenario.replace('-', '_'), outcome_case(scenario, code))
 

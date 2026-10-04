@@ -19,9 +19,16 @@ through `sh`, so Git for Windows' `bin` directory, for example
 [Windows launch](docs/agents/plugin-maintenance.md#windows-launch). Consultation
 on Windows also needs the native `codex.exe`; see
 [plugin maintenance](docs/agents/plugin-maintenance.md#process-consultation-component).
-The consultation protocol and hook metadata are qualified on Codex 0.157.0. Host
+The consultation protocol is qualified on Codex 0.160.0; hook metadata is qualified
+on Codex 0.157.0. Host
 schema or cache-layout changes need renewed qualification rather than an assumed
 compatibility guarantee.
+
+For a provider configured with `env_key = "S2A_API_KEY"`, start Codex with that
+variable available. The plugin explicitly forwards it to the consultation MCP
+process. Other credential environment names need their own `env_vars` declaration
+in the plugin source and an update; ordinary MCP startup does not inherit them.
+See [authentication and diagnostics](docs/agents/plugin-maintenance.md#process-consultation-component).
 
 ~~~sh
 codex plugin marketplace add https://github.com/IpiggyI/codex-advisor.git

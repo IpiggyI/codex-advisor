@@ -37,6 +37,7 @@ def result_text(result):
 class MCP:
     def __init__(self):
         self.output_lock = threading.Lock()
+        self.calls_lock = threading.RLock()
         self.calls = {}
         self.plugin = Path(__file__).resolve().parent.parent
 
@@ -48,8 +49,11 @@ class MCP:
                 self.cancel_all()
 
     def cancel_all(self):
-        for cancel, _ in list(self.calls.values()):
+        with self.calls_lock:
+            calls = list(self.calls.values())
+        for cancel, _ in calls:
             cancel.set()
+        return calls
 
     def consultation(self, request, cancel):
         expected = home = thread = None
@@ -76,13 +80,44 @@ class MCP:
                       'message': 'Consultation encountered an unsupported host response or local I/O failure.',
                       'expected': expected, 'actual': None}
         result = limit_result(result, home, thread)
-        self.send({'id': request['id'], 'result': {'isError': result['status'] == 'failed',
-                   'structuredContent': result, 'content': [{'type': 'text', 'text': result_text(result)}]}})
+        return {'id': request['id'], 'result': {'isError': result['status'] == 'failed',
+                'structuredContent': result, 'content': [{'type': 'text', 'text': result_text(result)}]}}
+
+    def complete_call(self, request, cancel):
+        try:
+            result = self.consultation(request, cancel)
+        finally:
+            with self.calls_lock:
+                self.calls.pop(request['id'], None)
+        self.send(result)
+
+    def start_call(self, request):
+        with self.calls_lock:
+            duplicate = request['id'] in self.calls
+            if not duplicate:
+                cancel = threading.Event()
+                thread = threading.Thread(target=self.complete_call, args=(request, cancel))
+                self.calls[request['id']] = (cancel, thread)
+                try:
+                    thread.start()
+                except BaseException:
+                    cancel.set()
+                    self.calls.pop(request['id'], None)
+                    raise
+        if duplicate:
+            self.send({'id': request['id'], 'error': {'code': -32600, 'message': 'Duplicate request identity.'}})
 
     def dispatch(self, request):
         method, request_id = request.get('method'), request.get('id')
+        params = request.get('params', {})
+        if not isinstance(params, dict) or (request_id is not None and type(request_id) not in (str, int)):
+            raise ValueError()
         if method == 'notifications/cancelled':
-            active = self.calls.get(request.get('params', {}).get('requestId'))
+            cancelled_id = params.get('requestId')
+            if type(cancelled_id) not in (str, int):
+                raise ValueError()
+            with self.calls_lock:
+                active = self.calls.get(cancelled_id)
             if active:
                 active[0].set()
             return
@@ -97,13 +132,7 @@ class MCP:
         elif method == 'ping':
             self.send({'id': request_id, 'result': {}})
         elif method == 'tools/call':
-            if request_id in self.calls:
-                self.send({'id': request_id, 'error': {'code': -32600, 'message': 'Duplicate request identity.'}})
-                return
-            cancel = threading.Event()
-            thread = threading.Thread(target=self.consultation, args=(request, cancel))
-            self.calls[request_id] = (cancel, thread)
-            thread.start()
+            self.start_call(request)
         else:
             self.send({'id': request_id, 'error': {'code': -32601, 'message': 'Unknown MCP method.'}})
 
@@ -123,8 +152,7 @@ class MCP:
                 except (ValueError, TypeError):
                     self.send({'id': None, 'error': {'code': -32700, 'message': 'Invalid JSON-RPC input.'}})
         finally:
-            self.cancel_all()
-            for _, thread in list(self.calls.values()):
+            for _, thread in self.cancel_all():
                 thread.join()
 
 

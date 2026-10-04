@@ -16,7 +16,7 @@ if sys.argv[1:] == ['debug', 'models', '--bundled']:
           'tool_mode': 'code_mode_only',
           'apply_patch_tool_type': 'freeform', 'experimental_supported_tools': ['clock'],
           'supports_search_tool': True, 'use_tools_instructions': True,
-          'use_responses_lite': False if scenario == 'image-omit-nonlite' else
+          'use_responses_lite': False if scenario == 'image-omit-nonlite' or scenario.startswith('nonlite-') else
                                 None if scenario == 'image-omit-unknown-mode' else True}
           for slug in ('gpt-6-astra', 'gpt-6.1-sol')]}))
     sys.exit(0)
@@ -83,6 +83,7 @@ for line in sys.stdin:
     elif method == 'thread/start':
         assert stage == 'advisor' and params['ephemeral'] is True
         assert params['baseInstructions'] == 'SOURCE_BASE_INSTRUCTIONS'
+        base_instructions = params['baseInstructions']
         assert params['developerInstructions'] == ''
         result = {'thread': {'id': thread}, 'model': settings['model'],
                   'reasoningEffort': settings['model_reasoning_effort']}
@@ -105,18 +106,70 @@ for line in sys.stdin:
             continue
         result = {'turn': {'id': turn}}
         emit({'id': message['id'], 'result': result})
+        if scenario in ('missing-env-event', 'missing-env-turn'):
+            error = {'message': os.environ.get('CONSULT_FIXTURE_NATIVE_MESSAGE',
+                     'Missing environment variable: `S2A_API_KEY`.'),
+                     'additionalDetails': 'PRIVATE_NATIVE_VALUE', 'codexErrorInfo': 'other'}
+            if scenario == 'missing-env-event':
+                emit({'method': 'error', 'params': {'threadId': thread, 'turnId': turn,
+                      'willRetry': False, 'error': error}})
+            else:
+                emit({'method': 'item/completed', 'params': {'threadId': thread, 'turnId': turn,
+                      'item': {'type': 'agentMessage', 'phase': 'final_answer',
+                               'text': json.dumps({'kind': 'plan', 'advice': 'Unaccepted advice.'})}}})
+            emit({'method': 'turn/completed', 'params': {'threadId': thread,
+                  'turn': {'id': turn, 'status': 'failed', 'error': error}}})
+            continue
         trace = Path(os.environ['CODEX_ROLLOUT_TRACE_ROOT']) / 'rollout'
         trace.mkdir(parents=True, exist_ok=True)
         (trace / 'payloads').mkdir()
         request = {'model': params['model'], 'reasoning': {'effort': params['effort']},
-                   'input': [{'type': 'additional_tools', 'role': 'developer', 'tools': []}] +
-                            json.loads((root / 'injected.json').read_text())}
+                   'input': [{'type': 'additional_tools', 'role': 'developer', 'tools': []}]}
+        if catalog.get('use_responses_lite') is True:
+            request['input'].append({'type': 'message', 'role': 'developer',
+                                     'content': [{'type': 'input_text', 'text': base_instructions}]})
+        else:
+            request['instructions'] = base_instructions
+        request['input'] += [
+            {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': 'HOST_SKILLS'}]},
+            {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': 'HOST_ENVIRONMENT'}]}]
+        history_start = len(request['input'])
+        request['input'] += json.loads((root / 'injected.json').read_text()) + [
+            {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': params['input'][0]['text']}]}]
         if scenario == 'lost-context':
-            request['input'].pop(1)
+            request['input'].pop(history_start)
         if scenario == 'changed-context':
-            request['input'][1]['role'] = 'assistant'
+            request['input'][history_start]['role'] = 'assistant'
         if scenario == 'changed-text':
-            request['input'][1]['content'][0]['text'] = 'constraint silently rewritten'
+            request['input'][history_start]['content'][0]['text'] = 'constraint silently rewritten'
+        if scenario == 'lost-base':
+            request['input'].pop(1)
+        if scenario == 'changed-base':
+            request['input'][1]['content'][0]['text'] = 'changed base instructions'
+        if scenario == 'base-role':
+            request['input'][1]['role'] = 'user'
+        if scenario == 'base-reordered':
+            request['input'].insert(history_start, request['input'].pop(1))
+        if scenario == 'nonlite-lost-base':
+            request.pop('instructions')
+        if scenario == 'nonlite-changed-base':
+            request['instructions'] = 'changed base instructions'
+        if scenario == 'lost-guidance':
+            request['input'].pop(-2)
+        if scenario == 'changed-guidance':
+            request['input'][-2]['content'][0]['text'] = 'changed consultation guidance'
+        if scenario == 'guidance-role':
+            request['input'][-2]['role'] = 'user'
+        if scenario == 'guidance-reordered':
+            request['input'].insert(history_start, request['input'].pop(-2))
+        if scenario == 'lost-invocation':
+            request['input'].pop()
+        if scenario == 'changed-invocation':
+            request['input'][-1]['content'][0]['text'] = 'changed consultation invocation'
+        if scenario == 'invocation-role':
+            request['input'][-1]['role'] = 'developer'
+        if scenario == 'invocation-reordered':
+            request['input'].insert(-2, request['input'].pop())
         if scenario == 'changed-agent-content':
             agent = next(value for value in request['input'] if value['type'] == 'agent_message')
             agent['content'][1]['encrypted_content'] = 'modified-opaque-bytes'

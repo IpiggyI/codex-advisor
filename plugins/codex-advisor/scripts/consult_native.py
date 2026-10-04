@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import queue
+import re
 import shutil
 import signal
 import subprocess
@@ -13,6 +14,7 @@ import threading
 import time
 
 from consult_context import Failure, require
+from consult_process import CLEANUP_FAILED, supervise_linux
 
 
 FEATURES_OFF = ('shell_tool view_image goals request_permissions_tool '
@@ -32,6 +34,7 @@ GUIDANCE = (
     'escalate to the user), using the output schema. This is advice to the caller, '
     'not user-facing output or independent acceptance. Do not execute the task. '
     'Advice grants no authorization, veto, or new requirement.')
+INVOCATION = 'Return process consultation for the caller now.'
 
 
 class WindowsJob:
@@ -118,32 +121,59 @@ def terminate(process):
 
 
 def terminate_tree(process, job):
-    if process.stdin and not process.stdin.closed:
+    writer = getattr(process, '_consult_writer', None)
+    if writer is None or not writer.is_alive():
+        close_input(process)
         try:
-            process.stdin.close()
-        except BrokenPipeError:
+            process.wait(timeout=1)
+        except subprocess.TimeoutExpired:
             pass
-    try:
-        process.wait(timeout=1)
-    except subprocess.TimeoutExpired:
-        pass
     if job:
         job.terminate()
     elif os.name == 'nt':
         raise Failure('cleanup', 'Native process has no containment job; tree cleanup cannot be proven.')
     else:
+        terminate_group(process)
+    process.wait(timeout=10)
+    if writer is not None and writer.ident is not None:
+        writer.join(timeout=2)
+        require(not writer.is_alive(), 'cleanup', 'Native input writer did not terminate.')
+    close_input(process)
+
+
+def close_input(process):
+    if process.stdin and not process.stdin.closed:
         try:
-            os.killpg(process.pid, signal.SIGTERM)
-        except ProcessLookupError:
+            process.stdin.close()
+        except BrokenPipeError:
             pass
+
+
+def terminate_group(process):
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    if getattr(process, '_consult_linux', False):
         try:
-            process.wait(timeout=1)
+            process.wait(timeout=12)
         except subprocess.TimeoutExpired:
-            pass
-        try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
+            kill_group(process)
+            raise Failure('cleanup', 'Linux native process supervision did not finish.') from None
+        require(process.returncode != CLEANUP_FAILED, 'cleanup', 'Linux native process tree cleanup failed.')
+        return
+    try:
+        process.wait(timeout=1)
+    except subprocess.TimeoutExpired:
+        pass
+    kill_group(process)
+
+
+def kill_group(process):
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
     process.wait(timeout=10)
 
 
@@ -168,12 +198,15 @@ def launch(command, env, cwd):
     job = WindowsJob() if os.name == 'nt' else None
     if job:
         command = [sys.executable, '-B', str(Path(__file__).resolve()), '--job-child', *command]
+    elif sys.platform == 'linux':
+        command = [sys.executable, '-B', str(Path(__file__).resolve()), '--linux-child', *command]
     process = None
     try:
         process = subprocess.Popen(command, cwd=cwd, env=env, stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                                    text=True, encoding='utf-8', start_new_session=os.name != 'nt',
                                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0)
+        process._consult_linux = sys.platform == 'linux'
         if job:
             job.assign(process)
             process._consult_job = job
@@ -258,8 +291,13 @@ class Server:
         self.cancel, self.deadline = cancel, deadline
         self.messages, self.pending = queue.Queue(), []
         self.sequence = 0
-        self.reader = threading.Thread(target=self._read, daemon=True)
-        self.reader.start()
+        self.reader = None
+        try:
+            self.reader = threading.Thread(target=self._read, daemon=True)
+            self.reader.start()
+        except BaseException:
+            self.close()
+            raise
 
     def _read(self):
         try:
@@ -271,12 +309,35 @@ class Server:
         finally:
             self.messages.put(None)
 
-    def send(self, payload):
+    def _write(self, text, result):
         try:
-            self.process.stdin.write(json.dumps(payload) + '\n')
+            self.process.stdin.write(text)
             self.process.stdin.flush()
-        except (BrokenPipeError, OSError):
-            raise Failure('executor', 'Native App Server closed its input.') from None
+        except (OSError, ValueError):
+            result.put(False)
+        else:
+            result.put(True)
+
+    def send(self, payload):
+        check_cancel(self.cancel, self.deadline)
+        result = queue.Queue(maxsize=1)
+        writer = threading.Thread(target=self._write, args=(json.dumps(payload) + '\n', result), daemon=True)
+        self.process._consult_writer = writer
+        try:
+            writer.start()
+        except RuntimeError:
+            raise Failure('executor', 'Cannot start native App Server input writer.') from None
+        while True:
+            check_cancel(self.cancel, self.deadline)
+            try:
+                written = result.get(timeout=.1)
+                writer.join(timeout=2)
+                require(not writer.is_alive(), 'cleanup', 'Native input writer did not terminate.')
+                check_cancel(self.cancel, self.deadline)
+                require(written, 'executor', 'Native App Server closed its input.')
+                return
+            except queue.Empty:
+                continue
 
     def receive(self):
         while True:
@@ -313,8 +374,10 @@ class Server:
         try:
             terminate(self.process)
         finally:
-            self.reader.join(timeout=2)
-            if not self.reader.is_alive():
+            if self.reader is not None and self.reader.ident is not None:
+                self.reader.join(timeout=2)
+            writer = getattr(self.process, '_consult_writer', None)
+            if (self.reader is None or not self.reader.is_alive()) and (writer is None or not writer.is_alive()):
                 for stream in (self.process.stdin, self.process.stdout):
                     stream.close()
 
@@ -380,12 +443,21 @@ def native_failure(error, message):
                 status = info[code].get('httpStatusCode')
                 if type(status) is int and 100 <= status <= 599:
                     details['httpStatusCode'] = status
+    native_message = error.get('message') if isinstance(error, dict) else None
+    missing = re.fullmatch(r'Missing environment variable: `([A-Za-z_][A-Za-z0-9_]{0,127})`\.',
+                           native_message) if isinstance(native_message, str) else None
+    if missing:
+        name = missing.group(1)
+        details.update(reason='missing_environment_variable', environmentVariable=name)
+        message = ('Native consultation is missing environment variable ' + name + '. '
+                   'Forward ' + name + " through the MCP server's env_vars configuration.")
     return Failure('executor', message, details=details)
 
 
 def completion(server, thread, turn):
     finals = []
     while True:
+        check_cancel(server.cancel, server.deadline)
         message = server.pending.pop(0) if server.pending else server.receive()
         method, params = message.get('method'), message.get('params', {})
         if method == 'error':
@@ -417,6 +489,7 @@ def completion(server, thread, turn):
                     advice['kind'] in ('plan', 'correction', 'stop') and
                     isinstance(advice['advice'], str) and bool(advice['advice'].strip()),
                     'output', 'Consultation output violates the plan/correction/stop contract.')
+            check_cancel(server.cancel, server.deadline)
             return advice
 
 
@@ -438,17 +511,46 @@ def comparable(item, omit_image_detail=False):
     return value
 
 
-def verify_history(request, caller, omit_image_detail=False):
+def verify_base(request, caller, lite):
+    items = request.get('input', [])
+    if lite:
+        prefix = int(bool(items) and items[0].get('type') == 'additional_tools')
+        wanted = {'type': 'message', 'role': 'developer',
+                  'content': [{'type': 'input_text', 'text': caller['base']}]}
+        require('instructions' not in request and len(items) > prefix and comparable(items[prefix]) == wanted,
+                'context', 'Actual advisor request omitted, changed, or reordered caller base instructions.')
+        return prefix + 1
+    require(request.get('instructions') == caller['base'],
+            'context', 'Actual advisor request omitted or changed caller base instructions.')
+    return 0
+
+
+def verify_history(request, caller, omit_image_detail=False, start=0):
     source = iter(enumerate(caller['items']))
     index, wanted = next(source, (0, None))
-    for item in request.get('input', []):
+    last = start - 1
+    for position, item in enumerate(request.get('input', [])):
+        if position < start:
+            continue
         if wanted is not None and (comparable(item) == comparable(wanted) or
                                   (omit_image_detail and comparable(item) == comparable(wanted, True))):
+            last = position
             index, wanted = next(source, (index + 1, None))
     if wanted is not None:
         raise Failure('context', 'Actual advisor request omitted or changed effective caller history.',
                       details={'sourceIndex': index, 'itemType': wanted['type'],
                                'sourceItems': len(caller['items']), 'requestItems': len(request.get('input', []))})
+    return last
+
+
+def verify_guidance(request, history_end):
+    items = request.get('input', [])
+    wanted = {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}
+    require(len(items) > history_end + 1 and comparable(items[history_end + 1]) == wanted,
+            'context', 'Actual advisor request omitted, changed, or reordered consultation guidance.')
+    invocation = {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': INVOCATION}]}
+    require(len(items) > history_end + 2 and comparable(items[history_end + 2]) == invocation,
+            'context', 'Actual advisor request omitted, changed, or reordered consultation invocation.')
 
 
 def verify_requests(root, thread, expected, caller):
@@ -476,7 +578,10 @@ def verify_requests(root, thread, expected, caller):
                         (inventories or request.get('tools') == []) and
                         all(item.get('tools') == [] for item in inventories),
                         'tools', 'Actual consultation request did not prove an empty tool set.')
-                verify_history(request, caller, model.get('use_responses_lite') is True)
+                lite = model.get('use_responses_lite') is True
+                start = verify_base(request, caller, lite)
+                history_end = verify_history(request, caller, lite, start)
+                verify_guidance(request, history_end)
             except Failure as error:
                 error.actual = actual
                 raise
@@ -508,7 +613,7 @@ def execute(home, caller, expected, cancel):
                     {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}]})
                 started_turn = server.call('turn/start', {'threadId': thread, 'model': expected['model'],
                                            'effort': expected['effort'], 'outputSchema': SCHEMA,
-                                           'input': [{'type': 'text', 'text': 'Return process consultation for the caller now.'}]})
+                                           'input': [{'type': 'text', 'text': INVOCATION}]})
                 advice = completion(server, thread, started_turn['turn']['id'])
             finally:
                 server.close()
@@ -526,11 +631,14 @@ def execute(home, caller, expected, cancel):
                 execution_error.actual = actual
         if execution_error is not None:
             raise execution_error
+        check_cancel(cancel, deadline)
         return {'status': 'succeeded', **advice, 'actual': actual, 'expected': expected,
                 'advisorThreadId': thread, 'callerThreadId': caller['thread']}
 
 
 if __name__ == '__main__':
+    if len(sys.argv) >= 3 and sys.argv[1] == '--linux-child':
+        sys.exit(supervise_linux(sys.argv[2:]))
     # The parent assigns this blocked helper to a job before native code can
     # spawn descendants. One unbuffered byte leaves JSON-RPC stdin untouched.
     if len(sys.argv) < 3 or sys.argv[1] != '--job-child' or os.read(0, 1) != b'G':

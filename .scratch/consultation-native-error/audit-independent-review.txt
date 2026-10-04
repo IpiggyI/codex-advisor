@@ -1,0 +1,22 @@
+椰椰，`READINESS`：`ready`。当前 16 文件的本地修复可交付；结论不包含发布、真实安装更新或既有会话恢复。
+
+`FINDINGS`：没有确认需要返工的实质缺陷。已读取完整跟踪差异及六个新增文件，审查认证转发、错误脱敏、请求完整性、取消和进程清理、持久失败计数。新增检查能够检出旧实现的对应缺陷。
+
+`VERIFICATION`：
+
+- 独立执行 `git diff --check`、12 个 Python AST 和清单 JSON 检查，全部通过。三项文档检查分别通过 66、41、3 项。
+- 审查前后，16 文件均匹配[交付快照](/home/hyy/develop/personal/GitHub/codex-advisor/.scratch/consultation-native-error/audit-review-snapshot.json)。
+- 核对 [WSL 全套日志](/home/hyy/develop/personal/GitHub/codex-advisor/.scratch/consultation-native-error/audit-final-wsl-with-limits.log)：139 项边界中 131 通过、8 项按平台跳过；生命周期、存储、原生执行、Linux 后代检查全部通过。
+- 核对 [Windows 最终批次](/home/hyy/develop/personal/GitHub/codex-advisor/.scratch/consultation-native-error/audit-limits-windows-summary.json)：5 项存储、139 项边界、3 项完整链全部通过。复用的生命周期、原生执行和真实宿主检查，其相关源码及测试摘要与当前交付一致。
+- 核对原始认证对照、各组失败复现日志、960 次并发操作结果及两侧真实认证完整链结果。没有重跑真实模型调用或会修改状态的集成检查。
+
+`GAPS`：真实安装更新和既有会话重新加载未验证；非 Lite 格式缺少真实宿主认证；其他 POSIX 平台、文件系统、认证变量及声明排除的历史类型没有覆盖。上述限制已记录在[验收记录](/home/hyy/develop/personal/GitHub/codex-advisor/.scratch/consultation-native-error/acceptance.md:147)。本次审查没有修改文件、配置、计数或用户进程。
+
+<oai-mem-citation>
+<citation_entries>
+MEMORY.md:298-299|note=[kept original counters and installed-session evidence boundaries distinct]
+</citation_entries>
+<rollout_ids>
+01a10258-a72d-7190-b5cf-c5201bdea381
+</rollout_ids>
+</oai-mem-citation>

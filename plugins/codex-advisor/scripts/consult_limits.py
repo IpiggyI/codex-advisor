@@ -1,7 +1,9 @@
 """Persist cumulative consultation failures for each host thread."""
 
 from contextlib import closing
+import os
 import sqlite3
+import tempfile
 
 from consult_context import Failure
 
@@ -10,16 +12,34 @@ STOP_CALLING = ('Stop calling process_consultation in this thread. '
                 'Report consultation as unavailable and continue authorized work and required checks.')
 
 
+def initialize_database(path):
+    if path.exists():
+        return
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.consultation-failures-', delete=False) as pending:
+        name = pending.name
+    try:
+        with closing(sqlite3.connect(name, timeout=5)) as database, database:
+            database.execute('CREATE TABLE failures ('
+                             'thread TEXT PRIMARY KEY, count INTEGER NOT NULL CHECK(count BETWEEN 1 AND 4))')
+        try:
+            # Publish the complete schema without replacing another initializer's database.
+            os.link(name, path)
+        except FileExistsError:
+            pass
+    finally:
+        os.unlink(name)
+
+
 def failure_count(home, thread, failed=False):
     path = home / 'codex-advisor/consultation-failures.sqlite3'
     try:
         if not failed and not path.exists():
             return 0
         path.parent.mkdir(parents=True, exist_ok=True)
+        if failed:
+            initialize_database(path)
         with closing(sqlite3.connect(path, timeout=5)) as database, database:
             if failed:
-                database.execute('CREATE TABLE IF NOT EXISTS failures ('
-                                 'thread TEXT PRIMARY KEY, count INTEGER NOT NULL CHECK(count BETWEEN 1 AND 4))')
                 database.execute('INSERT INTO failures VALUES (?, 1) ON CONFLICT(thread) DO UPDATE '
                                  'SET count = MIN(count + 1, ?)', (thread, FAILURE_LIMIT))
             row = database.execute('SELECT count FROM failures WHERE thread = ?', (thread,)).fetchone()

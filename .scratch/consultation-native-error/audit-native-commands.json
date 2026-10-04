@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "command": "python3 -B tests/verify-consultation-native.py",
+      "phase": "red",
+      "exitStatus": 1,
+      "log": "audit-native-red.log",
+      "result": "14 methods, 28 failures including subtests; four packet defects reproduced"
+    },
+    {
+      "command": "python3 -B tests/verify-consultation-native.py NativeRequest.test_fixed_invocation_has_exact_content_role_and_position NativeRequest.test_native_retry_suffix_keeps_the_fixed_invocation_before_assistant_message",
+      "phase": "red-invocation",
+      "exitStatus": 1,
+      "log": "audit-native-red.log",
+      "result": "2 methods, 8 failing subtests; missing, changed, wrong-role, or reordered invocation accepted before its gate"
+    },
+    {
+      "command": "python3 -B tests/verify-consultation-native.py",
+      "phase": "green",
+      "exitStatus": 0,
+      "log": "audit-native-green.log",
+      "result": "16 tests passed"
+    },
+    {
+      "command": "python3 -B tests/verify-consultation.py Boundary.test_outcome_lost_base Boundary.test_outcome_changed_base Boundary.test_outcome_base_role Boundary.test_outcome_base_reordered Boundary.test_outcome_nonlite_plan Boundary.test_outcome_nonlite_lost_base Boundary.test_outcome_nonlite_changed_base Boundary.test_outcome_lost_guidance Boundary.test_outcome_changed_guidance Boundary.test_outcome_guidance_role Boundary.test_outcome_guidance_reordered Boundary.test_outcome_lost_invocation Boundary.test_outcome_changed_invocation Boundary.test_outcome_invocation_role Boundary.test_outcome_invocation_reordered Boundary.test_outcome_lost_context Boundary.test_outcome_changed_context Boundary.test_outcome_changed_text Boundary.test_context_failure_locates_first_difference Boundary.test_outcome_retry_event Boundary.test_outcome_wrong_error_thread Boundary.test_cancellation_terminates_tree Boundary.test_parent_exit_does_not_hide_descendant",
+      "phase": "green",
+      "exitStatus": 0,
+      "log": "audit-native-fixture-green.log",
+      "result": "23 tests passed"
+    },
+    {
+      "command": "python3 -B tests/verify-consultation-host.py",
+      "phase": "green",
+      "exitStatus": 0,
+      "log": "audit-native-host-green.log",
+      "result": "8 real-host tests passed against an unauthenticated loopback endpoint"
+    },
+    {
+      "command": "git diff --check -- plugins/codex-advisor/scripts/consult_native.py tests/fixtures/consult-codex.py tests/verify-consultation.py",
+      "phase": "green",
+      "exitStatus": 0,
+      "result": "No whitespace errors"
+    }
+  ]
+}

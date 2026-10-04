@@ -54,8 +54,17 @@ The component reads exactly one rollout snapshot matching the caller identity in
 the MCP metadata and stops before the unfinished consultation item, including when
 that item is the host's code-mode wrapper. The caller's tool inventory is not
 forwarded. The server applies the routing profile's consultation mapping to the
-caller's host-recorded dial. The component uses native Codex authentication and
-never reads, copies, or transmits credentials.
+caller's host-recorded dial. The component uses native Codex authentication. It
+does not parse credential values or copy credential files.
+
+Native MCP startup filters the host environment. The plugin's `.mcp.json`
+explicitly forwards `S2A_API_KEY` through `env_vars` for providers whose `env_key`
+uses that name. The host process must already have the variable. Other provider
+environment names require an explicit declaration in the source manifest and a
+plugin update; they are not discovered from provider configuration or inherited
+automatically. Do not store credential values in the manifest, add wildcard
+inheritance, or patch the managed plugin cache. Native file/keyring authentication
+continues to use the configured Codex home.
 
 The routing profile maps host modes to comparison efforts. The current `ultra`
 mode compares as `xhigh`. Qualified `retained_context` events are model-invisible
@@ -73,8 +82,10 @@ Every actual inference request must prove the expected model and effort, an empt
 `additional_tools.tools` or explicit top-level `tools=[]`, and no nonempty tool
 inventory at either location. The temporary catalog sizes the tool-output byte
 limit from the actual caller history so injection cannot shorten an existing result.
-Every request must also retain the complete caller history in order; silent
-automatic compaction is a context failure. Comparison permits removal of empty
+Every request must also retain the caller's base instructions, complete history,
+consultation guidance, and final consultation request in order. Base instructions
+must be in the top-level instruction field or the leading developer message;
+silent automatic compaction is a context failure. Comparison permits removal of empty
 text blocks from tool results and transport-only item fields. When the selected
 native catalog enables `use_responses_lite`, comparison also permits omission of
 the supported image `detail` hints (`auto`, `high`, and `original`) from messages
@@ -91,7 +102,10 @@ observed request matched `expected` and `actual` model/effort. The result includ
 `isError=true`, carries `code`, `message`, `expected`, and `actual` where observed;
 it contains no advice. Optional `details` locate the failing record or history
 item and retain qualified native error codes and HTTP status without copying
-history or native error text. Text content leads with readable advice or the
+history or arbitrary native error text. A qualified missing-environment error
+also reports `reason=missing_environment_variable`, the bounded variable name in
+`environmentVariable`, and an instruction to forward it through MCP `env_vars`.
+No variable value is returned. Text content leads with readable advice or the
 failure reason; `structuredContent` carries the machine-readable outcome.
 
 Calls with a qualified host thread identity report `failureCount` and
@@ -105,6 +119,10 @@ Counts are stored atomically by thread ID in
 `$CODEX_HOME/codex-advisor/consultation-failures.sqlite3`. The file contains only
 thread IDs and bounded counts. Resuming a thread or restarting its MCP process keeps
 the limit; another thread, including a child thread, has an independent count.
+The initial schema is built in a private sibling file and published through an
+atomic hard link, so concurrent readers cannot observe a partly initialized database.
+An existing database is never replaced or repaired. Unsupported atomic publication
+returns `failure_state`; the private initialization file is removed after the attempt.
 The MCP tool declares `readOnlyHint=false` because failed calls update this state.
 Calls whose cache layout or host identity cannot be qualified disable consultation
 without assigning a counter to an unverified thread. Unavailable or malformed
@@ -116,7 +134,10 @@ mismatches all end in that failure result. Native `willRetry=true` notifications
 wait for the same turn's terminal result within the existing deadline. The
 component starts no additional consultation attempt. Failed inference also checks
 available request traces to report observed model and effort. MCP
-cancellation terminates the native process tree and returns failure. The native
+cancellation terminates the native process tree and returns failure. Cancellation
+and deadlines remain effective while writing to a blocked native input pipe and
+while consuming buffered completion events. Completed MCP requests release their
+registry entries, and only active duplicate request IDs are refused. The native
 execution deadline is 180 seconds. Catalogs, request traces, captured outputs,
 logs, and native SQLite state stay in one temporary directory and are deleted when
 the call finishes or is cancelled. Only the bounded failure counters persist. The
@@ -127,6 +148,13 @@ executable in the official npm package layout beside the discovered Codex shim.
 It does not execute `.cmd` wrappers with configuration arguments. Windows Job
 Objects contain the native process tree; unavailable or failed containment and
 cleanup APIs return an explicit failure.
+
+On Linux, a dedicated child subreaper owns each native process and reaps descendants
+even when they leave the original process group. Shutdown terminates the native
+process before closing a blocked input pipe. The supervisor allows ten seconds
+for descendant cleanup; its caller allows twelve seconds for supervisor exit and
+reports an explicit failure if cleanup cannot be established. Other POSIX platforms
+use process-group cleanup; descendants that detach from the group are not contained.
 
 The two-stage isolation adds one native initialization per call. Normal caller
 startup must already have initialized its Codex home; consultation does not
@@ -139,7 +167,19 @@ available for real request construction against an unauthenticated loopback
 endpoint. It covers long function/custom-tool results, empty text blocks, image
 detail normalization in user messages and both tool-result types, and
 recovery after a completed message precedes a stream failure, in a temporary home
-without contacting a model provider.
+without contacting a model provider. It also checks that a missing provider
+environment variable produces a specific diagnostic before any HTTP request.
+
+Run `python3 tests/verify-consultation-env.py` for changes to `.mcp.json` or native
+launch. It installs a disposable local marketplace/plugin and starts its MCP
+server through the real native host, using inert marker values. The check proves
+that undeclared provider variables are filtered, the shipped declaration forwards
+the required variable, and an unrelated variable stays excluded. It also exercises
+the complete host-to-MCP-to-native consultation chain, using the host's own metadata
+and rollout, and checks that the returned advice and temporary-state cleanup survive
+the return path. Directly starting the Python MCP script does not exercise this host
+environment boundary. These loopback checks establish no authenticated consultation
+in an existing desktop session.
 
 ## Hooks
 
@@ -211,7 +251,10 @@ The runtime group drives the inspector from all seventeen templates and covers i
 options, template-derived expectations, rejection paths, and emitted metadata.
 The consultation group exercises the MCP boundary with a substitute native
 executable: complete context, routing, actual request validation, isolation,
-outcomes, explicit failures, cancellation, and temporary-state cleanup. The hooks
+outcomes, explicit failures, cancellation, and temporary-state cleanup. Separate
+lifecycle checks cover request-ID reuse, malformed cancellation, native input
+backpressure, buffered completion, and process startup failure. Linux checks also
+cover detached descendants before and after their native parent exits. The hooks
 group runs shipped commands with pinned JSON events, checking canonical injection,
 delegate exclusion, all entry dials with the confirmation line on a match, delayed
 child evidence, and explicit pending outcomes. Every surfacing case, confirmation

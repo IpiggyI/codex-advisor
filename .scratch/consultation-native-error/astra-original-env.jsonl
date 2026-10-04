@@ -1,0 +1,36 @@
+{"pid": 38756, "keyPresent": false, "codexHome": null, "codexExe": "C:\\Users\\Shy\\AppData\\Local\\Codey\\codex-runtime\\ef136ab93f4ff3f4\\codex.exe", "codexShim": "C:\\Users\\Shy\\AppData\\Local\\Codey\\codex-runtime\\ef136ab93f4ff3f4\\codex.EXE", "environmentNames": []}
+{
+  "thread": "01a10778-eeee-72c1-89f3-dcba3cc85770",
+  "sourceSha256": "f55592ec62d5ea92323273e1c3404b903b76131c6d132564545d7c90cf3ce7b0",
+  "boundaryLine": 29,
+  "nativeErrors": [
+    {
+      "keys": [
+        "message",
+        "codexErrorInfo",
+        "additionalDetails",
+        "misalignment"
+      ],
+      "length": 135,
+      "terms": [
+        "Missing environment variable",
+        "S2A_API_KEY"
+      ],
+      "messageShape": "WORD WORD WORD: `WORD2WORD`."
+    }
+  ],
+  "platform": "nt",
+  "sourceItems": 14,
+  "expected": {
+    "model": "gpt-6-astra",
+    "effort": "high"
+  },
+  "status": "failed",
+  "code": "executor",
+  "message": "Native consultation reported an inference error.",
+  "details": {
+    "nativeCode": "other",
+    "requestVerification": "trace"
+  },
+  "actual": null
+}

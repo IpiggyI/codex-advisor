@@ -3,7 +3,8 @@
     "codex_advisor": {
       "command": "sh",
       "args": ["./scripts/run-python.sh", "./scripts/process-consultation.py"],
-      "cwd": "."
+      "cwd": ".",
+      "env_vars": ["S2A_API_KEY"]
     }
   }
 }

@@ -1,0 +1,21 @@
+{
+  "baseline": "255734c0ebe39bc8a3830af6a0e237cbc24979f1",
+  "files": {
+    "README.md": "4530986e45d5a96df009cb29537574ebc3f5c7fa54deabd3af7a18ebb722f60e",
+    "docs/agents/plugin-maintenance.md": "153cb05e573225380096d4c599f9a33aef168bace4edfebc8aa79c54d4fb970d",
+    "plugins/codex-advisor/.mcp.json": "85b0cb14be64e7bd7dc714edb1e5f23bab5dc3a18b22ae04ba60cd319555fa0e",
+    "plugins/codex-advisor/scripts/consult_native.py": "2ecc2be3676a8bbb5869ae2cf2003944df723fc3e6f837b4d65e274ef3608192",
+    "plugins/codex-advisor/scripts/process-consultation.py": "262fba3205300248d19bb788e58f0612a005f171c5466872c889e62526d9d379",
+    "tests/fixtures/consult-codex.py": "6b92c4334fab2488b75ba602d6439242a8f2bb76667d2cc2513e397f3524c488",
+    "tests/verify-consultation-host.py": "9278379c4a831a3a2031d7db1add9bbac95cfc057d6ebc04888c7952973d6cef",
+    "tests/verify-consultation.py": "1a2103b975d81cced2a40f675ea0c991da68b58b1d41c1dafef21e2a205da9d6",
+    "tests/verify.sh": "43f439c23fa5fb612f46d5267b37c5a3c7e006fd3033e0be02d0111bd68ae567",
+    "plugins/codex-advisor/scripts/consult_process.py": "e67f1c6a614a88d10c7e0a270adaad832440db7beabca07a2228e4b98881014b",
+    "tests/verify-consultation-env.py": "f1e99a422a495df34c5f87d2ef14980bd54527180c8604cb36c33b454eb7feca",
+    "tests/verify-consultation-lifecycle.py": "206a98fba7ddc1f559249cf1e1c94d60607f61f38c55b6468ba6d8bf6f351584",
+    "tests/verify-consultation-native.py": "4a82236e2022c18543b1730dea6b12aa9579d2fd546b2aee03f2841b663491e1",
+    "tests/verify-consultation-process.py": "470bd2f782b2b6992a96c1ea5cf9789fad9440f6119fc900db3faed63c776005",
+    "plugins/codex-advisor/scripts/consult_limits.py": "54b98e79945114db0b0f6956c5e75bd2268daea992fa3329046644592fc85e8b",
+    "tests/verify-consultation-limits.py": "7361e0dbb96a1d76e88be186fa3183cd1debeacfff135be0b09c982e5870d5ce"
+  }
+}

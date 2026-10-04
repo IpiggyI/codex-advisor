@@ -1,0 +1,23 @@
+{
+  "sourceRollout": "/home/hyy/.codex/sessions/2026/10/04/rollout-2026-10-04T23-53-00-01a1079e-58d4-7e50-81c6-0f4e17fb1887.jsonl",
+  "sourceLine": 318,
+  "timestamp": "2026-10-04T16:13:28.395Z",
+  "exitCode": 0,
+  "result": {
+    "thread": "01a10780-aef2-7b33-8e9c-fefebfb58f70",
+    "sourceSha256": "89bb39b5c7485ca0a957e6101e66980820a01c6348937e0fb73b4654eb44035f",
+    "boundaryLine": 31,
+    "nativeErrors": [],
+    "platform": "nt",
+    "sourceItems": 15,
+    "expected": {
+      "model": "gpt-6.1-sol",
+      "effort": "medium"
+    },
+    "status": "succeeded",
+    "actual": {
+      "model": "gpt-6.1-sol",
+      "effort": "medium"
+    }
+  }
+}

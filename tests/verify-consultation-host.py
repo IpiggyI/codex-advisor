@@ -3,16 +3,19 @@
 
 import http.server
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
 import threading
 import unittest
+import uuid
 
 sys.dont_write_bytecode = True
 PLUGIN = Path(__file__).resolve().parent.parent / 'plugins/codex-advisor'
 sys.path.insert(0, str(PLUGIN / 'scripts'))
 from consult_native import execute
+from consult_context import Failure
 
 ADVICE = '保留全部上下文。'
 EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
@@ -129,6 +132,24 @@ class NativeHistory(unittest.TestCase):
         config.write_text(config.read_text(encoding='utf-8').replace(
             'stream_max_retries = 0', 'stream_max_retries = 1'), encoding='utf-8')
         self.assertEqual(self.consult('RETAINED_OUTPUT', request_count=2), 'RETAINED_OUTPUT')
+
+    def test_missing_environment_variable_fails_before_request(self):
+        name = 'CA_MISSING_ENV_' + uuid.uuid4().hex.upper()
+        self.assertNotIn(name, os.environ)
+        with (self.home / 'config.toml').open('a', encoding='utf-8') as config:
+            config.write('env_key = "' + name + '"\n')
+        caller = {'base': 'Keep the caller history intact.', 'thread': 'local-test', 'items': [
+            {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': 'RETAINED_CONTEXT'}]}]}
+        with self.assertRaises(Failure) as raised:
+            execute(self.home, caller, EXPECTED, threading.Event())
+        error = raised.exception
+        self.assertEqual(self.endpoint.requests, [])
+        self.assertEqual(error.code, 'executor')
+        self.assertIsNone(error.actual)
+        self.assertEqual(error.details, {'nativeCode': 'other', 'reason': 'missing_environment_variable',
+                                        'environmentVariable': name, 'requestVerification': 'trace'})
+        self.assertIn(name, str(error))
+        self.assertIn('env_vars', str(error))
 
 
 if __name__ == '__main__':

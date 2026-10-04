@@ -1,0 +1,10 @@
+{
+  "README.md": "1f1032dbc078259c2aff6469d25d4fedc8062cb85e509598d28cff83e0af20ca",
+  "docs/agents/plugin-maintenance.md": "c6b585762603469c92888a83e4f27bdd9f3413174959f55a316891ee7723a101",
+  "plugins/codex-advisor/.mcp.json": "85b0cb14be64e7bd7dc714edb1e5f23bab5dc3a18b22ae04ba60cd319555fa0e",
+  "plugins/codex-advisor/scripts/consult_native.py": "ba0209cd5d01071bd9841bf783e6b6a02428ce62cfeee9cac67ae5dca37bed10",
+  "tests/fixtures/consult-codex.py": "b9bd5b67c5578511c16d6d4c3085ce1069f86a90cfcb70b3e8c18c143ae60144",
+  "tests/verify-consultation-host.py": "9278379c4a831a3a2031d7db1add9bbac95cfc057d6ebc04888c7952973d6cef",
+  "tests/verify-consultation.py": "f7c175b586ddf4bc13c5c99b4421f4d004b6adc102cc88b018765c80ff67dca0",
+  "tests/verify-consultation-env.py": "23c1700866675a85714e89b96e03154f0994284b261fa67da9bbba37f3cd8d31"
+}
