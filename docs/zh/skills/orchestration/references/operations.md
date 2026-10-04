@@ -1,6 +1,6 @@
 # Native 操作
 
-每次新的 native spawn 之前阅读本文件，包括为 independent acceptance 派发 Advisor。
+每次原生派发之前阅读本文件，包括独立验收派发；向已有线程送入工作之前也要阅读。
 
 ## 检查入口
 
@@ -19,21 +19,43 @@ Explorer 和 Advisor 入口也可以在不加载 skill 的情况下调用；仅�
 
 ## 派发
 
-使用 native spawn 接口，带新上下文；Explorer 调用总是开启新线程。入口把 effort 留给调用方时传入 `reasoning_effort`；钉死的入口不传。每次全新 spawn 都把 `task_name` 设为一个能与兄弟线程区分的短名称。`message` 的第一行是同一名称，原文纯文本、不加 Markdown 标记，空一行，再接角色数据包：
+使用原生派发接口，带新上下文；探索调用总是开启新线程。入口把推理强度留给调用方时传入 `reasoning_effort`；固定强度的入口不传。每次全新派发都把 `task_name` 设为一个能与兄弟线程区分的短名称。`message` 的第一行是同一名称，原文纯文本、不加 Markdown 标记，空一行，写下述路由声明，再空一行，接角色数据包：
 
 ~~~text
 agent_type: ca_worker_crux_m
 fork_turns: none
-reasoning_effort: <listed-effort>
 task_name: wire_http_checks
-message: <短名称，空一行，再接 role-contracts.md 中的五段 worker 数据包>
+message: <短名称，空一行，路由行，空一行，五段工作代理数据包>
 ~~~
 
 按所选角色替换入口、effort、短名称和数据包。对不含复制会话的显式数据包使用 `fork_turns: none`；每次 spawn 传入的 `model` 和 `reasoning_effort` 只有在它之下才生效。对调用方选择的入口，始终传入 routing profile 中列出的某个 effort，即使是默认值；否则宿主继承可能替你选。模板的 `model` 和 `model_reasoning_effort` 优先于 spawn 时传入的值，所以钉死的入口无法到达另一个 effort。不要通过编辑入口文件或 primary 设置来调整 effort。已安装入口只由安装器写入；不要手工编辑。
 
+## 声明每次路由
+
+使用下列单行格式。角色、档位、型号和单个推理强度取自路由配置：
+
+~~~text
+Route: role=<角色> tier=<档位> dial=<型号>[<强度>] basis=<种类> ref=<证据引用>
+~~~
+
+`mainstay` 省略 `basis` 和 `ref`。其他档位需要非空引用，并从下表选取依据种类：
+
+| 角色 | `crux` 依据 | `rescue` 依据 |
+|---|---|---|
+| 工作代理或探索代理 | `key-difficulty`、`failure`、`user-declaration` | `failure`、`user-declaration` |
+| 验收顾问 | `acceptance-mapping`、`user-declaration` | `acceptance-mapping`、`user-declaration` |
+
+`key-difficulty` 引用已识别的约束；`failure` 引用失败尝试及诊断；`user-declaration` 引用用户声明；`acceptance-mapping` 引用验收范围和路由配置中的映射。仅声明型号不授权 `rescue`。独立验收按其映射选档，即使这是该顾问的第一次调用。
+
+向工作线程调用 `followup_task` 或 `send_message` 时，`message` 从路由行开始，空一行，再接数据包或修正。两种调用之前都检查[续用窗口](recovery.md#保留或更换线程)；新工单还需写明共享区域以及确实需要已有上下文的原因。目标可用 UUID、规范任务路径或相对任务路径。钩子要求目标在调用者所属宿主会话中唯一匹配；无法解析或存在歧义时拒绝。探索调用和独立验收使用新线程。发给已识别的主代理或非插件入口的消息不需要路由。
+
+`PreToolUse` 钩子拒绝缺失或格式错误的声明、入口与档位或拨盘冲突、未列出的强度、错误依据种类，以及超窗或缺少有效宿主证据的工作线程续用。检查通过时输出路由确认。程序核对依据格式；依据真假、任务适配、用户授权和所选档位是否为最低兼容档位，由调用者对照任务记录判断。钩子从目标会话记录读取实际拨盘和活动时间，不写持久状态。
+
 ## 读取派发检查
 
 `PostToolUse` 钩子把每个 `ca_*` 派发与其随插件发布的模板中的模型和钉死 effort 比较，或与调用方明确传入的 effort 比较；钉死的 effort 优先于 spawn 参数。它还对照宿主记录检查子线程的角色、父级、会话和任务路径。匹配时，钩子向发起 spawn 的会话添加一行确认：身份、模型和 effort 与宿主记录一致，工作目录和权限未检查。缺少调用方 effort、设置不匹配，或证据缺失或冲突时，钩子添加一条消息，说明受影响工作保持待定。派发到任何其他入口都不会收到消息。对 `ca_*` 派发而言，没有消息表示钩子没有运行，例如因为它未被信任；该派发属于未检查，而不是已核验。
+
+路由确认和实际拨盘确认分别证明不同事实。检查器通过不能证明调用前的路由检查已执行。缺少路由确认时，手动检查声明和准入条件，并把自动阻断标为未核实。新增或变更的钩子需要用户在 `/hooks` 中评审信任。被跳过或执行失败的钩子不能保证阻断。
 
 ## 核验路由证据
 

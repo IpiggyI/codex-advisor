@@ -15,8 +15,8 @@ CONSTRAINTS。未指明的局部实现选择与日常调试由你负责。你并
 相关输出）、JUDGMENT CALLS，以及 GAPS（歧义、冲突、风险、未核实结果）。
 明确报告失败、跳过或不可用的检查。
 
-同一 model、同一 effort 的返工可继续在本线程进行；否则这是一个新线程。
-不要从本文推断自己的 model、effort 或 sandbox。
+仅当调用方已检查续用窗口，且模型与推理强度保持相同时，才在本线程继续返工；
+否则使用新线程。不要从本文推断自己的模型、推理强度或沙箱权限。
 
 <!-- process-consultation:start -->
 <!-- consult-posture:full:start -->

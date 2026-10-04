@@ -15,15 +15,16 @@ Diagnose environment problems, missing facts, contract gaps, reasoning failures,
 and executor suitability before choosing repair, clarification, or a ladder step.
 Repair environment problems first. A contract gap (unclear expected behavior,
 conflicting requirements, a reserved interface) is a corrected contract on the
-same thread, not a ladder step and not a capability failure. Environment problems
-and contract gaps do not move work along the path below. Primary takeover is
+same dial, reusing the thread only inside the window below. It is not a ladder
+step or a capability failure. Environment problems and contract gaps do not move
+work along the path below. Primary takeover is
 available in ordinary work; Architect mode keeps edits delegated.
 
 ## Climb the escalation ladder
 
-After a failed acceptance, issue R1: a rework ticket in the same thread at the
-same dial. Rework names the violated requirement, reproducible failure, expected
-behavior, and verification; it contains no fix, and structural preference alone
+After a failed acceptance, issue R1: a rework ticket at the same dial, in the
+same thread only inside the window below. Rework names the violated requirement,
+reproducible failure, expected behavior, and verification; it contains no fix, and structural preference alone
 does not justify it. When rework also fails and the diagnosis attributes the cause
 to capability, the attempt and rework together count as one capability failure.
 
@@ -43,13 +44,24 @@ capability failure.
 
 ## Keep or replace the thread
 
-Same-model, same-effort worker rework may continue its thread through native
-follow-up, which keeps the thread's `task_name`. Every delegated effort change,
-upward or downward, requires a new native thread with explicit settings; model
-changes and role reassignments also require new matching entries. A resumed thread
-with a different requested effort does not satisfy this policy, and a resume with
-a changed prompt is never reported as a new session. This is an explicit lifecycle
-policy, not a universal claim about cache behavior or savings.
+The reuse window is 30 minutes from the worker thread's latest host-recorded
+activity. Read the timestamp from its session transcript; a missing, invalid,
+future, or older timestamp requires a fresh thread. The exact 30-minute boundary
+is inside the window. This is a lifecycle policy, not a measured cache lifetime.
+
+Rework, corrected contracts, continuations after an interruption, and new tickets
+all use this window. Reuse also requires the same role, model, and effort. New
+tickets additionally require the same area and a concrete need for shared context;
+record both in the task packet. Explorer calls and independent acceptance always
+start fresh threads.
+
+Use native follow-up within the window and retain `task_name`. Outside it, start
+a new thread at the same tier and dial with the original contract, defect evidence,
+previous report, and verification receipts. Changing threads preserves capability
+failure history and does not advance the escalation ladder. Every effort change, model change, or role
+reassignment requires a new matching entry and explicit settings. A changed prompt
+on a reused thread is not a new session. Follow the route checks in
+[operations.md](operations.md) for both fresh and reused threads.
 
 ## Hand off actual state
 

@@ -1,0 +1,434 @@
+[
+  {
+    "approval": "never",
+    "exit": 0,
+    "hooks": [
+      {
+        "session_id": "01a10860-67ca-7212-badd-49aee9ed453e",
+        "turn_id": "01a10860-6800-7110-8152-98a2f2d39584",
+        "transcript_path": "/tmp/ca-route-host-zh8al7qg/home/sessions/2026/10/05/rollout-2026-10-05T03-24-58-01a10860-67ca-7212-badd-49aee9ed453e.jsonl",
+        "cwd": "/tmp/ca-route-host-zh8al7qg/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationspawn_agent",
+        "tool_input": {
+          "agent_type": "ca_worker_crux_m",
+          "fork_turns": "none",
+          "task_name": "denied",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_0"
+      },
+      {
+        "session_id": "01a10860-67ca-7212-badd-49aee9ed453e",
+        "turn_id": "01a10860-6800-7110-8152-98a2f2d39584",
+        "transcript_path": "/tmp/ca-route-host-zh8al7qg/home/sessions/2026/10/05/rollout-2026-10-05T03-24-58-01a10860-67ca-7212-badd-49aee9ed453e.jsonl",
+        "cwd": "/tmp/ca-route-host-zh8al7qg/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationspawn_agent",
+        "tool_input": {
+          "agent_type": "ca_worker_crux_m",
+          "fork_turns": "none",
+          "task_name": "allowed",
+          "message": "CHILD_PACKET"
+        },
+        "tool_use_id": "call_1"
+      },
+      {
+        "session_id": "01a10860-67ca-7212-badd-49aee9ed453e",
+        "turn_id": "01a10860-6800-7110-8152-98a2f2d39584",
+        "transcript_path": "/tmp/ca-route-host-zh8al7qg/home/sessions/2026/10/05/rollout-2026-10-05T03-24-58-01a10860-67ca-7212-badd-49aee9ed453e.jsonl",
+        "cwd": "/tmp/ca-route-host-zh8al7qg/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationfollowup_task",
+        "tool_input": {
+          "target": "allowed",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_2"
+      },
+      {
+        "session_id": "01a10860-67ca-7212-badd-49aee9ed453e",
+        "turn_id": "01a10860-6800-7110-8152-98a2f2d39584",
+        "transcript_path": "/tmp/ca-route-host-zh8al7qg/home/sessions/2026/10/05/rollout-2026-10-05T03-24-58-01a10860-67ca-7212-badd-49aee9ed453e.jsonl",
+        "cwd": "/tmp/ca-route-host-zh8al7qg/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationsend_message",
+        "tool_input": {
+          "target": "allowed",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_3"
+      }
+    ],
+    "children": [
+      {
+        "meta": {
+          "id": "01a10860-6886-7482-9ac1-255ce317f67d",
+          "session_id": "01a10860-67ca-7212-badd-49aee9ed453e",
+          "parent_thread_id": "01a10860-67ca-7212-badd-49aee9ed453e",
+          "timestamp": "2026-10-04T19:24:58.374Z",
+          "cwd": "/tmp/ca-route-host-zh8al7qg/work",
+          "cli_version": "0.160.0",
+          "agent_path": "/root/allowed",
+          "agent_role": "ca_worker_crux_m"
+        },
+        "turns": 1,
+        "activity": [
+          {
+            "timestamp": "2026-10-04T19:24:58.399Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:24:58.404Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:24:58.447Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:24:58.454Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:24:58.458Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          }
+        ]
+      }
+    ],
+    "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a10860-67ca-7212-badd-49aee9ed453e\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"error\",\"message\":\"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"LOCAL_COMPLETE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":500,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":50,\"reasoning_output_tokens\":0}}\n",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-zh8al7qg/home\"))\nReading additional input from stdin...\n2026-10-04T19:24:58.334781Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationspawn_agent\n2026-10-04T19:24:58.447796Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationfollowup_task\n2026-10-04T19:24:58.501561Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationsend_message\n",
+    "outputs": [
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-685e-7e61-be96-b64cbe7a1491",
+        "call_id": "call_0",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationspawn_agent"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-68a2-7cb0-8eee-3ab44715b7ab",
+        "call_id": "call_1",
+        "output": "{\"task_name\":\"/root/allowed\"}"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-68cf-79d3-b50d-cdedf608e189",
+        "call_id": "call_2",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationfollowup_task"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-6905-7ff0-b0d6-dd793d747fc5",
+        "call_id": "call_3",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationsend_message"
+      }
+    ],
+    "verified": true
+  },
+  {
+    "approval": "on-request",
+    "exit": 0,
+    "hooks": [
+      {
+        "session_id": "01a10860-782d-7891-bb08-54ef75a48d5c",
+        "turn_id": "01a10860-7863-78d0-a225-68bbdbb94d18",
+        "transcript_path": "/tmp/ca-route-host-sph1yry3/home/sessions/2026/10/05/rollout-2026-10-05T03-25-02-01a10860-782d-7891-bb08-54ef75a48d5c.jsonl",
+        "cwd": "/tmp/ca-route-host-sph1yry3/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationspawn_agent",
+        "tool_input": {
+          "agent_type": "ca_worker_crux_m",
+          "fork_turns": "none",
+          "task_name": "denied",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_0"
+      },
+      {
+        "session_id": "01a10860-782d-7891-bb08-54ef75a48d5c",
+        "turn_id": "01a10860-7863-78d0-a225-68bbdbb94d18",
+        "transcript_path": "/tmp/ca-route-host-sph1yry3/home/sessions/2026/10/05/rollout-2026-10-05T03-25-02-01a10860-782d-7891-bb08-54ef75a48d5c.jsonl",
+        "cwd": "/tmp/ca-route-host-sph1yry3/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationspawn_agent",
+        "tool_input": {
+          "agent_type": "ca_worker_crux_m",
+          "fork_turns": "none",
+          "task_name": "allowed",
+          "message": "CHILD_PACKET"
+        },
+        "tool_use_id": "call_1"
+      },
+      {
+        "session_id": "01a10860-782d-7891-bb08-54ef75a48d5c",
+        "turn_id": "01a10860-7863-78d0-a225-68bbdbb94d18",
+        "transcript_path": "/tmp/ca-route-host-sph1yry3/home/sessions/2026/10/05/rollout-2026-10-05T03-25-02-01a10860-782d-7891-bb08-54ef75a48d5c.jsonl",
+        "cwd": "/tmp/ca-route-host-sph1yry3/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationfollowup_task",
+        "tool_input": {
+          "target": "allowed",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_2"
+      },
+      {
+        "session_id": "01a10860-782d-7891-bb08-54ef75a48d5c",
+        "turn_id": "01a10860-7863-78d0-a225-68bbdbb94d18",
+        "transcript_path": "/tmp/ca-route-host-sph1yry3/home/sessions/2026/10/05/rollout-2026-10-05T03-25-02-01a10860-782d-7891-bb08-54ef75a48d5c.jsonl",
+        "cwd": "/tmp/ca-route-host-sph1yry3/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationsend_message",
+        "tool_input": {
+          "target": "allowed",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_3"
+      }
+    ],
+    "children": [
+      {
+        "meta": {
+          "id": "01a10860-78e9-72e2-a39d-8c0a9ad02076",
+          "session_id": "01a10860-782d-7891-bb08-54ef75a48d5c",
+          "parent_thread_id": "01a10860-782d-7891-bb08-54ef75a48d5c",
+          "timestamp": "2026-10-04T19:25:02.569Z",
+          "cwd": "/tmp/ca-route-host-sph1yry3/work",
+          "cli_version": "0.160.0",
+          "agent_path": "/root/allowed",
+          "agent_role": "ca_worker_crux_m"
+        },
+        "turns": 1,
+        "activity": [
+          {
+            "timestamp": "2026-10-04T19:25:02.593Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:25:02.599Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:25:02.618Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:25:02.621Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:25:02.625Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          }
+        ]
+      }
+    ],
+    "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a10860-782d-7891-bb08-54ef75a48d5c\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"error\",\"message\":\"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"LOCAL_COMPLETE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":500,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":50,\"reasoning_output_tokens\":0}}\n",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-sph1yry3/home\"))\nReading additional input from stdin...\n2026-10-04T19:25:02.527370Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationspawn_agent\n2026-10-04T19:25:02.640225Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationfollowup_task\n2026-10-04T19:25:02.695707Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationsend_message\n",
+    "outputs": [
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-78bf-73c0-9f5c-5c971fcf9a14",
+        "call_id": "call_0",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationspawn_agent"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-7903-7872-bd86-86b45855f9a4",
+        "call_id": "call_1",
+        "output": "{\"task_name\":\"/root/allowed\"}"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-7930-7441-a85b-1061e3647b32",
+        "call_id": "call_2",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationfollowup_task"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-7967-7f13-9e69-029b90235f7b",
+        "call_id": "call_3",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationsend_message"
+      }
+    ],
+    "verified": true
+  },
+  {
+    "approval": "untrusted",
+    "exit": 1,
+    "hooks": [],
+    "children": [],
+    "stdout": "",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-y8b88ymn/home\"))\nError: approval_policy = \"untrusted\" is no longer supported; remove this setting\n",
+    "outputs": []
+  },
+  {
+    "approval": "on-failure",
+    "exit": 0,
+    "hooks": [
+      {
+        "session_id": "01a10860-8487-71f3-8f31-349addb544e4",
+        "turn_id": "01a10860-84c3-78c1-822e-539f692f4a72",
+        "transcript_path": "/tmp/ca-route-host-17ioe26_/home/sessions/2026/10/05/rollout-2026-10-05T03-25-05-01a10860-8487-71f3-8f31-349addb544e4.jsonl",
+        "cwd": "/tmp/ca-route-host-17ioe26_/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationspawn_agent",
+        "tool_input": {
+          "agent_type": "ca_worker_crux_m",
+          "fork_turns": "none",
+          "task_name": "denied",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_0"
+      },
+      {
+        "session_id": "01a10860-8487-71f3-8f31-349addb544e4",
+        "turn_id": "01a10860-84c3-78c1-822e-539f692f4a72",
+        "transcript_path": "/tmp/ca-route-host-17ioe26_/home/sessions/2026/10/05/rollout-2026-10-05T03-25-05-01a10860-8487-71f3-8f31-349addb544e4.jsonl",
+        "cwd": "/tmp/ca-route-host-17ioe26_/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationspawn_agent",
+        "tool_input": {
+          "agent_type": "ca_worker_crux_m",
+          "fork_turns": "none",
+          "task_name": "allowed",
+          "message": "CHILD_PACKET"
+        },
+        "tool_use_id": "call_1"
+      },
+      {
+        "session_id": "01a10860-8487-71f3-8f31-349addb544e4",
+        "turn_id": "01a10860-84c3-78c1-822e-539f692f4a72",
+        "transcript_path": "/tmp/ca-route-host-17ioe26_/home/sessions/2026/10/05/rollout-2026-10-05T03-25-05-01a10860-8487-71f3-8f31-349addb544e4.jsonl",
+        "cwd": "/tmp/ca-route-host-17ioe26_/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationfollowup_task",
+        "tool_input": {
+          "target": "allowed",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_2"
+      },
+      {
+        "session_id": "01a10860-8487-71f3-8f31-349addb544e4",
+        "turn_id": "01a10860-84c3-78c1-822e-539f692f4a72",
+        "transcript_path": "/tmp/ca-route-host-17ioe26_/home/sessions/2026/10/05/rollout-2026-10-05T03-25-05-01a10860-8487-71f3-8f31-349addb544e4.jsonl",
+        "cwd": "/tmp/ca-route-host-17ioe26_/work",
+        "hook_event_name": "PreToolUse",
+        "model": "gpt-6.1-sol",
+        "permission_mode": "bypassPermissions",
+        "tool_name": "collaborationsend_message",
+        "tool_input": {
+          "target": "allowed",
+          "message": "DENY_PACKET"
+        },
+        "tool_use_id": "call_3"
+      }
+    ],
+    "children": [
+      {
+        "meta": {
+          "id": "01a10860-8560-7a51-afc4-e20f1d01ce09",
+          "session_id": "01a10860-8487-71f3-8f31-349addb544e4",
+          "parent_thread_id": "01a10860-8487-71f3-8f31-349addb544e4",
+          "timestamp": "2026-10-04T19:25:05.760Z",
+          "cwd": "/tmp/ca-route-host-17ioe26_/work",
+          "cli_version": "0.160.0",
+          "agent_path": "/root/allowed",
+          "agent_role": "ca_worker_crux_m"
+        },
+        "turns": 1,
+        "activity": [
+          {
+            "timestamp": "2026-10-04T19:25:05.786Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:25:05.793Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:25:05.814Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:25:05.819Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:25:05.823Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          }
+        ]
+      }
+    ],
+    "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a10860-8487-71f3-8f31-349addb544e4\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"error\",\"message\":\"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"LOCAL_COMPLETE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":500,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":50,\"reasoning_output_tokens\":0}}\n",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-17ioe26_/home\"))\nReading additional input from stdin...\n2026-10-04T19:25:05.714517Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationspawn_agent\n2026-10-04T19:25:05.835377Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationfollowup_task\n2026-10-04T19:25:05.893498Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationsend_message\n",
+    "outputs": [
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-8532-7e80-9be5-26cf207573b4",
+        "call_id": "call_0",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationspawn_agent"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-857c-74b0-8029-ecd2c11dafb3",
+        "call_id": "call_1",
+        "output": "{\"task_name\":\"/root/allowed\"}"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-85ab-7c01-aea1-ea07523daa72",
+        "call_id": "call_2",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationfollowup_task"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a10860-85e5-7112-80d4-f33145dd99e2",
+        "call_id": "call_3",
+        "output": "Tool call blocked by PreToolUse hook: CA_PROBE_DENIED. Tool: collaborationsend_message"
+      }
+    ],
+    "verified": true
+  }
+]

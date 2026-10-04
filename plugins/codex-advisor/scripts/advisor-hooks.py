@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Inject canonical posture and verify native dispatches without writing state."""
+"""Inject posture, check routing before calls, and verify native dispatches."""
 
+from datetime import datetime, timezone
 import json
 from pathlib import Path
+import posixpath
 import re
 import sys
 import time
@@ -14,6 +16,9 @@ from consult_context import Failure, advisor_dial, load_profile
 PLUGIN = Path(__file__).resolve().parent.parent
 REFERENCES = PLUGIN / 'skills/orchestration/references'
 WAIT_SECONDS = 2
+REUSE_SECONDS = 30 * 60
+SPAWN = 'collaborationspawn_agent'
+CONTINUE = {'collaborationfollowup_task', 'collaborationsend_message'}
 
 
 class Pending(Exception):
@@ -155,18 +160,129 @@ def dispatch(event):
             'working directory and permissions were not checked.')
 
 
+def route_line(message, task=None):
+    require(isinstance(message, str), 'A route declaration is required in message.')
+    lines = message.splitlines()
+    if task is not None:
+        require(len(lines) >= 3 and lines[0] == task and not lines[1],
+                'Start message with task_name, a blank line, then Route:.')
+        lines = lines[2:]
+    match = re.fullmatch(r'Route: role=(worker|explorer|advisor) tier=(mainstay|crux|rescue) '
+                        r'dial=(gpt-[\w.-]+)\[([a-z]+)\]'
+                        r'(?: basis=([a-z-]+) ref=(\S[^\r\n]*))?', lines[0] if lines else '')
+    require(match is not None, 'A canonical Route: role=... tier=... dial=... line is required.')
+    return match.groups()
+
+
+def check_route(route, entry, dial):
+    role, tier, model, effort, basis, reference = route
+    require(entry.split('_')[1:3] == [role, tier], 'Route role or tier conflicts with the native entry.')
+    rows = load_profile(PLUGIN)[0]
+    require(entry in rows and rows[entry][0] == model and effort in rows[entry][1],
+            'The declared dial is outside this entry in the routing profile.')
+    require((model, effort) == dial, 'The declared dial conflicts with native settings or host evidence.')
+    if tier == 'mainstay':
+        require(basis is None, 'Mainstay routes omit basis and ref.')
+        return
+    allowed = ({'acceptance-mapping', 'user-declaration'} if role == 'advisor' else
+               {'failure', 'user-declaration'} | ({'key-difficulty'} if tier == 'crux' else set()))
+    require(basis in allowed and reference and reference.strip(),
+            'This role and tier require an allowed basis and nonempty ref: ' + ', '.join(sorted(allowed)) + '.')
+
+
+def target_thread(event, target):
+    require(isinstance(target, str) and target.strip(), 'A native target is required.')
+    path, meta = parent(event)
+    roots = [p for p in path.parents if p.name == 'sessions']
+    require(len(roots) == 1, 'The host transcript is outside the qualified sessions layout.')
+    caller_path = child_path(meta) or '/root'
+    task = posixpath.normpath(target if target.startswith('/') else caller_path + '/' + target)
+    matches = []
+    for candidate in roots[0].rglob('*.jsonl'):
+        try:
+            child = header(candidate)
+        except (OSError, ValueError, Pending):
+            continue
+        if child.get('session_id', child.get('id')) != event.get('session_id'):
+            continue
+        if child.get('id') == target or (child_path(child) or '/root') == task:
+            matches.append((candidate, child))
+    require(len(matches) == 1, 'The target must resolve to exactly one thread in this host session.')
+    return matches[0]
+
+
+def check_window(path, now=None):
+    rows = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
+    activity = [row for row in rows if row.get('type') in ('response_item', 'event_msg', 'turn_context')]
+    require(activity, 'Target activity time is unknown; start a fresh thread at the same tier and dial.')
+    timestamp = activity[-1].get('timestamp')
+    require(isinstance(timestamp, str), 'Target activity time is missing; start a fresh thread.')
+    try:
+        latest = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+    except ValueError:
+        raise Pending('Target activity time is invalid; start a fresh thread.') from None
+    require(latest.tzinfo is not None, 'Target activity time has no timezone; start a fresh thread.')
+    age = ((now or datetime.now(timezone.utc)) - latest).total_seconds()
+    require(0 <= age <= REUSE_SECONDS,
+            'Target activity is outside the 30-minute reuse window; start a fresh thread at the same tier and dial.')
+
+
+def target_entry(meta):
+    entry = meta.get('agent_role')
+    source = meta.get('source')
+    if meta.get('parent_thread_id') or isinstance(source, dict):
+        require(isinstance(entry, str) and entry, 'Target entry identity is missing.')
+        require(isinstance(source, dict), 'Target source identity is missing.')
+        spawn = source.get('subagent', {}).get('thread_spawn', {})
+        require(spawn.get('agent_role', entry) == entry, 'Target entry and source identity conflict.')
+    return entry if isinstance(entry, str) else ''
+
+
+def route_gate(event):
+    arguments = event.get('tool_input')
+    require(isinstance(arguments, dict), 'Native tool arguments are unavailable.')
+    if event['tool_name'] == SPAWN:
+        entry = arguments.get('agent_type', '')
+        if not isinstance(entry, str) or not entry.startswith('ca_'):
+            return None
+        require(isinstance(arguments.get('task_name'), str) and arguments['task_name'].strip(),
+                'A nonempty native task_name is required.')
+        route = route_line(arguments.get('message'), arguments.get('task_name'))
+        require(arguments.get('fork_turns') == 'none', 'Native entries require fork_turns: none.')
+        dial = expected(arguments)
+    else:
+        path, meta = target_thread(event, arguments.get('target'))
+        entry = target_entry(meta)
+        if not entry.startswith('ca_'):
+            return None
+        require(entry.startswith('ca_worker_'), 'Explorer calls and independent acceptance require fresh threads.')
+        route = route_line(arguments.get('message'))
+        dial = actual(path, entry, meta.get('parent_thread_id'), event['session_id'], child_path(meta))
+        check_window(path)
+    check_route(route, entry, dial)
+    return ('Codex Advisor: route declaration checked for ' + entry + '; '
+            'basis truth, task fit, and user authorization remain the caller\'s responsibility.')
+
+
 def main():
     event = json.load(sys.stdin)
     kind = event.get('hook_event_name')
-    if kind not in ('SessionStart', 'PostToolUse'):
+    if kind not in ('SessionStart', 'PostToolUse', 'PreToolUse'):
         return
-    if kind == 'PostToolUse' and event.get('tool_name') != 'collaborationspawn_agent':
+    if kind == 'PostToolUse' and event.get('tool_name') != SPAWN:
+        return
+    if kind == 'PreToolUse' and event.get('tool_name') not in {SPAWN, *CONTINUE}:
         return
     try:
-        context = posture(event) if kind == 'SessionStart' else dispatch(event)
+        context = (posture(event) if kind == 'SessionStart' else
+                   route_gate(event) if kind == 'PreToolUse' else dispatch(event))
     except (Pending, Failure, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
         reason = (str(error) if isinstance(error, (Pending, Failure))
                   else 'Hook input or runtime evidence could not be read.')
+        if kind == 'PreToolUse':
+            print(json.dumps({'hookSpecificOutput': {'hookEventName': kind, 'permissionDecision': 'deny',
+                              'permissionDecisionReason': 'Codex Advisor route check: ' + reason}}))
+            return
         context = 'Codex Advisor: affected work remains pending. ' + reason
     if context:
         print(json.dumps({'hookSpecificOutput': {'hookEventName': kind, 'additionalContext': context}}))

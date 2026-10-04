@@ -5,10 +5,10 @@ Codex Advisor is a Codex-only fork of
 Any primary can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Version 0.3.2 supplies seventeen native entries across `mainstay`, `crux`, and
+Version 0.3.3 supplies seventeen native entries across `mainstay`, `crux`, and
 `rescue`, a single routing profile, zero-argument process consultation, and
 hooks for posture injection and automatic dispatch verification.
-See the [Chinese version manual](docs/releases/0.3.2.html) for a complete guide.
+See the [Chinese version manual](docs/releases/0.3.3.html) for a complete guide.
 
 ## Install
 
@@ -19,8 +19,7 @@ through `sh`, so Git for Windows' `bin` directory, for example
 [Windows launch](docs/agents/plugin-maintenance.md#windows-launch). Consultation
 on Windows also needs the native `codex.exe`; see
 [plugin maintenance](docs/agents/plugin-maintenance.md#process-consultation-component).
-The consultation protocol is qualified on Codex 0.160.0; hook metadata is qualified
-on Codex 0.157.0. Host
+The consultation protocol and native route hooks are qualified on Codex 0.160.0. Host
 schema or cache-layout changes need renewed qualification rather than an assumed
 compatibility guarantee.
 
@@ -43,7 +42,7 @@ The companion installer writes seventeen entries under `$CODEX_HOME/agents`, or
 deletes nothing. It leaves unrelated agents and primary configuration alone.
 Installed entries are not hand-edited.
 
-Start a fresh interactive task and review the plugin's two hooks in `/hooks`.
+Start a fresh interactive task and review the plugin's three hooks in `/hooks`.
 Installing or enabling a plugin does not trust hooks. Until you trust them, the
 host skips them and shows a startup warning. Confirm that the task exposes
 `codex-advisor:orchestration`, the native entries, and the `codex_advisor` MCP
@@ -95,11 +94,21 @@ is identified or interacting constraints need joint handling. `rescue` requires
 a capability failure in `crux` or your explicit declaration. See
 [allocation](plugins/codex-advisor/skills/orchestration/SKILL.md#allocate-by-role-and-capability-tier).
 
-After failed acceptance, the primary issues rework in the same thread at the
-same dial. Only a capability failure moves work along the path `mainstay` to
+After failed acceptance, the primary issues rework at the same dial, reusing the
+thread only within 30 minutes of its latest host-recorded activity. Unknown or
+expired activity requires a fresh thread at that tier and dial. Only a capability
+failure moves work along the path `mainstay` to
 `crux` to `rescue` to the user; environment problems and contract gaps do not.
 [Recovery](plugins/codex-advisor/skills/orchestration/references/recovery.md#climb-the-escalation-ladder)
 holds the counting rules, the ladder, and the handoff.
+
+Before the first dispatch of a multi-ticket task, record dependencies, combined
+contracts, workspace isolation, and verification batches in its task record.
+Commit boundaries follow authorization and rollback needs separately from acceptance.
+Every native dispatch and worker continuation carries a
+[route declaration](plugins/codex-advisor/skills/orchestration/references/operations.md#declare-every-route).
+The pre-call hook checks its structure and dial; the primary judges its evidence
+and the lowest compatible tier. A model declaration alone does not authorize `rescue`.
 
 ## Process consultation and posture
 
@@ -116,6 +125,11 @@ or reject advice. Advice grants no authorization. See the
 [canonical posture](plugins/codex-advisor/skills/orchestration/references/consult-posture.md).
 
 ## Hooks and acceptance
+
+`PreToolUse` checks routing before spawning or messaging a plugin worker, including
+its reuse window. It rejects invalid declarations with a reason. The caller still
+verifies basis truth, authorization, and task fit; hook failures or untrusted hooks
+cannot enforce the gate.
 
 `SessionStart` injects the primary's selected posture and adoption rules, also
 on resume. Delegates carry their posture in their entry instructions. On a

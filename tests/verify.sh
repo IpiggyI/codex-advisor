@@ -525,5 +525,6 @@ if [ -z "${1-}" ] || [ "${1-}" = --consultation ]; then
 fi
 if [ -z "${1-}" ] || [ "${1-}" = --hooks ]; then
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-hooks.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/verify-routing.py"
 fi
 printf '%s\n' 'VERIFY PASSED: selected deterministic checks (no live routing claim)'

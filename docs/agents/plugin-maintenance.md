@@ -187,8 +187,12 @@ The plugin loads `hooks/hooks.json` from the default plugin location. After firs
 installation, the user reviews and trusts its hooks in `/hooks`, and reviews them
 again after an update changes a hook definition. Installation does not grant trust;
 the host skips untrusted hooks and prints a startup warning pointing to `/hooks`.
-The plugin does not read or modify trust state. The `PostToolUse` confirmation line
-makes a skipped hook visible for each dispatch, as the absence of any message.
+The plugin does not read or modify trust state. The `PreToolUse` route confirmation
+and `PostToolUse` observed-dial confirmation identify separate checks; absence of
+the corresponding line leaves that check unverified. An inspector pass establishes
+no pre-call gate execution. A hook error, timeout, or untrusted definition cannot
+enforce route admission; the caller must check eligibility manually and report
+the automatic gate as unverified.
 ADR-0006 records the trust boundary and the probe that exercised it.
 
 `SessionStart` injects the exact selected canonical posture block and adoption
@@ -199,6 +203,24 @@ every effort; if the selected advisor model depends on effort, missing selection
 evidence leaves the work pending.
 Native delegate identity excludes a second posture injection; entries carry their
 own posture. Missing session identity also leaves the work pending.
+
+`PreToolUse` matches `collaborationspawn_agent`, `collaborationfollowup_task`, and
+`collaborationsend_message`. It parses the message's route declaration, reads allowed
+dials from the routing profile and expected settings from the entry template, and
+returns `permissionDecision: deny` on an invalid route. Admission basis kinds are
+role-specific; Advisor acceptance mapping is an allowed basis in higher tiers.
+It checks structure and compatibility, not whether the cited evidence is true or
+the user authorized the work. Non-plugin spawns and resolved non-plugin targets
+pass through. Unknown or ambiguous message targets are denied.
+
+For continuation, the target is resolved from the caller's host session by UUID
+or absolute/relative task path. The hook reads its role and all recorded turn dials,
+requires a Worker, and compares the latest `response_item`, `event_msg`, or
+`turn_context` timestamp with UTC now. An age from zero through 1800 seconds is
+allowed; missing, invalid, naive, future, and expired times are denied. File mtime
+and session creation time do not establish recent activity. New-ticket context
+reuse and the lowest compatible tier remain caller judgments. The runtime rules
+and route form are in [operations.md](../../plugins/codex-advisor/skills/orchestration/references/operations.md#declare-every-route).
 
 `PostToolUse` joins the native response's task path and the parent transcript
 identity to one child session header, then reads that child's host-recorded turn
@@ -263,6 +285,17 @@ establish installed-host trust or live dispatch behavior. A template change reac
 installation and runtime groups, so it takes the unqualified run. Documentation
 changes have no group here: check structure, links, and whether the text still
 matches actual behavior.
+
+The hooks group also runs `verify-routing.py`: all entry dials, role-specific
+bases, spawn and both continuation entrances, target resolution, actual dial
+conflicts, and exact reuse-window boundaries. The feature's
+[host probe](../../.scratch/plan-route-reuse-window/probe-host.py) drives the native
+host against a loopback response service in a temporary home. Its `--product` mode
+installs the current hooks from a disposable local marketplace; only the unrelated
+MCP manifest is omitted. Hook trust bypass is restricted to this test invocation
+and requires user authorization. This is not evidence of user-reviewed hook trust
+or of authenticated model behavior. Recorded results and untested environments
+live in the [acceptance record](../../.scratch/plan-route-reuse-window/acceptance.md).
 
 Run the unqualified verifier once on the final state. It contains all four groups,
 so it replaces the focused runs instead of following them:

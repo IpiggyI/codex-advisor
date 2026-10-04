@@ -1,0 +1,67 @@
+PASS  profile anchors: plugins/codex-advisor/skills/orchestration/references/routing-profile.md
+PASS  model segments: plugins/codex-advisor/skills/orchestration/references/routing-profile.md
+PASS  profile anchors: docs/zh/skills/orchestration/references/routing-profile.md
+PASS  model segments: docs/zh/skills/orchestration/references/routing-profile.md
+PASS  docs/zh/agents/ca-advisor-crux-h.toml
+PASS  docs/zh/agents/ca-advisor-crux-m.toml
+PASS  docs/zh/agents/ca-advisor-mainstay-h.toml
+PASS  docs/zh/agents/ca-advisor-mainstay-m.toml
+PASS  docs/zh/agents/ca-advisor-rescue-h.toml
+PASS  docs/zh/agents/ca-advisor-rescue-m.toml
+PASS  docs/zh/agents/ca-explorer-crux-h.toml
+PASS  docs/zh/agents/ca-explorer-crux-m.toml
+PASS  docs/zh/agents/ca-explorer-mainstay-h.toml
+PASS  docs/zh/agents/ca-explorer-mainstay-m.toml
+PASS  docs/zh/agents/ca-explorer-rescue.toml
+PASS  docs/zh/agents/ca-worker-crux-h.toml
+PASS  docs/zh/agents/ca-worker-crux-m.toml
+PASS  docs/zh/agents/ca-worker-mainstay-h.toml
+PASS  docs/zh/agents/ca-worker-mainstay-m.toml
+PASS  docs/zh/agents/ca-worker-rescue-h.toml
+PASS  docs/zh/agents/ca-worker-rescue-m.toml
+PASS  docs/zh/skills/orchestration/SKILL.md
+PASS  docs/zh/skills/orchestration/references/consult-posture.md
+PASS  docs/zh/skills/orchestration/references/independent-acceptance.md
+PASS  docs/zh/skills/orchestration/references/operations.md
+PASS  docs/zh/skills/orchestration/references/recovery.md
+PASS  docs/zh/skills/orchestration/references/role-contracts.md
+PASS  docs/zh/skills/orchestration/references/routing-profile.md
+PASS  plugins/codex-advisor/.codex-plugin/plugin.json
+PASS  plugins/codex-advisor/.mcp.json
+PASS  plugins/codex-advisor/agents/ca-advisor-crux-h.toml
+PASS  plugins/codex-advisor/agents/ca-advisor-crux-m.toml
+PASS  plugins/codex-advisor/agents/ca-advisor-mainstay-h.toml
+PASS  plugins/codex-advisor/agents/ca-advisor-mainstay-m.toml
+PASS  plugins/codex-advisor/agents/ca-advisor-rescue-h.toml
+PASS  plugins/codex-advisor/agents/ca-advisor-rescue-m.toml
+PASS  plugins/codex-advisor/agents/ca-explorer-crux-h.toml
+PASS  plugins/codex-advisor/agents/ca-explorer-crux-m.toml
+PASS  plugins/codex-advisor/agents/ca-explorer-mainstay-h.toml
+PASS  plugins/codex-advisor/agents/ca-explorer-mainstay-m.toml
+PASS  plugins/codex-advisor/agents/ca-explorer-rescue.toml
+PASS  plugins/codex-advisor/agents/ca-worker-crux-h.toml
+PASS  plugins/codex-advisor/agents/ca-worker-crux-m.toml
+PASS  plugins/codex-advisor/agents/ca-worker-mainstay-h.toml
+PASS  plugins/codex-advisor/agents/ca-worker-mainstay-m.toml
+PASS  plugins/codex-advisor/agents/ca-worker-rescue-h.toml
+PASS  plugins/codex-advisor/agents/ca-worker-rescue-m.toml
+PASS  plugins/codex-advisor/hooks/hooks.json
+PASS  plugins/codex-advisor/scripts/advisor-hooks.py
+PASS  plugins/codex-advisor/scripts/consult_context.py
+PASS  plugins/codex-advisor/scripts/consult_limits.py
+PASS  plugins/codex-advisor/scripts/consult_native.py
+PASS  plugins/codex-advisor/scripts/consult_process.py
+PASS  plugins/codex-advisor/scripts/inspect-agent-runtime.sh
+PASS  plugins/codex-advisor/scripts/install-agents.sh
+PASS  plugins/codex-advisor/scripts/process-consultation.py
+PASS  plugins/codex-advisor/scripts/run-python.sh
+PASS  plugins/codex-advisor/skills/orchestration/SKILL.md
+PASS  plugins/codex-advisor/skills/orchestration/agents/openai.yaml
+PASS  plugins/codex-advisor/skills/orchestration/references/consult-posture.md
+PASS  plugins/codex-advisor/skills/orchestration/references/independent-acceptance.md
+PASS  plugins/codex-advisor/skills/orchestration/references/operations.md
+PASS  plugins/codex-advisor/skills/orchestration/references/recovery.md
+PASS  plugins/codex-advisor/skills/orchestration/references/role-contracts.md
+PASS  plugins/codex-advisor/skills/orchestration/references/routing-profile.md
+PASS  README.md
+66/66 passed, 0 failed

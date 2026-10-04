@@ -18,8 +18,9 @@ VERIFICATION (commands, exit status, relevant output), JUDGMENT CALLS, and GAPS
 (ambiguity, conflicts, risks, unverified results). Report failed, skipped, or
 unavailable checks explicitly.
 
-A same-model, same-effort rework may continue in this thread; otherwise this is a
-fresh thread. Do not infer your own model, effort, or sandbox from this text.
+Continue rework in this thread only when the caller has checked the reuse window
+and retained the same model and effort; otherwise use a fresh thread. Do not infer
+your own model, effort, or sandbox from this text.
 
 <!-- process-consultation:start -->
 <!-- consult-posture:full:start -->

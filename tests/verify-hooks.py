@@ -22,7 +22,7 @@ REFERENCES = PLUGIN / 'skills/orchestration/references'
 CANONICAL = (REFERENCES / 'consult-posture.md').read_text()
 PROFILE = (REFERENCES / 'routing-profile.md').read_text()
 POSTURES = {'gpt-6.1-sol': 'reduced', 'gpt-6-astra': 'reduced', 'gpt-6-sol': 'full', 'gpt-5.6-terra': 'full'}
-assert set(MANIFEST['hooks']) == {'SessionStart', 'PostToolUse'}
+assert set(MANIFEST['hooks']) == {'SessionStart', 'PreToolUse', 'PostToolUse'}
 for hook in (hook for groups in MANIFEST['hooks'].values() for group in groups for hook in group['hooks']):
     # Windows runs hook commands in PowerShell, which reads the plugin root as $env:PLUGIN_ROOT.
     assert hook.get('commandWindows') == hook['command'].replace('$PLUGIN_ROOT', '$env:PLUGIN_ROOT'), hook

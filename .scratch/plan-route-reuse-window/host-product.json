@@ -1,0 +1,368 @@
+[
+  {
+    "approval": "never",
+    "exit": 0,
+    "installedHashes": {
+      "hooks/hooks.json": "f0eb4e0a8e5274a94b29f3e655f7fbe6b88da9a2a8803699653b004b810d8667",
+      "scripts/advisor-hooks.py": "5ecb74fc2d486adca280d94c5ef64143b4b8232cc3854bd3d789f902e5413e72",
+      "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39"
+    },
+    "hooks": [],
+    "children": [
+      {
+        "meta": {
+          "id": "01a1086a-69b0-7281-8e47-ba0f4d624c1d",
+          "session_id": "01a1086a-6890-7430-b7f4-1a88ce4a490e",
+          "parent_thread_id": "01a1086a-6890-7430-b7f4-1a88ce4a490e",
+          "timestamp": "2026-10-04T19:35:54.032Z",
+          "cwd": "/tmp/ca-route-host-g2ahw37k/work",
+          "cli_version": "0.160.0",
+          "agent_path": "/root/allowed",
+          "agent_role": "ca_worker_crux_m"
+        },
+        "turns": 2,
+        "dials": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "xhigh"
+          },
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "xhigh"
+          }
+        ],
+        "activity": [
+          {
+            "timestamp": "2026-10-04T19:35:54.057Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.063Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.082Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.086Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.090Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.330Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.333Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.354Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.357Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:54.362Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          }
+        ]
+      }
+    ],
+    "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1086a-6890-7430-b7f4-1a88ce4a490e\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"error\",\"message\":\"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"LOCAL_COMPLETE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":600,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":60,\"reasoning_output_tokens\":0}}\n",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-g2ahw37k/home\"))\nReading additional input from stdin...\n2026-10-04T19:35:53.961982Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent\n2026-10-04T19:35:54.188799Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationfollowup_task\n2026-10-04T19:35:54.260526Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationsend_message\n2026-10-04T19:35:54.366199Z ERROR codex_core::session: failed to record rollout items: thread 01a1086a-6890-7430-b7f4-1a88ce4a490e not found\n",
+    "outputs": [
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-696a-7982-b143-97bc610795d1",
+        "call_id": "call_0",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-69fd-7e72-8d2f-9f3e0c174807",
+        "call_id": "call_1",
+        "output": "{\"task_name\":\"/root/allowed\"}"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-6a4c-7560-95c2-dd3d6bfdf83a",
+        "call_id": "call_2",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationfollowup_task"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-6a94-79f3-9c81-c3ec6415c0a8",
+        "call_id": "call_3",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationsend_message"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-6adc-7c73-9be5-90435f12bc05",
+        "call_id": "call_4",
+        "output": ""
+      }
+    ],
+    "verified": true
+  },
+  {
+    "approval": "on-request",
+    "exit": 0,
+    "installedHashes": {
+      "hooks/hooks.json": "f0eb4e0a8e5274a94b29f3e655f7fbe6b88da9a2a8803699653b004b810d8667",
+      "scripts/advisor-hooks.py": "5ecb74fc2d486adca280d94c5ef64143b4b8232cc3854bd3d789f902e5413e72",
+      "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39"
+    },
+    "hooks": [],
+    "children": [
+      {
+        "meta": {
+          "id": "01a1086a-75be-7b23-a998-23bb90c78de0",
+          "session_id": "01a1086a-7497-7350-83ae-274afd085c3c",
+          "parent_thread_id": "01a1086a-7497-7350-83ae-274afd085c3c",
+          "timestamp": "2026-10-04T19:35:57.118Z",
+          "cwd": "/tmp/ca-route-host-uh02zxuq/work",
+          "cli_version": "0.160.0",
+          "agent_path": "/root/allowed",
+          "agent_role": "ca_worker_crux_m"
+        },
+        "turns": 2,
+        "dials": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "xhigh"
+          },
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "xhigh"
+          }
+        ],
+        "activity": [
+          {
+            "timestamp": "2026-10-04T19:35:57.143Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.151Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.184Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.188Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.193Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.422Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.426Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.447Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.452Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:35:57.456Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          }
+        ]
+      }
+    ],
+    "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1086a-7497-7350-83ae-274afd085c3c\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"error\",\"message\":\"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"LOCAL_COMPLETE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":600,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":60,\"reasoning_output_tokens\":0}}\n",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-uh02zxuq/home\"))\nReading additional input from stdin...\n2026-10-04T19:35:57.046014Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent\n2026-10-04T19:35:57.273838Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationfollowup_task\n2026-10-04T19:35:57.347062Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationsend_message\n2026-10-04T19:35:57.459915Z ERROR codex_core::session: failed to record rollout items: thread 01a1086a-7497-7350-83ae-274afd085c3c not found\n",
+    "outputs": [
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-7576-7082-9472-d2637ed2a054",
+        "call_id": "call_0",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-760e-7971-8362-bb9e9fdb6ffc",
+        "call_id": "call_1",
+        "output": "{\"task_name\":\"/root/allowed\"}"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-7659-79a1-a2df-21ef7f1b2c23",
+        "call_id": "call_2",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationfollowup_task"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-76a3-71e2-ad99-21cc0da6f517",
+        "call_id": "call_3",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationsend_message"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-76f0-72d1-92af-aef22d96af32",
+        "call_id": "call_4",
+        "output": ""
+      }
+    ],
+    "verified": true
+  },
+  {
+    "approval": "on-failure",
+    "exit": 0,
+    "installedHashes": {
+      "hooks/hooks.json": "f0eb4e0a8e5274a94b29f3e655f7fbe6b88da9a2a8803699653b004b810d8667",
+      "scripts/advisor-hooks.py": "5ecb74fc2d486adca280d94c5ef64143b4b8232cc3854bd3d789f902e5413e72",
+      "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39"
+    },
+    "hooks": [],
+    "children": [
+      {
+        "meta": {
+          "id": "01a1086a-81c9-7702-92f9-7866ac67150a",
+          "session_id": "01a1086a-8096-7952-800f-86dc0b401ccd",
+          "parent_thread_id": "01a1086a-8096-7952-800f-86dc0b401ccd",
+          "timestamp": "2026-10-04T19:36:00.201Z",
+          "cwd": "/tmp/ca-route-host-2hw9nx9x/work",
+          "cli_version": "0.160.0",
+          "agent_path": "/root/allowed",
+          "agent_role": "ca_worker_crux_m"
+        },
+        "turns": 2,
+        "dials": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "xhigh"
+          },
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "xhigh"
+          }
+        ],
+        "activity": [
+          {
+            "timestamp": "2026-10-04T19:36:00.227Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.233Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.254Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.257Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.262Z",
+            "type": "event_msg",
+            "event": "task_complete"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.510Z",
+            "type": "event_msg",
+            "event": "task_started"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.514Z",
+            "type": "turn_context",
+            "event": null
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.535Z",
+            "type": "event_msg",
+            "event": "item_completed"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.538Z",
+            "type": "event_msg",
+            "event": "token_count"
+          },
+          {
+            "timestamp": "2026-10-04T19:36:00.547Z",
+            "type": "event_msg",
+            "event": "turn_aborted"
+          }
+        ]
+      }
+    ],
+    "stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a1086a-8096-7952-800f-86dc0b401ccd\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"`--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"error\",\"message\":\"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"LOCAL_COMPLETE\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":600,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":60,\"reasoning_output_tokens\":0}}\n",
+    "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/ca-route-host-2hw9nx9x/home\"))\nReading additional input from stdin...\n2026-10-04T19:36:00.118585Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent\n2026-10-04T19:36:00.352169Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationfollowup_task\n2026-10-04T19:36:00.424230Z ERROR codex_core::tools::router: error=Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationsend_message\n",
+    "outputs": [
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-8176-7a51-9de1-1236e0c6c55d",
+        "call_id": "call_0",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-8219-7b11-9292-9b151919e5df",
+        "call_id": "call_1",
+        "output": "{\"task_name\":\"/root/allowed\"}"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-8260-7b30-941e-1258090026a5",
+        "call_id": "call_2",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationfollowup_task"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-82a8-7ca0-8c10-edbbe18aeb6c",
+        "call_id": "call_3",
+        "output": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationsend_message"
+      },
+      {
+        "type": "function_call_output",
+        "id": "fco_01a1086a-82ff-7d20-acff-493aefee2274",
+        "call_id": "call_4",
+        "output": ""
+      }
+    ],
+    "verified": true
+  }
+]

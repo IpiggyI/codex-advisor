@@ -1,0 +1,23 @@
+PASS: launcher skips unusable interpreter, preserves arguments/stdin, disables bytecode, fails without Python
+PASS: exact canonical full/reduced/adoption, unknown model, resume, delegate exclusion, invalid fallback or segment table
+PASS: all 17 entries, confirmation line on match, wrong model/effort, omitted caller effort; disabled negatives
+PASS: native response/path/header join, bounded race, missing/ambiguous/conflicting evidence; disabled negatives
+PASS: hooks are stateless; no primary Stop or SubagentStop enforcement in this scoped group
+test_admission_basis_by_role_and_tier (__main__.RoutingGate.test_admission_basis_by_role_and_tier) ... ok
+test_all_shipped_entries_and_efforts (__main__.RoutingGate.test_all_shipped_entries_and_efforts) ... ok
+test_ambiguous_and_other_session_targets_are_denied (__main__.RoutingGate.test_ambiguous_and_other_session_targets_are_denied) ... ok
+test_exact_window_boundary (__main__.RoutingGate.test_exact_window_boundary) ... ok
+test_explorer_and_advisor_reuse_denied (__main__.RoutingGate.test_explorer_and_advisor_reuse_denied) ... ok
+test_followup_and_message_targets_and_invalid_routes (__main__.RoutingGate.test_followup_and_message_targets_and_invalid_routes) ... ok
+test_latest_activity_not_file_mtime_or_first_turn (__main__.RoutingGate.test_latest_activity_not_file_mtime_or_first_turn) ... ok
+test_missing_or_conflicting_target_identity_is_denied (__main__.RoutingGate.test_missing_or_conflicting_target_identity_is_denied) ... ok
+test_missing_route_is_denied (__main__.RoutingGate.test_missing_route_is_denied) ... ok
+test_route_mismatches_and_missing_fields (__main__.RoutingGate.test_route_mismatches_and_missing_fields) ... ok
+test_stale_unknown_future_and_conflicting_host_evidence (__main__.RoutingGate.test_stale_unknown_future_and_conflicting_host_evidence) ... ok
+test_unrelated_entries_and_parent_messages_are_unchanged (__main__.RoutingGate.test_unrelated_entries_and_parent_messages_are_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 5.521s
+
+OK
+VERIFY PASSED: selected deterministic checks (no live routing claim)

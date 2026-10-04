@@ -34,11 +34,15 @@ holds even before its reference is read.
   packet in the independent-acceptance reference below instead. Spawn with
   `fork_turns: none`; a dispatch counts as checked only when the hook's
   confirmation line or the inspector shows its model and effort.
+- Before `followup_task` or `send_message` to a worker: read the route declaration
+  in [operations.md](references/operations.md) and the reuse window in
+  [recovery.md](references/recovery.md). Both tools can deliver new work and must
+  carry the route; new tickets also state their shared area and context need.
 - Accepting a delegated result, or working under Architect mode: this file suffices.
 - After a failed acceptance, before rework or escalation: read
-  [recovery.md](references/recovery.md). Rework first in the same thread at the
-  same dial; any change of effort, model, or role uses a new thread with the
-  current-state handoff.
+  [recovery.md](references/recovery.md). Rework first at the same dial, reusing
+  the thread only inside its reuse window. A window expiry or any change of
+  effort, model, or role uses a new thread with the current-state handoff.
 - When the user asks for independent review or a delivery may be high-risk: read
   [independent-acceptance.md](references/independent-acceptance.md) and the
   acceptance mapping in the routing profile. Independent acceptance runs in a
@@ -65,7 +69,14 @@ Inside a role-and-tier cell, take the first candidate at its default. Take a lat
 candidate when the task needs its higher model segment or depends more on judgment
 the packet cannot capture. Compare model segments through the routing profile's
 [segment table](references/routing-profile.md#model-segments).
-A capability tier is set by its models; effort is a finer grade inside the tier.
+A capability tier is a set of allowed dials for one role. The same model can
+occupy different tiers at different efforts.
+
+A user model declaration filters candidates. Choose the lowest tier that meets
+the difficulty or escalation floor, contains a compatible candidate, and admits
+the stated basis. A model declaration can justify `crux`; it does not by itself
+authorize `rescue`. Ask the user to resolve incompatible constraints. Independent
+acceptance follows the profile's acceptance mapping instead of the new-work floor.
 
 ## Delegate outcomes and retain scheduling
 
@@ -79,7 +90,16 @@ their packet carries the rest of the contract. Checks that span other work packa
 or the whole delivery stay in your plan.
 
 Check dependencies, ownership (including generated files and check side effects),
-and actual available slots before dispatch. Decide ticket boundaries, dispatch
+and actual available slots before dispatch. For a task with two or more tickets,
+write the whole-task plan in the existing task record before its first dispatch:
+dependencies; contracts and their owners; workspace isolation; and verification
+batches with covered contracts, executor, and execution point. Merge tickets that
+share files or tightly coupled changes in one area into one contract. Give
+concurrent writers separate working directories and isolated check outputs; if
+the host cannot provide them, sequence the writers. Each contract waits only for
+the results it actually needs.
+
+Decide ticket boundaries, dispatch
 count, and verification batches separately: combine checks that share costly
 setup while the scope stays understandable and a failure stays locatable, and
 keep a real check where dependent work rests on its result. Independent delegated
@@ -89,6 +109,10 @@ predecessor left. Do not split a shared file into nominally independent owners o
 nest workers to evade capacity. Collect each report and inspect the combined
 result. Failed, blocked, missing, or incomplete work and its dependents stay
 pending; a successful sibling does not complete them.
+
+Choose commit boundaries separately from acceptance, by the user's authorization
+and the changes that must roll back together. When asking about commit granularity,
+include a per-contract option. Commit only with explicit user authorization.
 
 ## Accept the actual deliverable
 

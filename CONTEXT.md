@@ -34,8 +34,8 @@ The plugin script that writes the shipped native entries onto `$CODEX_HOME/agent
 _Avoid_: Hand-editing installed entries; expecting the installer to preserve a hand-edited copy.
 
 **Capability tier**:
-An ordered allocation level for one delegated call, set by its models, with effort as a finer grade inside it. The three tiers are `mainstay`, `crux`, and `rescue`.
-_Avoid_: Treating effort or a model segment as a tier; light, standard, or senior as current tier names.
+An ordered allocation level defined by a set of allowed dials for each role. The three tiers are `mainstay`, `crux`, and `rescue`; one model may appear in several tiers at different efforts.
+_Avoid_: Treating a model name, effort, or model segment alone as a tier; light, standard, or senior as current tier names.
 
 **Model segment**:
 A model's capability position, ordered from `starter` through `midrange` and `premium` to `flagship`. Models in the same segment share a capability rank; the routing profile assigns each model its segment.

@@ -1,0 +1,217 @@
+PASS: canonical posture, advisor exclusion, outside-section identity, three negative posture fixtures
+PASS: profile/template equality, negative model fixture
+PASS: fork metadata, overwrite, unchanged, check drift, former names and unrelated files untouched, refusals
+PASS: generic inspector, table-driven templates, former options as unknown arguments, payload filtering
+test_cancel_cleanup_failure_retains_cause (__main__.Boundary.test_cancel_cleanup_failure_retains_cause) ... ok
+test_cancellation_terminates_tree (__main__.Boundary.test_cancellation_terminates_tree) ... ok
+test_cleanup_failure_is_explicit (__main__.Boundary.test_cleanup_failure_is_explicit) ... ok
+test_compaction_replaces_history (__main__.Boundary.test_compaction_replaces_history) ... ok
+test_context_failure_locates_first_difference (__main__.Boundary.test_context_failure_locates_first_difference) ... ok
+test_delegate_encrypted_content_changed (__main__.Boundary.test_delegate_encrypted_content_changed) ... ok
+test_delegate_trigger_metadata (__main__.Boundary.test_delegate_trigger_metadata) ... ok
+test_earliest_unfinished_images_reasoning_and_truncation (__main__.Boundary.test_earliest_unfinished_images_reasoning_and_truncation) ... ok
+test_empty_tool_text_blocks_are_lossless (__main__.Boundary.test_empty_tool_text_blocks_are_lossless) ... ok
+test_failure_limit_is_scoped_to_thread_not_root_session (__main__.Boundary.test_failure_limit_is_scoped_to_thread_not_root_session) ... ok
+test_four_failures_disable_resumed_thread_before_native_execution (__main__.Boundary.test_four_failures_disable_resumed_thread_before_native_execution) ... ok
+test_image_custom_tool_call_image_changed_high (__main__.Boundary.test_image_custom_tool_call_image_changed_high) ... ok
+test_image_custom_tool_call_image_detail_changed_high (__main__.Boundary.test_image_custom_tool_call_image_detail_changed_high) ... ok
+test_image_custom_tool_call_image_dropped_high (__main__.Boundary.test_image_custom_tool_call_image_dropped_high) ... ok
+test_image_custom_tool_call_image_omit_low_low (__main__.Boundary.test_image_custom_tool_call_image_omit_low_low) ... ok
+test_image_custom_tool_call_image_omit_nonlite_original (__main__.Boundary.test_image_custom_tool_call_image_omit_nonlite_original) ... ok
+test_image_custom_tool_call_image_omit_unknown_mode_original (__main__.Boundary.test_image_custom_tool_call_image_omit_unknown_mode_original) ... ok
+test_image_custom_tool_call_image_reordered_high (__main__.Boundary.test_image_custom_tool_call_image_reordered_high) ... ok
+test_image_custom_tool_call_plan_auto (__main__.Boundary.test_image_custom_tool_call_plan_auto) ... ok
+test_image_custom_tool_call_plan_high (__main__.Boundary.test_image_custom_tool_call_plan_high) ... ok
+test_image_custom_tool_call_plan_original (__main__.Boundary.test_image_custom_tool_call_plan_original) ... ok
+test_image_function_call_image_changed_high (__main__.Boundary.test_image_function_call_image_changed_high) ... ok
+test_image_function_call_image_detail_changed_high (__main__.Boundary.test_image_function_call_image_detail_changed_high) ... ok
+test_image_function_call_image_dropped_high (__main__.Boundary.test_image_function_call_image_dropped_high) ... ok
+test_image_function_call_image_omit_low_low (__main__.Boundary.test_image_function_call_image_omit_low_low) ... ok
+test_image_function_call_image_omit_nonlite_original (__main__.Boundary.test_image_function_call_image_omit_nonlite_original) ... ok
+test_image_function_call_image_omit_unknown_mode_original (__main__.Boundary.test_image_function_call_image_omit_unknown_mode_original) ... ok
+test_image_function_call_image_reordered_high (__main__.Boundary.test_image_function_call_image_reordered_high) ... ok
+test_image_function_call_plan_auto (__main__.Boundary.test_image_function_call_plan_auto) ... ok
+test_image_function_call_plan_high (__main__.Boundary.test_image_function_call_plan_high) ... ok
+test_image_function_call_plan_original (__main__.Boundary.test_image_function_call_plan_original) ... ok
+test_image_message_image_changed_high (__main__.Boundary.test_image_message_image_changed_high) ... ok
+test_image_message_image_detail_changed_high (__main__.Boundary.test_image_message_image_detail_changed_high) ... ok
+test_image_message_image_dropped_high (__main__.Boundary.test_image_message_image_dropped_high) ... ok
+test_image_message_image_omit_low_low (__main__.Boundary.test_image_message_image_omit_low_low) ... ok
+test_image_message_image_omit_nonlite_original (__main__.Boundary.test_image_message_image_omit_nonlite_original) ... ok
+test_image_message_image_omit_unknown_mode_original (__main__.Boundary.test_image_message_image_omit_unknown_mode_original) ... ok
+test_image_message_image_reordered_high (__main__.Boundary.test_image_message_image_reordered_high) ... ok
+test_image_message_plan_auto (__main__.Boundary.test_image_message_plan_auto) ... ok
+test_image_message_plan_high (__main__.Boundary.test_image_message_plan_high) ... ok
+test_image_message_plan_original (__main__.Boundary.test_image_message_plan_original) ... ok
+test_missing_environment_error_has_actionable_cause (__main__.Boundary.test_missing_environment_error_has_actionable_cause) ... ok
+test_native_errors_reach_limit_without_another_model_request (__main__.Boundary.test_native_errors_reach_limit_without_another_model_request) ... ok
+test_native_world_state_and_attribution (__main__.Boundary.test_native_world_state_and_attribution) ... ok
+test_outcome_abort (__main__.Boundary.test_outcome_abort) ... ok
+test_outcome_bad_output (__main__.Boundary.test_outcome_bad_output) ... ok
+test_outcome_base_reordered (__main__.Boundary.test_outcome_base_reordered) ... ok
+test_outcome_base_role (__main__.Boundary.test_outcome_base_role) ... ok
+test_outcome_changed_base (__main__.Boundary.test_outcome_changed_base) ... ok
+test_outcome_changed_context (__main__.Boundary.test_outcome_changed_context) ... ok
+test_outcome_changed_guidance (__main__.Boundary.test_outcome_changed_guidance) ... ok
+test_outcome_changed_invocation (__main__.Boundary.test_outcome_changed_invocation) ... ok
+test_outcome_changed_text (__main__.Boundary.test_outcome_changed_text) ... ok
+test_outcome_correction (__main__.Boundary.test_outcome_correction) ... ok
+test_outcome_earlier_mismatch (__main__.Boundary.test_outcome_earlier_mismatch) ... ok
+test_outcome_empty (__main__.Boundary.test_outcome_empty) ... ok
+test_outcome_error (__main__.Boundary.test_outcome_error) ... ok
+test_outcome_guidance_reordered (__main__.Boundary.test_outcome_guidance_reordered) ... ok
+test_outcome_guidance_role (__main__.Boundary.test_outcome_guidance_role) ... ok
+test_outcome_hook_leak (__main__.Boundary.test_outcome_hook_leak) ... ok
+test_outcome_invocation_reordered (__main__.Boundary.test_outcome_invocation_reordered) ... ok
+test_outcome_invocation_role (__main__.Boundary.test_outcome_invocation_role) ... ok
+test_outcome_lost_base (__main__.Boundary.test_outcome_lost_base) ... ok
+test_outcome_lost_context (__main__.Boundary.test_outcome_lost_context) ... ok
+test_outcome_lost_guidance (__main__.Boundary.test_outcome_lost_guidance) ... ok
+test_outcome_lost_invocation (__main__.Boundary.test_outcome_lost_invocation) ... ok
+test_outcome_mcp_leak (__main__.Boundary.test_outcome_mcp_leak) ... ok
+test_outcome_missing_inventory (__main__.Boundary.test_outcome_missing_inventory) ... ok
+test_outcome_no_trace (__main__.Boundary.test_outcome_no_trace) ... ok
+test_outcome_nonempty_top_tools (__main__.Boundary.test_outcome_nonempty_top_tools) ... ok
+test_outcome_nonlite_changed_base (__main__.Boundary.test_outcome_nonlite_changed_base) ... ok
+test_outcome_nonlite_lost_base (__main__.Boundary.test_outcome_nonlite_lost_base) ... ok
+test_outcome_nonlite_plan (__main__.Boundary.test_outcome_nonlite_plan) ... ok
+test_outcome_overflow (__main__.Boundary.test_outcome_overflow) ... ok
+test_outcome_retry_event (__main__.Boundary.test_outcome_retry_event) ... ok
+test_outcome_stop (__main__.Boundary.test_outcome_stop) ... ok
+test_outcome_tool_request (__main__.Boundary.test_outcome_tool_request) ... ok
+test_outcome_tools (__main__.Boundary.test_outcome_tools) ... ok
+test_outcome_top_tools (__main__.Boundary.test_outcome_top_tools) ... ok
+test_outcome_wrong_effort (__main__.Boundary.test_outcome_wrong_effort) ... ok
+test_outcome_wrong_error_thread (__main__.Boundary.test_outcome_wrong_error_thread) ... ok
+test_outcome_wrong_model (__main__.Boundary.test_outcome_wrong_model) ... ok
+test_parallel_failure_updates_are_atomic_and_bounded (__main__.Boundary.test_parallel_failure_updates_are_atomic_and_bounded) ... ok
+test_parent_exit_does_not_hide_descendant (__main__.Boundary.test_parent_exit_does_not_hide_descendant) ... ok
+test_reject_agent_author (__main__.Boundary.test_reject_agent_author) ... ok
+test_reject_agent_encrypted (__main__.Boundary.test_reject_agent_encrypted) ... ok
+test_reject_agent_recipient (__main__.Boundary.test_reject_agent_recipient) ... ok
+test_reject_arguments (__main__.Boundary.test_reject_arguments) ... ok
+test_reject_audio (__main__.Boundary.test_reject_audio) ... ok
+test_reject_boundary (__main__.Boundary.test_reject_boundary) ... ok
+test_reject_compaction (__main__.Boundary.test_reject_compaction) ... ok
+test_reject_identity (__main__.Boundary.test_reject_identity) ... ok
+test_reject_layout (__main__.Boundary.test_reject_layout) ... ok
+test_reject_missing_meta (__main__.Boundary.test_reject_missing_meta) ... ok
+test_reject_parallel (__main__.Boundary.test_reject_parallel) ... ok
+test_reject_retained_answer (__main__.Boundary.test_reject_retained_answer) ... ok
+test_reject_retained_kind (__main__.Boundary.test_reject_retained_kind) ... ok
+test_reject_rollback (__main__.Boundary.test_reject_rollback) ... ok
+test_reject_unsupported (__main__.Boundary.test_reject_unsupported) ... ok
+test_reject_wrong_dial (__main__.Boundary.test_reject_wrong_dial) ... ok
+test_reject_wrong_turn (__main__.Boundary.test_reject_wrong_turn) ... ok
+test_retained_assistant_message_is_model_invisible (__main__.Boundary.test_retained_assistant_message_is_model_invisible) ... ok
+test_retained_verified_answer_preserves_tool_result (__main__.Boundary.test_retained_verified_answer_preserves_tool_result) ... ok
+test_route_crux (__main__.Boundary.test_route_crux) ... ok
+test_route_crux_astra (__main__.Boundary.test_route_crux_astra) ... ok
+test_route_mainstay (__main__.Boundary.test_route_mainstay) ... ok
+test_route_mainstay_sol_6_1 (__main__.Boundary.test_route_mainstay_sol_6_1) ... ok
+test_route_primary_astra (__main__.Boundary.test_route_primary_astra) ... ok
+test_route_primary_astra_max (__main__.Boundary.test_route_primary_astra_max) ... ok
+test_route_primary_astra_ultra (__main__.Boundary.test_route_primary_astra_ultra) ... ok
+test_route_primary_medium (__main__.Boundary.test_route_primary_medium) ... ok
+test_route_primary_sol (__main__.Boundary.test_route_primary_sol) ... ok
+test_route_primary_sol_6_1 (__main__.Boundary.test_route_primary_sol_6_1) ... ok
+test_route_primary_sol_6_1_max (__main__.Boundary.test_route_primary_sol_6_1_max) ... ok
+test_route_primary_sol_6_1_ultra (__main__.Boundary.test_route_primary_sol_6_1_ultra) ... ok
+test_route_primary_unknown (__main__.Boundary.test_route_primary_unknown) ... ok
+test_route_rescue (__main__.Boundary.test_route_rescue) ... ok
+test_route_rescue_sol_6_1 (__main__.Boundary.test_route_rescue_sol_6_1) ... ok
+test_schema_and_annotations (__main__.Boundary.test_schema_and_annotations) ... ok
+test_segments_changed_segment (__main__.Boundary.test_segments_changed_segment) ... ok
+test_segments_duplicate_model (__main__.Boundary.test_segments_duplicate_model) ... ok
+test_segments_missing_model (__main__.Boundary.test_segments_missing_model) ... ok
+test_segments_missing_table (__main__.Boundary.test_segments_missing_table) ... ok
+test_segments_row_order (__main__.Boundary.test_segments_row_order) ... ok
+test_segments_same_segment (__main__.Boundary.test_segments_same_segment) ... ok
+test_segments_unknown_segment (__main__.Boundary.test_segments_unknown_segment) ... ok
+test_success_does_not_reset_cumulative_failures (__main__.Boundary.test_success_does_not_reset_cumulative_failures) ... ok
+test_terminal_error_retains_observed_dial_and_safe_details (__main__.Boundary.test_terminal_error_retains_observed_dial_and_safe_details) ... ok
+test_unqualified_identity_disables_without_writing_a_counter (__main__.Boundary.test_unqualified_identity_disables_without_writing_a_counter) ... ok
+test_unreadable_failure_state_prevents_native_execution (__main__.Boundary.test_unreadable_failure_state_prevents_native_execution) ... ok
+test_untrusted_missing_environment_messages_stay_generic (__main__.Boundary.test_untrusted_missing_environment_messages_stay_generic) ... ok
+test_windows_cleanup_AssignProcessToJobObject (__main__.Boundary.test_windows_cleanup_AssignProcessToJobObject) ... skipped 'Windows Job Object API boundary requires Windows'
+test_windows_cleanup_CloseHandle (__main__.Boundary.test_windows_cleanup_CloseHandle) ... skipped 'Windows Job Object API boundary requires Windows'
+test_windows_cleanup_CreateJobObjectW (__main__.Boundary.test_windows_cleanup_CreateJobObjectW) ... skipped 'Windows Job Object API boundary requires Windows'
+test_windows_cleanup_QueryInformationJobObject (__main__.Boundary.test_windows_cleanup_QueryInformationJobObject) ... skipped 'Windows Job Object API boundary requires Windows'
+test_windows_cleanup_SetInformationJobObject (__main__.Boundary.test_windows_cleanup_SetInformationJobObject) ... skipped 'Windows Job Object API boundary requires Windows'
+test_windows_native_npm_ambiguous (__main__.Boundary.test_windows_native_npm_ambiguous) ... skipped 'Windows native npm lookup requires Windows'
+test_windows_native_npm_layout (__main__.Boundary.test_windows_native_npm_layout) ... skipped 'Windows native npm lookup requires Windows'
+test_windows_native_npm_missing (__main__.Boundary.test_windows_native_npm_missing) ... skipped 'Windows native npm lookup requires Windows'
+
+----------------------------------------------------------------------
+Ran 139 tests in 34.908s
+
+OK (skipped=8)
+test_duplicate_active_request_preserves_original_cancellation (__main__.RequestLifetime.test_duplicate_active_request_preserves_original_cancellation) ... ok
+test_failed_request_thread_start_releases_request (__main__.RequestLifetime.test_failed_request_thread_start_releases_request) ... ok
+test_finished_request_is_released_and_id_can_be_reused (__main__.RequestLifetime.test_finished_request_is_released_and_id_can_be_reused) ... ok
+test_invalid_cancellation_does_not_terminate_server (__main__.RequestLifetime.test_invalid_cancellation_does_not_terminate_server) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+OK
+test_concurrent_failures_preserve_each_thread_and_cap_counts (__main__.FailureStorage.test_concurrent_failures_preserve_each_thread_and_cap_counts) ... ok
+test_corrupt_database_is_not_reset (__main__.FailureStorage.test_corrupt_database_is_not_reset) ... ok
+test_existing_database_without_schema_is_not_reset (__main__.FailureStorage.test_existing_database_without_schema_is_not_reset) ... ok
+test_failed_publication_leaves_no_database_or_private_file (__main__.FailureStorage.test_failed_publication_leaves_no_database_or_private_file) ... ok
+test_reader_cannot_observe_partially_initialized_database (__main__.FailureStorage.test_reader_cannot_observe_partially_initialized_database) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.267s
+
+OK
+test_completion_checks_cancellation_after_consuming_terminal_message (__main__.NativeLifecycle.test_completion_checks_cancellation_after_consuming_terminal_message) ... ok
+test_pending_completion_keeps_retry_and_identity_validation (__main__.NativeLifecycle.test_pending_completion_keeps_retry_and_identity_validation) ... ok
+test_pending_completion_rejects_existing_cancellation (__main__.NativeLifecycle.test_pending_completion_rejects_existing_cancellation) ... ok
+test_pending_completion_rejects_expired_deadline (__main__.NativeLifecycle.test_pending_completion_rejects_expired_deadline) ... ok
+test_reader_start_failure_closes_native_process_and_pipes (__main__.NativeLifecycle.test_reader_start_failure_closes_native_process_and_pipes) ... ok
+test_real_pipe_cancellation_terminates_before_stream_close (__main__.NativeLifecycle.test_real_pipe_cancellation_terminates_before_stream_close) ... ok
+test_real_pipe_deadline_terminates_before_stream_close (__main__.NativeLifecycle.test_real_pipe_deadline_terminates_before_stream_close) ... ok
+test_success_publication_rejects_cancellation_during_verification (__main__.NativeLifecycle.test_success_publication_rejects_cancellation_during_verification) ... ok
+test_success_publication_rejects_deadline_during_verification (__main__.NativeLifecycle.test_success_publication_rejects_deadline_during_verification) ... ok
+test_exact_base_and_guidance_accept_both_qualified_representations (__main__.NativeRequest.test_exact_base_and_guidance_accept_both_qualified_representations) ... ok
+test_fixed_invocation_has_exact_content_role_and_position (__main__.NativeRequest.test_fixed_invocation_has_exact_content_role_and_position) ... ok
+test_guidance_must_follow_complete_history_with_exact_role_and_content (__main__.NativeRequest.test_guidance_must_follow_complete_history_with_exact_role_and_content) ... ok
+test_history_error_keeps_source_item_index (__main__.NativeRequest.test_history_error_keeps_source_item_index) ... ok
+test_lite_base_is_required_in_exact_developer_prefix (__main__.NativeRequest.test_lite_base_is_required_in_exact_developer_prefix) ... ok
+test_native_retry_suffix_keeps_the_fixed_invocation_before_assistant_message (__main__.NativeRequest.test_native_retry_suffix_keeps_the_fixed_invocation_before_assistant_message) ... ok
+test_nonlite_base_is_required_as_exact_top_level_instructions (__main__.NativeRequest.test_nonlite_base_is_required_as_exact_top_level_instructions) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.473s
+
+OK
+test_detached_descendant_is_reaped_after_parent_exit (__main__.LinuxDescendants.test_detached_descendant_is_reaped_after_parent_exit) ... ok
+test_detached_descendant_is_reaped_on_cancellation (__main__.LinuxDescendants.test_detached_descendant_is_reaped_on_cancellation) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.147s
+
+OK
+PASS: launcher skips unusable interpreter, preserves arguments/stdin, disables bytecode, fails without Python
+PASS: exact canonical full/reduced/adoption, unknown model, resume, delegate exclusion, invalid fallback or segment table
+PASS: all 17 entries, confirmation line on match, wrong model/effort, omitted caller effort; disabled negatives
+PASS: native response/path/header join, bounded race, missing/ambiguous/conflicting evidence; disabled negatives
+PASS: hooks are stateless; no primary Stop or SubagentStop enforcement in this scoped group
+test_admission_basis_by_role_and_tier (__main__.RoutingGate.test_admission_basis_by_role_and_tier) ... ok
+test_all_shipped_entries_and_efforts (__main__.RoutingGate.test_all_shipped_entries_and_efforts) ... ok
+test_ambiguous_and_other_session_targets_are_denied (__main__.RoutingGate.test_ambiguous_and_other_session_targets_are_denied) ... ok
+test_exact_window_boundary (__main__.RoutingGate.test_exact_window_boundary) ... ok
+test_explorer_and_advisor_reuse_denied (__main__.RoutingGate.test_explorer_and_advisor_reuse_denied) ... ok
+test_followup_and_message_targets_and_invalid_routes (__main__.RoutingGate.test_followup_and_message_targets_and_invalid_routes) ... ok
+test_latest_activity_not_file_mtime_or_first_turn (__main__.RoutingGate.test_latest_activity_not_file_mtime_or_first_turn) ... ok
+test_missing_route_is_denied (__main__.RoutingGate.test_missing_route_is_denied) ... ok
+test_route_mismatches_and_missing_fields (__main__.RoutingGate.test_route_mismatches_and_missing_fields) ... ok
+test_stale_unknown_future_and_conflicting_host_evidence (__main__.RoutingGate.test_stale_unknown_future_and_conflicting_host_evidence) ... ok
+test_unrelated_entries_and_parent_messages_are_unchanged (__main__.RoutingGate.test_unrelated_entries_and_parent_messages_are_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 5.129s
+
+OK
+VERIFY PASSED: selected deterministic checks (no live routing claim)
