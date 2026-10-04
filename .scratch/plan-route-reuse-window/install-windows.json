@@ -1,0 +1,326 @@
+{
+  "platform": "windows",
+  "version": "0.3.3",
+  "sourceCommit": "dc127b5dd75ffbacf53bc95d2e8ff7d4fccde078",
+  "date": "2026-10-04T20:11:45.167854+00:00",
+  "commands": [
+    {
+      "label": "host-version",
+      "command": [
+        "codex",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "codex-cli 0.160.0\n",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    },
+    {
+      "label": "marketplace-before",
+      "command": [
+        "codex",
+        "plugin",
+        "marketplace",
+        "list",
+        "--json"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"name\": \"codex-advisor\", \"root\": \"C:\\\\Users\\\\Shy\\\\.codex\\\\.tmp\\\\marketplaces\\\\codex-advisor\", \"marketplaceSource\": {\"sourceType\": \"git\", \"source\": \"https://github.com/IpiggyI/codex-advisor.git\"}}",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    },
+    {
+      "label": "marketplace-upgrade",
+      "command": [
+        "codex",
+        "plugin",
+        "marketplace",
+        "upgrade",
+        "codex-advisor",
+        "--json"
+      ],
+      "exitCode": 0,
+      "stdout": "{\n  \"selectedMarketplaces\": [\n    \"codex-advisor\"\n  ],\n  \"upgradedRoots\": [\n    \"C:\\\\Users\\\\Shy\\\\.codex\\\\.tmp\\\\marketplaces\\\\codex-advisor\"\n  ],\n  \"errors\": []\n}\n",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    },
+    {
+      "label": "marketplace-commit",
+      "command": [
+        "git",
+        "-C",
+        "C:\\Users\\Shy\\.codex\\.tmp\\marketplaces\\codex-advisor",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "stdout": "dc127b5dd75ffbacf53bc95d2e8ff7d4fccde078\n",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    },
+    {
+      "label": "install",
+      "command": [
+        "codex",
+        "plugin",
+        "add",
+        "codex-advisor@codex-advisor",
+        "--json"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "#< CLIXML\nError: failed to back up plugin cache entry: 拒绝访问。 (os error 5)\n\nCaused by:\n    0: failed to back up plugin cache entry: 拒绝访问。 (os error 5)\n    1: 拒绝访问。 (os error 5)\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    },
+    {
+      "label": "companion-install",
+      "command": [
+        "C:/Program Files/Git/bin/sh.exe",
+        "C:/Users/Shy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.3/scripts/install-agents.sh",
+        "--target-dir",
+        "/c/Users/Shy/.codex/agents"
+      ],
+      "exitCode": 0,
+      "stdout": "UNCHANGED: /c/Users/Shy/.codex/agents/ca-advisor-crux-h.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-advisor-crux-m.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-advisor-mainstay-h.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-advisor-mainstay-m.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-advisor-rescue-h.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-advisor-rescue-m.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-explorer-crux-h.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-explorer-crux-m.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-explorer-mainstay-h.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-explorer-mainstay-m.toml\nUNCHANGED: /c/Users/Shy/.codex/agents/ca-explorer-rescue.toml\nINSTALLED: /c/Users/Shy/.codex/agents/ca-worker-crux-h.toml\nINSTALLED: /c/Users/Shy/.codex/agents/ca-worker-crux-m.toml\nINSTALLED: /c/Users/Shy/.codex/agents/ca-worker-mainstay-h.toml\nINSTALLED: /c/Users/Shy/.codex/agents/ca-worker-mainstay-m.toml\nINSTALLED: /c/Users/Shy/.codex/agents/ca-worker-rescue-h.toml\nINSTALLED: /c/Users/Shy/.codex/agents/ca-worker-rescue-m.toml\nINSTALL PASSED: shipped templates match exactly.\n",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    },
+    {
+      "label": "companion-check",
+      "command": [
+        "C:/Program Files/Git/bin/sh.exe",
+        "C:/Users/Shy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.3/scripts/install-agents.sh",
+        "--target-dir",
+        "/c/Users/Shy/.codex/agents",
+        "--check"
+      ],
+      "exitCode": 0,
+      "stdout": "CHECK PASSED: selected templates match exactly.\n",
+      "stderr": "#< CLIXML\n<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"progress\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N=\"SourceId\">1</I64><PR N=\"Record\"><AV>正在准备首次使用模块。</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>"
+    }
+  ],
+  "hostVersion": "codex-cli 0.160.0",
+  "postFailureState": {
+    "plugin": {
+      "pluginId": "codex-advisor@codex-advisor",
+      "name": "codex-advisor",
+      "marketplaceName": "codex-advisor",
+      "version": "0.3.3",
+      "installed": true,
+      "enabled": true,
+      "source": {
+        "source": "local",
+        "path": "C:\\Users\\Shy\\.codex\\.tmp\\marketplaces\\codex-advisor\\plugins\\codex-advisor"
+      },
+      "marketplaceSource": {
+        "sourceType": "git",
+        "source": "https://github.com/IpiggyI/codex-advisor.git"
+      },
+      "installPolicy": "AVAILABLE",
+      "authPolicy": "ON_INSTALL"
+    },
+    "cacheDirectories": [
+      {
+        "Name": "0.3.2",
+        "FullName": "C:\\Users\\Shy\\.codex\\plugins\\cache\\codex-advisor\\codex-advisor\\0.3.2"
+      },
+      {
+        "Name": "0.3.3",
+        "FullName": "C:\\Users\\Shy\\.codex\\plugins\\cache\\codex-advisor\\codex-advisor\\0.3.3"
+      }
+    ],
+    "processes": [
+      {
+        "processId": 32276,
+        "parentProcessId": 24960,
+        "name": "codex.exe",
+        "executable": "C:\\Users\\Shy\\.codex\\plugins\\.plugin-appserver\\codex.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 5004,
+        "parentProcessId": 48704,
+        "name": "codex.exe",
+        "executable": "C:\\Users\\Shy\\AppData\\Local\\Codey\\codex-runtime\\ef136ab93f4ff3f4\\codex.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 30172,
+        "parentProcessId": 5004,
+        "name": "sh.exe",
+        "executable": "C:\\Program Files\\Git\\bin\\sh.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 56032,
+        "parentProcessId": 54216,
+        "name": "python.exe",
+        "executable": "D:\\Environment\\Python\\Python312\\python.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 3684,
+        "parentProcessId": 54940,
+        "name": "codex.exe",
+        "executable": "C:\\Users\\Shy\\AppData\\Local\\Codey\\codex-runtime\\ef136ab93f4ff3f4\\codex.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 14208,
+        "parentProcessId": 5004,
+        "name": "sh.exe",
+        "executable": "C:\\Program Files\\Git\\bin\\sh.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 58092,
+        "parentProcessId": 56156,
+        "name": "python.exe",
+        "executable": "D:\\Environment\\Python\\Python312\\python.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 57644,
+        "parentProcessId": 5004,
+        "name": "sh.exe",
+        "executable": "C:\\Program Files\\Git\\bin\\sh.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 48360,
+        "parentProcessId": 57640,
+        "name": "python.exe",
+        "executable": "D:\\Environment\\Python\\Python312\\python.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 55956,
+        "parentProcessId": 5004,
+        "name": "sh.exe",
+        "executable": "C:\\Program Files\\Git\\bin\\sh.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      },
+      {
+        "processId": 43532,
+        "parentProcessId": 60204,
+        "name": "python.exe",
+        "executable": "D:\\Environment\\Python\\Python312\\python.exe",
+        "usesAdvisorCache": false,
+        "usesVersion032": false
+      }
+    ]
+  },
+  "status": "installed-files-verified-standard-reinstall-blocked",
+  "postFailureCacheHashes": {
+    ".codex-plugin/plugin.json": "c1f05f646aaad2c12f8b2ba8eb9dab840b8137d95f4f0ac18d733111387b18fc",
+    ".mcp.json": "85b0cb14be64e7bd7dc714edb1e5f23bab5dc3a18b22ae04ba60cd319555fa0e",
+    "agents/ca-advisor-crux-h.toml": "90e852d4c289508c81f3e2e2a178a9dcafeeb3748570a65418546ef4e9574954",
+    "agents/ca-advisor-crux-m.toml": "581f2dcb4cfd221cabb38a76ca030fb70dcfb237c4a5220780fbd9301a7015ec",
+    "agents/ca-advisor-mainstay-h.toml": "b7c56a944cca6529c71e2862958c3eaf592dc8f5e973d96f642d0e1e8ea963df",
+    "agents/ca-advisor-mainstay-m.toml": "6f02a91bde12c77db1472a7a5dd99781fd29f77d04de30f44a4b63688947e551",
+    "agents/ca-advisor-rescue-h.toml": "a1af5a5f886751c39cbf6803b6a21ff9beb6286863e36bd09c76293ec93a37e8",
+    "agents/ca-advisor-rescue-m.toml": "5730881ef7dbf8aa6a3f20f40c71c84b5fb322ee7eb7705fdbb53c7673d8da18",
+    "agents/ca-explorer-crux-h.toml": "9bf8fe63fb783bdd033e291b9f8a6d91ac7859e53aae23ab2b5ad50f252cc703",
+    "agents/ca-explorer-crux-m.toml": "af0423f3078cd3064aa7c6756f5cfa1aa7d598320e95f87cb929b9d70fea0b58",
+    "agents/ca-explorer-mainstay-h.toml": "4bb6c3ee1f290aff81947e37730b456e270baaf54bff45390e6f5bcfb8ffdcf3",
+    "agents/ca-explorer-mainstay-m.toml": "d140b2fbdb70a8d0a2ba1fe691663c2611bcd5a970ad921afab4f9536e6b49c5",
+    "agents/ca-explorer-rescue.toml": "a52b1dc2b77aef04e037f3ed6d30b23ebcab7856a6f1955c4793129f9da89891",
+    "agents/ca-worker-crux-h.toml": "c3a84f26cf86469acb7255b139c1ab3e33a3e884beb91ca5c19c889adc5a81d3",
+    "agents/ca-worker-crux-m.toml": "c61e85cf01f40af9739c8aeca633a3a0d3e28f7e5c47401515118131c587139a",
+    "agents/ca-worker-mainstay-h.toml": "756b9308a99328a58370d32431d135c8328924e3bf32254ca3dd5dfd529c96d2",
+    "agents/ca-worker-mainstay-m.toml": "fb63e11407f4941fb1ce8750548f99a3fa17d7f629d79ccf5aa536b939673e3c",
+    "agents/ca-worker-rescue-h.toml": "aa790663b5f2161d0170122d9e6a6dcaaa0b73be4cf595d40a4894169ee1564c",
+    "agents/ca-worker-rescue-m.toml": "b49fc589681e005631cac4a7c25e415d2c8a3934ccd5e18f5bf4241835d714d7",
+    "hooks/hooks.json": "f0eb4e0a8e5274a94b29f3e655f7fbe6b88da9a2a8803699653b004b810d8667",
+    "scripts/advisor-hooks.py": "5ecb74fc2d486adca280d94c5ef64143b4b8232cc3854bd3d789f902e5413e72",
+    "scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+    "scripts/consult_limits.py": "54b98e79945114db0b0f6956c5e75bd2268daea992fa3329046644592fc85e8b",
+    "scripts/consult_native.py": "2ecc2be3676a8bbb5869ae2cf2003944df723fc3e6f837b4d65e274ef3608192",
+    "scripts/consult_process.py": "e67f1c6a614a88d10c7e0a270adaad832440db7beabca07a2228e4b98881014b",
+    "scripts/inspect-agent-runtime.sh": "efa7e4799eee9ece6dc0b6e3dfff199e566df35fc2b9d2652d19f6d36c3fc555",
+    "scripts/install-agents.sh": "2bb7a5d1fd137e9cb29d962a026e5d5d074bc47d758a7855bf5efd563fe1b220",
+    "scripts/process-consultation.py": "262fba3205300248d19bb788e58f0612a005f171c5466872c889e62526d9d379",
+    "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39",
+    "skills/orchestration/SKILL.md": "3821f704ea5c7e128ff1c7767ac09c5e564e047790728d77f08bce0c86fc34db",
+    "skills/orchestration/agents/openai.yaml": "a67cd928c2dd3e58ababfd86311d22fc24130c2148b2df5c8fc5acdfad17bc38",
+    "skills/orchestration/references/consult-posture.md": "936aa3294d39b67ca2787d06b2ec265caa08a7bd34a0929ae05dfaa3cd85bbc9",
+    "skills/orchestration/references/independent-acceptance.md": "a3f2aa9eacb4de4d80d2cf19945bf6fd819743c88f08d158eaf302e89bc6fe0f",
+    "skills/orchestration/references/operations.md": "79b4dc85c38b4a0457c1117e07739199a61214e46380608c975d5e93754d5341",
+    "skills/orchestration/references/recovery.md": "a9ddea1e7a81aa2503c4ae8e09c2651b48ed0bc1df1eed80f8e934c468efd3cb",
+    "skills/orchestration/references/role-contracts.md": "4bcce0398ee855ca0a8bd82585dc0491e231bcc0ddd63ae82ba78b82bed851da",
+    "skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654"
+  },
+  "postFailureCacheMismatches": [],
+  "installedRoot": "C:/Users/Shy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.3",
+  "pluginFileCount": 37,
+  "entryCount": 17,
+  "entryHashes": {
+    "ca-advisor-mainstay-h.toml": "b7c56a944cca6529c71e2862958c3eaf592dc8f5e973d96f642d0e1e8ea963df",
+    "ca-explorer-rescue.toml": "a52b1dc2b77aef04e037f3ed6d30b23ebcab7856a6f1955c4793129f9da89891",
+    "ca-advisor-crux-m.toml": "581f2dcb4cfd221cabb38a76ca030fb70dcfb237c4a5220780fbd9301a7015ec",
+    "ca-explorer-mainstay-m.toml": "d140b2fbdb70a8d0a2ba1fe691663c2611bcd5a970ad921afab4f9536e6b49c5",
+    "ca-worker-mainstay-m.toml": "fb63e11407f4941fb1ce8750548f99a3fa17d7f629d79ccf5aa536b939673e3c",
+    "ca-explorer-crux-h.toml": "9bf8fe63fb783bdd033e291b9f8a6d91ac7859e53aae23ab2b5ad50f252cc703",
+    "ca-worker-crux-m.toml": "c61e85cf01f40af9739c8aeca633a3a0d3e28f7e5c47401515118131c587139a",
+    "ca-worker-rescue-h.toml": "aa790663b5f2161d0170122d9e6a6dcaaa0b73be4cf595d40a4894169ee1564c",
+    "ca-worker-crux-h.toml": "c3a84f26cf86469acb7255b139c1ab3e33a3e884beb91ca5c19c889adc5a81d3",
+    "ca-advisor-rescue-m.toml": "5730881ef7dbf8aa6a3f20f40c71c84b5fb322ee7eb7705fdbb53c7673d8da18",
+    "ca-explorer-mainstay-h.toml": "4bb6c3ee1f290aff81947e37730b456e270baaf54bff45390e6f5bcfb8ffdcf3",
+    "ca-advisor-crux-h.toml": "90e852d4c289508c81f3e2e2a178a9dcafeeb3748570a65418546ef4e9574954",
+    "ca-explorer-crux-m.toml": "af0423f3078cd3064aa7c6756f5cfa1aa7d598320e95f87cb929b9d70fea0b58",
+    "ca-advisor-rescue-h.toml": "a1af5a5f886751c39cbf6803b6a21ff9beb6286863e36bd09c76293ec93a37e8",
+    "ca-worker-rescue-m.toml": "b49fc589681e005631cac4a7c25e415d2c8a3934ccd5e18f5bf4241835d714d7",
+    "ca-worker-mainstay-h.toml": "756b9308a99328a58370d32431d135c8328924e3bf32254ca3dd5dfd529c96d2",
+    "ca-advisor-mainstay-m.toml": "6f02a91bde12c77db1472a7a5dd99781fd29f77d04de30f44a4b63688947e551"
+  },
+  "finalHashes": {
+    ".codex-plugin/plugin.json": "c1f05f646aaad2c12f8b2ba8eb9dab840b8137d95f4f0ac18d733111387b18fc",
+    ".mcp.json": "85b0cb14be64e7bd7dc714edb1e5f23bab5dc3a18b22ae04ba60cd319555fa0e",
+    "agents/ca-advisor-crux-h.toml": "90e852d4c289508c81f3e2e2a178a9dcafeeb3748570a65418546ef4e9574954",
+    "agents/ca-advisor-crux-m.toml": "581f2dcb4cfd221cabb38a76ca030fb70dcfb237c4a5220780fbd9301a7015ec",
+    "agents/ca-advisor-mainstay-h.toml": "b7c56a944cca6529c71e2862958c3eaf592dc8f5e973d96f642d0e1e8ea963df",
+    "agents/ca-advisor-mainstay-m.toml": "6f02a91bde12c77db1472a7a5dd99781fd29f77d04de30f44a4b63688947e551",
+    "agents/ca-advisor-rescue-h.toml": "a1af5a5f886751c39cbf6803b6a21ff9beb6286863e36bd09c76293ec93a37e8",
+    "agents/ca-advisor-rescue-m.toml": "5730881ef7dbf8aa6a3f20f40c71c84b5fb322ee7eb7705fdbb53c7673d8da18",
+    "agents/ca-explorer-crux-h.toml": "9bf8fe63fb783bdd033e291b9f8a6d91ac7859e53aae23ab2b5ad50f252cc703",
+    "agents/ca-explorer-crux-m.toml": "af0423f3078cd3064aa7c6756f5cfa1aa7d598320e95f87cb929b9d70fea0b58",
+    "agents/ca-explorer-mainstay-h.toml": "4bb6c3ee1f290aff81947e37730b456e270baaf54bff45390e6f5bcfb8ffdcf3",
+    "agents/ca-explorer-mainstay-m.toml": "d140b2fbdb70a8d0a2ba1fe691663c2611bcd5a970ad921afab4f9536e6b49c5",
+    "agents/ca-explorer-rescue.toml": "a52b1dc2b77aef04e037f3ed6d30b23ebcab7856a6f1955c4793129f9da89891",
+    "agents/ca-worker-crux-h.toml": "c3a84f26cf86469acb7255b139c1ab3e33a3e884beb91ca5c19c889adc5a81d3",
+    "agents/ca-worker-crux-m.toml": "c61e85cf01f40af9739c8aeca633a3a0d3e28f7e5c47401515118131c587139a",
+    "agents/ca-worker-mainstay-h.toml": "756b9308a99328a58370d32431d135c8328924e3bf32254ca3dd5dfd529c96d2",
+    "agents/ca-worker-mainstay-m.toml": "fb63e11407f4941fb1ce8750548f99a3fa17d7f629d79ccf5aa536b939673e3c",
+    "agents/ca-worker-rescue-h.toml": "aa790663b5f2161d0170122d9e6a6dcaaa0b73be4cf595d40a4894169ee1564c",
+    "agents/ca-worker-rescue-m.toml": "b49fc589681e005631cac4a7c25e415d2c8a3934ccd5e18f5bf4241835d714d7",
+    "hooks/hooks.json": "f0eb4e0a8e5274a94b29f3e655f7fbe6b88da9a2a8803699653b004b810d8667",
+    "scripts/advisor-hooks.py": "5ecb74fc2d486adca280d94c5ef64143b4b8232cc3854bd3d789f902e5413e72",
+    "scripts/consult_context.py": "6982f639abc56227f74206d65fb9391149a359455b6aad45cbb6bea9e41fce28",
+    "scripts/consult_limits.py": "54b98e79945114db0b0f6956c5e75bd2268daea992fa3329046644592fc85e8b",
+    "scripts/consult_native.py": "2ecc2be3676a8bbb5869ae2cf2003944df723fc3e6f837b4d65e274ef3608192",
+    "scripts/consult_process.py": "e67f1c6a614a88d10c7e0a270adaad832440db7beabca07a2228e4b98881014b",
+    "scripts/inspect-agent-runtime.sh": "efa7e4799eee9ece6dc0b6e3dfff199e566df35fc2b9d2652d19f6d36c3fc555",
+    "scripts/install-agents.sh": "2bb7a5d1fd137e9cb29d962a026e5d5d074bc47d758a7855bf5efd563fe1b220",
+    "scripts/process-consultation.py": "262fba3205300248d19bb788e58f0612a005f171c5466872c889e62526d9d379",
+    "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39",
+    "skills/orchestration/SKILL.md": "3821f704ea5c7e128ff1c7767ac09c5e564e047790728d77f08bce0c86fc34db",
+    "skills/orchestration/agents/openai.yaml": "a67cd928c2dd3e58ababfd86311d22fc24130c2148b2df5c8fc5acdfad17bc38",
+    "skills/orchestration/references/consult-posture.md": "936aa3294d39b67ca2787d06b2ec265caa08a7bd34a0929ae05dfaa3cd85bbc9",
+    "skills/orchestration/references/independent-acceptance.md": "a3f2aa9eacb4de4d80d2cf19945bf6fd819743c88f08d158eaf302e89bc6fe0f",
+    "skills/orchestration/references/operations.md": "79b4dc85c38b4a0457c1117e07739199a61214e46380608c975d5e93754d5341",
+    "skills/orchestration/references/recovery.md": "a9ddea1e7a81aa2503c4ae8e09c2651b48ed0bc1df1eed80f8e934c468efd3cb",
+    "skills/orchestration/references/role-contracts.md": "4bcce0398ee855ca0a8bd82585dc0491e231bcc0ddd63ae82ba78b82bed851da",
+    "skills/orchestration/references/routing-profile.md": "15fdc5e3aa6150ab2626db1c6df0b9b7e259894bce67021b4ec8125db384f654"
+  },
+  "limits": [
+    "The standard plugin add command failed to back up the cache entry with access denied.",
+    "All 37 installed plugin files and 17 native entries match published source; standard reinstall persistence remains unverified.",
+    "No user process was terminated and no cache file was edited manually.",
+    "Hook trust review and existing-session reload remain unverified.",
+    "Windows native route-hook execution was not tested."
+  ]
+}

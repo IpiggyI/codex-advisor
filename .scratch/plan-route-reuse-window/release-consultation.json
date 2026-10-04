@@ -1,0 +1,45 @@
+{
+  "source": "fresh installed MCP process; metadata reconstructed from current host records",
+  "requestMetadata": {
+    "threadId": "01a1084c-e552-7d02-a837-5f4621755a1a",
+    "sessionId": "01a1084c-e552-7d02-a837-5f4621755a1a",
+    "itemId": "ctc_004042dbf25eb032016ac2b3fcf0e48194a7da516c2640d668",
+    "x-codex-turn-metadata": {
+      "thread_id": "01a1084c-e552-7d02-a837-5f4621755a1a",
+      "session_id": "01a1084c-e552-7d02-a837-5f4621755a1a",
+      "turn_id": "01a1087f-1fac-7632-ad65-16d66fd0f16e",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh"
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "isError": false,
+      "structuredContent": {
+        "status": "succeeded",
+        "advice": "将本次新进程咨询结果与两侧安装证据保存到任务记录，再仅提交这些记录并推送，核对远端提交。保留首次咨询失败记录和原线程失败计数。WSL 安装与重装已通过；Windows 仅确认 37 个插件文件和 17 个入口匹配，标准安装命令仍有拒绝访问错误，重装持久性未验证。不要终止用户进程或手改缓存。最终报告区分文件更新、新进程咨询和既有会话重载，并请用户在两侧全新任务中审阅 `/hooks`。",
+        "kind": "plan",
+        "actual": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "expected": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "advisorThreadId": "01a1088f-611c-71d3-8cce-82020d1b2fa8",
+        "callerThreadId": "01a1084c-e552-7d02-a837-5f4621755a1a",
+        "failureCount": 1,
+        "consultationDisabled": false
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "将本次新进程咨询结果与两侧安装证据保存到任务记录，再仅提交这些记录并推送，核对远端提交。保留首次咨询失败记录和原线程失败计数。WSL 安装与重装已通过；Windows 仅确认 37 个插件文件和 17 个入口匹配，标准安装命令仍有拒绝访问错误，重装持久性未验证。不要终止用户进程或手改缓存。最终报告区分文件更新、新进程咨询和既有会话重载，并请用户在两侧全新任务中审阅 `/hooks`。\n\nplan | gpt-6-astra[xhigh]"
+        }
+      ]
+    }
+  }
+}
