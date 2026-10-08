@@ -1,0 +1,783 @@
+{
+  "host": "codex-cli 0.161.0",
+  "hook_sha256": "5ecb74fc2d486adca280d94c5ef64143b4b8232cc3854bd3d789f902e5413e72",
+  "cases": [
+    {
+      "call_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+      "task": "fast_tier_acceptance",
+      "response": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "hook": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "rollout": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "allowed": false,
+      "result": "Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent"
+    },
+    {
+      "call_id": "call_30a8146b049244ee82b0205d113d651e",
+      "task": "fast_tier_acceptance",
+      "response": {
+        "chars": 1804,
+        "lines": 1,
+        "sha256": "ff342a7f7b33aa1c14048a0d66b0704f57d87b0af56fa2d7c3958c82d767eea5",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "hook": {
+        "chars": 1804,
+        "lines": 1,
+        "sha256": "ff342a7f7b33aa1c14048a0d66b0704f57d87b0af56fa2d7c3958c82d767eea5",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "rollout": {
+        "chars": 1804,
+        "lines": 1,
+        "sha256": "ff342a7f7b33aa1c14048a0d66b0704f57d87b0af56fa2d7c3958c82d767eea5",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "allowed": false,
+      "result": "Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent"
+    },
+    {
+      "call_id": "call_85e8ad584a624f3ca147bf1f48e5735c",
+      "task": "review_session_delete",
+      "response": {
+        "chars": 5412,
+        "lines": 1,
+        "sha256": "3866ea300a738ab4d66e5bc9e4365dbd8485de8b3f4dee66baa653c5ef89ceef",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "hook": {
+        "chars": 5412,
+        "lines": 1,
+        "sha256": "3866ea300a738ab4d66e5bc9e4365dbd8485de8b3f4dee66baa653c5ef89ceef",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "rollout": {
+        "chars": 5412,
+        "lines": 1,
+        "sha256": "3866ea300a738ab4d66e5bc9e4365dbd8485de8b3f4dee66baa653c5ef89ceef",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "allowed": false,
+      "result": "Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent"
+    },
+    {
+      "call_id": "plain_0",
+      "task": "plain_0",
+      "response": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "dcd2a2449d11a8c83ee83c75152ae0356b76ac2809eed81a5898bcd2ee853126",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "hook": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "dcd2a2449d11a8c83ee83c75152ae0356b76ac2809eed81a5898bcd2ee853126",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "rollout": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "dcd2a2449d11a8c83ee83c75152ae0356b76ac2809eed81a5898bcd2ee853126",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "allowed": true,
+      "result": {
+        "task_name": "/root/plain_0"
+      }
+    },
+    {
+      "call_id": "plain_1",
+      "task": "plain_1",
+      "response": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "4c234d3cbd6527f8e277bfebbe6850ee6a927f60eeb70987de6a30dfeff40ea3",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "hook": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "4c234d3cbd6527f8e277bfebbe6850ee6a927f60eeb70987de6a30dfeff40ea3",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "rollout": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "4c234d3cbd6527f8e277bfebbe6850ee6a927f60eeb70987de6a30dfeff40ea3",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "allowed": true,
+      "result": {
+        "task_name": "/root/plain_1"
+      }
+    },
+    {
+      "call_id": "plain_2",
+      "task": "plain_2",
+      "response": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "551156430bdde25e359191edbc94773e32e17365c7ad998283babe55722c2f56",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "hook": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "551156430bdde25e359191edbc94773e32e17365c7ad998283babe55722c2f56",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "rollout": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "551156430bdde25e359191edbc94773e32e17365c7ad998283babe55722c2f56",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "allowed": true,
+      "result": {
+        "task_name": "/root/plain_2"
+      }
+    },
+    {
+      "call_id": "malformed",
+      "task": "malformed",
+      "response": {
+        "chars": 38,
+        "lines": 5,
+        "sha256": "8e3b4fed3df80c07818b39d48c6e101c4f114517d22a20aee7ced96969ceb449",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "hook": {
+        "chars": 38,
+        "lines": 5,
+        "sha256": "8e3b4fed3df80c07818b39d48c6e101c4f114517d22a20aee7ced96969ceb449",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "rollout": {
+        "chars": 38,
+        "lines": 5,
+        "sha256": "8e3b4fed3df80c07818b39d48c6e101c4f114517d22a20aee7ced96969ceb449",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "allowed": false,
+      "result": "Tool call blocked by PreToolUse hook: Codex Advisor route check: A canonical Route: role=... tier=... dial=... line is required.. Tool: collaborationspawn_agent"
+    },
+    {
+      "call_id": "native_opaque",
+      "task": "native_opaque",
+      "response": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "hook": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "rollout": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "allowed": true,
+      "result": {
+        "task_name": "/root/native_opaque"
+      }
+    }
+  ],
+  "children": [
+    {
+      "role": "ca_advisor_crux_m",
+      "id": "01a11b96-79e2-7001-9073-5c321dcd762b",
+      "task": "/root/plain_0",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "received_plain_packet": false,
+      "opaque": [
+        {
+          "chars": 116,
+          "lines": 5,
+          "sha256": "dcd2a2449d11a8c83ee83c75152ae0356b76ac2809eed81a5898bcd2ee853126",
+          "opaque_prefix": false,
+          "has_route": true
+        }
+      ]
+    },
+    {
+      "role": "ca_advisor_crux_m",
+      "id": "01a11b96-7b4c-77d2-8b51-c61a6f3ef032",
+      "task": "/root/plain_2",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "received_plain_packet": false,
+      "opaque": [
+        {
+          "chars": 116,
+          "lines": 5,
+          "sha256": "551156430bdde25e359191edbc94773e32e17365c7ad998283babe55722c2f56",
+          "opaque_prefix": false,
+          "has_route": true
+        }
+      ]
+    },
+    {
+      "role": "default",
+      "id": "01a11b96-7c31-7e40-97de-268869b88967",
+      "task": "/root/native_opaque",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "received_plain_packet": false,
+      "opaque": [
+        {
+          "chars": 5496,
+          "lines": 1,
+          "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+          "opaque_prefix": true,
+          "has_route": false
+        }
+      ]
+    },
+    {
+      "role": "ca_advisor_crux_m",
+      "id": "01a11b96-7a89-7b33-8f9d-19112e14b207",
+      "task": "/root/plain_1",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "received_plain_packet": false,
+      "opaque": [
+        {
+          "chars": 116,
+          "lines": 5,
+          "sha256": "4c234d3cbd6527f8e277bfebbe6850ee6a927f60eeb70987de6a30dfeff40ea3",
+          "opaque_prefix": false,
+          "has_route": true
+        }
+      ]
+    }
+  ],
+  "hook_boundaries": [
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "fast_tier_acceptance",
+      "shape": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+      "tail": [
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "user",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": null,
+          "role": null,
+          "channel": null,
+          "call_id": null,
+          "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1"
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "user",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "fast_tier_acceptance",
+      "shape": {
+        "chars": 1804,
+        "lines": 1,
+        "sha256": "ff342a7f7b33aa1c14048a0d66b0704f57d87b0af56fa2d7c3958c82d767eea5",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "call_30a8146b049244ee82b0205d113d651e",
+      "tail": [
+        {
+          "type": null,
+          "role": null,
+          "channel": null,
+          "call_id": null,
+          "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1"
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "user",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_30a8146b049244ee82b0205d113d651e",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "review_session_delete",
+      "shape": {
+        "chars": 5412,
+        "lines": 1,
+        "sha256": "3866ea300a738ab4d66e5bc9e4365dbd8485de8b3f4dee66baa653c5ef89ceef",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "call_85e8ad584a624f3ca147bf1f48e5735c",
+      "tail": [
+        {
+          "type": "message",
+          "role": "user",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "call_1117c8d44c7f418c85dcacfd8979acb5",
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_30a8146b049244ee82b0205d113d651e",
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "call_30a8146b049244ee82b0205d113d651e",
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_85e8ad584a624f3ca147bf1f48e5735c",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "plain_0",
+      "shape": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "dcd2a2449d11a8c83ee83c75152ae0356b76ac2809eed81a5898bcd2ee853126",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "plain_0",
+      "tail": [
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_30a8146b049244ee82b0205d113d651e",
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "call_30a8146b049244ee82b0205d113d651e",
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "call_85e8ad584a624f3ca147bf1f48e5735c",
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "call_85e8ad584a624f3ca147bf1f48e5735c",
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "assistant",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_0",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "plain_1",
+      "shape": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "4c234d3cbd6527f8e277bfebbe6850ee6a927f60eeb70987de6a30dfeff40ea3",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "plain_1",
+      "tail": [
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_0",
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_0",
+          "turn_id": null
+        },
+        {
+          "type": "agent_message",
+          "role": null,
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_1",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "plain_2",
+      "shape": {
+        "chars": 116,
+        "lines": 5,
+        "sha256": "551156430bdde25e359191edbc94773e32e17365c7ad998283babe55722c2f56",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "plain_2",
+      "tail": [
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_1",
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_1",
+          "turn_id": null
+        },
+        {
+          "type": "agent_message",
+          "role": null,
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_2",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "malformed",
+      "shape": {
+        "chars": 38,
+        "lines": 5,
+        "sha256": "8e3b4fed3df80c07818b39d48c6e101c4f114517d22a20aee7ced96969ceb449",
+        "opaque_prefix": false,
+        "has_route": true
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "malformed",
+      "tail": [
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_2",
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_2",
+          "turn_id": null
+        },
+        {
+          "type": "agent_message",
+          "role": null,
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "malformed",
+          "turn_id": null
+        }
+      ]
+    },
+    {
+      "kind": "PreToolUse",
+      "tool": "collaborationspawn_agent",
+      "task": "native_opaque",
+      "shape": {
+        "chars": 5496,
+        "lines": 1,
+        "sha256": "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4",
+        "opaque_prefix": true,
+        "has_route": false
+      },
+      "turn_id": "01a11b96-7855-79d3-aefd-8929e342bae1",
+      "tool_use_id": "native_opaque",
+      "tail": [
+        {
+          "type": "message",
+          "role": "developer",
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "plain_2",
+          "turn_id": null
+        },
+        {
+          "type": "agent_message",
+          "role": null,
+          "channel": null,
+          "call_id": null,
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "malformed",
+          "turn_id": null
+        },
+        {
+          "type": "function_call_output",
+          "role": null,
+          "channel": null,
+          "call_id": "malformed",
+          "turn_id": null
+        },
+        {
+          "type": "function_call",
+          "role": null,
+          "channel": null,
+          "call_id": "native_opaque",
+          "turn_id": null
+        }
+      ]
+    }
+  ],
+  "verified": true
+}

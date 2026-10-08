@@ -31,15 +31,14 @@ installation alone does not create a global routing default.
 Use the native spawn interface with fresh context; an Explorer call always starts
 a new thread. Pass `reasoning_effort` when the entry leaves effort to the caller;
 a pinned entry takes none. On every fresh spawn, set `task_name` to a short name
-that distinguishes this thread from its siblings. The first line of `message` is
-that same name, verbatim plain text with no Markdown marker, then a blank line,
-then the route declaration below, another blank line, and the role packet:
+that distinguishes this thread from its siblings. Put the role packet in `message`
+and declare the route in the visible assistant message immediately before the call:
 
 ~~~text
 agent_type: ca_worker_crux_m
 fork_turns: none
 task_name: wire_http_checks
-message: <short name, blank line, Route line, blank line, five-part worker packet>
+message: <five-part worker packet>
 ~~~
 
 Replace entry, effort, short name, and packet for the selected role. Use
@@ -53,12 +52,21 @@ effort. Installed entries are written only by the installer; do not hand-edit th
 
 ## Declare every route
 
-Use this single-line form, with the chosen role, tier, model, and one effort from
-the routing profile:
+Write exactly one route line in a visible assistant message, then invoke the
+native tool directly. Use the chosen role, tier, model, and one effort from the
+routing profile:
 
 ~~~text
-Route: role=<role> tier=<tier> dial=<model>[<effort>] basis=<kind> ref=<evidence reference>
+Route: tool=<tool> target=<target> role=<role> tier=<tier> dial=<model>[<effort>] basis=<kind> ref=<evidence reference>
 ~~~
+
+`tool` is `spawn_agent`, `followup_task`, or `send_message`. For a spawn, `target`
+is the exact `task_name`; for continuation, it is the exact `target` argument.
+The declaration belongs to the next call in the same host turn. Declare it again
+after an intervening tool call, another message, compaction, or a rejected call.
+The hook binds the host's call ID, arguments, turn, tool, and target to this
+declaration. The native `message` is an opaque task payload and remains unchanged;
+its contents cannot supply a route declaration to the hook.
 
 For `mainstay`, omit `basis` and `ref`. Other tiers require a nonempty reference
 and a basis from this table:
@@ -74,8 +82,8 @@ the accepted scope and profile mapping for `acceptance-mapping`. A model-only
 declaration does not authorize `rescue`. Independent acceptance follows its
 mapping even when it is the Advisor's first call.
 
-`followup_task` and `send_message` to a worker start `message` with the route
-line, a blank line, then the packet or correction. Check the
+`followup_task` and `send_message` to a worker carry the packet or correction in
+`message`, with the route declared before each call. Check the
 [reuse window](recovery.md#keep-or-replace-the-thread) before either call; new
 tickets also state the shared area and concrete need for existing context.
 Use the target's UUID, canonical task path, or relative task path. The hook
@@ -83,7 +91,8 @@ requires one matching target in the caller's host session; an unresolved or
 ambiguous target is denied. Explorer calls and independent acceptance use fresh
 threads. Messages to a resolved primary or non-plugin entry need no route.
 
-The `PreToolUse` hook rejects missing or malformed declarations, entry/tier/dial
+The `PreToolUse` hook rejects missing, stale, ambiguous, or malformed declarations,
+host-call or target mismatches, entry/tier/dial
 conflicts, unlisted efforts, invalid basis kinds, and worker reuse outside the
 window or without valid host evidence. A passed check emits a route confirmation.
 It checks the basis format, not its truth, task fit, user authorization, or whether

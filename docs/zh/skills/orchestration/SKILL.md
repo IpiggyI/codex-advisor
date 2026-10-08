@@ -17,7 +17,7 @@ description: "主代理被要求委派、即将委派工作，或即将验收、
 
 - 每次新的 native spawn 之前，包括改派和为 independent acceptance 派发 Advisor：阅读 [operations.md](references/operations.md) 和 [routing-profile.md](references/routing-profile.md) 中的 dial 表。Explorer 或 Worker 的 spawn 还要阅读 [role-contracts.md](references/role-contracts.md) 中的对应数据包；Advisor 的 spawn 改用下文 independent acceptance 参考文件中的数据包。spawn 时使用 `fork_turns: none`；只有钩子的确认行或检查器显示了派发的模型和 effort，该派发才算已检查。
 - 验收委派结果，或在 Architect mode 下工作：本文件已足够。
-- 对工作线程使用 `followup_task` 或 `send_message` 之前：阅读 [operations.md](references/operations.md) 中的路由声明和 [recovery.md](references/recovery.md) 中的续用窗口。两个工具都能送入新工作，必须携带路由；新工单还需说明共享区域和上下文需求。
+- 对工作线程使用 `followup_task` 或 `send_message` 之前：阅读 [operations.md](references/operations.md) 中的路由声明和 [recovery.md](references/recovery.md) 中的续用窗口。两个工具都能送入新工作，调用前必须有可见的路由声明；新工单还需说明共享区域和上下文需求。
 - 验收失败后、返工或升级之前：阅读 [recovery.md](references/recovery.md)。先在同一拨盘上返工，仅在续用窗口内复用线程。超窗或推理强度、模型、角色发生变化时，使用新线程并携带当前状态交接。
 - 用户要求独立评审，或交付可能是高风险时：阅读 [independent-acceptance.md](references/independent-acceptance.md) 和 routing profile 中的验收映射。independent acceptance 在你自己的检查之后，于全新的 Advisor 线程中运行；咨询、自评和委派的检查执行都不能代替它。
 - 姿态块或 adoption 块缺失或不适用时：按下文咨询一节所述，阅读 [consult-posture.md](references/consult-posture.md) 和 routing profile 中的咨询映射。

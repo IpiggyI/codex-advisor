@@ -205,8 +205,14 @@ Native delegate identity excludes a second posture injection; entries carry thei
 own posture. Missing session identity also leaves the work pending.
 
 `PreToolUse` matches `collaborationspawn_agent`, `collaborationfollowup_task`, and
-`collaborationsend_message`. It parses the message's route declaration, reads allowed
-dials from the routing profile and expected settings from the entry template, and
+`collaborationsend_message`. It reads the route declaration from the visible assistant
+message immediately before the current call in the host transcript. The event's
+session, turn, call ID, tool, and arguments must match that transcript, and the
+declaration names the exact tool and target. An intervening message, tool call,
+turn boundary, or compaction requires a fresh declaration. Completed calls cannot
+reuse declarations. The native message remains opaque: the host forwards that
+field in `agent_message.encrypted_content`, so the hook never parses its body.
+It reads allowed dials from the routing profile and expected settings from the entry template, and
 returns `permissionDecision: deny` on an invalid route. Admission basis kinds are
 role-specific; Advisor acceptance mapping is an allowed basis in higher tiers.
 It checks structure and compatibility, not whether the cited evidence is true or
@@ -287,15 +293,20 @@ changes have no group here: check structure, links, and whether the text still
 matches actual behavior.
 
 The hooks group also runs `verify-routing.py`: all entry dials, role-specific
-bases, spawn and both continuation entrances, target resolution, actual dial
-conflicts, and exact reuse-window boundaries. The feature's
-[host probe](../../.scratch/plan-route-reuse-window/probe-host.py) drives the native
-host against a loopback response service in a temporary home. Its `--product` mode
-installs the current hooks from a disposable local marketplace; only the unrelated
-MCP manifest is omitted. Hook trust bypass is restricted to this test invocation
-and requires user authorization. This is not evidence of user-reviewed hook trust
-or of authenticated model behavior. Recorded results and untested environments
-live in the [acceptance record](../../.scratch/plan-route-reuse-window/acceptance.md).
+bases, spawn and both continuation entrances, declaration binding and stale-declaration
+refusal, target resolution, actual dial conflicts, and exact reuse-window boundaries.
+Run `python3 tests/verify-routing-host.py --allow-hook-trust-bypass` after the user
+authorizes the disposable-home hook trust bypass. It installs the current hooks
+from a temporary local marketplace and drives the native host against a loopback
+response service; only the unrelated MCP manifest is omitted. It verifies all
+three native entrances, rejected calls, the child roles and dials, and unchanged
+packet hashes in the children's encrypted content blocks. The provider returns
+fixed responses and does not decrypt packets. These checks establish neither
+user-reviewed hook trust nor authenticated model behavior. Qualification evidence
+and untested boundaries live in the
+[message-format issue](../../.scratch/native-route-message-format/issues/01-spawn-message-header-rejection.md).
+Requalify after changes to the host's pre-call transcript flush, turn/call identity,
+native tool schema, or agent-message transport.
 
 Run the unqualified verifier once on the final state. It contains all four groups,
 so it replaces the focused runs instead of following them:

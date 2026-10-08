@@ -1,0 +1,94 @@
+{
+  "exit": 0,
+  "sessions": [
+    {
+      "id": "01a11baf-e895-7eb3-bd37-944e2a4f4c94",
+      "parent": "01a11baf-76ab-7f13-9233-0439813f196d",
+      "role": "ca_advisor_rescue_h",
+      "cwd": "/home/hyy/develop/personal/GitHub/codex-advisor",
+      "turns": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "name": "exec",
+          "input": "const results = await Promise.allSettled([\n  tools.exec_command({cmd:\"cat .scratch/native-route-message-format/review-packet.md\",max_output_tokens:18000}),\n  tools.exec_command({cmd:\"cat /tmp/ca-route-review-bys5oqhf/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/SKILL.md\",max_output_tokens:18000}),\n  tools.exec_command({cmd:\"git status --short && git rev-parse --show-toplevel\",max_output_tokens:6000})\n]); results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "text(await tools.exec_command({cmd:\"pwd\",max_output_tokens:1000}));\n"
+        },
+        {
+          "name": "send_message",
+          "arguments": {
+            "target": "/root",
+            "message_sha256": "e9be04a9014828bff3cb51605ab31ddd23244e887b7b671d4ac1d3df242ee5f5"
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        }
+      ]
+    },
+    {
+      "id": "01a11baf-76ab-7f13-9233-0439813f196d",
+      "parent": null,
+      "role": null,
+      "cwd": "/home/hyy/develop/personal/GitHub/codex-advisor",
+      "turns": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "name": "exec",
+          "input": "text(await tools.exec_command({cmd:\"cat /tmp/ca-route-review-bys5oqhf/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/SKILL.md\",\"max_output_tokens\":12000}));\n"
+        },
+        {
+          "name": "spawn_agent",
+          "arguments": {
+            "agent_type": "ca_advisor_rescue_h",
+            "fork_turns": "none",
+            "task_name": "route_review",
+            "message_sha256": "fae9203e9e6b7dd7d3a5279d062a1db30c071debec5bac7c529fa3781467d8b5"
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "send_message",
+          "arguments": {
+            "target": "route_review",
+            "message_sha256": "48f813595abfac86900ffddbbfd0c3742848a4ab82f164d34899738606250aa0"
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        }
+      ]
+    }
+  ]
+}

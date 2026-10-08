@@ -1,0 +1,164 @@
+{
+  "host": "codex-cli 0.161.0",
+  "installed_hashes": {
+    "scripts/advisor-hooks.py": "4ab86667bcd0b52bed79f32c269d7ff85de07194721aed32a9402c948077101e",
+    "hooks/hooks.json": "f0eb4e0a8e5274a94b29f3e655f7fbe6b88da9a2a8803699653b004b810d8667",
+    "scripts/run-python.sh": "1483b79de2d1c8caa5cd6c0dbd911922df19a8d1b73a203d1c431c0e36470f39"
+  },
+  "cases": [
+    {
+      "call": "missing_spawn",
+      "tool": "spawn_agent",
+      "allowed": false
+    },
+    {
+      "call": "wrong_spawn",
+      "tool": "spawn_agent",
+      "allowed": false
+    },
+    {
+      "call": "advisor",
+      "tool": "spawn_agent",
+      "allowed": true
+    },
+    {
+      "call": "worker",
+      "tool": "spawn_agent",
+      "allowed": true
+    },
+    {
+      "call": "missing_followup_task",
+      "tool": "followup_task",
+      "allowed": false
+    },
+    {
+      "call": "wrong_followup_task",
+      "tool": "followup_task",
+      "allowed": false
+    },
+    {
+      "call": "allowed_followup_task",
+      "tool": "followup_task",
+      "allowed": true
+    },
+    {
+      "call": "missing_send_message",
+      "tool": "send_message",
+      "allowed": false
+    },
+    {
+      "call": "wrong_send_message",
+      "tool": "send_message",
+      "allowed": false
+    },
+    {
+      "call": "allowed_send_message",
+      "tool": "send_message",
+      "allowed": true
+    },
+    {
+      "call": "drain_messages",
+      "tool": "followup_task",
+      "allowed": true
+    },
+    {
+      "call": "call_1117c8d44c7f418c85dcacfd8979acb5",
+      "tool": "spawn_agent",
+      "allowed": true
+    },
+    {
+      "call": "call_30a8146b049244ee82b0205d113d651e",
+      "tool": "spawn_agent",
+      "allowed": true
+    },
+    {
+      "call": "call_85e8ad584a624f3ca147bf1f48e5735c",
+      "tool": "spawn_agent",
+      "allowed": true
+    }
+  ],
+  "children": [
+    {
+      "task": "/root/advisor",
+      "id": "01a11bd9-8cfd-78e3-b8c2-3c9d44528821",
+      "role": "ca_advisor_crux_m",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "packet_sha256": [
+        "527b2bec49e25e2ea872d9bbc7ea1550453db0ab26f8cbc02239c31784d11457"
+      ]
+    },
+    {
+      "task": "/root/fast_tier_acceptance_1",
+      "id": "01a11bd9-9241-7553-bffb-4cc8f96034ae",
+      "role": "ca_advisor_crux_m",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "packet_sha256": [
+        "ff342a7f7b33aa1c14048a0d66b0704f57d87b0af56fa2d7c3958c82d767eea5"
+      ]
+    },
+    {
+      "task": "/root/worker",
+      "id": "01a11bd9-8dd4-75d1-a7f6-1ebb09a8db64",
+      "role": "ca_worker_crux_m",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        },
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "packet_sha256": [
+        "af4e34a475ba60d3c60285c086141e455c378e2174f197ddaf07e3fdd060a8bd",
+        "f9061d5039cc6e47ba49317d52be08f09ae605a13a6d6241cd1d204f3bded3d1",
+        "a867082d88cd363c665b1a05404aa29a11fe141b71fcee1fe4336258a14dfc32",
+        "312cb812b96097b22ccca972d5a0fdebcd5ff55fced1f4208cb57df0258a6395"
+      ]
+    },
+    {
+      "task": "/root/review_session_delete_2",
+      "id": "01a11bd9-9318-77f0-b383-c87304035788",
+      "role": "ca_advisor_crux_m",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "packet_sha256": [
+        "3866ea300a738ab4d66e5bc9e4365dbd8485de8b3f4dee66baa653c5ef89ceef"
+      ]
+    },
+    {
+      "task": "/root/fast_tier_acceptance_0",
+      "id": "01a11bd9-9185-7bf0-8e8d-6159a40b053f",
+      "role": "ca_advisor_crux_m",
+      "dials": [
+        {
+          "model": "gpt-6.1-sol",
+          "effort": "xhigh"
+        }
+      ],
+      "packet_sha256": [
+        "c4b6b77278d0a1ac65e5e7bcec28b8e808be9280a1183077d20a3013ca8691e4"
+      ]
+    }
+  ],
+  "verified": true
+}

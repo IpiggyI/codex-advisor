@@ -1,0 +1,153 @@
+{
+  "exit": 0,
+  "sessions": [
+    {
+      "id": "01a11bc0-64ac-7ab2-ac02-fce51a6de54c",
+      "parent": "01a11bbf-7767-74b2-b12c-7cfaf9c4c97b",
+      "role": "ca_advisor_rescue_h",
+      "cwd": "/home/hyy/develop/personal/GitHub/codex-advisor",
+      "turns": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "hook_confirmations": [],
+      "tools": [
+        {
+          "name": "exec",
+          "input": "const results = await Promise.allSettled([\n  tools.exec_command({cmd:\"cat .scratch/native-route-message-format/review-packet.md\",max_output_tokens:16000}),\n  tools.exec_command({cmd:\"cat .scratch/native-route-message-format/review-state.json\",max_output_tokens:12000}),\n  tools.exec_command({cmd:\"cat /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/SKILL.md\",max_output_tokens:14000}),\n  tools.exec_command({cmd:\"git status --short --untracked-files=all\",max_output_tokens:7000})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "const results=await Promise.allSettled([\ntools.exec_command({cmd:\"git diff c28af93 --stat && git rev-parse HEAD && git diff c28af93 -- plugins/codex-advisor/scripts/advisor-hooks.py tests/verify-routing.py\",max_output_tokens:29000}),\ntools.exec_command({cmd:\"git diff c28af93 -- README.md docs/agents/plugin-maintenance.md docs/zh/skills/orchestration/SKILL.md docs/zh/skills/orchestration/references/operations.md plugins/codex-advisor/skills/orchestration/SKILL.md plugins/codex-advisor/skills/orchestration/references/operations.md\",max_output_tokens:16000}),\ntools.exec_command({cmd:\"cat .scratch/native-route-message-format/issues/01-spawn-message-header-rejection.md\",max_output_tokens:22000}),\ntools.exec_command({cmd:\"cat /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/independent-acceptance.md && cat /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/routing-profile.md\",max_output_tokens:14000}),\ntools.exec_command({cmd:\"rg --files -g AGENTS.md -g CLAUDE.md -g '*verify*' -g '*host*' .scratch/native-route-message-format tests plugins docs && cat docs/agents/plugin-maintenance.md\",max_output_tokens:14000})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 25000}\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"git diff c28af93 -- README.md docs/agents/plugin-maintenance.md docs/zh/skills/orchestration/SKILL.md docs/zh/skills/orchestration/references/operations.md plugins/codex-advisor/skills/orchestration/SKILL.md plugins/codex-advisor/skills/orchestration/references/operations.md\",max_output_tokens:6500}),\ntools.exec_command({cmd:\"cat .scratch/native-route-message-format/issues/01-spawn-message-header-rejection.md\",max_output_tokens:16000}),\ntools.exec_command({cmd:\"cat /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/independent-acceptance.md && cat /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/routing-profile.md\",max_output_tokens:7000})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 24000}\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"nl -ba tests/verify-routing-host.py\",max_output_tokens:18000}),\ntools.exec_command({cmd:\"nl -ba plugins/codex-advisor/scripts/advisor-hooks.py\",max_output_tokens:15000}),\ntools.exec_command({cmd:\"python3 -B - <<'PY'\\nfrom pathlib import Path\\nimport hashlib,json\\nstate=json.loads(Path('.scratch/native-route-message-format/review-state.json').read_text())\\nfor name,want in state.items():\\n p=Path(name)\\n got=hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None\\n print(('MATCH' if got==want else 'MISMATCH'), name, got)\\nprint('ARTIFACTS')\\nfor p in sorted(Path('.scratch/native-route-message-format').rglob('*')):\\n if p.is_file(): print(p, p.stat().st_size)\\nPY\",max_output_tokens:4500}),\ntools.exec_command({cmd:\"rg --files --hidden -g AGENTS.md -g CLAUDE.md -g '!**/.git/**' . /home/hyy/develop/personal/GitHub 2>/dev/null\",max_output_tokens:2500})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 18000}\nconst code = `from pathlib import Path\nimport hashlib,json\nstate=json.loads(Path(\".scratch/native-route-message-format/review-state.json\").read_text())\nfor name,want in state.items():\n p=Path(name)\n got=hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None\n print((\"MATCH\" if got==want else \"MISMATCH\"), name, got)\nprint(\"ARTIFACTS\")\nfor p in sorted(Path(\".scratch/native-route-message-format\").rglob(\"*\")):\n if p.is_file(): print(p, p.stat().st_size)\n`;\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"python3 -B -c '\"+code.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:4500}),\ntools.exec_command({cmd:\"cat .scratch/native-route-message-format/host-after.json .scratch/native-route-message-format/historical-host-after.json .scratch/native-route-message-format/host-red.log .scratch/native-route-message-format/verify.log .scratch/native-route-message-format/historical-host.log\",max_output_tokens:18000}),\ntools.exec_command({cmd:\"cat AGENTS.md && nl -ba tests/verify-routing.py && cat plugins/codex-advisor/hooks/hooks.json\",max_output_tokens:14000}),\ntools.exec_command({cmd:\"cat tests/test_zh_mirror.py tests/test_shipped_wording.py\",max_output_tokens:13000})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 15000}\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"cat tests/test_zh_mirror.py tests/test_shipped_wording.py\",max_output_tokens:12000}),\ntools.exec_command({cmd:\"cat .scratch/native-route-message-format/probe-host.py\",max_output_tokens:9500}),\ntools.exec_command({cmd:\"rg -n 'channel|retained_context|turn_aborted|thread_rolled_back|rollback' plugins/codex-advisor/scripts/consult_context.py tests/fixtures/hooks.json .scratch/native-route-message-format/host-before.json && cat .scratch/native-route-message-format/review-routing-evidence.json && git diff --check\",max_output_tokens:4500})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 9500}\nconst code=`from pathlib import Path\nimport json, hashlib\nroot=Path(\".scratch/native-route-message-format\")\nb=json.loads((root/\"host-before.json\").read_text())\nprint(\"BEFORE\",b[\"host\"],\"hook\",b[\"hook_sha256\"],\"verified\",b[\"verified\"])\nfor c in b[\"cases\"]:\n print(\"case\",c[\"call_id\"],c[\"allowed\"], \"shapes_equal\",c[\"response\"]==c[\"hook\"]==c[\"rollout\"],c[\"response\"])\nfor e in b[\"hook_boundaries\"]:\n print(\"boundary\",e[\"task\"],e.get(\"turn_id\"),e.get(\"tool_use_id\"),e.get(\"tail\"))\nfor c in b[\"children\"]: print(\"child\",c)\nfor name in (\"host-after.json\",\"historical-host-after.json\"):\n a=json.loads((root/name).read_text())\n print(\"AFTER\",name,\"hashes\",{n:hashlib.sha256((Path(\"plugins/codex-advisor\")/n).read_bytes()).hexdigest()==h for n,h in a[\"installed_hashes\"].items()})\n if name.startswith(\"historical\"):\n  print(\"historical hashes\",[(c[\"call_id\"],c[\"response\"][\"sha256\"] in [h for ch in a[\"children\"] for h in ch[\"packet_sha256\"]]) for c in b[\"cases\"][:3]])\n`;\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"python3 -B -c '\"+code.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:7000}),\ntools.exec_command({cmd:\"python3 -B tests/test_zh_mirror.py\",max_output_tokens:1500}),\ntools.exec_command({cmd:\"python3 -B tests/test_shipped_wording.py\",max_output_tokens:1700}),\ntools.exec_command({cmd:\"sed -n '69,192p' tests/verify-routing.py && sed -n '115,190p' plugins/codex-advisor/scripts/consult_context.py && cat plugins/codex-advisor/agents/ca-advisor-rescue-h.toml\",max_output_tokens:5500})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 6000}\nconst code=`from pathlib import Path\nfrom unittest.mock import patch\nimport copy, io, json, runpy, sys\nfrom contextlib import redirect_stdout\nsys.path.insert(0,str(Path(\"plugins/codex-advisor/scripts\").resolve()))\nh=runpy.run_path(\"plugins/codex-advisor/scripts/advisor-hooks.py\")\nargs={\"agent_type\":\"ca_worker_crux_m\",\"fork_turns\":\"none\",\"task_name\":\"example\",\"message\":\"gAAAA-native-payload\"}\nevent={\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"collaborationspawn_agent\",\"session_id\":\"session\",\"turn_id\":\"turn-old\",\"tool_use_id\":\"call-old\",\"transcript_path\":\"/virtual/sessions/parent.jsonl\",\"tool_input\":args}\nbase=[\n {\"type\":\"turn_context\",\"payload\":{\"turn_id\":\"turn-old\"}},\n {\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\"Route: tool=spawn_agent target=example role=worker tier=crux dial=gpt-6.1-sol[xhigh] basis=key-difficulty ref=spec\"}]}},\n {\"type\":\"response_item\",\"payload\":{\"type\":\"function_call\",\"namespace\":\"collaboration\",\"name\":\"spawn_agent\",\"call_id\":\"call-old\",\"arguments\":json.dumps(args)}}]\nclass Snapshot:\n def __init__(self,rows): self.rows=rows\n def read_text(self,**kwargs): return \"\\\\n\".join(json.dumps(r) for r in self.rows)\ndef check(label,rows):\n snap=Snapshot(rows)\n with patch.dict(h[\"main\"].__globals__,parent=lambda e:(snap,{})),patch.object(sys,\"stdin\",io.StringIO(json.dumps(event))):\n  output=io.StringIO()\n  with redirect_stdout(output): h[\"main\"]()\n  result=json.loads(output.getvalue())[\"hookSpecificOutput\"]\n  print(label,json.dumps(result,ensure_ascii=False))\ncheck(\"control_current\",base)\ncheck(\"control_completed_call\",base+[{\"type\":\"response_item\",\"payload\":{\"type\":\"function_call_output\",\"call_id\":\"call-old\",\"output\":\"done\"}}])\ncheck(\"aborted_then_new_turn\",base+[{\"type\":\"event_msg\",\"payload\":{\"type\":\"turn_aborted\",\"turn_id\":\"turn-old\"}},{\"type\":\"turn_context\",\"payload\":{\"turn_id\":\"turn-new\"}}])\ncheck(\"compaction_after_call\",base+[{\"type\":\"compacted\",\"payload\":{\"replacement_history\":[]}}])\ncheck(\"terminal_turn_after_call\",base+[{\"type\":\"event_msg\",\"payload\":{\"type\":\"task_complete\",\"turn_id\":\"turn-old\"}}])\ncheck(\"compaction_before_call\",base[:-1]+[{\"type\":\"compacted\",\"payload\":{\"replacement_history\":[]}}]+base[-1:])\n`;\ntext(await tools.exec_command({cmd:\"python3 -B -c '\"+code.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:5500}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 4500}\nconst code=`from pathlib import Path\nimport copy,json,runpy\nfrom types import SimpleNamespace\nm=runpy.run_path(\"tests/verify-routing-host.py\")\nrecord=json.loads(Path(\".scratch/native-route-message-format/host-after.json\").read_text())\ncases=m[\"scenarios\"]()\noutputs=[]\nfor c in cases:\n output=(\"Tool call blocked by PreToolUse hook: Codex Advisor route check: fixture\" if not c[\"allowed\"] else json.dumps({\"task_name\":\"/root/\"+c[\"arguments\"][\"task_name\"]}) if c[\"tool\"]==\"spawn_agent\" else \"\")\n outputs.append({\"type\":\"function_call_output\",\"call_id\":c[\"id\"],\"output\":output})\nendpoint=SimpleNamespace(cases=cases,requests=[{\"reasoning\":{\"effort\":\"medium\"},\"input\":outputs}])\nprint(\"saved_child_evidence_against_current_scenarios\",len(m[\"verify\"](endpoint,copy.deepcopy(record[\"children\"]))))\ndef test(label,mutate):\n children=copy.deepcopy(record[\"children\"])\n e=copy.deepcopy(endpoint)\n mutate(e,children)\n try: m[\"verify\"](e,children)\n except (AssertionError,KeyError) as error: print(label,\"REJECTED\",type(error).__name__)\n else: print(label,\"ACCEPTED\")\ntest(\"changed_packet\",lambda e,c:c[0][\"packet_sha256\"].__setitem__(0,\"bad\"))\ntest(\"lost_packet\",lambda e,c:c[1][\"packet_sha256\"].pop())\ntest(\"wrong_role\",lambda e,c:c[0].update(role=\"default\"))\ntest(\"wrong_effort\",lambda e,c:c[0][\"dials\"][0].update(effort=\"low\"))\ntest(\"missing_call_output\",lambda e,c:e.requests[0][\"input\"].pop())\ntest(\"disabled_gate\",lambda e,c:e.requests[0][\"input\"][0].update(output=\"\"))\n`;\nconst settings=`from pathlib import Path\nimport json\np=Path(\".scratch/native-route-message-format/review-host.jsonl\")\nfor n,line in enumerate(p.read_text().splitlines(),1):\n try: r=json.loads(line)\n except ValueError: continue\n t=r.get(\"type\",\"\")\n if any(k in t for k in (\"thread\",\"turn\",\"agent\",\"hook\")):\n  out={k:v for k,v in r.items() if k in (\"type\",\"thread_id\",\"id\",\"turn_id\",\"status\")}\n  if \"item\" in r and isinstance(r[\"item\"],dict):\n   item=r[\"item\"]\n   out[\"item_type\"]=item.get(\"type\")\n   out[\"tool\"]=item.get(\"tool\")\n   out[\"agent_id\"]=item.get(\"agent_id\")\n   if item.get(\"type\")==\"collab_tool_call\":\n    out[\"collab\"]={k:v for k,v in item.items() if k not in (\"message\",\"prompt\",\"arguments\",\"content\",\"text\")}\n  if out: print(n,json.dumps(out,ensure_ascii=False))\n`;\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"python3 -B -c '\"+code.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:2500}),\ntools.exec_command({cmd:\"python3 -B -c '\"+settings.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:2500}),\ntools.exec_command({cmd:\"nl -ba plugins/codex-advisor/skills/orchestration/references/operations.md | sed -n '50,109p' && nl -ba .scratch/native-route-message-format/issues/01-spawn-message-header-rejection.md | sed -n '107,161p' && nl -ba .scratch/native-route-message-format/host-red.log\",max_output_tokens:4000})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 5000}\nconst code=`from pathlib import Path\nimport json\nsessions=Path(\"/tmp/ca-route-review-lvisz97w/home/sessions\")\nprint(\"session_directory_exists\",sessions.exists())\nfor p in sessions.rglob(\"*.jsonl\"):\n with p.open() as f:\n  meta=json.loads(f.readline()).get(\"payload\",{})\n  spawn=meta.get(\"source\",{}).get(\"subagent\",{}).get(\"thread_spawn\",{}) if isinstance(meta.get(\"source\"),dict) else {}\n  if spawn.get(\"agent_path\")!=\"/root/route_review\": continue\n  print(\"OWN_HEADER\",str(p),{k:meta.get(k) for k in (\"id\",\"session_id\",\"parent_thread_id\",\"agent_role\",\"cwd\")},spawn)\n  for line in f:\n   if \"\\\\\"type\\\\\":\\\\\"turn_context\\\\\"\" not in line and \"\\\\\"type\\\\\": \\\\\"turn_context\\\\\"\" not in line: continue\n   row=json.loads(line)\n   if row.get(\"type\")==\"turn_context\":\n    t=row[\"payload\"]\n    print(\"OWN_TURN\",{k:t.get(k) for k in (\"turn_id\",\"cwd\",\"model\",\"effort\",\"approval_policy\",\"sandbox_policy\")})\n`;\ntext(await tools.exec_command({cmd:\"python3 -B -c '\"+code.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:5000}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "// @exec: {\"max_output_tokens\": 3000}\nconst code=`from pathlib import Path\nimport hashlib,json,subprocess\nstate=json.loads(Path(\".scratch/native-route-message-format/review-state.json\").read_text())\nmismatch=[name for name,want in state.items() if hashlib.sha256(Path(name).read_bytes()).hexdigest()!=want]\nprint(\"FINAL_SCOPE_HASHES\",len(state),\"matched\",not mismatch,mismatch)\nbefore=json.loads(Path(\".scratch/native-route-message-format/host-before.json\").read_text())\nbaseline=subprocess.check_output([\"git\",\"show\",\"c28af93:plugins/codex-advisor/scripts/advisor-hooks.py\"])\nprint(\"BASELINE_HOOK_HASH_MATCH\",hashlib.sha256(baseline).hexdigest()==before[\"hook_sha256\"])\nroot=Path(\"/tmp/ca-route-review-lvisz97w/home/sessions\")\nparent_id=\"01a11bbf-7767-74b2-b12c-7cfaf9c4c97b\"\nfor path in root.rglob(\"*\"+parent_id+\".jsonl\"):\n for line in path.open():\n  if \"function_call\" not in line or \"spawn_agent\" not in line: continue\n  row=json.loads(line)\n  item=row.get(\"payload\",{})\n  if row.get(\"type\")!=\"response_item\" or item.get(\"type\")!=\"function_call\" or item.get(\"name\")!=\"spawn_agent\": continue\n  args=json.loads(item[\"arguments\"])\n  if args.get(\"task_name\")==\"route_review\":\n   print(\"OWN_SPAWN\",{k:args.get(k) for k in (\"agent_type\",\"fork_turns\",\"task_name\",\"model\",\"reasoning_effort\")})\n`;\nconst results=await Promise.allSettled([\ntools.exec_command({cmd:\"python3 -B -c '\"+code.replaceAll(\"'\",\"'\\\\''\")+\"'\",max_output_tokens:2000}),\ntools.exec_command({cmd:\"git diff --check && git status --short --untracked-files=all\",max_output_tokens:2500})\n]);results.forEach((r,i)=>text({i,...r}));\n"
+        }
+      ]
+    },
+    {
+      "id": "01a11bbf-7767-74b2-b12c-7cfaf9c4c97b",
+      "parent": null,
+      "role": null,
+      "cwd": "/home/hyy/develop/personal/GitHub/codex-advisor",
+      "turns": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "hook_confirmations": [
+        "Codex Advisor: route declaration checked for ca_advisor_rescue_h; basis truth, task fit, and user authorization remain the caller's responsibility.",
+        "Codex Advisor: ca_advisor_rescue_h identity, model, and effort match the host record at gpt-6-astra[xhigh]; working directory and permissions were not checked."
+      ],
+      "tools": [
+        {
+          "name": "exec",
+          "input": "text(await tools.exec_command({cmd:\"cat /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/SKILL.md\",max_output_tokens:12000}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "const base=\"/tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references\";\nconst results=await Promise.allSettled([\"operations.md\",\"routing-profile.md\",\"independent-acceptance.md\"].map(name=>tools.exec_command({cmd:`cat ${base}/${name}`,max_output_tokens:14000})));\nresults.forEach((r,i)=>text({file:[\"operations.md\",\"routing-profile.md\",\"independent-acceptance.md\"][i],...r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "text(await tools.exec_command({cmd:\"sh /tmp/ca-route-review-lvisz97w/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/scripts/install-agents.sh --check-role advisor-rescue-h\",max_output_tokens:4000}));\n"
+        },
+        {
+          "name": "spawn_agent",
+          "arguments": {
+            "agent_type": "ca_advisor_rescue_h",
+            "fork_turns": "none",
+            "task_name": "route_review",
+            "message_sha256": "6fa77a3e61a01dcddc61a0508219909cbce95da381be2ccafc3cd57d30a4bdea"
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        },
+        {
+          "name": "wait_agent",
+          "arguments": {
+            "timeout_ms": 60000
+          }
+        }
+      ]
+    }
+  ]
+}

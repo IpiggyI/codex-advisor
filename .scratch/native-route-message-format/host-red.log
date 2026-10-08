@@ -1,0 +1,1 @@
+Expected baseline failure: advisor Tool call blocked by PreToolUse hook: Codex Advisor route check: Start message with task_name, a blank line, then Route:.. Tool: collaborationspawn_agent

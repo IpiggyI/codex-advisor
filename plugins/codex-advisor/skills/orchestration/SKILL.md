@@ -37,7 +37,7 @@ holds even before its reference is read.
 - Before `followup_task` or `send_message` to a worker: read the route declaration
   in [operations.md](references/operations.md) and the reuse window in
   [recovery.md](references/recovery.md). Both tools can deliver new work and must
-  carry the route; new tickets also state their shared area and context need.
+  follow a visible route declaration; new tickets also state their shared area and context need.
 - Accepting a delegated result, or working under Architect mode: this file suffices.
 - After a failed acceptance, before rework or escalation: read
   [recovery.md](references/recovery.md). Rework first at the same dial, reusing

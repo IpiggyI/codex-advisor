@@ -160,18 +160,67 @@ def dispatch(event):
             'working directory and permissions were not checked.')
 
 
-def route_line(message, task=None):
-    require(isinstance(message, str), 'A route declaration is required in message.')
-    lines = message.splitlines()
-    if task is not None:
-        require(len(lines) >= 3 and lines[0] == task and not lines[1],
-                'Start message with task_name, a blank line, then Route:.')
-        lines = lines[2:]
-    match = re.fullmatch(r'Route: role=(worker|explorer|advisor) tier=(mainstay|crux|rescue) '
+def route_line(line, event):
+    match = re.fullmatch(r'Route: tool=(spawn_agent|followup_task|send_message) target=(\S+) '
+                        r'role=(worker|explorer|advisor) tier=(mainstay|crux|rescue) '
                         r'dial=(gpt-[\w.-]+)\[([a-z]+)\]'
-                        r'(?: basis=([a-z-]+) ref=(\S[^\r\n]*))?', lines[0] if lines else '')
-    require(match is not None, 'A canonical Route: role=... tier=... dial=... line is required.')
-    return match.groups()
+                        r'(?: basis=([a-z-]+) ref=(\S[^\r\n]*))?', line)
+    require(match is not None, 'A canonical Route: tool=... target=... role=... tier=... dial=... line is required.')
+    tool, target, *route = match.groups()
+    arguments = event['tool_input']
+    require('collaboration' + tool == event['tool_name'] and
+            target == arguments.get('task_name' if tool == 'spawn_agent' else 'target'),
+            'The route declaration must name this tool and its exact task_name or target.')
+    return route
+
+
+def current_call(event, rows):
+    call_id = event.get('tool_use_id')
+    require(isinstance(call_id, str) and call_id, 'The host tool call identity is missing.')
+    calls = [(index, row['payload']) for index, row in enumerate(rows)
+             if row.get('type') == 'response_item' and row['payload'].get('type') == 'function_call'
+             and row['payload'].get('call_id') == call_id]
+    require(len(calls) == 1, 'The current tool call must appear exactly once in the host transcript.')
+    index, call = calls[0]
+    require(call.get('namespace') == 'collaboration' and
+            'collaboration' + call.get('name', '') == event['tool_name'] and
+            json.loads(call.get('arguments', 'null')) == event['tool_input'],
+            'The host tool call conflicts with the route-check input.')
+    later = rows[index + 1:]
+    require(not any(row.get('type') in ('turn_context', 'compacted') or
+                    (row.get('type') == 'event_msg' and row['payload'].get('type') in
+                     ('task_started', 'task_complete', 'turn_aborted')) for row in later),
+            'The host turn or history changed after this call; declare a fresh route for a new call.')
+    require(not any(row.get('type') == 'response_item' and
+                    row['payload'].get('type') == 'function_call_output' and
+                    row['payload'].get('call_id') == call_id for row in later),
+            'A completed tool call cannot reuse a route declaration.')
+    return index
+
+
+def declared_route(event):
+    path, _ = parent(event)
+    rows = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
+    index = current_call(event, rows)
+    turns = [i for i, row in enumerate(rows[:index]) if row.get('type') == 'turn_context']
+    require(isinstance(event.get('turn_id'), str) and event['turn_id'] and turns and
+            rows[turns[-1]]['payload'].get('turn_id') == event['turn_id'],
+            'The current turn must match the host transcript before its route declaration.')
+    require(not any(row.get('type') == 'event_msg' and row['payload'].get('type') in
+                    ('task_started', 'task_complete', 'turn_aborted') for row in rows[turns[-1] + 1:index]),
+            'The host turn changed before this call; declare a fresh route in an active turn.')
+    boundary = max([turns[-1]] + [i for i, row in enumerate(rows[:index]) if row.get('type') == 'compacted'])
+    history = rows[boundary + 1:index]
+    items = [row['payload'] for row in history if row.get('type') == 'response_item'
+             and row['payload'].get('type') != 'reasoning']
+    require(items and items[-1].get('type') == 'message' and items[-1].get('role') == 'assistant',
+            'Declare the route in a visible assistant message immediately before this tool call.')
+    content = items[-1].get('content')
+    require(isinstance(content, list) and all(part.get('type') == 'output_text' and
+            isinstance(part.get('text'), str) for part in content), 'The route message must be plain text.')
+    lines = [line for part in content for line in part['text'].splitlines() if line.startswith('Route:')]
+    require(len(lines) == 1, 'Declare exactly one Route: line in the preceding assistant message.')
+    return route_line(lines[0], event)
 
 
 def check_route(route, entry, dial):
@@ -247,7 +296,6 @@ def route_gate(event):
             return None
         require(isinstance(arguments.get('task_name'), str) and arguments['task_name'].strip(),
                 'A nonempty native task_name is required.')
-        route = route_line(arguments.get('message'), arguments.get('task_name'))
         require(arguments.get('fork_turns') == 'none', 'Native entries require fork_turns: none.')
         dial = expected(arguments)
     else:
@@ -256,10 +304,10 @@ def route_gate(event):
         if not entry.startswith('ca_'):
             return None
         require(entry.startswith('ca_worker_'), 'Explorer calls and independent acceptance require fresh threads.')
-        route = route_line(arguments.get('message'))
         dial = actual(path, entry, meta.get('parent_thread_id'), event['session_id'], child_path(meta))
         check_window(path)
-    check_route(route, entry, dial)
+    require(isinstance(arguments.get('message'), str) and arguments['message'], 'A native message is required.')
+    check_route(declared_route(event), entry, dial)
     return ('Codex Advisor: route declaration checked for ' + entry + '; '
             'basis truth, task fit, and user authorization remain the caller\'s responsibility.')
 

@@ -1,0 +1,45 @@
+{
+  "exit": 0,
+  "sessions": [
+    {
+      "id": "01a11bdc-1d83-7a63-9f42-82ac474f7026",
+      "parent": null,
+      "role": null,
+      "cwd": "/home/hyy/develop/personal/GitHub/codex-advisor",
+      "turns": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "xhigh",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "hook_confirmations": [],
+      "tools": [
+        {
+          "name": "exec",
+          "input": "const r = await tools.exec_command({cmd:\"cat /tmp/ca-route-review-d4egck1j/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/SKILL.md\",\"max_output_tokens\":12000}); text(r.output);\n"
+        },
+        {
+          "name": "exec",
+          "input": "const paths = [\n\"/tmp/ca-route-review-d4egck1j/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/operations.md\",\n\"/tmp/ca-route-review-d4egck1j/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/routing-profile.md\",\n\"/tmp/ca-route-review-d4egck1j/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/skills/orchestration/references/independent-acceptance.md\"\n];\nconst results = await Promise.allSettled(paths.map(path => tools.exec_command({cmd:\"cat \" + path,max_output_tokens:12000})));\nresults.forEach((r,i)=>text({path:paths[i],result:r}));\n"
+        },
+        {
+          "name": "exec",
+          "input": "const results = await Promise.allSettled([\ntools.exec_command({cmd:\"sh /tmp/ca-route-review-d4egck1j/home/plugins/cache/codex-advisor/codex-advisor/0.3.3/scripts/install-agents.sh --check-role advisor-rescue-h\",max_output_tokens:3000}),\ntools.exec_command({cmd:\"cat /home/hyy/develop/personal/GitHub/codex-advisor/.scratch/native-route-message-format/review-packet.md\",max_output_tokens:10000})\n]); results.forEach((r,i)=>text({check:i,result:r}));\n"
+        },
+        {
+          "name": "spawn_agent",
+          "arguments": {
+            "agent_type": "ca_advisor_rescue_h",
+            "fork_turns": "none",
+            "task_name": "route_review",
+            "message_sha256": "c3eac09770f02ad013cbc6c164f597f8d58134eea05ad7b05e5b8b2647ac33f9"
+          }
+        }
+      ]
+    }
+  ]
+}

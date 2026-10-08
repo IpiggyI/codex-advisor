@@ -1,0 +1,204 @@
+test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) ...
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_started', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_started', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_complete', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_complete', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='turn_aborted', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='turn_aborted', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_started', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_started', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_complete', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_complete', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='turn_aborted', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='turn_aborted', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_started', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_started', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_complete', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_complete', position=3) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='turn_aborted', position=2) ... FAIL
+  test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='turn_aborted', position=3) ... FAIL
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_started', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_started', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_complete', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='task_complete', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='turn_aborted', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationspawn_agent', boundary='turn_aborted', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_started', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_started', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_complete', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='task_complete', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='turn_aborted', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationfollowup_task', boundary='turn_aborted', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_started', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_started', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_complete', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='task_complete', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='turn_aborted', position=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+======================================================================
+FAIL: test_call_requires_an_active_host_turn (__main__.RoutingGate.test_call_requires_an_active_host_turn) (tool='collaborationsend_message', boundary='turn_aborted', position=3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 238, in test_call_requires_an_active_host_turn
+    self.denied(args, tool, lambda e, r: r.insert(position, boundary))
+  File "/home/hyy/develop/personal/GitHub/codex-advisor/tests/verify-routing.py", line 90, in denied
+    self.assertEqual(result.get('permissionDecision'), 'deny', result)
+AssertionError: None != 'deny' : {'hookEventName': 'PreToolUse', 'additionalContext': "Codex Advisor: route declaration checked for ca_worker_crux_m; basis truth, task fit, and user authorization remain the caller's responsibility."}
+
+----------------------------------------------------------------------
+Ran 1 test in 1.282s
+
+FAILED (failures=18)

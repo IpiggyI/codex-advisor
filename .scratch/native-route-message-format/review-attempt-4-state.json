@@ -1,0 +1,12 @@
+{
+  "README.md": "45643caca4064a7893bf35b8b6a618025f8d9954e5a55a66cc985db9490f9109",
+  "docs/agents/plugin-maintenance.md": "f7562f2927e20c4ec7b814e98464fc5295e7992c33264bae6abf5f541cc7fd0e",
+  "docs/zh/skills/orchestration/SKILL.md": "c5f48e451ad487f4174bd91988a754aed437dd4107e3b0342431c0af0bd31475",
+  "docs/zh/skills/orchestration/references/operations.md": "9da6219e14db2f19ca70a22e06df17d68bcc378b455a8695c91f4df8d1ea8606",
+  "plugins/codex-advisor/scripts/advisor-hooks.py": "29869d0f4e9fed1849e6caead5894216ac491f3db964c8b7f75e2f004ac9c2af",
+  "plugins/codex-advisor/skills/orchestration/SKILL.md": "f03a9718629d092a947a0ede73eb01abf4543f413dc0001a2add4913c71f800b",
+  "plugins/codex-advisor/skills/orchestration/references/operations.md": "95174643a8a1630873761711b8ea5a0e2ac18d5db309b1f0bf2774c76d65b682",
+  "tests/verify-routing.py": "039455801fe49bfce2104e0d198b09ec8f306921ca5b9b05b29e9c7efab6b239",
+  "tests/verify-routing-host.py": "6476324cc0d01a4b7ac7d6c05d80216f3696169e3d5e8a47e99b523464099b11",
+  ".scratch/native-route-message-format/issues/01-spawn-message-header-rejection.md": "285c2b4a75e17be33c4fe8598e7883e5d8333f57728a23e58f89ae38d26052a2"
+}
