@@ -1,0 +1,45 @@
+{
+  "source": "fresh installed MCP process; metadata reconstructed from current host records",
+  "requestMetadata": {
+    "threadId": "01a11b87-6480-7942-b7e5-64fe7e8c6c89",
+    "sessionId": "01a11b87-6480-7942-b7e5-64fe7e8c6c89",
+    "itemId": "ctc_0cc4109c5a70e3fc016ac7aee7dc84819ab4a917bdfb3813a6",
+    "x-codex-turn-metadata": {
+      "thread_id": "01a11b87-6480-7942-b7e5-64fe7e8c6c89",
+      "session_id": "01a11b87-6480-7942-b7e5-64fe7e8c6c89",
+      "turn_id": "01a11bf2-b829-7f93-8dc1-1a4f9a5cf1f0",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh"
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+      "isError": false,
+      "structuredContent": {
+        "status": "succeeded",
+        "advice": "核对本次新进程咨询的实际模型、上下文校验及原线程失败计数，保留旧进程咨询失败记录。成功后将咨询结果和两侧安装证据写回原工单，仅提交这些收尾记录并推送，确认远端提交一致。复用现有验证，无需重新部署未改变的插件文件。最终报告两侧安装、重装及 37 个插件文件、17 个入口核对通过；将新进程成功限定为新进程可用，现有会话重载仍未验证。请用户在两侧全新任务中审阅 `/hooks`。",
+        "kind": "plan",
+        "actual": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "expected": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "advisorThreadId": "01a11c03-bf69-7493-8b86-797b6ee3c332",
+        "callerThreadId": "01a11b87-6480-7942-b7e5-64fe7e8c6c89",
+        "failureCount": 1,
+        "consultationDisabled": false
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "核对本次新进程咨询的实际模型、上下文校验及原线程失败计数，保留旧进程咨询失败记录。成功后将咨询结果和两侧安装证据写回原工单，仅提交这些收尾记录并推送，确认远端提交一致。复用现有验证，无需重新部署未改变的插件文件。最终报告两侧安装、重装及 37 个插件文件、17 个入口核对通过；将新进程成功限定为新进程可用，现有会话重载仍未验证。请用户在两侧全新任务中审阅 `/hooks`。\n\nplan | gpt-6-astra[xhigh]"
+        }
+      ]
+    }
+  }
+}
