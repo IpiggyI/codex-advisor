@@ -58,3 +58,19 @@ Windows Python 为 `D:\Environment\Python\Python312\python.exe`，启用 `PYTHON
 最终 `sh tests/verify.sh` 退出 0，包含安装、入口、咨询和钩子四组；咨询相关 164 项通过、8 项 Windows 专属跳过，路由门禁 19 项通过，日志为 `evidence/release-verification.log`。手册结构 3 项、中文镜像 41 项、发布文案 66 项、HTML 内部锚点与本地链接、差异空白全部通过。六个已独立验收的修复文件仍匹配原快照；本轮新增的是版本清单、README 版本与已验证宿主范围、`docs/releases/0.3.5.html`，没有追加运行逻辑。手册沿用上一版样式，未做页面视觉验收。
 
 Windows 原生程序从 WSL 启动时会继承指向 WSL 的 `CODEX_HOME`。主会话只读探针确认该情况，并在后续 Windows 操作中明确选用 `C:\Users\Shy\.codex`，避免更新错误的一侧。Windows 配套安装器使用明确的 Git Bash 目标 `/c/Users/Shy/.codex/agents`，避免将 Windows 盘符路径解释为相对路径。
+
+## 已发布与安装核验
+
+发布提交为 `92a29d6ddc1b0418a8ccf72a15667fb92b6a2b2b`，版本 `0.3.5`。`git push origin main` 成功，主会话通过 `git ls-remote origin refs/heads/main` 核对远端引用一致。
+
+WSL 标准市场升级、安装、重装、配套安装器及 `--check` 均退出 0；37 个受版本控制的插件文件与发布源码逐字节相同，17 个入口与模板相同。市场提交等于发布提交。证据为 `evidence/install-wsl.json`。
+
+WSL 从真实 `0.3.5` 缓存新建 MCP 进程，使用主会话当时仍未完成的工具边界及宿主记录中的真实身份元数据，调用零参数 `process_consultation`。预期和实际均为 `gpt-6.1-sol[high]`，咨询成功；主线程失败数仍为 3，未清零，未停用。顾问线程为 `01a12e2d-fe78-78a3-9cd7-6e842f0acab1`，完整结果为 `evidence/live-installed-wsl.json`。主会话采纳其保留用户进程、保存证据并分别报告新进程可用与旧会话重载状态的建议。
+
+Windows 标准市场升级成功，市场提交匹配发布提交。标准 `plugin add` 首次返回退出 1，原因为备份旧插件缓存时拒绝访问。随后只读观察到新版缓存与已启用的 `0.3.5` 安装登记，37 个文件完全匹配发布源码；在这个前提变化后重试一次，仍返回相同错误，不再重试。没有手改缓存。配套安装与 `--check` 均退出 0，17 个入口完全匹配。记录为 `evidence/install-windows.json`。新版内容已存在且新进程可用，不等于标准重装流程已经成功。
+
+主会话只读查询 Windows 咨询进程的工作目录，未读取或保存环境变量值。两个旧咨询进程链 `48808 → 40240 → 51716` 与 `63568 → 64052 → 67872` 的工作目录均为 `C:\Users\Shy\.codex\plugins\cache\codex-advisor\codex-advisor\0.3.4\`；父级宿主为 Codey 的 `codex.exe`（PID `30204`）和命令行 `codex.exe`（PID `65392`）。这些是当时的进程快照；停止任何用户进程前须重新核对身份并获得明确授权。
+
+Windows 使用 Codey 原生程序 `0.162.0-alpha.17.2` 新建一次性核验线程，外层固定响应来自本机无认证端点，宿主向实际安装的 `0.3.5` MCP 自动转发元数据；内部咨询使用 Windows 真实配置和原生认证访问模型服务，没有复制或链接凭据文件，也没有修改真实模型配置。咨询成功，预期和实际均为 `gpt-6.1-sol[high]`，失败数零，未停用；顾问线程为 `01a12e32-86ff-7cf0-9ca2-9271a6e0ae26`。原始结构化结果为 `evidence/live-installed-windows.json`。该一次性线程的建议只属于核验场景，不替主会话决策。测试结束后删除本轮生成的调用者会话文件及临时目录，停止本轮测试进程，保留用户会话与已有计数。
+
+两侧新进程可用已经验证。既有会话重载未验证；已停用线程保持停用。钩子定义与入口模板没有变化。Windows 标准重装仍待释放旧缓存占用后执行；本轮未停止用户进程。

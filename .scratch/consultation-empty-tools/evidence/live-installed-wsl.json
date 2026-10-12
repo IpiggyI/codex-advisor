@@ -1,0 +1,36 @@
+{
+  "installedVersion": "0.3.5",
+  "installedPath": "/home/hyy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.5",
+  "metadataSource": "active-host-rollout",
+  "existingSessionReloadVerified": false,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+      "isError": false,
+      "structuredContent": {
+        "status": "succeeded",
+        "advice": "完成 WSL 新安装进程的真实咨询核验，保存结果并核对发布提交与安装文件。Windows 标准安装已因旧缓存备份被拒绝而失败；只读确认占用或权限原因，不反复重试、不手改缓存、不终止用户进程。先保存发布与 WSL 部署证据，再明确报告 Windows 部署待完成；若确认旧会话占用，请用户关闭对应会话后继续标准安装、重装及内容核验。分别记录新进程可用、现有会话重新加载和已停用线程状态，成功调用不清零失败计数。",
+        "kind": "plan",
+        "actual": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "expected": {
+          "model": "gpt-6.1-sol",
+          "effort": "high"
+        },
+        "advisorThreadId": "01a12e2d-fe78-78a3-9cd7-6e842f0acab1",
+        "callerThreadId": "01a12e07-52b8-7200-ba95-1cc67ce8a75b",
+        "failureCount": 3,
+        "consultationDisabled": false
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "完成 WSL 新安装进程的真实咨询核验，保存结果并核对发布提交与安装文件。Windows 标准安装已因旧缓存备份被拒绝而失败；只读确认占用或权限原因，不反复重试、不手改缓存、不终止用户进程。先保存发布与 WSL 部署证据，再明确报告 Windows 部署待完成；若确认旧会话占用，请用户关闭对应会话后继续标准安装、重装及内容核验。分别记录新进程可用、现有会话重新加载和已停用线程状态，成功调用不清零失败计数。\n\nplan | gpt-6.1-sol[high]"
+        }
+      ]
+    }
+  }
+}

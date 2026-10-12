@@ -1,0 +1,28 @@
+{
+  "installedVersion": "0.3.5",
+  "installedPath": "C:\\Users\\Shy\\.codex\\plugins\\cache\\codex-advisor\\codex-advisor\\0.3.5",
+  "outerThreadId": "01a12e32-5885-7940-9293-d79f2d22de88",
+  "outerModelEndpoint": "loopback",
+  "innerModelEndpoint": "configured-provider",
+  "credentialFilesCopied": false,
+  "existingSessionReloadVerified": false,
+  "result": {
+    "status": "succeeded",
+    "kind": "plan",
+    "advice": "检查本次咨询返回是否符合 `kind` 和 `advice` 响应结构。若检查通过，报告一次咨询调用成功，并将结论限定为本次入口及响应结构。不要重复调用、修改文件或配置，也不要启动或停止服务，以保留全部用户状态。",
+    "actual": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "expected": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "advisorThreadId": "01a12e32-86ff-7cf0-9ca2-9271a6e0ae26",
+    "callerThreadId": "01a12e32-5885-7940-9293-d79f2d22de88",
+    "failureCount": 0,
+    "consultationDisabled": false
+  },
+  "mcpStatus": "completed",
+  "mcpError": null
+}
