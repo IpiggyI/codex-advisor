@@ -230,9 +230,8 @@ class NativeEnvironment(unittest.TestCase):
             block.get('text') == 'CHAIN_EARLIEST_CONSTRAINT' for block in item.get('content', []))
             for item in request['input']))
         inventories = [item for item in request['input'] if item['type'] == 'additional_tools']
-        self.assertTrue(inventories or request.get('tools') == [])
         self.assertTrue(all(item['tools'] == [] for item in inventories))
-        self.assertFalse(request.get('tools'))
+        self.assertTrue('tools' not in request or request['tools'] == [])
         self.assertEqual(len(list((self.home / 'sessions').rglob('*.jsonl'))), 1)
 
 

@@ -1,0 +1,8 @@
+{
+  "docs/agents/plugin-maintenance.md": "f60c8a54f6021220f30e236e3e074584999630480378b9794c73fff9ef9bd37a",
+  "plugins/codex-advisor/scripts/consult_native.py": "2e264cdf778fbda48ae3bb534054708ebfd9c1b73d6359f59469ee49bdebc8b6",
+  "tests/fixtures/consult-codex.py": "604c0f705ca1b202306a362ed6dd2c6dcb54e4c3b626a93a541152127909685e",
+  "tests/verify-consultation-env.py": "bc7b15a04b1ee5692b20310576da2f79ddbbd378ea83bd3ed42746f8f6777749",
+  "tests/verify-consultation-native.py": "6b321581ef5051ae1af32386420f5ddcc025703f58fc7605b8c402c1674b1496",
+  "tests/verify-consultation.py": "937f9b62c630bc1e31c566902095a28fb091a17f4cf7a90e8b770d808ab09b83"
+}

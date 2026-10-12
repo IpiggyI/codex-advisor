@@ -78,9 +78,12 @@ its child processes. Discovery can start configured servers but receives no
 caller context; tool/resource descriptions are discarded. A second native process
 disables every discovered name, verifies that MCP capabilities and hooks are empty,
 and disables built-in tools through the temporary model catalog and settings.
-Every actual inference request must prove the expected model and effort, an empty
-`additional_tools.tools` or explicit top-level `tools=[]`, and no nonempty tool
-inventory at either location. The temporary catalog sizes the tool-output byte
+Every actual inference request must prove the expected model and effort and no
+nonempty or malformed tool inventory at either location. Each `additional_tools`
+item must contain `tools=[]`; a present top-level `tools` must equal `[]`.
+When the selected native catalog enables `use_responses_lite`, omission of both
+inventories also proves an empty tool set. Other catalog modes require at least
+one explicit empty inventory. The temporary catalog sizes the tool-output byte
 limit from the actual caller history so injection cannot shorten an existing result.
 Every request must also retain the caller's base instructions, complete history,
 consultation guidance, and final consultation request in order. Base instructions

@@ -228,6 +228,58 @@ class NativeRequest(unittest.TestCase):
             with self.subTest(lite=lite):
                 self.assertEqual(self.verify(self.request(lite), lite), EXPECTED)
 
+    def test_lite_empty_tools_may_omit_both_inventories(self):
+        request = self.request()
+        request['input'].pop(0)
+        self.assertEqual(self.verify(request), EXPECTED)
+
+    def test_nonlite_requires_an_explicit_empty_inventory(self):
+        request = self.request(False)
+        request['input'].pop(0)
+        with self.assertRaises(Failure) as raised:
+            self.verify(request, False)
+        self.assertEqual(raised.exception.code, 'tools')
+
+    def test_explicit_empty_top_level_tools_accept_both_catalog_modes(self):
+        for lite in (True, False):
+            with self.subTest(lite=lite):
+                request = self.request(lite)
+                request['input'].pop(0)
+                request['tools'] = []
+                self.assertEqual(self.verify(request, lite), EXPECTED)
+
+    def test_nonempty_or_malformed_tools_fail_in_both_locations(self):
+        for lite in (True, False):
+            for value in (None, {}, '', [{'name': 'shell'}]):
+                for location in ('top', 'additional', 'both', 'omitted_additional'):
+                    with self.subTest(lite=lite, value=value, location=location):
+                        request = self.request(lite)
+                        if location in ('top', 'both', 'omitted_additional'):
+                            request['tools'] = value
+                        if location in ('additional', 'both'):
+                            request['input'][0]['tools'] = value
+                        if location == 'omitted_additional':
+                            request['input'].pop(0)
+                        with self.assertRaises(Failure) as raised:
+                            self.verify(request, lite)
+                        self.assertEqual(raised.exception.code, 'tools')
+                        self.assertEqual(raised.exception.actual, EXPECTED)
+
+    def test_additional_inventory_requires_tools_and_checks_every_item(self):
+        for lite in (True, False):
+            for change in ('missing', 'second_nonempty'):
+                with self.subTest(lite=lite, change=change):
+                    request = self.request(lite)
+                    request['tools'] = []
+                    if change == 'missing':
+                        request['input'][0].pop('tools')
+                    else:
+                        request['input'].append({'type': 'additional_tools', 'role': 'developer',
+                                                 'tools': [{'name': 'shell'}]})
+                    with self.assertRaises(Failure) as raised:
+                        self.verify(request, lite)
+                    self.assertEqual(raised.exception.code, 'tools')
+
     def test_lite_base_is_required_in_exact_developer_prefix(self):
         for change in ('missing', 'content', 'role', 'position', 'substring', 'top_level'):
             with self.subTest(change=change):

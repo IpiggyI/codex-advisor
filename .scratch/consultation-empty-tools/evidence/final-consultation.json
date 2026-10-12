@@ -1,0 +1,24 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Consultation failed: Actual consultation request did not prove an empty tool set.\nCode: tools"
+    }
+  ],
+  "structuredContent": {
+    "status": "failed",
+    "code": "tools",
+    "message": "Actual consultation request did not prove an empty tool set.",
+    "expected": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "actual": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "failureCount": 2,
+    "consultationDisabled": false
+  },
+  "isError": true
+}

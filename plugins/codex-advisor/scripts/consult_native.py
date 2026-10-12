@@ -574,11 +574,12 @@ def verify_requests(root, thread, expected, caller):
                 raise Failure('mismatch', 'Actual consultation model or effort differs from its expected dial.', actual)
             inventories = [item for item in request.get('input', []) if item.get('type') == 'additional_tools']
             try:
+                lite = model.get('use_responses_lite') is True
+                # Responses Lite omits both inventories when its tool set is empty.
                 require(('tools' not in request or request['tools'] == []) and
-                        (inventories or request.get('tools') == []) and
+                        (inventories or request.get('tools') == [] or lite) and
                         all(item.get('tools') == [] for item in inventories),
                         'tools', 'Actual consultation request did not prove an empty tool set.')
-                lite = model.get('use_responses_lite') is True
                 start = verify_base(request, caller, lite)
                 history_end = verify_history(request, caller, lite, start)
                 verify_guidance(request, history_end)

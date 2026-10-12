@@ -204,6 +204,8 @@ for line in sys.stdin:
         if scenario == 'top-tools':
             request['tools'] = []
             request['input'].pop(0)
+        if scenario == 'omitted-lite-tools':
+            request['input'].pop(0)
         if scenario == 'nonempty-top-tools':
             request['tools'] = [{'name': 'shell'}]
         if scenario == 'missing-inventory':

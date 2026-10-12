@@ -5,10 +5,10 @@ Codex Advisor is a Codex-only fork of
 Any primary can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Version 0.3.4 supplies seventeen native entries across `mainstay`, `crux`, and
+Version 0.3.5 supplies seventeen native entries across `mainstay`, `crux`, and
 `rescue`, a single routing profile, zero-argument process consultation, and
 hooks for posture injection and automatic dispatch verification.
-See the [Chinese version manual](docs/releases/0.3.4.html) for a complete guide.
+See the [Chinese version manual](docs/releases/0.3.5.html) for a complete guide.
 
 ## Install
 
@@ -19,8 +19,8 @@ through `sh`, so Git for Windows' `bin` directory, for example
 [Windows launch](docs/agents/plugin-maintenance.md#windows-launch). Consultation
 on Windows also needs the native `codex.exe`; see
 [plugin maintenance](docs/agents/plugin-maintenance.md#process-consultation-component).
-The consultation protocol is qualified on Codex 0.160.0; native route hooks are
-qualified on Codex 0.161.0. Host
+Consultation request construction is qualified on Codex 0.162.1 and Windows
+0.162.0-alpha.17.2; native route hooks are qualified on Codex 0.161.0. Host
 schema or cache-layout changes need renewed qualification rather than an assumed
 compatibility guarantee.
 
