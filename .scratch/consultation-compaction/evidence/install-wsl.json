@@ -1,0 +1,19 @@
+{
+  "host": "wsl",
+  "version": "0.3.6",
+  "sourceCommit": "593e93c610ebc25b6f10765fad6f382a239908c8",
+  "marketplaceUpgradeExit": 0,
+  "standardInstallExit": 0,
+  "retryInstallExit": null,
+  "installFailure": null,
+  "companionInstallExit": 0,
+  "companionCheckExit": 0,
+  "pluginFiles": 37,
+  "pluginMismatches": [],
+  "nativeEntries": 17,
+  "entryMismatches": [],
+  "existingSessionReload": "unverified",
+  "originalEncryptedContentInference": "unverified",
+  "failureCountersCleared": false,
+  "userProcessesStopped": false
+}

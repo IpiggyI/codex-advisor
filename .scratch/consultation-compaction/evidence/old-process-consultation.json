@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Consultation failed: Consultation encountered an unsupported host response or local I/O failure.\nCode: internal"
+    }
+  ],
+  "structuredContent": {
+    "status": "failed",
+    "code": "internal",
+    "message": "Consultation encountered an unsupported host response or local I/O failure.",
+    "expected": null,
+    "actual": null,
+    "failureCount": 1,
+    "consultationDisabled": false
+  },
+  "isError": true
+}
