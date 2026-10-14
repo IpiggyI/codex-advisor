@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check real native request construction against a local, unauthenticated endpoint."""
 
+import copy
 import http.server
 import json
 import os
@@ -14,8 +15,8 @@ import uuid
 sys.dont_write_bytecode = True
 PLUGIN = Path(__file__).resolve().parent.parent / 'plugins/codex-advisor'
 sys.path.insert(0, str(PLUGIN / 'scripts'))
-from consult_native import execute
-from consult_context import Failure
+from consult_native import execute, verify_history
+from consult_context import Failure, validate_items
 
 ADVICE = '保留全部上下文。'
 EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
@@ -132,6 +133,36 @@ class NativeHistory(unittest.TestCase):
         config.write_text(config.read_text(encoding='utf-8').replace(
             'stream_max_retries = 0', 'stream_max_retries = 1'), encoding='utf-8')
         self.assertEqual(self.consult('RETAINED_OUTPUT', request_count=2), 'RETAINED_OUTPUT')
+
+    def test_encrypted_compaction_retains_content_and_rejects_request_changes(self):
+        compact = {'type': 'compaction', 'id': 'cmp_local', 'encrypted_content': 'opaque-compaction-74813',
+                   'internal_chat_message_metadata_passthrough': {'turn_id': 'fixture'}}
+        caller = {'base': 'Keep the caller history intact.', 'thread': 'local-test', 'items': [
+            {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': 'BEFORE_COMPACTION'}]},
+            compact,
+            {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': 'AFTER_COMPACTION'}]}]}
+        validate_items(caller['items'])
+        result = execute(self.home, caller, EXPECTED, threading.Event())
+        self.assertEqual(result['status'], 'succeeded', result)
+        self.assertEqual(result['actual'], EXPECTED)
+        request = self.endpoint.requests[-1]
+        actual = next(item for item in request['input'] if item.get('type') == 'compaction')
+        self.assertEqual(actual['encrypted_content'], compact['encrypted_content'])
+        for change in ('changed', 'missing', 'reordered'):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(request)
+                position = next(index for index, item in enumerate(altered['input'])
+                                if item.get('type') == 'compaction')
+                if change == 'changed':
+                    altered['input'][position]['encrypted_content'] = 'CHANGED'
+                elif change == 'missing':
+                    altered['input'].pop(position)
+                else:
+                    altered['input'].insert(position - 1, altered['input'].pop(position))
+                with self.assertRaises(Failure) as raised:
+                    verify_history(altered, caller)
+                self.assertEqual(raised.exception.code, 'context')
+                self.assertEqual(raised.exception.details['sourceIndex'], 1)
 
     def test_missing_environment_variable_fails_before_request(self):
         name = 'CA_MISSING_ENV_' + uuid.uuid4().hex.upper()

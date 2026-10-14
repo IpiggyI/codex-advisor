@@ -87,6 +87,9 @@ def validate_items(items):
                     'unsupported_content', 'Invalid opaque reasoning.')
             if item.get('content') is not None:
                 validate_content(item['content'])
+        elif kind == 'compaction':
+            require(isinstance(item.get('encrypted_content'), str) and bool(item['encrypted_content']),
+                    'unsupported_content', 'Invalid opaque compaction content.')
         elif kind in ('function_call', 'custom_tool_call'):
             call = item.get('call_id')
             require(isinstance(call, str) and call and call not in seen,

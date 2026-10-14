@@ -72,6 +72,11 @@ host bookkeeping: verified answers remain in their original tool results, and
 compaction supplies the model-visible replacement history. Unknown event variants
 still fail explicitly.
 
+Replacement history may contain a `compaction` item with nonempty opaque
+`encrypted_content`. The component preserves that item and its position when
+injecting history. Request verification requires the encrypted content to match
+exactly; missing, changed, or reordered compaction items fail as context loss.
+
 Before passing any caller context, a native discovery process enumerates every
 configured MCP server name through all inventory pages and then terminates with
 its child processes. Discovery can start configured servers but receives no

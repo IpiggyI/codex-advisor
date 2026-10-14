@@ -242,6 +242,28 @@ public class CodexFixture {
         self.assertEqual(result['status'], 'succeeded', result)
         self.assertEqual(json.loads((self.root / 'injected.json').read_text())[:-1], history)
 
+    def test_encrypted_compaction_replaces_history_without_changes(self):
+        records, meta, _ = fixture()
+        replacement = [item('RETAINED_CONSTRAINT'), {
+            'type': 'compaction', 'id': 'cmp_fixture', 'encrypted_content': 'opaque-compaction-74813',
+            'internal_chat_message_metadata_passthrough': {'turn_id': TURN}}, item('AFTER_COMPACTION')]
+        records.insert(-3, {'type': 'compacted', 'payload': {'replacement_history': replacement}})
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded', result)
+        injected = json.loads((self.root / 'injected.json').read_text())
+        self.assertEqual(injected[:-1], replacement + [record['payload'] for record in records[-3:-1]])
+        self.assertNotIn('EARLIEST_CONSTRAINT', json.dumps(injected))
+
+    def test_invalid_encrypted_compaction_is_rejected_before_native_execution(self):
+        for content in ({}, {'encrypted_content': ''}, {'encrypted_content': None}, {'encrypted_content': 7}):
+            with self.subTest(content=content):
+                records, meta, _ = fixture()
+                records.insert(-1, {'type': 'compacted', 'payload': {
+                    'replacement_history': [dict(content, type='compaction')]}})
+                result = self.call(records, meta)
+                self.assertEqual(result['code'], 'unsupported_content', result)
+                self.assertFalse((self.root / 'injected.json').exists())
+
     def test_delegate_trigger_metadata(self):
         records, meta, history = fixture('gpt-6-luna', 'max', 'ca_worker_mainstay_m')
         records.insert(1, {'type': 'inter_agent_communication_metadata', 'payload': {'trigger_turn': True}})
