@@ -35,6 +35,89 @@ Relative targets resolve against the current directory.
 [ADR-0008](../adr/0008-installer-deletes-no-old-filenames.md) records why the
 installer deletes no old filenames and when to revisit that.
 
+## Host upgrade checks
+
+After each host upgrade and before each plugin release, run all three local maintainer
+checks from the repository root:
+
+```sh
+python3 tests/consultation_schema_check.py
+python3 tests/consultation_corpus_replay.py
+python3 tests/consultation_native_corpus.py
+```
+
+The schema check generates the installed host's experimental JSON protocol schema
+in a temporary directory and compares every `ResponseItem` variant with
+`consult_context.py`'s `ITEM_POLICY`. A nonempty `missingTypes` list means the
+policy table needs an explicit decision for those host types. Schema generation
+or an unreadable union also fails the check.
+
+The corpus check runs production `reconstruct()` at sequential `function_call` and
+`custom_tool_call` boundaries in every rollout under `~/.codex/sessions` and existing
+`/mnt/c/Users/*/.codex/sessions` directories. Repeat `--root PATH` to replace the
+default roots. Each boundary uses the latest preceding turn context as MCP
+metadata and a truncated copy in a temporary home. An id-less boundary receives
+a temporary selection id; it is excluded from reconstructed history. Prior
+records remain unchanged. Legacy files without a session header and boundaries
+before any turn context or task-start event are skipped and counted.
+Positions with an earlier declared call still awaiting its result are skipped as
+`parallelSkipped`, included in `boundariesSkipped`. The batch-start position is
+replayed. Pairing follows `ITEM_POLICY`, including capability and hosted calls;
+compaction replaces the tracked history. Invalid pairing
+structures remain subject to production validation.
+
+Corpus output is JSON containing counts and failure locations, stages, types,
+codes, and messages, without history text. Failures with code `rollback` are
+deliberate design rejections: their diagnostics appear in `designRejections`,
+with counts by code in `counts.designRejections`, and do not change the exit
+status. Every other failure appears in `failures` and produces a nonzero exit
+status, identifying a reconstruction limit to investigate before release. Do not
+relax validation merely to pass the corpus. The report includes both the
+boundary index and the failing record index, starting at zero. A skipped boundary
+is unverified. Neither check sends a remote request or changes real rollouts;
+temporary schemas and rollout copies are removed automatically. These maintainer
+checks are explicit commands and are not run by `tests/verify.sh`.
+
+The native corpus check selects the smallest eligible reconstructed caller history
+for every preserved item type, measured as UTF-8 JSON bytes of base instructions
+and items. For capability, control, and hosted types, it selects boundaries whose raw
+effective history before the boundary contains the type. Production reconstruction
+must exclude those items, and the actual native requests must contain neither
+excluded items nor tools at request or item level. Both sample kinds use the
+replay check's sequential boundary and compaction rules.
+The source is the real caller rollout; it does not generate caller histories with
+consultation-specific features. Repeat `--root PATH` to replace the default session
+roots. Types without an eligible sample appear in `uncoveredTypes` and fail coverage.
+
+Each selected history runs through production `consult_native.execute()`, including
+its catalog, configuration, injection, isolation checks, and strict request
+verification. At run time it reads the `ca_advisor_*` rows in the routing profile
+and queries `codex debug models --bundled`. Each sample runs in every request mode
+used by those advisor models, according to their `use_responses_lite` values. The
+selected advisor uses that mode in the unmodified production catalog. Modes used
+by no advisor model appear in `notCovered`; they are not executed and do not fail
+the check. `requestModes` lists the active modes and their advisor models. The
+tool does not force catalog flags. The provider is a credential-free
+loopback endpoint in a temporary home, with a fixed structured response. No caller
+provider configuration or credentials are copied. Homes, traces, and rollout
+copies are removed after use. This check cannot prove remote API acceptance of
+opaque or injected items.
+Loopback checks cannot detect a backend that rejects hosted tool records. Before
+release, any newly preserved hosted tool type requires one real authenticated
+request to the configured backend, with tool isolation and a structured result
+verified.
+
+Output is JSON: selected file names and boundary indices, verdicts for each type
+and mode, `sampleKind` (`preserved` or `excluded`), uncovered types, and failures
+containing only stage, type, code, path, and message. It never emits history text.
+Any failed mode, selection failure, or
+uncovered type produces a nonzero exit status. Investigate failures without
+relaxing comparison. The targeted native mutation test
+`test_transport_normalization_mutation_fails_with_type_and_path` in
+`tests/test_consultation_native_corpus.py` uses a synthetic history with a source
+item id. It verifies that the normal comparison passes, then deliberately disables
+source id removal and requires a context failure with a type and field path.
+
 ## Process consultation component
 
 [ADR-0006](../adr/0006-mainstay-crux-rescue-and-process-consultation.md#consultation-mechanism-and-host-facts)
@@ -50,12 +133,53 @@ output and bytecode writes disabled. An unusable interpreter is rejected before
 starting the component. The component requires the qualified versioned Codex
 plugin-cache layout; an unknown layout fails explicitly.
 
-The component reads exactly one rollout snapshot matching the caller identity in
+The component checks `$CODEX_HOME/codex-advisor/consultation-off` on every call,
+using the caller's `CODEX_HOME` derived from the versioned plugin cache layout.
+WSL and Windows each have their own `CODEX_HOME` and marker. While the marker
+exists, the component returns a failed `switched_off` result with
+`consultationDisabled=true`, the stop-calling guidance, and the marker path to
+delete. It reads no rollout, starts no native process, and neither reads nor writes
+failure counts; the result has no `failureCount`. Deleting the marker enables the
+next call in the same MCP process. A thread that receives the switched-off result
+stops calling for the rest of that thread, so only new threads resume after deletion.
+
+With no marker, the component reads exactly one rollout snapshot matching the caller identity in
 the MCP metadata and stops before the unfinished consultation item, including when
 that item is the host's code-mode wrapper. The caller's tool inventory is not
 forwarded. The server applies the routing profile's consultation mapping to the
 caller's host-recorded dial. The component uses native Codex authentication. It
 does not parse credential values or copy credential files.
+
+The history policy table declares `preserve`, `capability`, `control`, `hosted`, or `reject` for each
+known item and content block. It drives validation, injection, expected history,
+and type-specific comparison normalization. Call/result pairs share one declaration.
+`additional_tools` and the complete `tool_search_call`/`tool_search_output` pair
+are capability declarations and enter neither injected nor expected history.
+`configuration_update` and `compaction_trigger` are caller control items and also
+enter neither injected nor expected history. `web_search_call`,
+`image_generation_call`, and `local_shell_call` are hosted tool records: they are
+validated, then enter neither injected nor expected history. `local_shell_call`
+pairs with `function_call_output` through the same nonempty `call_id`; its result
+is excluded with the call. A missing identity or a pair with only one excluded
+member fails as `pairing`. Ordinary function call results remain preserved.
+`context_compaction` and `other` are preserved.
+Incomplete pairs fail. Undeclared item types and undeclared
+content blocks are preserved verbatim; missing or changed payloads fail comparison.
+Comparison removes item-level `id`, `internal_chat_message_metadata_passthrough`,
+and null-valued fields from every type as transport normalization. Only declared
+types receive type-specific normalization, including empty tool text blocks and
+Lite image detail omission.
+Every request must omit tools or carry an empty tool list, both at request level
+and in every input item, regardless of its type. Non-Lite requests must prove an
+empty tool set with `request.tools == []` or an `additional_tools` item whose
+`tools == []`; only Responses Lite may omit both inventories. Declared shapes
+require only protocol-required fields, plus pairing and opaque-content invariants;
+optional fields may be absent.
+History failures report `stage` (`record`, `item`, `content`, or `request`), `type`,
+`recordIndex` and/or `historyIndex`, and `hostVersion` from `session_meta.cli_version`
+when available. Comparison failures also report the first differing field `path`,
+without field values or compared text. Unknown rollout records, retained events,
+rollback, invalid declared shapes, and incomplete tool pairs still fail explicitly.
 
 Native MCP startup filters the host environment. The plugin's `.mcp.json`
 explicitly forwards `S2A_API_KEY` through `env_vars` for providers whose `env_key`
@@ -116,7 +240,7 @@ also reports `reason=missing_environment_variable`, the bounded variable name in
 No variable value is returned. Text content leads with readable advice or the
 failure reason; `structuredContent` carries the machine-readable outcome.
 
-Calls with a qualified host thread identity report `failureCount` and
+Calls with a qualified host thread identity and no marker report `failureCount` and
 `consultationDisabled`. The fourth cumulative failed call disables further
 consultation for that thread. Successful calls do not reset the count. A disabled
 thread receives `code=disabled` before reconstruction or native execution; the

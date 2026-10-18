@@ -1,0 +1,225 @@
+[
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+    "callLine": 44,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 22,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+    "callLine": 259,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 112,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+    "callLine": 342,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 148,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+    "callLine": 351,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 152,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+    "callLine": 45,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 23,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+    "callLine": 219,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 97,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+    "callLine": 252,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 109,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/18/rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+    "callLine": 304,
+    "hostVersion": "0.163.0-alpha.10.2",
+    "items": 131,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 0,
+    "sourceLine": 3,
+    "type": "additional_tools",
+    "keys": [
+      "type",
+      "id",
+      "role",
+      "tools"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/home/hyy/.codex/sessions/2026/10/15/rollout-2026-10-15T14-26-27-01a13e3d-9c16-75b3-a1db-0d6be4435ed6.jsonl",
+    "callLine": 1070,
+    "hostVersion": "0.162.1",
+    "items": 139,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 17,
+    "sourceLine": 805,
+    "type": "web_search_call",
+    "keys": [
+      "type",
+      "id",
+      "status",
+      "action",
+      "internal_chat_message_metadata_passthrough"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/home/hyy/.codex/sessions/2026/10/15/rollout-2026-10-15T14-26-27-01a13e3d-9c16-75b3-a1db-0d6be4435ed6.jsonl",
+    "callLine": 1366,
+    "hostVersion": "0.162.1",
+    "items": 271,
+    "reconstruct": "unsupported_content: The caller has an unqualified history item."
+  },
+  {
+    "index": 17,
+    "sourceLine": 805,
+    "type": "web_search_call",
+    "keys": [
+      "type",
+      "id",
+      "status",
+      "action",
+      "internal_chat_message_metadata_passthrough"
+    ],
+    "singleItem": "unsupported_content: The caller has an unqualified history item.",
+    "withoutThisItem": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/14/rollout-2026-10-14T14-14-26-01a1390c-3ded-7e60-aef5-c96450017a15.jsonl",
+    "callLine": 1583,
+    "hostVersion": "0.162.0-alpha.17.2",
+    "items": 58,
+    "reconstruct": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/14/rollout-2026-10-14T14-14-26-01a1390c-3ded-7e60-aef5-c96450017a15.jsonl",
+    "callLine": 1618,
+    "hostVersion": "0.162.0-alpha.17.2",
+    "items": 73,
+    "reconstruct": "PASS"
+  },
+  {
+    "rollout": "/mnt/c/Users/Shy/.codex/sessions/2026/10/14/rollout-2026-10-14T14-14-26-01a1390c-3ded-7e60-aef5-c96450017a15.jsonl",
+    "callLine": 2286,
+    "hostVersion": "0.162.0-alpha.17.2",
+    "items": 361,
+    "reconstruct": "PASS"
+  }
+]

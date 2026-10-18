@@ -1,0 +1,40 @@
+{
+  "hostVersion": "codex-cli 0.163.0",
+  "hostVariantCount": 18,
+  "validatorAcceptedCount": 8,
+  "validatorAcceptedTypes": [
+    "agent_message",
+    "compaction",
+    "custom_tool_call",
+    "custom_tool_call_output",
+    "function_call",
+    "function_call_output",
+    "message",
+    "reasoning"
+  ],
+  "hostTypesWithoutValidatorBranch": [
+    "additional_tools",
+    "compaction_trigger",
+    "configuration_update",
+    "context_compaction",
+    "image_generation_call",
+    "local_shell_call",
+    "other",
+    "tool_search_call",
+    "tool_search_output",
+    "web_search_call"
+  ],
+  "injectItemsSchema": {
+    "description": "Raw Responses API items to append to the thread's model-visible history.",
+    "items": true,
+    "type": "array"
+  },
+  "lastTurnIdSchema": {
+    "description": "Optional last turn id to fork through, inclusive.\n\nWhen specified, turns after `last_turn_id` are omitted from the fork. The referenced turn cannot be in progress.",
+    "type": [
+      "string",
+      "null"
+    ]
+  },
+  "boundary": "类型差集不是实际故障计数；other 为协议兜底变体。"
+}

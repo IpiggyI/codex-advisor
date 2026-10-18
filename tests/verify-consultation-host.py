@@ -17,38 +17,12 @@ PLUGIN = Path(__file__).resolve().parent.parent / 'plugins/codex-advisor'
 sys.path.insert(0, str(PLUGIN / 'scripts'))
 from consult_native import execute, verify_history
 from consult_context import Failure, validate_items
+from consultation_loopback import Endpoint
 
 ADVICE = '保留全部上下文。'
 EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
 IMAGE = ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1Pe'
          'AAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC')
-
-
-class Endpoint(http.server.BaseHTTPRequestHandler):
-    def do_POST(self):
-        self.server.requests.append(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
-        interrupted = self.server.disconnect_first and len(self.server.requests) == 1
-        text = json.dumps({'kind': 'plan', 'advice': '过期建议。' if interrupted else ADVICE}, ensure_ascii=False)
-        item = {'type': 'message', 'id': 'msg_local', 'role': 'assistant', 'status': 'completed',
-                'content': [{'type': 'output_text', 'text': text}]}
-        events = [
-            {'type': 'response.created', 'response': {'id': 'resp_local', 'status': 'in_progress', 'output': []}},
-            {'type': 'response.output_item.added', 'output_index': 0,
-             'item': dict(item, status='in_progress', content=[])},
-            {'type': 'response.output_text.delta', 'item_id': 'msg_local', 'output_index': 0,
-             'content_index': 0, 'delta': text},
-            {'type': 'response.output_item.done', 'output_index': 0, 'item': item},
-            {'type': 'response.completed', 'response': {'id': 'resp_local', 'status': 'completed',
-             'output': [item], 'usage': {'input_tokens': 100, 'output_tokens': 10, 'total_tokens': 110}}}]
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/event-stream')
-        self.end_headers()
-        for event in events[:-1] if interrupted else events:
-            self.wfile.write(('data: ' + json.dumps(event, ensure_ascii=False) + '\n\n').encode('utf-8'))
-        self.wfile.flush()
-
-    def log_message(self, *args):
-        pass
 
 
 class NativeHistory(unittest.TestCase):
@@ -58,6 +32,7 @@ class NativeHistory(unittest.TestCase):
         self.endpoint = http.server.HTTPServer(('127.0.0.1', 0), Endpoint)
         self.endpoint.requests = []
         self.endpoint.disconnect_first = False
+        self.endpoint.advice = ADVICE
         self.listener = threading.Thread(target=self.endpoint.serve_forever, daemon=True)
         self.listener.start()
         (self.home / 'config.toml').write_text(

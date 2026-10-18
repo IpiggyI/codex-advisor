@@ -5,10 +5,10 @@ Codex Advisor is a Codex-only fork of
 Any primary can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Version 0.3.6 supplies seventeen native entries across `mainstay`, `crux`, and
+Version 0.3.7 supplies seventeen native entries across `mainstay`, `crux`, and
 `rescue`, a single routing profile, zero-argument process consultation, and
 hooks for posture injection and automatic dispatch verification.
-See the [Chinese version manual](docs/releases/0.3.6.html) for a complete guide.
+See the [Chinese version manual](docs/releases/0.3.7.html) for a complete guide.
 
 ## Install
 
@@ -19,10 +19,9 @@ through `sh`, so Git for Windows' `bin` directory, for example
 [Windows launch](docs/agents/plugin-maintenance.md#windows-launch). Consultation
 on Windows also needs the native `codex.exe`; see
 [plugin maintenance](docs/agents/plugin-maintenance.md#process-consultation-component).
-Consultation request construction is qualified on Codex 0.162.1 and Windows
-0.162.0-alpha.17.2; native route hooks are qualified on Codex 0.161.0. Host
-schema or cache-layout changes need renewed qualification rather than an assumed
-compatibility guarantee.
+Consultation request construction is qualified on Codex 0.163.0 and Windows
+0.162.0-alpha.17.2; native route hooks are qualified on Codex 0.161.0. Host schema or cache-layout changes need renewed
+qualification rather than an assumed compatibility guarantee.
 
 For a provider configured with `env_key = "S2A_API_KEY"`, start Codex with that
 variable available. The plugin explicitly forwards it to the consultation MCP
@@ -119,6 +118,15 @@ record, and a fresh advisor without tools returns a `plan`, `correction`, or
 `stop`. A failed consultation returns an explicit failure, never fabricated
 advice, and the work stays pending. See
 [consultation](plugins/codex-advisor/skills/orchestration/SKILL.md#consult-at-decision-points).
+
+Create `$CODEX_HOME/codex-advisor/consultation-off` to switch consultation off.
+The component derives the caller's `CODEX_HOME` from its versioned plugin cache
+location. WSL and Windows each have their own `CODEX_HOME` and marker.
+While the marker exists, every call returns `code=switched_off` with
+`consultationDisabled=true`, without reading a rollout, starting a native process,
+or reading or writing failure counts. Delete the marker to enable consultation
+without restarting the MCP process. A thread that receives this result stops
+calling for the rest of that thread; only new threads resume after deletion.
 
 Exact caller/advisor model identity selects the full or reduced posture. The
 posture says when to consult; the adoption rules say how to adopt, deviate from,

@@ -3,6 +3,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
+import importlib.util
 from pathlib import Path
 import sqlite3
 import sys
@@ -55,6 +56,37 @@ class FailureStorage(unittest.TestCase):
         self.assertEqual(results, [1])
         self.assertEqual(limits.failure_count(self.home, 'writer'), 1)
         self.assertEqual(list(self.path.parent.iterdir()), [self.path])
+
+    def test_switched_off_result_never_accesses_failure_state(self):
+        for thread in (None, 'caller'):
+            with self.subTest(thread=thread), mock.patch.object(limits, 'failure_count') as counter:
+                result = limits.limit_result({'status': 'failed', 'code': 'switched_off',
+                                              'message': 'The user switched consultation off.',
+                                              'expected': None, 'actual': None}, self.home, thread)
+                counter.assert_not_called()
+                self.assertTrue(result['consultationDisabled'])
+                self.assertNotIn('failureCount', result)
+                self.assertFalse(self.path.exists())
+
+    def test_switch_precedes_identity_rollout_native_and_counter_access(self):
+        spec = importlib.util.spec_from_file_location('consultation',
+            Path(limits.__file__).with_name('process-consultation.py'))
+        server = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(server)
+        marker = self.home / 'codex-advisor/consultation-off'
+        marker.parent.mkdir()
+        marker.touch()
+        with mock.patch.object(server, 'caller_home', return_value=self.home), \
+                mock.patch.multiple(server, identity=mock.DEFAULT, reconstruct=mock.DEFAULT,
+                                    execute=mock.DEFAULT, failure_count=mock.DEFAULT) as calls, \
+                mock.patch.object(limits, 'failure_count') as counter:
+            response = server.MCP().consultation({'id': 1, 'params': {
+                'name': 'process_consultation', 'arguments': {}}}, threading.Event())['result']
+            self.assertTrue(response['isError'])
+            self.assertEqual(response['structuredContent']['code'], 'switched_off')
+            for call in calls.values():
+                call.assert_not_called()
+            counter.assert_not_called()
 
     def test_concurrent_failures_preserve_each_thread_and_cap_counts(self):
         def fail(index):

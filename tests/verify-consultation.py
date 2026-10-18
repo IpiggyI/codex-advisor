@@ -222,6 +222,50 @@ public class CodexFixture {
         inventory = [json.loads(line) for line in (self.root / 'inventory-calls.jsonl').read_text().splitlines()]
         self.assertTrue(all(message['method'] in ('initialize', 'initialized', 'mcpServerStatus/list') for message in inventory))
 
+    def test_policy_reconstructs_preserved_history_without_excluded_items(self):
+        records, meta, history = fixture()
+        preserved = [{'type': 'synthetic_future_item', 'payload': 'SYNTHETIC_HISTORY'},
+                     {'type': 'message', 'role': 'user', 'content': [
+                         {'type': 'synthetic_future_block', 'payload': 'SYNTHETIC_BLOCK'}]}]
+        excluded = [{'type': 'web_search_call', 'id': 'web_synthetic', 'status': 'completed',
+                         'action': {'type': 'search', 'query': 'synthetic'}},
+                        {'type': 'image_generation_call'},
+                        {'type': 'local_shell_call', 'call_id': 'shell', 'status': 'completed', 'action': {}},
+                        {'type': 'function_call_output', 'call_id': 'shell', 'output': ''},
+                        {'type': 'additional_tools', 'role': 'developer', 'tools': [{'name': 'synthetic'}]},
+                        {'type': 'tool_search_call', 'execution': 'server', 'arguments': {'query': 'synthetic'}},
+                        {'type': 'tool_search_output', 'execution': 'server', 'status': 'completed',
+                         'tools': [{'name': 'synthetic'}]}]
+        records[-1:-1] = [{'type': 'response_item', 'payload': value}
+                         for value in excluded + preserved]
+        result = self.call(records, meta)
+        self.assertEqual(result['status'], 'succeeded', result)
+        injected = json.loads((self.root / 'injected.json').read_text())
+        self.assertEqual(injected[:-1], history + preserved)
+
+    def test_history_rejection_diagnostics_include_host_and_locations(self):
+        cases = [({'type': 'future_record', 'payload': {}}, 'record', 'future_record'),
+                 ({'type': 'retained_context', 'payload': {'type': 'future_event', 'turn_id': TURN}},
+                  'record', 'future_event'),
+                 ({'type': 'response_item', 'payload': {'type': 'compaction', 'encrypted_content': ''}},
+                  'item', 'compaction'),
+                 ({'type': 'response_item', 'payload': item(None)}, 'content', 'input_text')]
+        for record, stage, kind in cases:
+            with self.subTest(stage=stage, kind=kind):
+                records, meta, _ = fixture()
+                records[0]['payload']['cli_version'] = 'synthetic-host-version'
+                position = len(records) - 1
+                records.insert(position, record)
+                result = self.call(records, meta)
+                self.assertEqual(result['status'], 'failed', result)
+                details = result['details']
+                self.assertEqual(details['stage'], stage)
+                self.assertEqual(details['type'], kind)
+                self.assertEqual(details['recordIndex'], position)
+                self.assertEqual(details['hostVersion'], 'synthetic-host-version')
+                if stage != 'record':
+                    self.assertIn('historyIndex', details)
+
     def test_compaction_replaces_history(self):
         records, meta, _ = fixture()
         replacement = [item('COMPACTION_SUMMARY'), item('RETAINED_EARLIEST')]
@@ -384,6 +428,44 @@ public class CodexFixture {
         result = self.call(failed, failed_meta)
         self.assertEqual(result['failureCount'], 2)
         self.assertFalse(result['consultationDisabled'])
+
+    def check_consultation_switch(self, existing_count):
+        if existing_count:
+            records, meta, _ = fixture('gpt-6-astra', 'unknown')
+            self.assertEqual(self.call(records, meta)['failureCount'], 1)
+        state = self.home / 'codex-advisor/consultation-failures.sqlite3'
+        previous = state.read_bytes() if state.exists() else None
+        marker = self.home / 'codex-advisor/consultation-off'
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.touch()
+        records, meta, _ = fixture()
+        self.start(records)
+        for _ in range(2):
+            self.send('tools/call', {'name': 'process_consultation', 'arguments': {}, '_meta': meta})
+            result = self.result()
+            self.assertEqual(result['status'], 'failed')
+            self.assertEqual(result['code'], 'switched_off')
+            self.assertTrue(result['consultationDisabled'])
+            self.assertNotIn('failureCount', result)
+            self.assertIn('The user switched consultation off.', result['message'])
+            self.assertIn('Stop calling process_consultation in this thread.', result['message'])
+            self.assertIn(str(marker), result['message'])
+            self.assertEqual(state.read_bytes() if state.exists() else None, previous)
+            self.assertFalse((self.root / 'inventory-calls.jsonl').exists())
+            self.assertFalse((self.root / 'advisor-calls.jsonl').exists())
+        marker.unlink()
+        self.before.pop(str(marker.relative_to(self.home)))
+        self.send('tools/call', {'name': 'process_consultation', 'arguments': {}, '_meta': meta})
+        result = self.result()
+        self.assertEqual(result['status'], 'succeeded', result)
+        self.assertEqual(result['failureCount'], int(existing_count))
+        self.assertFalse(result['consultationDisabled'])
+
+    def test_switch_off_and_delete_without_failure_state(self):
+        self.check_consultation_switch(False)
+
+    def test_switch_off_and_delete_preserves_existing_failure_count(self):
+        self.check_consultation_switch(True)
 
     def test_failure_limit_is_scoped_to_thread_not_root_session(self):
         failed, failed_meta, _ = fixture('gpt-6-astra', 'unknown')
@@ -773,11 +855,11 @@ for name, mutation, code in [
     ('compaction', lambda r, m: r.insert(-1, {'type': 'compacted', 'payload': {}}), 'compaction'),
     ('rollback', lambda r, m: r.insert(-1, {'type': 'event_msg', 'payload': {'type': 'thread_rolled_back'}}), 'rollback'),
     ('parallel', lambda r, m: (r.pop(-2), None)[1], 'pairing'),
-    ('unsupported', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': {'type': 'audio'}}), 'unsupported_content'),
+    ('unsupported', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': {'type': 'message', 'role': None, 'content': []}}), 'unsupported_content'),
     ('retained_kind', lambda r, m: r.insert(-1, {'type': 'retained_context', 'payload': {'type': 'unknown', 'turn_id': TURN}}), 'snapshot'),
     ('retained_answer', lambda r, m: r.insert(-1, {'type': 'retained_context', 'payload': {'type': 'verified_answer', 'turn_id': TURN, 'call_id': 'tool1', 'questions': [{'question': 'q', 'answer': None}]}}), 'snapshot'),
-    ('audio', lambda r, m: r[3]['payload']['content'].append({'type': 'input_audio'}), 'unsupported_content'),
-    ('agent_author', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), author='')}), 'unsupported_content'),
+    ('invalid_text', lambda r, m: r[3]['payload']['content'].append({'type': 'input_text', 'text': None}), 'unsupported_content'),
+    ('agent_author', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), author=None)}), 'unsupported_content'),
     ('agent_recipient', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), recipient=None)}), 'unsupported_content'),
     ('agent_encrypted', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), content=[{'type': 'encrypted_content', 'encrypted_content': ''}])}), 'unsupported_content'),
 ]:

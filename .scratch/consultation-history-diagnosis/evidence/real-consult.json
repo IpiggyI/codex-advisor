@@ -1,0 +1,96 @@
+{
+  "results": [
+    {
+      "type": "web_search_call",
+      "sampleKind": "preserved",
+      "file": "rollout-2026-02-27T17-49-58-019c9e81-4698-7c11-82b0-bf543f28b5ac.jsonl",
+      "boundaryIndex": 19,
+      "rawExcludedTypes": [],
+      "injectedTypes": [
+        "message",
+        "reasoning",
+        "web_search_call"
+      ],
+      "injectedItems": 10,
+      "hostVersion": "0.104.0",
+      "caller": {
+        "model": "gpt-5.3-codex",
+        "effort": "xhigh"
+      },
+      "status": "failed",
+      "code": "executor",
+      "message": "Native consultation reported an inference error.",
+      "details": {
+        "nativeCode": "other"
+      },
+      "actual": {
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      }
+    },
+    {
+      "type": "additional_tools",
+      "sampleKind": "excluded",
+      "file": "rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+      "boundaryIndex": 19,
+      "rawExcludedTypes": [
+        "additional_tools"
+      ],
+      "injectedTypes": [
+        "message"
+      ],
+      "injectedItems": 11,
+      "hostVersion": "0.163.0-alpha.10.2",
+      "caller": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "status": "succeeded",
+      "kind": "plan",
+      "adviceChars": 322,
+      "expected": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "actual": {
+        "model": "gpt-6.1-sol",
+        "effort": "high"
+      },
+      "advisorThreadId": "01a14ec9-71a2-79f1-a2ff-12bc7c75fc9f"
+    },
+    {
+      "type": "tool_search_output",
+      "sampleKind": "excluded",
+      "file": "rollout-2026-07-07T09-50-10-019f3a44-baef-7a23-9226-92f8d1d5a9fe.jsonl",
+      "boundaryIndex": 32,
+      "rawExcludedTypes": [
+        "tool_search_call",
+        "tool_search_output"
+      ],
+      "injectedTypes": [
+        "function_call",
+        "function_call_output",
+        "message",
+        "reasoning"
+      ],
+      "injectedItems": 19,
+      "hostVersion": "0.142.5",
+      "caller": {
+        "model": "gpt-5.5",
+        "effort": "high"
+      },
+      "status": "succeeded",
+      "kind": "correction",
+      "adviceChars": 193,
+      "expected": {
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      },
+      "actual": {
+        "model": "gpt-6.1-sol",
+        "effort": "xhigh"
+      },
+      "advisorThreadId": "01a14ec9-addf-7cf3-9d78-c096b94df2f9"
+    }
+  ]
+}

@@ -52,6 +52,9 @@ def failure_count(home, thread, failed=False):
 
 
 def limit_result(result, home, thread):
+    if result.get('code') == 'switched_off':
+        result['consultationDisabled'] = True
+        return result
     if home is None or thread is None:
         result.update(consultationDisabled=True, message=result['message'] + '\n' + STOP_CALLING)
         return result

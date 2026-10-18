@@ -1,0 +1,202 @@
+{
+  "rolloutFiles": 729,
+  "roots": [
+    "/home/hyy/.codex/sessions",
+    "/mnt/c/Users/Shy/.codex/sessions"
+  ],
+  "rows": [
+    {
+      "stage": "event",
+      "type": "thread_rolled_back",
+      "count": 13,
+      "files": 9,
+      "earliestHeaderVersion": "0.108.0-alpha.12",
+      "qualified": false
+    },
+    {
+      "stage": "item",
+      "type": "additional_tools",
+      "count": 2,
+      "files": 2,
+      "earliestHeaderVersion": "0.163.0-alpha.10.2",
+      "qualified": false
+    },
+    {
+      "stage": "item",
+      "type": "agent_message",
+      "count": 1126,
+      "files": 247,
+      "earliestHeaderVersion": "0.144.1",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "compaction",
+      "count": 1,
+      "files": 1,
+      "earliestHeaderVersion": "0.162.0-alpha.17.2",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "custom_tool_call",
+      "count": 9371,
+      "files": 443,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "custom_tool_call_output",
+      "count": 9371,
+      "files": 443,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "function_call",
+      "count": 25647,
+      "files": 612,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "function_call_output",
+      "count": 25646,
+      "files": 612,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "message",
+      "count": 15465,
+      "files": 707,
+      "earliestHeaderVersion": "0.85.0",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "reasoning",
+      "count": 24895,
+      "files": 670,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "item",
+      "type": "tool_search_call",
+      "count": 10,
+      "files": 10,
+      "earliestHeaderVersion": "0.133.0",
+      "qualified": false
+    },
+    {
+      "stage": "item",
+      "type": "tool_search_output",
+      "count": 10,
+      "files": 10,
+      "earliestHeaderVersion": "0.133.0",
+      "qualified": false
+    },
+    {
+      "stage": "item",
+      "type": "web_search_call",
+      "count": 384,
+      "files": 47,
+      "earliestHeaderVersion": "0.93.0",
+      "qualified": false
+    },
+    {
+      "stage": "record",
+      "type": "compacted",
+      "count": 73,
+      "files": 51,
+      "earliestHeaderVersion": "0.99.0-alpha.23",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "event_msg",
+      "count": 90157,
+      "files": 706,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "inter_agent_communication_metadata",
+      "count": 1126,
+      "files": 247,
+      "earliestHeaderVersion": "0.144.1",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "response_item",
+      "count": 111252,
+      "files": 707,
+      "earliestHeaderVersion": "0.85.0",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "session_meta",
+      "count": 732,
+      "files": 711,
+      "earliestHeaderVersion": "0.85.0",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "token_usage_record",
+      "count": 19361,
+      "files": 376,
+      "earliestHeaderVersion": "0.153.4",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "turn_context",
+      "count": 2392,
+      "files": 702,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "record",
+      "type": "world_state",
+      "count": 812,
+      "files": 478,
+      "earliestHeaderVersion": "0.144.0",
+      "qualified": true
+    },
+    {
+      "stage": "role",
+      "type": "assistant",
+      "count": 9862,
+      "files": 678,
+      "earliestHeaderVersion": "0.89.0",
+      "qualified": true
+    },
+    {
+      "stage": "role",
+      "type": "developer",
+      "count": 2578,
+      "files": 706,
+      "earliestHeaderVersion": "0.85.0",
+      "qualified": true
+    },
+    {
+      "stage": "role",
+      "type": "user",
+      "count": 3025,
+      "files": 707,
+      "earliestHeaderVersion": "0.85.0",
+      "qualified": true
+    }
+  ],
+  "boundary": "最早版本取包含该类型的文件头版本；续接会话的文件头可能早于写入该条目的宿主版本。thread_rolled_back 是有意拒绝的回滚，不是遗漏。"
+}

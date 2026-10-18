@@ -77,7 +77,7 @@ These facts were established on 2026-09-26 with Codex CLI `0.157.0`:
 | Host fact | Evidence boundary | Invalidation check |
 |---|---|---|
 | Host MCP `_meta` supplies caller thread, session, turn, item, model, and effort identity to a zero-property tool call. | One primary route and the qualified worker and Explorer routes in the ticket 01 probes. | Requalify after MCP metadata or tool-call schema changes. |
-| Ordered single-snapshot replay with replacement at `compacted.replacement_history` preserved the earliest effective context, unfinished-turn nonces, forced and automatic compaction, images, truncated output, and encrypted reasoning in the exercised shapes. | The actual source/advisor request comparisons recorded in ticket 01 acceptance P6; audio, video, rollback, parallel tool races, and other shapes were not certified. | Requalify after host version, rollout schema, compaction record, or supported item-shape changes; fail explicitly for an unqualified shape. |
+| Ordered single-snapshot replay with replacement at `compacted.replacement_history` preserved the earliest effective context, unfinished-turn nonces, forced and automatic compaction, images, truncated output, and encrypted reasoning in the exercised shapes. | The actual source/advisor request comparisons recorded in ticket 01 acceptance P6; audio, video, rollback, parallel tool races, and other shapes were not certified. | Requalify after host version, rollout schema, compaction record, or supported item-shape changes; the history policy below governs item shapes. |
 | `thread/start` plus `thread/inject_items` made the structured history model-visible in a fresh ephemeral thread. | The qualified B-prime probes. A fork-plus-current-turn splice failed intra-turn compaction and is rejected. | Requalify after App Server protocol or injection semantics change. |
 | The custom startup catalog plus the qualified disable settings produced an actual empty request tool set at the assigned dial. | The host inference-request trace, not an advisor statement or refused tool attempt. | Requalify after model catalog, configuration, tool registry, or request-trace format changes; missing trace evidence is failure. |
 | A relative MCP script path with `cwd="."` resolved to the installed plugin root, and caller-home discovery worked for the versioned cache layout. | The temporary installed-plugin probe. | Requalify after plugin path resolution or cache-layout changes; unsupported layouts fail explicitly. |
@@ -109,6 +109,43 @@ claim that the user entered `/hooks`. The detailed sequence is in the
 [P7 trust record](../../.scratch/tiers-and-advisor-consult/acceptance.md#p7-用户信任的执行与不受信任跳过).
 Revalidate this boundary if the host's hook discovery, startup review, hash trust,
 overview, warning, or event semantics change.
+
+### History policy
+
+Decided on 2026-10-18 with Codex CLI `0.163.0`; this replaces the rule that an
+unqualified item shape fails explicitly. One policy table declares each known
+history item and content block type as preserved, a capability declaration, or
+rejected, and drives validation, injection, the expected history, and
+type-specific comparison normalization. `additional_tools` and the
+`tool_search_call`/`tool_search_output` pair are capability declarations: they
+belong to the caller's tool inventory, which is not forwarded. `configuration_update` and
+`compaction_trigger` are caller control items and are excluded the same way,
+because the advisor's dial comes from routing, not from the caller's controls.
+Hosted tool records are excluded too: `web_search_call`, `image_generation_call`,
+and `local_shell_call` with the `function_call_output` that records its result.
+On 2026-10-18 the configured backend rejected a tool-less advisor request whose
+input carried a `web_search_call` with HTTP 400 (`Hosted tool 'web_search'
+requires authorization and metering that are not supported by rustponsesapi.`,
+`param: input`), so these records cannot reach an advisor that has no tools.
+Search results stay in the assistant messages that follow. Item and content
+block types absent from the table are injected verbatim; the actual request
+comparison and a type-independent check that no request item or request field
+carries tools protect them. A dropped or rewritten item then fails as context
+loss after the advisor request, and that failure counts toward the per-thread
+limit. Unknown rollout records, retained events, and rollback still fail before
+any request.
+
+The decision rests on a scan of 729 local rollouts, in which `web_search_call`
+(first recorded 2026-02-03) and tool search items (2026-05-25) predate the first
+consultation release, so their failures did not come from a host update after
+it. The local host forwarded injected `web_search_call` and
+`image_generation_call` items unchanged apart from transport fields against a
+fixed local endpoint, while the real backend rejected `web_search_call`: the
+loopback checks cannot show whether a backend accepts a hosted tool record, so a
+newly preserved hosted tool type needs one real request before release. The analysis and tickets are in
+[the plan](../../.scratch/consultation-history-diagnosis/spec.md). Invalidation
+check: after each host upgrade, the schema diff and corpus replay of ticket 05
+find a host type without a policy or a real rollout that no longer reconstructs.
 
 ## What this supersedes
 

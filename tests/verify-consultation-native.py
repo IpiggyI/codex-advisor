@@ -19,7 +19,7 @@ sys.dont_write_bytecode = True
 PLUGIN = Path(__file__).resolve().parent.parent / 'plugins/codex-advisor'
 sys.path.insert(0, str(PLUGIN / 'scripts'))
 import consult_native as native
-from consult_context import Failure
+from consult_context import Failure, ITEM_POLICY, CONTENT_POLICY, validate_items, reconstruct
 
 EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
 CALLER = {'base': 'BASE_CONSTRAINT', 'thread': 'caller', 'items': [
@@ -37,6 +37,124 @@ def completed():
              'item': {'type': 'agentMessage', 'phase': 'final_answer', 'text': json.dumps(ADVICE)}}},
             {'method': 'turn/completed', 'params': {'threadId': 'advisor', 'turnId': 'turn',
              'turn': {'id': 'turn', 'status': 'completed'}}}]
+
+
+class HistoryPolicy(unittest.TestCase):
+    def test_web_search_optional_fields_are_excluded(self):
+        for item in (
+                {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search'}},
+                {'type': 'web_search_call', 'id': 'web', 'status': 'completed',
+                 'action': {'type': 'search'}, 'internal_chat_message_metadata_passthrough': {}},
+                {'type': 'web_search_call', 'status': 'completed'},
+                {'type': 'web_search_call'}):
+            with self.subTest(keys=list(item)):
+                self.assertEqual(validate_items([item]), [])
+                native.verify_history({'input': []}, {'items': [item]})
+
+    def test_protocol_required_fields_and_pairing(self):
+        for item in (message(''), {'type': 'message', 'role': 'future_role', 'content': []},
+                     {'type': 'agent_message', 'author': '', 'recipient': '', 'content': []},
+                     {'type': 'reasoning', 'summary': []},
+                     {'type': 'message', 'role': 'user', 'content': [{'type': 'input_image'}]}):
+            self.assertEqual(validate_items([item]), [item])
+        call = {'type': 'tool_search_call', 'execution': 'server', 'arguments': None}
+        result = {'type': 'tool_search_output', 'execution': 'server', 'status': 'completed', 'tools': []}
+        self.assertEqual(validate_items([call, result]), [])
+        for index, field in ((0, 'arguments'), (0, 'execution'), (1, 'execution'), (1, 'status'), (1, 'tools')):
+            pair = copy.deepcopy([call, result])
+            del pair[index][field]
+            with self.assertRaises(Failure):
+                validate_items(pair)
+        for item in ({'type': 'reasoning'}, {'type': 'additional_tools', 'tools': []}):
+            with self.assertRaises(Failure):
+                validate_items([item])
+
+    def test_policy_controls_injection_and_comparison(self):
+        item = {'type': 'web_search_call', 'id': 'web', 'status': 'completed',
+                'action': {'type': 'search', 'query': 'PRIVATE_QUERY'}}
+        self.assertEqual(validate_items([item]), [])
+        self.assertEqual(native.verify_history({'input': []}, {'items': [item]}), -1)
+        with mock.patch.dict(ITEM_POLICY['web_search_call'], policy='preserve'):
+            self.assertEqual(validate_items([item]), [item])
+            with self.assertRaises(Failure):
+                native.verify_history({'input': []}, {'items': [item]})
+        with mock.patch.dict(ITEM_POLICY['web_search_call'], policy='reject'):
+            with self.assertRaises(Failure):
+                validate_items([item])
+
+    def test_unknown_items_and_blocks_remain_exact(self):
+        items = [{'type': 'future_item', 'id': 'KEEP_ID', 'nullable': None, 'text': 'PRIVATE_TEXT'},
+                 message('PRIVATE_MESSAGE'),
+                 {'type': 'message', 'role': 'user', 'content': [
+                     {'type': 'future_block', 'id': 'KEEP_BLOCK', 'text': 'PRIVATE_BLOCK'}]}]
+        self.assertEqual(validate_items(items), items)
+        self.assertEqual(native.comparable(items[0]), {'type': 'future_item', 'text': 'PRIVATE_TEXT'})
+        native.verify_history({'input': items}, {'items': items})
+        for index in range(len(items)):
+            for change in ('drop', 'rewrite'):
+                request = copy.deepcopy(items)
+                if change == 'drop':
+                    request.pop(index)
+                elif index == 0:
+                    request[index]['text'] = 'CHANGED_PRIVATE'
+                else:
+                    request[index]['content'][0]['text'] = 'CHANGED_PRIVATE'
+                with self.assertRaises(Failure) as raised:
+                    native.verify_history({'input': request}, {'items': items, 'hostVersion': 'test-host'})
+                error = raised.exception
+                self.assertEqual(error.code, 'context')
+                self.assertEqual(error.details['stage'], 'request')
+                self.assertEqual(error.details['hostVersion'], 'test-host')
+                self.assertIn('path', error.details)
+                self.assertNotIn('PRIVATE', str(error) + json.dumps(error.details))
+        request = copy.deepcopy(items)
+        request[1]['content'][0]['text'] = 'CHANGED_PRIVATE'
+        with self.assertRaises(Failure) as raised:
+            native.verify_history({'input': request}, {'items': items})
+        self.assertEqual(raised.exception.details['path'], 'content[0].text')
+
+    def test_undeclared_items_normalize_only_transport_fields(self):
+        item = {'type': 'future_generation_call', 'status': 'completed', 'result': 'PRIVATE_RESULT'}
+        transported = dict(item, id='image_synthetic', nullable=None,
+                           internal_chat_message_metadata_passthrough={'turn_id': 'synthetic'})
+        self.assertNotIn(item['type'], ITEM_POLICY)
+        self.assertEqual(validate_items([transported]), [transported])
+        self.assertEqual(native.comparable(transported), item)
+        for source, request in ((item, transported), (transported, item)):
+            native.verify_history({'input': [request]}, {'items': [source]})
+            changed = dict(request, result='CHANGED_PRIVATE_RESULT')
+            with self.assertRaises(Failure) as raised:
+                native.verify_history({'input': [changed]}, {'items': [source]})
+            self.assertEqual(raised.exception.code, 'context')
+            self.assertEqual(raised.exception.details['path'], 'result')
+            self.assertNotIn('PRIVATE', str(raised.exception) + json.dumps(raised.exception.details))
+
+    def test_capability_pairs_are_validated_before_exclusion(self):
+        call = {'type': 'tool_search_call', 'call_id': 'search', 'execution': 'client', 'arguments': {'query': 'tools'}}
+        result = {'type': 'tool_search_output', 'call_id': 'search', 'execution': 'client', 'status': 'completed', 'tools': [{'name': 'tool'}]}
+        self.assertEqual(validate_items([{'type': 'additional_tools', 'role': 'developer', 'tools': []}, call, result]), [])
+        for items in ([call], [result], [result, call], [call, call, result]):
+            with self.assertRaises(Failure) as raised:
+                validate_items(items)
+            self.assertEqual(raised.exception.code, 'pairing')
+            self.assertIn('historyIndex', raised.exception.details)
+        with mock.patch.dict(ITEM_POLICY['tool_search_output'], policy='preserve'):
+            with self.assertRaises(Failure) as raised:
+                validate_items([call, result])
+            self.assertEqual(raised.exception.code, 'pairing')
+
+    def test_content_policy_controls_both_paths(self):
+        item = message('PRIVATE')
+        with mock.patch.dict(CONTENT_POLICY['input_text'], policy='capability'):
+            expected = dict(item, content=[])
+            self.assertEqual(validate_items([item]), [expected])
+            self.assertEqual(native.comparable(item), expected)
+
+    def test_content_diagnostics(self):
+        with self.assertRaises(Failure) as raised:
+            validate_items([message(None)])
+        self.assertEqual(raised.exception.details, {'stage': 'content', 'type': 'input_text',
+                                                  'historyIndex': 0, 'contentIndex': 0})
 
 
 class NativeLifecycle(unittest.TestCase):
@@ -240,6 +358,13 @@ class NativeRequest(unittest.TestCase):
             self.verify(request, False)
         self.assertEqual(raised.exception.code, 'tools')
 
+    def test_nonlite_unknown_empty_inventory_is_not_proof(self):
+        request = self.request(False)
+        request['input'][0]['type'] = 'future_inventory'
+        with self.assertRaises(Failure) as raised:
+            self.verify(request, False)
+        self.assertEqual(raised.exception.code, 'tools')
+
     def test_explicit_empty_top_level_tools_accept_both_catalog_modes(self):
         for lite in (True, False):
             with self.subTest(lite=lite):
@@ -276,9 +401,19 @@ class NativeRequest(unittest.TestCase):
                     else:
                         request['input'].append({'type': 'additional_tools', 'role': 'developer',
                                                  'tools': [{'name': 'shell'}]})
-                    with self.assertRaises(Failure) as raised:
-                        self.verify(request, lite)
-                    self.assertEqual(raised.exception.code, 'tools')
+                    if change == 'missing':
+                        self.assertEqual(self.verify(request, lite), EXPECTED)
+                    else:
+                        with self.assertRaises(Failure) as raised:
+                            self.verify(request, lite)
+                        self.assertEqual(raised.exception.code, 'tools')
+
+    def test_unknown_input_type_cannot_grant_tools(self):
+        request = self.request()
+        request['input'].append({'type': 'future_inventory', 'tools': [{'name': 'shell'}]})
+        with self.assertRaises(Failure) as raised:
+            self.verify(request)
+        self.assertEqual(raised.exception.code, 'tools')
 
     def test_lite_base_is_required_in_exact_developer_prefix(self):
         for change in ('missing', 'content', 'role', 'position', 'substring', 'top_level'):

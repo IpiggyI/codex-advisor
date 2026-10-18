@@ -521,6 +521,7 @@ if [ -z "${1-}" ] || [ "${1-}" = --consultation ]; then
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-lifecycle.py"
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-limits.py"
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-native.py"
+    sh "$plugin_scripts/run-python.sh" "$script_dir/test_consultation_upgrade.py"
     sh "$plugin_scripts/run-python.sh" "$script_dir/verify-consultation-process.py"
 fi
 if [ -z "${1-}" ] || [ "${1-}" = --hooks ]; then

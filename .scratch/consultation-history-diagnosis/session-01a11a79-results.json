@@ -1,0 +1,138 @@
+[
+  {
+    "callLine": 1233,
+    "outputLine": 1236,
+    "timestamp": "2026-10-08T10:10:13.628Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {}
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 1611,
+    "outputLine": 1615,
+    "timestamp": "2026-10-08T10:30:58.169Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {},
+      {}
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 1730,
+    "outputLine": 1733,
+    "timestamp": "2026-10-08T10:40:40.938Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {}
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 2082,
+    "outputLine": 2084,
+    "timestamp": "2026-10-08T10:58:58.356Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      }
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 2224,
+    "outputLine": 2226,
+    "timestamp": "2026-10-08T11:10:38.827Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      }
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 2354,
+    "outputLine": 2357,
+    "timestamp": "2026-10-08T11:17:21.748Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {
+        "status": "succeeded",
+        "failureCount": 0,
+        "consultationDisabled": false
+      }
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 2547,
+    "outputLine": 2551,
+    "timestamp": "2026-10-08T11:33:00.520Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {},
+      {}
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 2722,
+    "outputLine": 2726,
+    "timestamp": "2026-10-08T11:47:00.636Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {},
+      {},
+      {}
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 2872,
+    "outputLine": 2874,
+    "timestamp": "2026-10-08T11:58:11.627Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      }
+    ],
+    "replay": "PASS"
+  },
+  {
+    "callLine": 3110,
+    "outputLine": 3114,
+    "timestamp": "2026-10-08T12:09:03.405Z",
+    "state": [
+      {
+        "successMarker": false,
+        "failureMarker": false
+      },
+      {},
+      {}
+    ],
+    "replay": "PASS"
+  }
+]

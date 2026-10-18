@@ -12,12 +12,14 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 REPO = Path(__file__).resolve().parent.parent
 PLUGIN = REPO / 'plugins/codex-advisor'
 sys.path.insert(0, str(PLUGIN / 'scripts'))
-from consult_native import Server, catalog, configuration, windows_codex
+from consult_native import Server, catalog, configuration, windows_codex, execute
+from consult_context import Failure
 
 EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
 ADVICE = 'Preserve the caller history and continue the authorized test.'
@@ -65,7 +67,7 @@ class ConsultationEndpoint(http.server.BaseHTTPRequestHandler):
 
     def response_item(self, request):
         inner = request.get('text', {}).get('format', {}).get('type') == 'json_schema'
-        if len(self.server.requests) == 1:
+        if len(self.server.requests) == 1 and not inner:
             item = {'type': 'function_call', 'id': 'fc_consult', 'call_id': 'call_consult',
                     'namespace': 'mcp__codex_advisor', 'name': 'process_consultation',
                     'arguments': '{}', 'status': 'completed'}
@@ -222,6 +224,73 @@ class NativeEnvironment(unittest.TestCase):
         self.assertRegex(returned['output'], r'"status"\s*:\s*"succeeded"')
         self.assertTrue(endpoint.consultation_temp_active, 'The test did not observe native temporary output.')
         self.assertEqual(list(self.consult_temp.iterdir()), [], 'Consultation temporary output survived.')
+
+    def test_native_hosted_history_exclusion(self):
+        endpoint = self.start_endpoint()
+        history = [
+            {'type': 'message', 'role': 'user', 'content': [
+                {'type': 'input_text', 'text': 'Retain the synthetic constraint.'}]},
+            {'type': 'web_search_call', 'id': 'ws_synthetic', 'status': 'completed',
+             'action': {'type': 'search', 'query': 'synthetic consultation history'}},
+            {'type': 'image_generation_call', 'id': 'ig_synthetic',
+             'status': 'completed', 'result': 'synthetic-image-result'},
+            {'type': 'local_shell_call', 'call_id': 'shell_synthetic',
+             'status': 'completed', 'action': {'type': 'exec', 'command': ['echo', 'fixture']}},
+            {'type': 'function_call_output', 'call_id': 'shell_synthetic', 'output': 'fixture'}]
+        from consult_context import validate_items
+        caller = {'base': 'Preserve synthetic history.', 'thread': 'synthetic-caller',
+                  'items': validate_items(history)}
+        self.assertEqual(caller['items'], [history[0]])
+        # Hosted records pass through production validation before exclusion.
+        with mock.patch.dict(os.environ, self.env):
+            result = execute(self.home, caller, EXPECTED, threading.Event())
+        self.assertEqual(result['status'], 'succeeded')
+        self.assertTrue(endpoint.requests)
+        from consult_native import verify_history
+        verify_history(endpoint.requests[-1], caller)
+        for request in endpoint.requests:
+            for item in request.get('input', []):
+                self.assertNotIn(item.get('type'), ('web_search_call', 'image_generation_call', 'local_shell_call'))
+                self.assertNotEqual(item.get('call_id'), 'shell_synthetic')
+        print('Native history exclusion: hosted records and local shell result absent; consultation succeeded.', flush=True)
+
+    def test_native_fabricated_history_fails_without_disclosing_text(self):
+        endpoint = self.start_endpoint()
+        secret = 'SYNTHETIC_UNKNOWN_HISTORY_PRIVATE_TEXT'
+        caller = {'base': 'Preserve synthetic history.', 'thread': 'synthetic-caller', 'items': [
+            {'type': 'synthetic_future_history', 'payload': {'text': secret}}]}
+        with mock.patch.dict(os.environ, self.env):
+            with self.assertRaises(Failure) as raised:
+                execute(self.home, caller, EXPECTED, threading.Event())
+        error = raised.exception
+        self.assertEqual(error.code, 'context')
+        self.assertEqual(error.details['stage'], 'request')
+        self.assertEqual(error.details['type'], 'synthetic_future_history')
+        self.assertTrue(error.details['path'])
+        output = json.dumps({'code': error.code, 'message': str(error), 'details': error.details})
+        self.assertNotIn(secret, output)
+        self.assertTrue(endpoint.requests)
+        self.assertFalse(any(item.get('type') == 'synthetic_future_history'
+                             for request in endpoint.requests for item in request.get('input', [])))
+        print('Native fabricated history rejection:', output, flush=True)
+
+    def test_native_nonempty_inventory_is_rejected(self):
+        endpoint = self.start_endpoint()
+        tools = [{'type': 'function', 'name': 'inert_inventory_probe',
+                  'description': 'An inert local isolation probe.',
+                  'parameters': {'type': 'object', 'properties': {}}}]
+        caller = {'base': 'Preserve synthetic history.', 'thread': 'synthetic-caller', 'items': [
+            {'type': 'additional_tools', 'role': 'developer', 'tools': tools}]}
+        with mock.patch.dict(os.environ, self.env):
+            with self.assertRaises(Failure) as raised:
+                execute(self.home, caller, EXPECTED, threading.Event())
+        self.assertEqual(raised.exception.code, 'tools')
+        self.assertTrue(endpoint.requests)
+        self.assertTrue(any(item.get('tools') == tools for request in endpoint.requests
+                            for item in request.get('input', [])),
+                        'The actual host request did not carry the injected inventory.')
+        self.assertNotIn('inert_inventory_probe', str(raised.exception))
+        print('PASS: actual native request carried nonempty additional_tools; code=tools', flush=True)
 
     def check_inner_request(self, request):
         self.assertEqual(request['model'], EXPECTED['model'])

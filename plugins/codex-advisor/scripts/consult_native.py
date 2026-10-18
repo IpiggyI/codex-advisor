@@ -13,7 +13,7 @@ import tempfile
 import threading
 import time
 
-from consult_context import Failure, require
+from consult_context import Failure, require, comparable, validate_items
 from consult_process import CLEANUP_FAILED, supervise_linux
 
 
@@ -493,22 +493,34 @@ def completion(server, thread, turn):
             return advice
 
 
-def comparable(item, omit_image_detail=False):
-    # The host removes item IDs, attribution metadata, and optional nulls from
-    # requests. Tool call_id, roles, content, and encrypted reasoning stay exact.
-    value = {key: value for key, value in item.items()
-             if key not in ('id', 'internal_chat_message_metadata_passthrough') and value is not None}
-    if item.get('type') in ('function_call_output', 'custom_tool_call_output') and isinstance(value.get('output'), list):
-        value['output'] = [block for block in value['output'] if block != {'type': 'input_text', 'text': ''}]
-    if omit_image_detail:
-        # Responses Lite omits supported image detail hints after image preparation.
-        for key in ('content', 'output'):
-            if isinstance(value.get(key), list):
-                value[key] = [{field: data for field, data in block.items() if field != 'detail'}
-                              if block.get('type') == 'input_image' and
-                              block.get('detail') in ('auto', 'high', 'original') else block
-                              for block in value[key]]
-    return value
+def differing_path(expected, actual, path=''):
+    if type(expected) is not type(actual):
+        return path or 'input'
+    if isinstance(expected, dict):
+        for key in expected:
+            child = (path + '.' if path else '') + key
+            if key not in actual:
+                return child
+            if expected[key] != actual[key]:
+                return differing_path(expected[key], actual[key], child)
+        for key in actual:
+            if key not in expected:
+                return (path + '.' if path else '') + key
+    elif isinstance(expected, list):
+        for index, value in enumerate(expected):
+            child = f'{path}[{index}]'
+            if index >= len(actual):
+                return child
+            if value != actual[index]:
+                return differing_path(value, actual[index], child)
+        if len(actual) != len(expected):
+            return f'{path}[{len(expected)}]'
+    return path or 'input'
+
+
+def require_equal(expected, actual, message, path=''):
+    if expected != actual:
+        raise Failure('context', message, details={'path': differing_path(expected, actual, path)})
 
 
 def verify_base(request, caller, lite):
@@ -517,16 +529,18 @@ def verify_base(request, caller, lite):
         prefix = int(bool(items) and items[0].get('type') == 'additional_tools')
         wanted = {'type': 'message', 'role': 'developer',
                   'content': [{'type': 'input_text', 'text': caller['base']}]}
-        require('instructions' not in request and len(items) > prefix and comparable(items[prefix]) == wanted,
-                'context', 'Actual advisor request omitted, changed, or reordered caller base instructions.')
+        require_equal(wanted, comparable(items[prefix]) if len(items) > prefix else None,
+                      'Actual advisor request omitted, changed, or reordered caller base instructions.')
+        if 'instructions' in request:
+            raise Failure('context', 'Unexpected top-level base instructions.', details={'path': 'instructions'})
         return prefix + 1
-    require(request.get('instructions') == caller['base'],
-            'context', 'Actual advisor request omitted or changed caller base instructions.')
+    require_equal(caller['base'], request.get('instructions'),
+                  'Actual advisor request omitted or changed caller base instructions.', 'instructions')
     return 0
 
 
 def verify_history(request, caller, omit_image_detail=False, start=0):
-    source = iter(enumerate(caller['items']))
+    source = iter(enumerate(validate_items(caller['items'])))
     index, wanted = next(source, (0, None))
     last = start - 1
     for position, item in enumerate(request.get('input', [])):
@@ -538,7 +552,12 @@ def verify_history(request, caller, omit_image_detail=False, start=0):
             index, wanted = next(source, (index + 1, None))
     if wanted is not None:
         raise Failure('context', 'Actual advisor request omitted or changed effective caller history.',
-                      details={'sourceIndex': index, 'itemType': wanted['type'],
+                      details={'stage': 'request', 'type': wanted['type'], 'historyIndex': index,
+                               'hostVersion': caller.get('hostVersion'),
+                               'path': differing_path(comparable(wanted, omit_image_detail),
+                                   comparable(request.get('input', [])[last + 1])
+                                   if last + 1 < len(request.get('input', [])) else None),
+                               'sourceIndex': index, 'itemType': wanted['type'],
                                'sourceItems': len(caller['items']), 'requestItems': len(request.get('input', []))})
     return last
 
@@ -546,18 +565,19 @@ def verify_history(request, caller, omit_image_detail=False, start=0):
 def verify_guidance(request, history_end):
     items = request.get('input', [])
     wanted = {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}
-    require(len(items) > history_end + 1 and comparable(items[history_end + 1]) == wanted,
-            'context', 'Actual advisor request omitted, changed, or reordered consultation guidance.')
+    require_equal(wanted, comparable(items[history_end + 1]) if len(items) > history_end + 1 else None,
+                  'Actual advisor request omitted, changed, or reordered consultation guidance.')
     invocation = {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': INVOCATION}]}
-    require(len(items) > history_end + 2 and comparable(items[history_end + 2]) == invocation,
-            'context', 'Actual advisor request omitted, changed, or reordered consultation invocation.')
+    require_equal(invocation, comparable(items[history_end + 2]) if len(items) > history_end + 2 else None,
+                  'Actual advisor request omitted, changed, or reordered consultation invocation.')
 
 
-def verify_requests(root, thread, expected, caller):
+def _verify_requests(root, thread, expected, caller, location):
     model = json.loads((root / 'models.json').read_text(encoding='utf-8'))['models'][0]
     observed = []
     for trace in sorted((root / 'trace').rglob('*.jsonl')):
-        for line in trace.read_text(encoding='utf-8').splitlines():
+        for record_index, line in enumerate(trace.read_text(encoding='utf-8').splitlines()):
+            location['recordIndex'] = record_index
             event = json.loads(line)
             payload = event.get('payload', {})
             if payload.get('type') != 'inference_started':
@@ -571,14 +591,22 @@ def verify_requests(root, thread, expected, caller):
             request = json.loads(path.read_text(encoding='utf-8'))
             actual = {'model': request.get('model'), 'effort': request.get('reasoning', {}).get('effort')}
             if actual != expected:
-                raise Failure('mismatch', 'Actual consultation model or effort differs from its expected dial.', actual)
-            inventories = [item for item in request.get('input', []) if item.get('type') == 'additional_tools']
+                raise Failure('mismatch', 'Actual consultation model or effort differs from its expected dial.', actual,
+                              details={'path': differing_path(expected, actual)})
             try:
                 lite = model.get('use_responses_lite') is True
                 # Responses Lite omits both inventories when its tool set is empty.
-                require(('tools' not in request or request['tools'] == []) and
-                        (inventories or request.get('tools') == [] or lite) and
-                        all(item.get('tools') == [] for item in inventories),
+                if 'tools' in request and request['tools'] != []:
+                    raise Failure('tools', 'Actual consultation request did not prove an empty tool set.',
+                                  details={'path': 'tools'})
+                for index, item in enumerate(request.get('input', [])):
+                    if 'tools' in item and item['tools'] != []:
+                        raise Failure('tools', 'Actual consultation input carries tools.',
+                                      details={'type': item.get('type'), 'historyIndex': index,
+                                               'path': f'input[{index}].tools'})
+                require(lite or request.get('tools') == [] or any(
+                        item.get('type') == 'additional_tools' and item.get('tools') == []
+                        for item in request.get('input', [])),
                         'tools', 'Actual consultation request did not prove an empty tool set.')
                 start = verify_base(request, caller, lite)
                 history_end = verify_history(request, caller, lite, start)
@@ -589,6 +617,17 @@ def verify_requests(root, thread, expected, caller):
             observed.append(actual)
     require(bool(observed), 'trace', 'No actual inference request trace was recorded.')
     return observed[-1]
+
+
+def verify_requests(root, thread, expected, caller):
+    location = {'stage': 'request', 'type': 'request', 'recordIndex': 0}
+    if caller.get('hostVersion') is not None:
+        location['hostVersion'] = caller['hostVersion']
+    try:
+        return _verify_requests(root, thread, expected, caller, location)
+    except Failure as error:
+        error.details = {**location, **error.details}
+        raise
 
 
 def execute(home, caller, expected, cancel):

@@ -60,6 +60,10 @@ class MCP:
         try:
             params = request.get('params', {})
             home = caller_home(self.plugin)
+            marker = home / 'codex-advisor/consultation-off'
+            if marker.exists():
+                raise Failure('switched_off', 'The user switched consultation off. ' + STOP_CALLING +
+                              '\nDelete ' + str(marker) + ' to turn consultation back on for new threads.')
             identity(params.get('_meta'))
             thread = params['_meta']['threadId']
             if failure_count(home, thread) >= FAILURE_LIMIT:
