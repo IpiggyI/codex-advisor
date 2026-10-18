@@ -1,0 +1,46 @@
+{
+ "host": "windows",
+ "scripts": "/mnt/c/Users/Shy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.7/scripts",
+ "boundaries": [
+  {
+   "rollout": "rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+   "callLine": 44,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+   "callLine": 259,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+   "callLine": 342,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T00-43-00-01a14abe-cae4-7ad1-9a87-159da8f58c7e.jsonl",
+   "callLine": 351,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+   "callLine": 45,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+   "callLine": 219,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+   "callLine": 252,
+   "reconstruct": "PASS"
+  },
+  {
+   "rollout": "rollout-2026-10-18T16-29-41-01a14e21-8439-7e22-ae3a-e7dc753b88c9.jsonl",
+   "callLine": 304,
+   "reconstruct": "PASS"
+  }
+ ]
+}

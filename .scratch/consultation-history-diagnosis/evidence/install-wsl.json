@@ -1,0 +1,20 @@
+{
+ "host": "wsl",
+ "version": "0.3.7",
+ "sourceCommit": "98e88b561831ad70c302a4bf47ea466865f87440",
+ "pluginFiles": 37,
+ "pluginMismatches": [],
+ "nativeEntries": 17,
+ "entryMismatches": [],
+ "companionInstallExit": 0,
+ "companionCheckExit": 0,
+ "hookDefinitionsChanged": false,
+ "existingSessionReload": "unverified",
+ "failureCountersCleared": false,
+ "userProcessesStopped": false,
+ "marketplaceUpgradeExit": 0,
+ "standardInstallExit": 0,
+ "retryInstallExit": null,
+ "installFailure": null,
+ "registeredVersion": "0.3.7"
+}

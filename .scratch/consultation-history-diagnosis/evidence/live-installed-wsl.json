@@ -1,0 +1,39 @@
+{
+  "rollout": "rollout-2026-10-15T14-26-27-01a13e3d-9c16-75b3-a1db-0d6be4435ed6.jsonl",
+  "callLine": 1366,
+  "hostVersion": "0.162.1",
+  "rawTypes": [
+    "custom_tool_call",
+    "custom_tool_call_output",
+    "function_call",
+    "function_call_output",
+    "message",
+    "reasoning",
+    "web_search_call"
+  ],
+  "injectedTypes": [
+    "custom_tool_call",
+    "custom_tool_call_output",
+    "function_call",
+    "function_call_output",
+    "message",
+    "reasoning"
+  ],
+  "injectedItems": 270,
+  "caller": {
+    "model": "gpt-6.1-sol",
+    "effort": "high"
+  },
+  "status": "succeeded",
+  "kind": "plan",
+  "adviceChars": 192,
+  "expected": {
+    "model": "gpt-6.1-sol",
+    "effort": "high"
+  },
+  "actual": {
+    "model": "gpt-6.1-sol",
+    "effort": "high"
+  },
+  "advisorThreadId": "01a14ee4-c89c-73f0-b86b-859432f5ab9d"
+}
