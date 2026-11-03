@@ -233,12 +233,11 @@ def validate_retained(payload):
         raise Failure('snapshot', 'Unqualified retained context event.', details={'eventType': kind})
 
 
-def _reconstruct(home, meta, location):
-    turn = identity(meta)
-    paths = list((home / 'sessions').rglob('*' + meta['threadId'] + '*.jsonl'))
-    require(len(paths) == 1, 'identity', 'Exactly one caller rollout must match the host identity.')
+def read_rollout(path, location):
+    location.update(type='session_meta', recordIndex=0)
+    location.pop('hostVersion', None)
     try:
-        snapshot = paths[0].read_bytes()
+        snapshot = path.read_bytes()
         records = []
         for index, line in enumerate(snapshot.splitlines()):
             location['recordIndex'] = index
@@ -251,6 +250,48 @@ def _reconstruct(home, meta, location):
         location['recordIndex'] = 0
     except (OSError, ValueError):
         raise Failure('snapshot', 'The caller rollout snapshot cannot be decoded.') from None
+    return records
+
+
+def matches_call(records, meta):
+    if not records or not isinstance(records[0], dict) or records[0].get('type') != 'session_meta':
+        return False
+    session = records[0].get('payload')
+    if not isinstance(session, dict) or session.get('id') != meta['threadId'] or \
+            session.get('session_id', session.get('id')) != meta['sessionId']:
+        return False
+    current = None
+    for record in records[1:]:
+        if not isinstance(record, dict) or not isinstance(record.get('payload'), dict):
+            continue
+        payload = record['payload']
+        if record.get('type') == 'turn_context':
+            current = payload.get('turn_id')
+        elif record.get('type') == 'response_item' and payload.get('id') == meta['itemId'] and \
+                current == meta['x-codex-turn-metadata']['turn_id']:
+            return True
+    return False
+
+
+def caller_records(home, meta, location):
+    paths = list((home / 'sessions').rglob('*' + meta['threadId'] + '*.jsonl'))
+    if len(paths) == 1:
+        return read_rollout(paths[0], location)
+    matches = []
+    for path in paths:
+        records = read_rollout(path, location)
+        if matches_call(records, meta):
+            matches.append(records)
+    location.pop('hostVersion', None)
+    if len(matches) != 1:
+        raise Failure('identity', 'Exactly one caller rollout must match the active consultation identity.',
+                      details={'candidateCount': len(paths), 'matchingCount': len(matches)})
+    return matches[0]
+
+
+def _reconstruct(home, meta, location):
+    turn = identity(meta)
+    records = caller_records(home, meta, location)
     require(records and isinstance(records[0], dict) and records[0].get('type') == 'session_meta',
             'identity', 'The caller session header is missing.')
     session = records[0].get('payload')

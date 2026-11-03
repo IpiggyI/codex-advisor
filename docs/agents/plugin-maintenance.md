@@ -143,9 +143,17 @@ failure counts; the result has no `failureCount`. Deleting the marker enables th
 next call in the same MCP process. A thread that receives the switched-off result
 stops calling for the rest of that thread, so only new threads resume after deletion.
 
-With no marker, the component reads exactly one rollout snapshot matching the caller identity in
-the MCP metadata and stops before the unfinished consultation item, including when
-that item is the host's code-mode wrapper. The caller's tool inventory is not
+With no marker, the component selects one rollout snapshot using the caller identity
+in the MCP metadata. When multiple file names contain the thread ID, it decodes each
+snapshot and requires exactly one with the matching thread and session header and
+the consultation item under the matching turn context. Selection precedes full
+history validation: an invalid matching snapshot cannot be discarded to resolve
+ambiguity. Undecodable candidates fail explicitly. If this search finds zero or
+multiple matching snapshots, it fails with `candidateCount` and `matchingCount`;
+modification times do not select a snapshot. The selected bytes undergo the same
+complete validation as a single-file snapshot, without rereading or merging files. Reconstruction stops
+before the unfinished consultation item, including when that item is the host's
+code-mode wrapper. The caller's tool inventory is not
 forwarded. The server applies the routing profile's consultation mapping to the
 caller's host-recorded dial. The component uses native Codex authentication. It
 does not parse credential values or copy credential files.

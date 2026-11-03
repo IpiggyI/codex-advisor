@@ -222,6 +222,78 @@ public class CodexFixture {
         inventory = [json.loads(line) for line in (self.root / 'inventory-calls.jsonl').read_text().splitlines()]
         self.assertTrue(all(message['method'] in ('initialize', 'initialized', 'mcpServerStatus/list') for message in inventory))
 
+    def write_other_rollout(self, records):
+        sessions = self.home / 'sessions/2026/09/26'
+        sessions.mkdir(parents=True, exist_ok=True)
+        path = sessions / ('rollout-' + THREAD + '_other.jsonl')
+        path.write_text(''.join(json.dumps(record) + '\n' for record in records))
+        return path
+
+    def test_multiple_rollouts_select_current_call_without_merging_history(self):
+        records, meta, history = fixture(model='gpt-6.1-terra', effort='medium')
+        older = copy.deepcopy(records)
+        older[1]['payload']['turn_id'] = older[2]['payload']['turn_id'] = 'older-turn'
+        older[3]['payload'] = item('UNRELATED_OLDER_HISTORY')
+        older[-1]['payload']['id'] = 'older-consult'
+        path = self.write_other_rollout(records)
+        os.utime(path, (1000000000, 1000000000))
+        result = self.call(older, meta)
+        self.assertEqual(result['status'], 'succeeded', result)
+        injected = json.loads((self.root / 'injected.json').read_text())
+        self.assertEqual(injected[:-1], history)
+
+    def test_multiple_rollouts_reject_duplicate_boundary_before_validation(self):
+        records, meta, _ = fixture()
+        duplicate = copy.deepcopy(records)
+        duplicate[3]['payload'] = item(None)
+        self.write_other_rollout(duplicate)
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'identity', result)
+        self.assertEqual(result['details']['candidateCount'], 2)
+        self.assertEqual(result['details']['matchingCount'], 2)
+        self.assertFalse((self.root / 'injected.json').exists())
+
+    def test_multiple_rollouts_reject_missing_boundary(self):
+        records, meta, _ = fixture()
+        self.write_other_rollout(records)
+        meta['itemId'] = 'missing'
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'identity', result)
+        self.assertEqual(result['details']['candidateCount'], 2)
+        self.assertEqual(result['details']['matchingCount'], 0)
+        self.assertFalse((self.root / 'injected.json').exists())
+
+    def test_multiple_rollouts_ignore_different_identity(self):
+        for field in ('id', 'session_id', 'turn_id'):
+            with self.subTest(field=field):
+                records, meta, history = fixture()
+                other = copy.deepcopy(records)
+                index = 2 if field == 'turn_id' else 0
+                other[index]['payload'][field] = 'different-identity'
+                self.write_other_rollout(other)
+                result = self.call(records, meta)
+                self.assertEqual(result['status'], 'succeeded', result)
+                injected = json.loads((self.root / 'injected.json').read_text())
+                self.assertEqual(injected[:-1], history)
+
+    def test_multiple_rollouts_preserve_selected_history_rejection(self):
+        records, meta, _ = fixture()
+        other = copy.deepcopy(records)
+        other[-1]['payload']['id'] = 'older-consult'
+        self.write_other_rollout(other)
+        records[3]['payload'] = item(None)
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'unsupported_content', result)
+        self.assertEqual(result['details']['recordIndex'], 3)
+        self.assertFalse((self.root / 'injected.json').exists())
+
+    def test_multiple_rollouts_reject_undecodable_candidate(self):
+        records, meta, _ = fixture()
+        self.write_other_rollout(records).write_text('{invalid json\n')
+        result = self.call(records, meta)
+        self.assertEqual(result['code'], 'snapshot', result)
+        self.assertFalse((self.root / 'injected.json').exists())
+
     def test_policy_reconstructs_preserved_history_without_excluded_items(self):
         records, meta, history = fixture()
         preserved = [{'type': 'synthetic_future_item', 'payload': 'SYNTHETIC_HISTORY'},

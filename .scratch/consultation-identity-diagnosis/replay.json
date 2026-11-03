@@ -1,0 +1,34 @@
+{
+  "metadataSource": "constructed from real session records; original MCP metadata unavailable",
+  "sourceHashes": {
+    "rollout-2026-11-03T09-44-38-01a19f14-6f4f-7cf2-8606-23cab91f8b01.jsonl": "73cad8178310484b8da93f478b0284f2d6f8201c38d79e0737f7d977973b33af",
+    "rollout-2026-11-03T09-58-30-01a19f14-6f4f-7cf2-8606-23cab91f8b01_01a19f21-1e2d-7362-b768-1cc27e2fc366.jsonl": "3b58e73f244b4b41ad4b2ba1c776479a633b8916662a6f39f426268fdd0d44f3"
+  },
+  "results": [
+    {
+      "boundaryIndex": 24,
+      "status": "passed",
+      "itemCount": 11,
+      "fullSnapshotEqualsSingle": true,
+      "itemsEqualValidatedSource": true,
+      "baseEqualsSource": true
+    },
+    {
+      "boundaryIndex": 68,
+      "status": "passed",
+      "itemCount": 30,
+      "fullSnapshotEqualsSingle": true,
+      "itemsEqualValidatedSource": true,
+      "baseEqualsSource": true
+    },
+    {
+      "boundaryIndex": 103,
+      "status": "passed",
+      "itemCount": 45,
+      "fullSnapshotEqualsSingle": true,
+      "itemsEqualValidatedSource": true,
+      "baseEqualsSource": true
+    }
+  ],
+  "originalFilesUnchanged": true
+}
