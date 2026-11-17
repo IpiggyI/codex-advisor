@@ -1,0 +1,8 @@
+{
+  "pluginId": "codex-advisor@codex-advisor",
+  "name": "codex-advisor",
+  "marketplaceName": "codex-advisor",
+  "version": "0.3.9",
+  "installedPath": "/home/hyy/.codex/plugins/cache/codex-advisor/codex-advisor/0.3.9",
+  "authPolicy": "ON_INSTALL"
+}
