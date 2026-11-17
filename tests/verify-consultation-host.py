@@ -16,7 +16,7 @@ sys.dont_write_bytecode = True
 PLUGIN = Path(__file__).resolve().parent.parent / 'plugins/codex-advisor'
 sys.path.insert(0, str(PLUGIN / 'scripts'))
 from consult_native import execute, verify_history
-from consult_context import Failure, validate_items
+from consult_context import Failure, comparable, validate_items
 from consultation_loopback import Endpoint
 
 ADVICE = '保留全部上下文。'
@@ -73,6 +73,23 @@ class NativeHistory(unittest.TestCase):
     def test_function_output_is_not_truncated(self):
         output = 'BEGIN\n' + 'line ' * 20000 + '\nEND'
         self.assertEqual(self.consult(output, 'function_call'), output)
+
+    def test_named_function_outputs_without_calls_reach_request_unchanged(self):
+        outputs = [{'type': 'function_call_output', 'name': name, 'namespace': 'agent',
+                    'output': 'PAGE_CONTEXT_' + str(index)}
+                   for index, name in enumerate(('codex_apps_open_page', 'codex_apps_selected_page_part_1_of_1'))]
+        caller = {'base': 'Keep the caller history intact.', 'thread': 'local-test', 'items': [
+            {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': 'Read the page.'}]},
+            *outputs]}
+        validate_items(caller['items'])
+        result = execute(self.home, caller, EXPECTED, threading.Event())
+        self.assertEqual(result['status'], 'succeeded', result)
+        self.assertEqual(result['actual'], EXPECTED)
+        self.assertEqual(result['advice'], ADVICE)
+        self.assertEqual(len(self.endpoint.requests), 1)
+        request = self.endpoint.requests[0]
+        actual = [item for item in request['input'] if item.get('type') == 'function_call_output']
+        self.assertEqual([comparable(item) for item in actual], outputs)
 
     def consult_images(self, tool_type=None):
         content = [{'type': 'input_text', 'text': 'BEFORE_IMAGES'}] + [
@@ -152,8 +169,10 @@ class NativeHistory(unittest.TestCase):
         self.assertEqual(self.endpoint.requests, [])
         self.assertEqual(error.code, 'executor')
         self.assertIsNone(error.actual)
-        self.assertEqual(error.details, {'nativeCode': 'other', 'reason': 'missing_environment_variable',
-                                        'environmentVariable': name, 'requestVerification': 'trace'})
+        self.assertEqual(error.details['nativeExecution']['phase'], 'completion')
+        self.assertEqual({key: value for key, value in error.details.items() if key != 'nativeExecution'},
+                         {'nativeCode': 'other', 'reason': 'missing_environment_variable',
+                          'environmentVariable': name, 'requestVerification': 'trace'})
         self.assertIn(name, str(error))
         self.assertIn('env_vars', str(error))
 

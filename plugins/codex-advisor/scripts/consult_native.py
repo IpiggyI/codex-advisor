@@ -1,6 +1,7 @@
 """Native authenticated App Server execution with temporary request evidence."""
 
 import json
+from contextlib import contextmanager
 import os
 from pathlib import Path
 import queue
@@ -35,6 +36,49 @@ GUIDANCE = (
     'not user-facing output or independent acceptance. Do not execute the task. '
     'Advice grants no authorization, veto, or new requirement.')
 INVOCATION = 'Return process consultation for the caller now.'
+
+
+class Diagnostics:
+    """Keep bounded execution metadata without event bodies or caller context."""
+
+    def __init__(self):
+        self.started = self.phase_started = time.monotonic()
+        self.current = 'startup'
+        self.timings = {}
+        self.events = {'retryCount': 0}
+
+    @contextmanager
+    def phase(self, name):
+        self.current, self.phase_started = name, time.monotonic()
+        try:
+            yield
+        except Failure as error:
+            error.details.setdefault('nativeExecution', self.snapshot())
+            raise
+        finally:
+            self.timings[name] = round((time.monotonic() - self.phase_started) * 1000)
+
+    def observe(self, message):
+        method = message.get('method')
+        known = ('thread/started', 'turn/started', 'turn/completed', 'item/started', 'item/completed',
+                 'item/agentMessage/delta', 'item/reasoning/summaryTextDelta', 'item/reasoning/textDelta',
+                 'thread/tokenUsage/updated', 'error')
+        elapsed = round((time.monotonic() - self.started) * 1000)
+        event = method if method in known else ('rpc_result' if method is None else 'other')
+        self.events.update(lastEvent=event, lastEventMs=elapsed)
+        if method in ('item/agentMessage/delta', 'item/reasoning/summaryTextDelta', 'item/reasoning/textDelta'):
+            self.events.setdefault('firstOutputMs', elapsed)
+        params = message.get('params')
+        if method == 'error' and isinstance(params, dict) and params.get('willRetry') is True:
+            self.events['retryCount'] += 1
+            details = native_failure(params.get('error'), '').details
+            self.events['lastRetry'] = {key: details[key] for key in ('nativeCode', 'httpStatusCode') if key in details}
+
+    def snapshot(self):
+        now = time.monotonic()
+        return {'phase': self.current, 'elapsedMs': round((now - self.started) * 1000),
+                'phaseElapsedMs': round((now - self.phase_started) * 1000),
+                'phaseTimingsMs': dict(self.timings), **self.events}
 
 
 class WindowsJob:
@@ -345,6 +389,8 @@ class Server:
             try:
                 result = self.messages.get(timeout=.1)
                 require(isinstance(result, dict), 'executor', 'Native App Server ended or emitted invalid JSON.')
+                if getattr(self, 'diagnostics', None) is not None:
+                    self.diagnostics.observe(result)
                 if 'method' in result and 'id' in result:
                     self.send({'id': result['id'], 'error': {'code': -32601,
                                'message': 'Consultation accepts no tool or approval requests.'}})
@@ -631,36 +677,49 @@ def verify_requests(root, thread, expected, caller):
 
 
 def execute(home, caller, expected, cancel):
+    diagnostics = Diagnostics()
     deadline = time.monotonic() + 180
     with tempfile.TemporaryDirectory(prefix='codex-advisor-consult-') as directory:
         root = Path(directory)
         env = dict(os.environ, CODEX_HOME=str(home), CODEX_ROLLOUT_TRACE_ROOT=str(root / 'trace'))
         values = configuration(root, expected)
-        values['model_catalog_json'] = str(catalog(env, root, cancel, deadline, (expected['model'], caller)))
-        names = server_names(env, root, values, cancel, deadline)
+        with diagnostics.phase('catalog'):
+            values['model_catalog_json'] = str(catalog(env, root, cancel, deadline, (expected['model'], caller)))
+        with diagnostics.phase('discovery'):
+            names = server_names(env, root, values, cancel, deadline)
         values['mcp_servers'] = sorted(names)
-        server = Server(env, root, values, cancel, deadline)
+        with diagnostics.phase('startup'):
+            server = Server(env, root, values, cancel, deadline)
+        server.diagnostics = diagnostics
         thread, execution_error = None, None
         try:
             try:
-                server.initialize()
-                verify_isolation(server, root, names)
-                started = server.call('thread/start', {'model': expected['model'], 'cwd': str(root),
-                                      'ephemeral': True, 'approvalPolicy': 'never', 'sandbox': 'read-only',
-                                      'baseInstructions': caller['base'], 'developerInstructions': ''})
+                with diagnostics.phase('initialize'):
+                    server.initialize()
+                with diagnostics.phase('isolation'):
+                    verify_isolation(server, root, names)
+                with diagnostics.phase('thread_start'):
+                    started = server.call('thread/start', {'model': expected['model'], 'cwd': str(root),
+                                          'ephemeral': True, 'approvalPolicy': 'never', 'sandbox': 'read-only',
+                                          'baseInstructions': caller['base'], 'developerInstructions': ''})
                 thread = started['thread']['id']
-                server.call('thread/inject_items', {'threadId': thread, 'items': caller['items'] + [
-                    {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}]})
-                started_turn = server.call('turn/start', {'threadId': thread, 'model': expected['model'],
-                                           'effort': expected['effort'], 'outputSchema': SCHEMA,
-                                           'input': [{'type': 'text', 'text': INVOCATION}]})
-                advice = completion(server, thread, started_turn['turn']['id'])
+                with diagnostics.phase('history_injection'):
+                    server.call('thread/inject_items', {'threadId': thread, 'items': caller['items'] + [
+                        {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}]})
+                with diagnostics.phase('turn_start'):
+                    started_turn = server.call('turn/start', {'threadId': thread, 'model': expected['model'],
+                                               'effort': expected['effort'], 'outputSchema': SCHEMA,
+                                               'input': [{'type': 'text', 'text': INVOCATION}]})
+                with diagnostics.phase('completion'):
+                    advice = completion(server, thread, started_turn['turn']['id'])
             finally:
-                server.close()
+                with diagnostics.phase('cleanup'):
+                    server.close()
         except Failure as error:
             execution_error = error
         try:
-            actual = verify_requests(root, thread, expected, caller)
+            with diagnostics.phase('request_verification'):
+                actual = verify_requests(root, thread, expected, caller)
         except Failure as error:
             if execution_error is None:
                 raise
@@ -670,8 +729,11 @@ def execute(home, caller, expected, cancel):
             if execution_error is not None:
                 execution_error.actual = actual
         if execution_error is not None:
+            execution_error.details['nativeExecution'].update(
+                totalElapsedMs=diagnostics.snapshot()['elapsedMs'], phaseTimingsMs=dict(diagnostics.timings))
             raise execution_error
-        check_cancel(cancel, deadline)
+        with diagnostics.phase('publish'):
+            check_cancel(cancel, deadline)
         return {'status': 'succeeded', **advice, 'actual': actual, 'expected': expected,
                 'advisorThreadId': thread, 'callerThreadId': caller['thread']}
 

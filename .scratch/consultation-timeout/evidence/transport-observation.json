@@ -1,0 +1,27 @@
+{
+  "transportSignals": {
+    "WebSocket": {
+      "count": 14,
+      "firstUnixSeconds": 1794908207,
+      "lastUnixSeconds": 1794908215
+    },
+    "Connection reset by peer": {
+      "count": 5,
+      "firstUnixSeconds": 1794908208,
+      "lastUnixSeconds": 1794908212
+    },
+    "stream disconnected before completion": {
+      "count": 5,
+      "firstUnixSeconds": 1794908208,
+      "lastUnixSeconds": 1794908212
+    }
+  },
+  "nativeTargets": {
+    "codex_api::endpoint::responses_websocket": 14,
+    "codex_core::responses_retry": 9
+  },
+  "inferenceEvents": {
+    "inference_started": 4,
+    "inference_failed": 4
+  }
+}

@@ -11,7 +11,7 @@ import tempfile
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'plugins/codex-advisor/scripts'))
-from consult_context import Failure, ITEM_POLICY, pair_identity, reconstruct
+from consult_context import Failure, ITEM_POLICY, pair_identity, reconstruct, standalone_output
 
 
 def default_roots():
@@ -38,6 +38,8 @@ class CallBatch:
         policy = ITEM_POLICY.get(kind, {}) if isinstance(kind, str) else {}
         shape = policy.get('shape')
         if shape not in ('call', 'result'):
+            return
+        if standalone_output(item, policy):
             return
         try:
             call = pair_identity(item, policy)

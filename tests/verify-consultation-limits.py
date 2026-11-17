@@ -93,9 +93,32 @@ class FailureStorage(unittest.TestCase):
             return limits.failure_count(self.home, 'thread-' + str(index % 4), True)
         with ThreadPoolExecutor(max_workers=12) as workers:
             counts = list(workers.map(fail, range(48)))
-        self.assertTrue(all(1 <= count <= 4 for count in counts))
-        self.assertEqual([limits.failure_count(self.home, 'thread-' + str(i)) for i in range(4)], [4] * 4)
+        self.assertTrue(all(1 <= count <= 3 for count in counts))
+        self.assertEqual([limits.failure_count(self.home, 'thread-' + str(i)) for i in range(4)], [3] * 4)
         self.assertEqual(list(self.path.parent.iterdir()), [self.path])
+
+    def test_third_cumulative_failure_disables_consultation(self):
+        for count in range(1, 4):
+            result = limits.limit_result({'status': 'failed', 'code': 'pairing', 'message': 'Unpaired.'},
+                                         self.home, 'caller')
+            self.assertEqual(result['failureCount'], count)
+            self.assertEqual(result['consultationDisabled'], count == 3)
+        self.assertIn('three failed calls', result['message'])
+
+    def test_legacy_four_failure_counter_remains_disabled_without_rewriting(self):
+        self.path.parent.mkdir()
+        with closing(sqlite3.connect(self.path)) as database, database:
+            database.execute('CREATE TABLE failures (thread TEXT PRIMARY KEY, count INTEGER NOT NULL '
+                             'CHECK(count BETWEEN 1 AND 4))')
+            database.execute('INSERT INTO failures VALUES (?, 4)', ('caller',))
+        previous = self.path.read_bytes()
+        self.assertEqual(limits.failure_count(self.home, 'caller'), 4)
+        result = limits.limit_result({'status': 'failed', 'code': 'disabled', 'message': 'Disabled.'},
+                                     self.home, 'caller')
+        self.assertTrue(result['consultationDisabled'])
+        self.assertEqual(result['failureCount'], 4)
+        self.assertEqual(self.path.read_bytes(), previous)
+        self.assertEqual(limits.failure_count(self.home, 'caller', True), 4)
 
     def reject_existing(self, content):
         self.path.write_bytes(content)

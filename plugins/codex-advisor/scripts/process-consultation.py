@@ -67,7 +67,7 @@ class MCP:
             identity(params.get('_meta'))
             thread = params['_meta']['threadId']
             if failure_count(home, thread) >= FAILURE_LIMIT:
-                raise Failure('disabled', 'Consultation is disabled after four failed calls. ' + STOP_CALLING)
+                raise Failure('disabled', 'Consultation is disabled after three failed calls. ' + STOP_CALLING)
             if params.get('name') != TOOL['name'] or params.get('arguments', {}) != {}:
                 raise Failure('arguments', 'Process consultation accepts only an empty argument object.')
             caller = reconstruct(home, params.get('_meta'))

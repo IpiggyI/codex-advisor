@@ -69,6 +69,7 @@ for call, result, policy, argument in (
     ITEM_POLICY[result] = {'policy': policy, 'shape': 'result', 'pair': call,
                            'blocks': ('output',), 'empty_text': True, 'search': policy == 'capability'}
 ITEM_POLICY['function_call_output']['call_policies'] = {'local_shell_call': 'hosted'}
+ITEM_POLICY['function_call_output']['named_output'] = True
 
 CONTENT_POLICY = {
     'input_text': {'policy': 'preserve', 'field': 'text', 'agent': True, 'empty_tool_text': True},
@@ -122,6 +123,12 @@ def pair_identity(item, policy):
     return call or None
 
 
+def standalone_output(item, policy):
+    return (policy.get('named_output') and item.get('call_id') is None and
+            isinstance(item.get('name'), str) and bool(item['name']) and
+            (item.get('namespace') is None or isinstance(item['namespace'], str)))
+
+
 def validate_items(items):
     require(isinstance(items, list), 'unsupported_content', 'History must be an array.')
     pending, seen, retained = {}, set(), []
@@ -167,9 +174,10 @@ def validate_items(items):
                 call = pair_identity(item, policy)
                 if call in pending:
                     disposition = policy.get('call_policies', {}).get(pending[call][2], disposition)
-                require(call is not None and call in pending and pending[call][0] == kind and
-                        pending[call][3] == disposition, 'pairing', 'A tool result has no matching call.')
-                del pending[call]
+                if not standalone_output(item, policy):
+                    require(call is not None and call in pending and pending[call][0] == kind and
+                            pending[call][3] == disposition, 'pairing', 'A tool result has no matching call.')
+                    del pending[call]
                 if policy.get('search'):
                     require(isinstance(item.get('status'), str) and isinstance(item.get('tools'), list),
                             'unsupported_content', 'Invalid tool inventory.')

@@ -40,6 +40,30 @@ def completed():
 
 
 class HistoryPolicy(unittest.TestCase):
+    def test_named_function_outputs_without_calls_are_preserved(self):
+        for identity in ({}, {'call_id': None}):
+            item = {'type': 'function_call_output', 'name': 'codex_apps_open_page',
+                    'namespace': 'agent', 'output': 'PAGE_CONTEXT', **identity}
+            with self.subTest(identity=identity):
+                self.assertEqual(validate_items([item]), [item])
+                native.verify_history({'input': [item]}, {'items': [item]})
+                for changed in ([], [{**item, 'output': 'CHANGED'}],
+                                [{**item, 'name': 'different'}], [{**item, 'namespace': 'different'}]):
+                    with self.assertRaises(Failure):
+                        native.verify_history({'input': changed}, {'items': [item]})
+
+    def test_named_outputs_do_not_hide_incomplete_or_invalid_pairs(self):
+        output = {'type': 'function_call_output', 'name': 'page', 'namespace': 'agent', 'output': ''}
+        call = {'type': 'function_call', 'call_id': 'pending', 'name': 'page', 'arguments': '{}'}
+        for items in ([call, output], [{**output, 'call_id': 'missing'}],
+                      [{**output, 'call_id': ''}], [{**output, 'name': ''}],
+                      [{**output, 'name': None}], [{**output, 'namespace': 1}],
+                      [{'type': 'function_call_output', 'output': ''}],
+                      [{**output, 'type': 'custom_tool_call_output'}]):
+            with self.subTest(items=items), self.assertRaises(Failure) as raised:
+                validate_items(items)
+            self.assertEqual(raised.exception.code, 'pairing')
+
     def test_web_search_optional_fields_are_excluded(self):
         for item in (
                 {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search'}},
@@ -158,6 +182,68 @@ class HistoryPolicy(unittest.TestCase):
 
 
 class NativeLifecycle(unittest.TestCase):
+    def test_diagnostics_keep_only_bounded_event_metadata(self):
+        clock = [10.0]
+        with mock.patch.object(native.time, 'monotonic', side_effect=lambda: clock[0]):
+            diagnostics = native.Diagnostics()
+            with diagnostics.phase('completion'):
+                clock[0] = 11.0
+                diagnostics.observe({'method': 'item/agentMessage/delta', 'params': {'delta': 'PRIVATE_TEXT'}})
+                clock[0] = 12.0
+                diagnostics.observe({'method': 'error', 'params': {
+                    'willRetry': True, 'error': {'message': 'PRIVATE_TOKEN',
+                        'codexErrorInfo': {'responseStreamDisconnected': {'httpStatusCode': 503}}}}})
+                clock[0] = 13.0
+                diagnostics.observe({'method': 'PRIVATE_METHOD', 'params': {'secret': 'PRIVATE_VALUE'}})
+                result = diagnostics.snapshot()
+            self.assertEqual(result['phase'], 'completion')
+            self.assertEqual(result['elapsedMs'], 3000)
+            self.assertEqual(result['firstOutputMs'], 1000)
+            self.assertEqual(result['lastEvent'], 'other')
+            self.assertEqual(result['lastEventMs'], 3000)
+            self.assertEqual(result['retryCount'], 1)
+            self.assertEqual(result['lastRetry'], {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503})
+            self.assertEqual(diagnostics.snapshot()['phaseTimingsMs'], {'completion': 3000})
+            self.assertNotIn('PRIVATE', json.dumps(result))
+
+    def test_startup_timeout_reports_phase_before_any_request(self):
+        with mock.patch.object(native, 'catalog', side_effect=Failure('timeout', 'Expired.')):
+            with self.assertRaises(Failure) as raised:
+                native.execute(Path('unused'), CALLER, EXPECTED, threading.Event())
+        self.assertEqual(raised.exception.details['nativeExecution']['phase'], 'catalog')
+
+    def test_receive_tracks_retry_and_terminal_event_without_output_text(self):
+        server = native.Server.__new__(native.Server)
+        server.cancel, server.deadline = threading.Event(), time.monotonic() + 5
+        server.pending, server.messages = [], native.queue.Queue()
+        server.diagnostics = native.Diagnostics()
+        server.messages.put({'method': 'error', 'params': {
+            'threadId': 'advisor', 'turnId': 'turn', 'willRetry': True,
+            'error': {'message': 'PRIVATE_ERROR', 'codexErrorInfo': 'serverOverloaded'}}})
+        for event in completed():
+            server.messages.put(event)
+        self.assertEqual(native.completion(server, 'advisor', 'turn'), ADVICE)
+        result = server.diagnostics.snapshot()
+        self.assertEqual(result['retryCount'], 1)
+        self.assertEqual(result['lastEvent'], 'turn/completed')
+        self.assertEqual(result['lastRetry'], {'nativeCode': 'serverOverloaded'})
+        self.assertNotIn(ADVICE['advice'], json.dumps(result))
+        self.assertNotIn('PRIVATE', json.dumps(result))
+
+    def test_cleanup_does_not_replace_completion_timeout_phase(self):
+        server = types.SimpleNamespace(initialize=lambda: None, close=lambda: None,
+                                      call=lambda *args: {'thread': {'id': 'advisor'}, 'turn': {'id': 'turn'}})
+        with mock.patch.object(native, 'catalog', return_value=Path('models.json')), \
+                mock.patch.object(native, 'server_names', return_value=set()), \
+                mock.patch.object(native, 'Server', return_value=server), \
+                mock.patch.object(native, 'verify_isolation'), \
+                mock.patch.object(native, 'completion', side_effect=Failure('timeout', 'Expired.')), \
+                mock.patch.object(native, 'verify_requests', return_value=EXPECTED):
+            with self.assertRaises(Failure) as raised:
+                native.execute(Path('unused'), CALLER, EXPECTED, threading.Event())
+        self.assertEqual(raised.exception.details['nativeExecution']['phase'], 'completion')
+        self.assertEqual(raised.exception.actual, EXPECTED)
+
     def launch_idle(self, root):
         with mock.patch.object(native, 'windows_codex', return_value=sys.executable):
             return native.launch([sys.executable, '-B', '-c',
@@ -299,6 +385,7 @@ class NativeLifecycle(unittest.TestCase):
             with self.assertRaises(Failure) as raised:
                 native.execute(Path(directory), CALLER, EXPECTED, cancel)
         self.assertEqual(raised.exception.code, 'timeout' if expires else 'cancelled')
+        self.assertEqual(raised.exception.details['nativeExecution']['phase'], 'publish')
 
     def test_success_publication_rejects_cancellation_during_verification(self):
         self.check_success_publication(False)

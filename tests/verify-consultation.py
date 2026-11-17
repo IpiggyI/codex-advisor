@@ -34,8 +34,8 @@ def agent_item():
             'internal_chat_message_metadata_passthrough': {'turn_id': TURN, 'create_time': 'fixture'}}
 
 
-def fixture(model='gpt-6-sol', effort='high', role=None):
-    session = {'id': THREAD, 'session_id': SESSION, 'base_instructions': {'text': 'SOURCE_BASE_INSTRUCTIONS'},
+def fixture(model='gpt-6-sol', effort='high', role=None, thread=THREAD):
+    session = {'id': thread, 'session_id': SESSION, 'base_instructions': {'text': 'SOURCE_BASE_INSTRUCTIONS'},
                'source': 'cli', 'agent_role': role}
     if role:
         session['source'] = {'subagent': {'thread_spawn': {'agent_role': role}}}
@@ -56,8 +56,8 @@ def fixture(model='gpt-6-sol', effort='high', role=None):
     records += [{'type': 'response_item', 'payload': value} for value in history]
     records += [{'type': 'response_item', 'payload': {'type': 'custom_tool_call',
                  'id': 'ctc_consult', 'call_id': 'consult1', 'name': 'functions.exec', 'input': 'consult'}}]
-    meta = {'threadId': THREAD, 'sessionId': SESSION, 'itemId': 'ctc_consult',
-            'x-codex-turn-metadata': {'thread_id': THREAD, 'session_id': SESSION,
+    meta = {'threadId': thread, 'sessionId': SESSION, 'itemId': 'ctc_consult',
+            'x-codex-turn-metadata': {'thread_id': thread, 'session_id': SESSION,
                                     'turn_id': TURN, 'model': model, 'reasoning_effort': effort}}
     return records, meta, history
 
@@ -197,6 +197,11 @@ public class CodexFixture {
                   'arguments': {} if arguments is None else arguments, '_meta': meta})
         return self.result()
 
+    def execution_details(self, result, phase):
+        details = dict(result['details'])
+        self.assertEqual(details.pop('nativeExecution')['phase'], phase)
+        return details
+
     def test_schema_and_annotations(self):
         config = json.loads((self.plugin / '.mcp.json').read_text())
         self.assertEqual(config, {'mcpServers': {'codex_advisor': {
@@ -322,9 +327,9 @@ public class CodexFixture {
                  ({'type': 'response_item', 'payload': {'type': 'compaction', 'encrypted_content': ''}},
                   'item', 'compaction'),
                  ({'type': 'response_item', 'payload': item(None)}, 'content', 'input_text')]
-        for record, stage, kind in cases:
+        for index, (record, stage, kind) in enumerate(cases):
             with self.subTest(stage=stage, kind=kind):
-                records, meta, _ = fixture()
+                records, meta, _ = fixture(thread=f'{index:08d}-1111-1111-1111-111111111111')
                 records[0]['payload']['cli_version'] = 'synthetic-host-version'
                 position = len(records) - 1
                 records.insert(position, record)
@@ -371,9 +376,10 @@ public class CodexFixture {
         self.assertNotIn('EARLIEST_CONSTRAINT', json.dumps(injected))
 
     def test_invalid_encrypted_compaction_is_rejected_before_native_execution(self):
-        for content in ({}, {'encrypted_content': ''}, {'encrypted_content': None}, {'encrypted_content': 7}):
+        for index, content in enumerate(({}, {'encrypted_content': ''},
+                                         {'encrypted_content': None}, {'encrypted_content': 7})):
             with self.subTest(content=content):
-                records, meta, _ = fixture()
+                records, meta, _ = fixture(thread=f'{index:08d}-1111-1111-1111-111111111111')
                 records.insert(-1, {'type': 'compacted', 'payload': {
                     'replacement_history': [dict(content, type='compaction')]}})
                 result = self.call(records, meta)
@@ -429,7 +435,8 @@ public class CodexFixture {
         result = self.call(records, meta, 'terminal-event')
         self.assertEqual(result['status'], 'failed', result)
         self.assertEqual(result['actual'], result['expected'])
-        self.assertEqual(result['details'], {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503})
+        self.assertEqual(self.execution_details(result, 'completion'),
+                         {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503})
         self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
 
     def test_missing_environment_error_has_actionable_cause(self):
@@ -441,7 +448,7 @@ public class CodexFixture {
                 self.assertEqual(result['code'], 'executor')
                 self.assertIsNone(result['actual'])
                 self.assertEqual(result['expected'], {'model': 'gpt-6.1-sol', 'effort': 'xhigh'})
-                self.assertEqual(result['details'], {'nativeCode': 'other',
+                self.assertEqual(self.execution_details(result, 'completion'), {'nativeCode': 'other',
                                  'reason': 'missing_environment_variable',
                                  'environmentVariable': 'S2A_API_KEY', 'requestVerification': 'trace'})
                 self.assertIn('S2A_API_KEY', result['message'])
@@ -450,18 +457,19 @@ public class CodexFixture {
                 self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
 
     def test_untrusted_missing_environment_messages_stay_generic(self):
-        records, meta, _ = fixture()
-        for message in ('Missing environment variable: `S2A_API_KEY`.\nPRIVATE_NATIVE_VALUE',
+        for index, message in enumerate(('Missing environment variable: `S2A_API_KEY`.\nPRIVATE_NATIVE_VALUE',
                         'Missing environment variable: `S2A_API_KEY=PRIVATE_NATIVE_VALUE`.',
                         'Missing environment variable: `' + 'X' * 129 + '`.',
-                        'PRIVATE_NATIVE_VALUE: Missing environment variable: `S2A_API_KEY`.'):
+                        'PRIVATE_NATIVE_VALUE: Missing environment variable: `S2A_API_KEY`.')):
             with self.subTest(message=message):
+                records, meta, _ = fixture(thread=f'{index:08d}-1111-1111-1111-111111111111')
                 self.env['CONSULT_FIXTURE_NATIVE_MESSAGE'] = message
                 result = self.call(records, meta, 'missing-env-event')
                 self.assertEqual(result['status'], 'failed', result)
                 self.assertEqual(result['code'], 'executor')
                 self.assertTrue(result['message'].startswith('Native consultation reported an inference error.'))
-                self.assertEqual(result['details'], {'nativeCode': 'other', 'requestVerification': 'trace'})
+                self.assertEqual(self.execution_details(result, 'completion'),
+                                 {'nativeCode': 'other', 'requestVerification': 'trace'})
                 self.assertNotIn('advice', result)
                 self.assertNotIn('S2A_API_KEY', json.dumps(result))
                 self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
@@ -475,18 +483,18 @@ public class CodexFixture {
         self.assertEqual(result['details']['itemType'], 'message')
         self.assertNotIn('EARLIEST_CONSTRAINT', json.dumps(result))
 
-    def test_four_failures_disable_resumed_thread_before_native_execution(self):
+    def test_three_failures_disable_resumed_thread_before_native_execution(self):
         records, meta, _ = fixture('gpt-6-astra', 'unknown')
-        for count in range(1, 5):
+        for count in range(1, 4):
             result = self.call(records, meta)
             self.assertEqual(result['code'], 'route')
             self.assertEqual(result['failureCount'], count)
-            self.assertEqual(result['consultationDisabled'], count == 4)
+            self.assertEqual(result['consultationDisabled'], count == 3)
         records, meta, _ = fixture('gpt-6-astra', 'ultra')
         result = self.call(records, meta)
         self.assertEqual(result['code'], 'disabled')
         self.assertTrue(result['consultationDisabled'])
-        self.assertEqual(result['failureCount'], 4)
+        self.assertEqual(result['failureCount'], 3)
         self.assertIn('Stop calling process_consultation', result['message'])
         self.assertFalse((self.root / 'injected.json').exists())
 
@@ -541,7 +549,7 @@ public class CodexFixture {
 
     def test_failure_limit_is_scoped_to_thread_not_root_session(self):
         failed, failed_meta, _ = fixture('gpt-6-astra', 'unknown')
-        for _ in range(4):
+        for _ in range(3):
             self.call(failed, failed_meta)
         records, meta, _ = fixture('gpt-6-astra', 'ultra')
         new_thread = '44444444-4444-4444-4444-444444444444'
@@ -572,7 +580,7 @@ public class CodexFixture {
 
     def test_native_errors_reach_limit_without_another_model_request(self):
         records, meta, _ = fixture()
-        for count in range(1, 5):
+        for count in range(1, 4):
             result = self.call(records, meta, 'terminal-event')
             self.assertEqual(result['code'], 'executor')
             self.assertEqual(result['failureCount'], count)
@@ -596,7 +604,7 @@ print(json.dumps(sorted(counts)))
         result = subprocess.run([sys.executable, '-B', '-c', script, str(self.plugin / 'scripts'),
                                  str(self.home), THREAD], capture_output=True, text=True, timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(json.loads(result.stdout), [1, 2, 3] + [4] * 9)
+        self.assertEqual(json.loads(result.stdout), [1, 2] + [3] * 10)
         records, meta, _ = fixture()
         self.assertEqual(self.call(records, meta)['code'], 'disabled')
 

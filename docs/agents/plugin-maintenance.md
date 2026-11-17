@@ -170,6 +170,11 @@ validated, then enter neither injected nor expected history. `local_shell_call`
 pairs with `function_call_output` through the same nonempty `call_id`; its result
 is excluded with the call. A missing identity or a pair with only one excluded
 member fails as `pairing`. Ordinary function call results remain preserved.
+A `function_call_output` without a `call_id` is preserved as a standalone result
+when it has a nonempty string `name` and an absent, null, or string `namespace`.
+An empty `call_id` or an unmatched nonempty `call_id` still fails as `pairing`.
+Standalone results do not complete pending calls; their names, namespaces, output,
+and order must survive request comparison.
 `context_compaction` and `other` are preserved.
 Incomplete pairs fail. Undeclared item types and undeclared
 content blocks are preserved verbatim; missing or changed payloads fail comparison.
@@ -248,8 +253,20 @@ also reports `reason=missing_environment_variable`, the bounded variable name in
 No variable value is returned. Text content leads with readable advice or the
 failure reason; `structuredContent` carries the machine-readable outcome.
 
+Native failures include bounded `details.nativeExecution` diagnostics: the failing
+phase, elapsed milliseconds, phase durations, the last recognized native event and
+its time, the first text or reasoning delta time when observed, and the retry count.
+A retry can include only a qualified native error code and HTTP status. Event names
+outside the fixed diagnostic list appear as `other`; event bodies, output text,
+request payloads, credentials, and arbitrary error messages are never retained.
+`firstOutputMs` measures the first native text or reasoning delta observed by the
+plugin, not the provider's first response. When cleanup and request verification
+follow an execution failure, `totalElapsedMs` and the final phase durations cover
+that work while `phase` and `elapsedMs` retain the original failure location.
+These diagnostics survive temporary trace cleanup in the returned failure result.
+
 Calls with a qualified host thread identity and no marker report `failureCount` and
-`consultationDisabled`. The fourth cumulative failed call disables further
+`consultationDisabled`. The third cumulative failed call disables further
 consultation for that thread. Successful calls do not reset the count. A disabled
 thread receives `code=disabled` before reconstruction or native execution; the
 caller stops consultation and continues authorized work with consultation marked
@@ -259,6 +276,7 @@ Counts are stored atomically by thread ID in
 `$CODEX_HOME/codex-advisor/consultation-failures.sqlite3`. The file contains only
 thread IDs and bounded counts. Resuming a thread or restarting its MCP process keeps
 the limit; another thread, including a child thread, has an independent count.
+Existing counts of four remain readable and disabled without rewriting the database.
 The initial schema is built in a private sibling file and published through an
 atomic hard link, so concurrent readers cannot observe a partly initialized database.
 An existing database is never replaced or repaired. Unsupported atomic publication

@@ -1,0 +1,70 @@
+{
+  "sourceBoundary": 31,
+  "sourceHost": "0.169.0",
+  "outcome": {
+    "status": "failed",
+    "code": "timeout",
+    "message": "The native consultation deadline expired.\nConsultation is disabled after three failed calls. Stop calling process_consultation in this thread. Report consultation as unavailable and continue authorized work and required checks.",
+    "expected": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "actual": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "details": {
+      "nativeExecution": {
+        "phase": "completion",
+        "elapsedMs": 180092,
+        "phaseElapsedMs": 175458,
+        "phaseTimingsMs": {
+          "catalog": 68,
+          "discovery": 4317,
+          "startup": 1,
+          "initialize": 144,
+          "isolation": 11,
+          "thread_start": 79,
+          "history_injection": 5,
+          "turn_start": 2,
+          "completion": 175458,
+          "cleanup": 32,
+          "request_verification": 6
+        },
+        "retryCount": 10,
+        "lastEvent": "error",
+        "lastEventMs": 174786,
+        "lastRetry": {
+          "nativeCode": "responseStreamDisconnected"
+        },
+        "totalElapsedMs": 180131
+      }
+    },
+    "failureCount": 3,
+    "consultationDisabled": true
+  },
+  "finalTiming": {
+    "phase": "request_verification",
+    "elapsedMs": 180143,
+    "phaseElapsedMs": 19,
+    "phaseTimingsMs": {
+      "catalog": 68,
+      "discovery": 4317,
+      "startup": 1,
+      "initialize": 144,
+      "isolation": 11,
+      "thread_start": 79,
+      "history_injection": 5,
+      "turn_start": 2,
+      "completion": 175458,
+      "cleanup": 32,
+      "request_verification": 6
+    },
+    "retryCount": 10,
+    "lastEvent": "error",
+    "lastEventMs": 174786,
+    "lastRetry": {
+      "nativeCode": "responseStreamDisconnected"
+    }
+  }
+}

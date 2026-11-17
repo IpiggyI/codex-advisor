@@ -7,7 +7,7 @@ import tempfile
 
 from consult_context import Failure
 
-FAILURE_LIMIT = 4
+FAILURE_LIMIT = 3
 STOP_CALLING = ('Stop calling process_consultation in this thread. '
                 'Report consultation as unavailable and continue authorized work and required checks.')
 
@@ -41,10 +41,12 @@ def failure_count(home, thread, failed=False):
         with closing(sqlite3.connect(path, timeout=5)) as database, database:
             if failed:
                 database.execute('INSERT INTO failures VALUES (?, 1) ON CONFLICT(thread) DO UPDATE '
-                                 'SET count = MIN(count + 1, ?)', (thread, FAILURE_LIMIT))
+                                 'SET count = CASE WHEN count < ? THEN count + 1 ELSE count END',
+                                 (thread, FAILURE_LIMIT))
             row = database.execute('SELECT count FROM failures WHERE thread = ?', (thread,)).fetchone()
             count = row[0] if row else 0
-            if type(count) is not int or not 0 <= count <= FAILURE_LIMIT:
+            # Existing counters can contain four failures; keep them disabled without rewriting state.
+            if type(count) is not int or not 0 <= count <= 4:
                 raise ValueError()
             return count
     except (OSError, sqlite3.Error, ValueError):
@@ -68,7 +70,7 @@ def limit_result(result, home, thread):
     result.update(failureCount=count, consultationDisabled=count >= FAILURE_LIMIT)
     if count >= FAILURE_LIMIT and result.get('code') != 'disabled':
         result.update(status='failed', code=result.get('code', 'disabled'),
-                      message=result.get('message', '') + '\nConsultation is disabled after four failed calls. ' + STOP_CALLING)
+                      message=result.get('message', '') + '\nConsultation is disabled after three failed calls. ' + STOP_CALLING)
         result.pop('advice', None)
         result.pop('kind', None)
     return result

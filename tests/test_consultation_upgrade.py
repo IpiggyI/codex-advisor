@@ -201,6 +201,21 @@ class Corpus(unittest.TestCase):
         self.assertNotIn('second', observed)
         self.assertEqual(observed[-1], 'third')
 
+    def test_named_output_preserves_pending_batch_and_replay(self):
+        output = {'type': 'response_item', 'payload': {
+            'type': 'function_call_output', 'name': 'codex_apps_open_page',
+            'namespace': 'agent', 'output': 'PRIVATE_HISTORY'}}
+        values = records()
+        values[4:4] = [output, copy.deepcopy(records()[-1])]
+        values.insert(-1, {'type': 'response_item', 'payload': {
+            'type': 'custom_tool_call_output', 'call_id': 'call2', 'output': ''}})
+        values[-1]['payload'].update(id='third', call_id='call3')
+        report = self.run_replay(values)
+        self.assertEqual(report['counts']['parallelSkipped'], 1)
+        self.assertEqual(report['counts']['replayed'], 2)
+        self.assertEqual(report['counts']['passed'], 2)
+        self.assertEqual(report['failures'], [])
+
     def test_rollback_location_and_no_history_output(self):
         values = records()
         values.insert(3, {'type': 'rollback', 'payload': {'text': 'PRIVATE_HISTORY'}})
