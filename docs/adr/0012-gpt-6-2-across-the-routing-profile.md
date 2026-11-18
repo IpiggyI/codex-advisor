@@ -48,8 +48,10 @@ either 6.2 model. Process consultation reads only the bundled catalog
 (`consult_native.py`, `catalog()`) and fails with `catalog` when the exact advisor
 model is absent. After upgrading WSL to Codex CLI `0.169.1`,
 `codex debug models --bundled` listed both 6.2 models, each with
-`use_responses_lite` true. Consultation on a 6.2 dial therefore requires Codex CLI
-`0.169.1` or later on each side.
+`use_responses_lite` true. Consultation on a 6.2 dial therefore requires an
+executable that bundles the selected model. On Windows, the standalone
+npm CLI can supply that catalog and run consultation when the desktop executable
+on PATH lacks the selected model.
 
 ADR-0011 records segment placements as user-declared routing values, not
 measurements. No comparison has measured `gpt-6.2-sol` against `gpt-6.1-sol` or

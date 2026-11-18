@@ -182,6 +182,49 @@ class HistoryPolicy(unittest.TestCase):
 
 
 class NativeLifecycle(unittest.TestCase):
+    def test_windows_uses_npm_executor_when_first_catalog_lacks_exact_model(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            desktop = str(root / 'desktop' / 'codex.exe')
+            shim = root / 'npm' / 'codex.cmd'
+            npm = shim.parent / 'node_modules/@openai/codex/vendor/target/bin/codex.exe'
+            npm.parent.mkdir(parents=True)
+            npm.touch()
+            resolve = {'codex.exe': desktop, 'codex.cmd': str(shim)}
+            catalogs = {desktop: [{'slug': 'gpt-6.1-sol'}],
+                        str(npm): [{'slug': EXPECTED['model'], 'use_responses_lite': True}]}
+
+            def bundled(command, env, cwd):
+                self.assertEqual(command[1:], ['debug', 'models', '--bundled'])
+                process = mock.Mock(returncode=0)
+                executable = desktop if command[0] == 'codex' else command[0]
+                process.communicate.return_value = (json.dumps({'models': catalogs[executable]}), None)
+                return process
+
+            def discovery(env, root, values, cancel, deadline, executable):
+                entry, = json.loads(Path(values['model_catalog_json']).read_text(encoding='utf-8'))['models']
+                self.assertEqual(entry['slug'], EXPECTED['model'])
+                self.assertTrue(entry['use_responses_lite'])
+                self.assertEqual(entry['shell_type'], 'disabled')
+                self.assertEqual(executable, str(npm))
+                return set()
+
+            server = mock.Mock()
+            server.call.return_value = {'thread': {'id': 'advisor'}, 'turn': {'id': 'turn'}}
+            with mock.patch.object(native, 'os', types.SimpleNamespace(name='nt', environ={})), \
+                    mock.patch.object(native.shutil, 'which', side_effect=lambda name, path: resolve.get(name)), \
+                    mock.patch.object(native, 'launch', side_effect=bundled) as launch, \
+                    mock.patch.object(native, 'terminate'), \
+                    mock.patch.object(native, 'server_names', side_effect=discovery), \
+                    mock.patch.object(native, 'Server', return_value=server) as start, \
+                    mock.patch.object(native, 'verify_isolation'), \
+                    mock.patch.object(native, 'completion', return_value=ADVICE), \
+                    mock.patch.object(native, 'verify_requests', return_value=EXPECTED):
+                result = native.execute(root, CALLER, EXPECTED, threading.Event())
+            self.assertEqual(result['actual'], EXPECTED)
+            self.assertEqual([call.args[0][0] for call in launch.call_args_list], [desktop, str(npm)])
+            self.assertEqual(start.call_args.args[-1], str(npm))
+
     def test_diagnostics_keep_only_bounded_event_metadata(self):
         clock = [10.0]
         with mock.patch.object(native.time, 'monotonic', side_effect=lambda: clock[0]):
@@ -233,7 +276,7 @@ class NativeLifecycle(unittest.TestCase):
     def test_cleanup_does_not_replace_completion_timeout_phase(self):
         server = types.SimpleNamespace(initialize=lambda: None, close=lambda: None,
                                       call=lambda *args: {'thread': {'id': 'advisor'}, 'turn': {'id': 'turn'}})
-        with mock.patch.object(native, 'catalog', return_value=Path('models.json')), \
+        with mock.patch.object(native, 'catalog', return_value=(Path('models.json'), 'codex')), \
                 mock.patch.object(native, 'server_names', return_value=set()), \
                 mock.patch.object(native, 'Server', return_value=server), \
                 mock.patch.object(native, 'verify_isolation'), \
@@ -375,7 +418,7 @@ class NativeLifecycle(unittest.TestCase):
                 cancel.set()
             return EXPECTED
         with tempfile.TemporaryDirectory(prefix='ca-native-publish-') as directory, \
-                mock.patch.object(native, 'catalog', return_value=Path(directory) / 'models.json'), \
+                mock.patch.object(native, 'catalog', return_value=(Path(directory) / 'models.json', 'codex')), \
                 mock.patch.object(native, 'server_names', return_value=set()), \
                 mock.patch.object(native, 'Server', return_value=server), \
                 mock.patch.object(native, 'verify_isolation'), \

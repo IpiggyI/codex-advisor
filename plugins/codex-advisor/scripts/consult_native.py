@@ -221,23 +221,27 @@ def kill_group(process):
     process.wait(timeout=10)
 
 
-def windows_codex(env):
-    executable = shutil.which('codex.exe', path=env.get('PATH'))
-    if executable:
-        return executable
-    shim = shutil.which('codex', path=env.get('PATH'))
-    require(shim is not None, 'executor', 'The native Codex executable is not available on PATH.')
+def windows_npm_codex(env):
+    shim = shutil.which('codex.cmd', path=env.get('PATH'))
+    if shim is None:
+        return None
     package = Path(shim).parent / 'node_modules/@openai/codex'
     matches = {path.resolve() for pattern in (
         'node_modules/@openai/codex-win32-*/vendor/*/bin/codex.exe',
         'vendor/*/bin/codex.exe') for path in package.glob(pattern) if path.is_file()}
-    require(len(matches) == 1, 'executor',
+    require(len(matches) <= 1, 'executor',
             'Exactly one native codex.exe is required in the qualified npm package layout.')
-    return str(matches.pop())
+    return str(matches.pop()) if matches else None
+
+
+def windows_codex(env):
+    executable = shutil.which('codex.exe', path=env.get('PATH')) or windows_npm_codex(env)
+    require(executable is not None, 'executor', 'The native Codex executable is not available on PATH.')
+    return executable
 
 
 def launch(command, env, cwd):
-    if os.name == 'nt':
+    if os.name == 'nt' and command[0] == 'codex':
         command = [windows_codex(env), *command[1:]]
     job = WindowsJob() if os.name == 'nt' else None
     if job:
@@ -278,9 +282,8 @@ def check_cancel(cancel, deadline):
     require(time.monotonic() < deadline, 'timeout', 'The native consultation deadline expired.')
 
 
-def catalog(env, root, cancel, deadline, caller_dial):
-    model, caller = caller_dial
-    process = launch(['codex', 'debug', 'models', '--bundled'], env, root)
+def bundled_model(executable, model, env, root, cancel, deadline):
+    process = launch([executable, 'debug', 'models', '--bundled'], env, root)
     try:
         while True:
             check_cancel(cancel, deadline)
@@ -292,24 +295,37 @@ def catalog(env, root, cancel, deadline, caller_dial):
         require(process.returncode == 0, 'catalog', 'Native bundled model discovery failed.')
         data = json.loads(output)
         selected = [entry for entry in data['models'] if entry.get('slug') == model]
-        require(len(selected) == 1, 'catalog', 'The exact advisor model is absent from the bundled catalog.')
-        entry = selected[0]
-        entry.pop('tool_mode', None)
-        entry.update(shell_type='disabled', apply_patch_tool_type=None,
-                     experimental_supported_tools=[], supports_search_tool=False)
-        # Injection must preserve tool results the caller already received.
-        output_bytes = [len(json.dumps(item['output'], ensure_ascii=False).encode('utf-8'))
-                        for item in caller['items'] if item.get('type') in
-                        ('function_call_output', 'custom_tool_call_output')]
-        entry['truncation_policy'] = {'mode': 'bytes', 'limit': max(output_bytes, default=1)}
-        for key in entry:
-            if 'instruction' in key and isinstance(entry[key], bool):
-                entry[key] = False
-        target = root / 'models.json'
-        target.write_text(json.dumps({'models': selected}), encoding='utf-8')
-        return target
+        require(len(selected) <= 1, 'catalog', 'The exact advisor model is duplicated in the bundled catalog.')
+        return selected[0] if selected else None
     finally:
         terminate(process)
+
+
+def catalog(env, root, cancel, deadline, caller_dial):
+    model, caller = caller_dial
+    executable = windows_codex(env) if os.name == 'nt' else 'codex'
+    entry = bundled_model(executable, model, env, root, cancel, deadline)
+    if entry is None and os.name == 'nt':
+        npm = windows_npm_codex(env)
+        if npm is not None and Path(npm) != Path(executable).resolve():
+            executable = npm
+            entry = bundled_model(executable, model, env, root, cancel, deadline)
+    require(entry is not None, 'catalog', 'The exact advisor model is absent from the bundled catalog. '
+            'Make a Codex CLI that bundles this model available on PATH.')
+    entry.pop('tool_mode', None)
+    entry.update(shell_type='disabled', apply_patch_tool_type=None,
+                 experimental_supported_tools=[], supports_search_tool=False)
+    # Injection must preserve tool results the caller already received.
+    output_bytes = [len(json.dumps(item['output'], ensure_ascii=False).encode('utf-8'))
+                    for item in caller['items'] if item.get('type') in
+                    ('function_call_output', 'custom_tool_call_output')]
+    entry['truncation_policy'] = {'mode': 'bytes', 'limit': max(output_bytes, default=1)}
+    for key in entry:
+        if 'instruction' in key and isinstance(entry[key], bool):
+            entry[key] = False
+    target = root / 'models.json'
+    target.write_text(json.dumps({'models': [entry]}), encoding='utf-8')
+    return target, executable
 
 
 def configuration(root, expected):
@@ -325,8 +341,8 @@ def configuration(root, expected):
 
 
 class Server:
-    def __init__(self, env, root, values, cancel, deadline):
-        command = ['codex', 'app-server']
+    def __init__(self, env, root, values, cancel, deadline, executable='codex'):
+        command = [executable, 'app-server']
         for key, value in values.items():
             encoded = ('{' + ','.join(json.dumps(name, ensure_ascii=False) + '={enabled=false}'
                        for name in value) + '}') if key == 'mcp_servers' else json.dumps(value)
@@ -428,8 +444,8 @@ class Server:
                     stream.close()
 
 
-def server_names(env, root, values, cancel, deadline):
-    server = Server(env, root, values, cancel, deadline)
+def server_names(env, root, values, cancel, deadline, executable):
+    server = Server(env, root, values, cancel, deadline, executable)
     names, cursors, cursor = set(), set(), None
     try:
         server.initialize()
@@ -684,12 +700,13 @@ def execute(home, caller, expected, cancel):
         env = dict(os.environ, CODEX_HOME=str(home), CODEX_ROLLOUT_TRACE_ROOT=str(root / 'trace'))
         values = configuration(root, expected)
         with diagnostics.phase('catalog'):
-            values['model_catalog_json'] = str(catalog(env, root, cancel, deadline, (expected['model'], caller)))
+            model_path, executable = catalog(env, root, cancel, deadline, (expected['model'], caller))
+            values['model_catalog_json'] = str(model_path)
         with diagnostics.phase('discovery'):
-            names = server_names(env, root, values, cancel, deadline)
+            names = server_names(env, root, values, cancel, deadline, executable)
         values['mcp_servers'] = sorted(names)
         with diagnostics.phase('startup'):
-            server = Server(env, root, values, cancel, deadline)
+            server = Server(env, root, values, cancel, deadline, executable)
         server.diagnostics = diagnostics
         thread, execution_error = None, None
         try:

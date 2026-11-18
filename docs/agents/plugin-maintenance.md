@@ -311,10 +311,13 @@ the call finishes or is cancelled. Only the bounded failure counters persist. Th
 component writes no repository files, caller history, or credential files.
 
 On Windows, consultation requires a native `codex.exe` on PATH or a unique native
-executable in the official npm package layout beside the discovered Codex shim.
-It does not execute `.cmd` wrappers with configuration arguments. Windows Job
-Objects contain the native process tree; unavailable or failed containment and
-cleanup APIs return an explicit failure.
+executable in the official npm package layout beside `codex.cmd` on PATH. If the
+first native executable's bundled catalog lacks the exact advisor model, the
+component checks the bundled catalog of the distinct npm executable. The
+component uses the selected executable for discovery and inference. It uses
+`codex.cmd` only to locate the package. Windows Job Objects contain the native
+process tree. An unavailable or failed containment or cleanup API returns an
+explicit failure.
 
 On Linux, a dedicated child subreaper owns each native process and reaps descendants
 even when they leave the original process group. Shutdown terminates the native

@@ -175,9 +175,10 @@ class NativeEnvironment(unittest.TestCase):
         values['features.plugins'] = True
         # Reserve outer tool-output capacity for the complete MCP result.
         budget = {'items': [{'type': 'function_call_output', 'output': 'x' * 4096}]}
-        values['model_catalog_json'] = str(catalog(self.env, self.root, threading.Event(),
-                time.monotonic() + 30, (EXPECTED['model'], budget)))
-        server = Server(self.env, self.root, values, threading.Event(), time.monotonic() + timeout)
+        model_path, executable = catalog(self.env, self.root, threading.Event(),
+                                         time.monotonic() + 30, (EXPECTED['model'], budget))
+        values['model_catalog_json'] = str(model_path)
+        server = Server(self.env, self.root, values, threading.Event(), time.monotonic() + timeout, executable)
         try:
             server.initialize()
             started = server.call('thread/start', {'model': EXPECTED['model'], 'cwd': str(self.root),

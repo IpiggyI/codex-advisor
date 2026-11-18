@@ -211,11 +211,11 @@ def run_mode(caller, mode, mutation=None):
     catalog = native.catalog
 
     def checked_catalog(*args):
-        path = catalog(*args)
+        path, executable = catalog(*args)
         data = json.loads(path.read_text(encoding='utf-8'))
         if (data['models'][0].get('use_responses_lite') is True) != mode['use_responses_lite']:
             raise Failure('catalog', 'The advisor request mode changed after catalog discovery.')
-        return path
+        return path, executable
 
     with local_home() as (home, endpoint), ExitStack() as stack:
         stack.enter_context(mock.patch.object(native, 'catalog', side_effect=checked_catalog))
