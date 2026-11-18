@@ -18,7 +18,7 @@ PLUGIN = REPO / 'plugins/codex-advisor'
 
 def scenario(name, tool, target, declaration=True, advisor=False):
     role = 'advisor' if advisor else 'worker'
-    route = (f'Route: tool={tool} target={target} role={role} tier=crux dial=gpt-6.1-sol[xhigh] '
+    route = (f'Route: tool={tool} target={target} role={role} tier=crux dial=gpt-6.2-sol[xhigh] '
              f'basis={"acceptance-mapping" if advisor else "key-difficulty"} ref=local-probe')
     arguments = {'message': 'gAAAA-native-fixture-' + name}
     if tool == 'spawn_agent':
@@ -121,7 +121,7 @@ def install(root, home, env, cwd, plugin):
 
 
 def configure(home, port):
-    (home / 'config.toml').write_text('model = "gpt-6.1-sol"\nmodel_reasoning_effort = "medium"\n'
+    (home / 'config.toml').write_text('model = "gpt-6.2-sol"\nmodel_reasoning_effort = "medium"\n'
         'approval_policy = "never"\nsandbox_mode = "read-only"\nmodel_provider = "local"\n'
         '[features]\nhooks = true\nmulti_agent_v2 = true\ncode_mode = false\n'
         'code_mode_only = false\ncode_mode_host = false\nplugins = true\n'
@@ -174,7 +174,7 @@ def verify(endpoint, children):
     assert {child['task'] for child in children} == set(expected_packets), children
     for child in children:
         assert child['role'] == spawned[child['task']] and child['dials'], child
-        assert all(d == {'model': 'gpt-6.1-sol', 'effort': 'xhigh'} for d in child['dials']), child
+        assert all(d == {'model': 'gpt-6.2-sol', 'effort': 'xhigh'} for d in child['dials']), child
         assert sorted(child['packet_sha256']) == sorted(expected_packets[child['task']]), child
     return results
 

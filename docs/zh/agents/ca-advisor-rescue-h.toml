@@ -1,6 +1,6 @@
 name = "ca_advisor_rescue_h"
-description = "Advisor，rescue 档更强备选：gpt-6-astra，effort 固定为 xhigh。针对验收数据包的只读判断；以 fork_turns none 生成新线程。"
-model = "gpt-6-astra"
+description = "Advisor，rescue 档更强备选：gpt-6.2-astra，effort 固定为 xhigh。针对验收数据包的只读判断；以 fork_turns none 生成新线程。"
+model = "gpt-6.2-astra"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 

@@ -1,6 +1,6 @@
 name = "ca_worker_crux_m"
-description = "Worker，crux 档默认候选：gpt-6.1-sol，effort 固定为 xhigh。从五段数据包接手限定范围的实现；以 fork_turns none 生成。"
-model = "gpt-6.1-sol"
+description = "Worker，crux 档默认候选：gpt-6.2-sol，effort 固定为 xhigh。从五段数据包接手限定范围的实现；以 fork_turns none 生成。"
+model = "gpt-6.2-sol"
 model_reasoning_effort = "xhigh"
 
 developer_instructions = """

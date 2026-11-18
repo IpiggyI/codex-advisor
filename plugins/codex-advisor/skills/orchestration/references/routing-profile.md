@@ -1,7 +1,7 @@
 # Routing profile
 
-The native-entry dials are anchored to `gpt-6-luna`, `gpt-6.1-sol`, and
-`gpt-6-astra`. Choose models, allowed efforts, defaults, and candidate order
+The native-entry dials are anchored to `gpt-6-luna`, `gpt-6.2-sol`, and
+`gpt-6.2-astra`. Choose models, allowed efforts, defaults, and candidate order
 from the table below.
 
 Notation: `model[a*, b]`. Every listed effort is allowed and `*` marks the
@@ -11,9 +11,9 @@ leaves effort to the caller.
 
 | Role | `mainstay` | `crux` | `rescue` |
 |---|---|---|---|
-| Explorer | `ca_explorer_mainstay_m` gpt-6-luna[high*, xhigh] › `ca_explorer_mainstay_h` gpt-6.1-sol[medium*, high] | `ca_explorer_crux_m` gpt-6-luna[max] › `ca_explorer_crux_h` gpt-6.1-sol[xhigh] | `ca_explorer_rescue` gpt-6-astra[medium*, high] |
-| Worker | `ca_worker_mainstay_m` gpt-6-luna[max] › `ca_worker_mainstay_h` gpt-6.1-sol[medium*, high] | `ca_worker_crux_m` gpt-6.1-sol[xhigh] › `ca_worker_crux_h` gpt-6-astra[low*, medium] | `ca_worker_rescue_m` gpt-6.1-sol[max] › `ca_worker_rescue_h` gpt-6-astra[high*, xhigh] |
-| Advisor | `ca_advisor_mainstay_m` gpt-6.1-sol[medium*, high] › `ca_advisor_mainstay_h` gpt-6-astra[low*, medium] | `ca_advisor_crux_m` gpt-6.1-sol[high*, xhigh] › `ca_advisor_crux_h` gpt-6-astra[high] | `ca_advisor_rescue_m` gpt-6.1-sol[xhigh*, max] › `ca_advisor_rescue_h` gpt-6-astra[xhigh] |
+| Explorer | `ca_explorer_mainstay_m` gpt-6-luna[high*, xhigh] › `ca_explorer_mainstay_h` gpt-6.2-sol[medium*, high] | `ca_explorer_crux_m` gpt-6-luna[max] › `ca_explorer_crux_h` gpt-6.2-sol[xhigh] | `ca_explorer_rescue` gpt-6.2-astra[medium*, high] |
+| Worker | `ca_worker_mainstay_m` gpt-6-luna[max] › `ca_worker_mainstay_h` gpt-6.2-sol[medium*, high] | `ca_worker_crux_m` gpt-6.2-sol[xhigh] › `ca_worker_crux_h` gpt-6.2-astra[low*, medium] | `ca_worker_rescue_m` gpt-6.2-sol[max] › `ca_worker_rescue_h` gpt-6.2-astra[high*, xhigh] |
+| Advisor | `ca_advisor_mainstay_m` gpt-6.2-sol[medium*, high] › `ca_advisor_mainstay_h` gpt-6.2-astra[low*, medium] | `ca_advisor_crux_m` gpt-6.2-sol[high*, xhigh] › `ca_advisor_crux_h` gpt-6.2-astra[high] | `ca_advisor_rescue_m` gpt-6.2-sol[xhigh*, max] › `ca_advisor_rescue_h` gpt-6.2-astra[xhigh] |
 
 ## Model segments
 
@@ -27,10 +27,13 @@ affected model's segment.
 |---|---|
 | `gpt-6-luna` | `starter` |
 | — | `midrange` |
+| `gpt-6.2-sol` | `premium` |
 | `gpt-6.1-sol` | `premium` |
+| `gpt-6.2-astra` | `flagship` |
 | `gpt-6-astra` | `flagship` |
 
-A dash means no model is assigned to that segment.
+A dash means no model is assigned to that segment. A model that no entry uses
+ranks only a primary that runs on it.
 
 ## Pinned and caller-selected effort
 
@@ -48,8 +51,8 @@ strongest dial. The Advisor has no consultation ladder of its own.
 
 A primary consults at the lowest Advisor dial in any tier that is not weaker
 than the primary's dial. If no Advisor dial is not weaker, use
-gpt-6-astra[xhigh]. A primary whose exact model id is absent from this profile
-uses gpt-6.1-sol[xhigh].
+gpt-6.2-astra[xhigh]. A primary whose exact model id is absent from this profile
+uses gpt-6.2-sol[xhigh].
 
 ## Acceptance mapping
 

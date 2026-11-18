@@ -15,8 +15,8 @@ import consultation_native_corpus as corpus
 from consult_context import Failure
 from test_consultation_upgrade import records, THREAD
 
-LITE = {'use_responses_lite': True, 'advisorModels': sorted(['gpt-6.1-sol', 'gpt-6-astra'])}
-FULL = {'use_responses_lite': False, 'advisorModels': ['gpt-6-astra']}
+LITE = {'use_responses_lite': True, 'advisorModels': sorted(['gpt-6.2-sol', 'gpt-6.2-astra'])}
+FULL = {'use_responses_lite': False, 'advisorModels': ['gpt-6.2-astra']}
 
 
 class Selection(unittest.TestCase):
@@ -114,8 +114,8 @@ class Selection(unittest.TestCase):
 class RequestModes(unittest.TestCase):
     def test_modes_come_only_from_advisor_rows_and_host_catalog(self):
         profile = corpus.load_profile(corpus.PLUGIN)
-        models = [{'slug': 'gpt-6.1-sol', 'use_responses_lite': True},
-                  {'slug': 'gpt-6-astra', 'use_responses_lite': True},
+        models = [{'slug': 'gpt-6.2-sol', 'use_responses_lite': True},
+                  {'slug': 'gpt-6.2-astra', 'use_responses_lite': True},
                   {'slug': 'gpt-6-luna', 'use_responses_lite': False}]
         modes, missing = corpus.modes_from_catalog(profile, models)
         self.assertEqual(len(modes), 1)
@@ -125,8 +125,8 @@ class RequestModes(unittest.TestCase):
         modes, missing = corpus.modes_from_catalog(profile, models)
         self.assertEqual([m['use_responses_lite'] for m in modes], [True, False])
         self.assertEqual(missing, [])
-        self.assertEqual(corpus.expected_dial({'model': 'gpt-6.1-sol', 'effort': 'high'}, modes[1])['model'],
-                         'gpt-6-astra')
+        self.assertEqual(corpus.expected_dial({'model': 'gpt-6.2-sol', 'effort': 'high'}, modes[1])['model'],
+                         'gpt-6.2-astra')
         with self.assertRaises(Failure):
             corpus.modes_from_catalog(profile, models[:1])
 
@@ -148,7 +148,7 @@ class RequestModes(unittest.TestCase):
 class NativeMutation(unittest.TestCase):
     def test_transport_normalization_mutation_fails_with_type_and_path(self):
         caller = {'base': 'Preserve the synthetic history.', 'thread': 'synthetic',
-                  'model': 'gpt-6.1-sol', 'effort': 'high', 'items': [{
+                  'model': 'gpt-6.2-sol', 'effort': 'high', 'items': [{
                       'type': 'message', 'id': 'source-id', 'role': 'user',
                       'content': [{'type': 'input_text', 'text': 'PRIVATE_MUTATION_FIXTURE'}]}]}
         corpus.run_mode(caller, LITE)

@@ -1,6 +1,6 @@
 name = "ca_worker_crux_h"
-description = "Worker, crux tier (stronger alternative): gpt-6-astra, the caller passes reasoning_effort. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
-model = "gpt-6-astra"
+description = "Worker, crux tier (stronger alternative): gpt-6.2-astra, the caller passes reasoning_effort. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
+model = "gpt-6.2-astra"
 
 developer_instructions = """
 Implement the OBJECTIVE within FILES AND OWNERSHIP, keeping INTERFACES and

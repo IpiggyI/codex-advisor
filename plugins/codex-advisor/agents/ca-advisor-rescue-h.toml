@@ -1,6 +1,6 @@
 name = "ca_advisor_rescue_h"
-description = "Advisor, rescue tier (stronger alternative): gpt-6-astra, effort fixed at xhigh. Read-only judgment for an acceptance packet; spawn a fresh thread with fork_turns none."
-model = "gpt-6-astra"
+description = "Advisor, rescue tier (stronger alternative): gpt-6.2-astra, effort fixed at xhigh. Read-only judgment for an acceptance packet; spawn a fresh thread with fork_turns none."
+model = "gpt-6.2-astra"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 

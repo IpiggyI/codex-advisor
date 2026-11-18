@@ -20,7 +20,7 @@ from consult_context import Failure, comparable, validate_items
 from consultation_loopback import Endpoint
 
 ADVICE = '保留全部上下文。'
-EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
+EXPECTED = {'model': 'gpt-6.2-sol', 'effort': 'xhigh'}
 IMAGE = ('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1Pe'
          'AAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC')
 

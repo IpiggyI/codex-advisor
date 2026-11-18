@@ -1,6 +1,6 @@
 name = "ca_explorer_rescue"
-description = "Explorer, rescue tier: gpt-6-astra, the caller passes reasoning_effort. Read-only evidence for a scoped question; spawn with fork_turns none."
-model = "gpt-6-astra"
+description = "Explorer, rescue tier: gpt-6.2-astra, the caller passes reasoning_effort. Read-only evidence for a scoped question; spawn with fork_turns none."
+model = "gpt-6.2-astra"
 sandbox_mode = "read-only"
 
 developer_instructions = """

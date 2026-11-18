@@ -1,6 +1,6 @@
 name = "ca_advisor_crux_h"
-description = "Advisor, crux tier (stronger alternative): gpt-6-astra, effort fixed at high. Read-only judgment for an acceptance packet; spawn a fresh thread with fork_turns none."
-model = "gpt-6-astra"
+description = "Advisor, crux tier (stronger alternative): gpt-6.2-astra, effort fixed at high. Read-only judgment for an acceptance packet; spawn a fresh thread with fork_turns none."
+model = "gpt-6.2-astra"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 

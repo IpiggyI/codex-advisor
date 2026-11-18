@@ -21,7 +21,8 @@ MANIFEST = json.loads((PLUGIN / 'hooks/hooks.json').read_text())
 REFERENCES = PLUGIN / 'skills/orchestration/references'
 CANONICAL = (REFERENCES / 'consult-posture.md').read_text()
 PROFILE = (REFERENCES / 'routing-profile.md').read_text()
-POSTURES = {'gpt-6.1-sol': 'reduced', 'gpt-6-astra': 'reduced', 'gpt-6-sol': 'full', 'gpt-5.6-terra': 'full'}
+POSTURES = {'gpt-6.2-sol': 'reduced', 'gpt-6.2-astra': 'reduced', 'gpt-6.1-sol': 'full', 'gpt-6-astra': 'full',
+            'gpt-6-sol': 'full', 'gpt-5.6-terra': 'full'}
 assert set(MANIFEST['hooks']) == {'SessionStart', 'PreToolUse', 'PostToolUse'}
 for hook in (hook for groups in MANIFEST['hooks'].values() for group in groups for hook in group['hooks']):
     # Windows runs hook commands in PowerShell, which reads the plugin root as $env:PLUGIN_ROOT.
@@ -133,12 +134,12 @@ with tempfile.TemporaryDirectory(prefix='codex-advisor-hooks-test-') as director
     copy_refs.mkdir(parents=True)
     for script in ('advisor-hooks.py', 'consult_context.py', 'run-python.sh'):
         (copy_plugin / 'scripts' / script).write_bytes((PLUGIN / 'scripts' / script).read_bytes())
-    effort_dependent = PROFILE.replace('gpt-6.1-sol[xhigh*, max]', 'gpt-6.1-sol[xhigh]')
+    effort_dependent = PROFILE.replace('gpt-6.2-sol[xhigh*, max]', 'gpt-6.2-sol[xhigh]')
     assert effort_dependent != PROFILE
     (copy_refs / 'routing-profile.md').write_text(effort_dependent)
     (copy_refs / 'consult-posture.md').write_text(CANONICAL)
-    pending({**session, 'model': 'gpt-6.1-sol'}, plugin=copy_plugin)
-    for broken, reason in ((PROFILE.replace('uses gpt-6.1-sol[xhigh]', 'uses gpt-6.1-sol[low]'), 'not an Advisor dial'),
+    pending({**session, 'model': 'gpt-6.2-sol'}, plugin=copy_plugin)
+    for broken, reason in ((PROFILE.replace('uses gpt-6.2-sol[xhigh]', 'uses gpt-6.2-sol[low]'), 'not an Advisor dial'),
                            (PROFILE.replace('| `gpt-6-luna` | `starter` |\n', ''), 'missing from the segment table')):
         assert broken != PROFILE
         (copy_refs / 'routing-profile.md').write_text(broken)

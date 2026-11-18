@@ -21,7 +21,7 @@ sys.path.insert(0, str(PLUGIN / 'scripts'))
 import consult_native as native
 from consult_context import Failure, ITEM_POLICY, CONTENT_POLICY, validate_items, reconstruct
 
-EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
+EXPECTED = {'model': 'gpt-6.2-sol', 'effort': 'xhigh'}
 CALLER = {'base': 'BASE_CONSTRAINT', 'thread': 'caller', 'items': [
     {'type': 'message', 'role': 'user', 'content': [{'type': 'input_text', 'text': 'FIRST_CONSTRAINT'}]},
     {'type': 'message', 'role': 'assistant', 'content': [{'type': 'output_text', 'text': 'LAST_SOURCE'}]}]}

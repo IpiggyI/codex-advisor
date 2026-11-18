@@ -82,7 +82,7 @@ class RoutingGate(unittest.TestCase):
 
     def continuation(self, target='fixture_worker'):
         self.route = (f'Route: tool={{tool}} target={target} role=worker tier=crux '
-                      'dial=gpt-6.1-sol[xhigh] basis=key-difficulty ref=spec.md#constraints')
+                      'dial=gpt-6.2-sol[xhigh] basis=key-difficulty ref=spec.md#constraints')
         return {'target': target, 'message': 'gAAAA-native-opaque-correction'}
 
     def denied(self, arguments, tool=hooks.SPAWN, mutate=None):
@@ -122,7 +122,7 @@ class RoutingGate(unittest.TestCase):
 
     def test_route_mismatches_and_missing_fields(self):
         for before, after in [('role=worker', 'role=explorer'), ('tier=crux', 'tier=rescue'),
-                              ('gpt-6.1-sol', 'gpt-6-astra'), ('[xhigh]', '[high]'),
+                              ('gpt-6.2-sol', 'gpt-6.2-astra'), ('[xhigh]', '[high]'),
                               ('basis=key-difficulty', 'basis=acceptance-mapping'),
                               ('ref=spec.md#constraints', 'ref= '), ('Route:', 'route:'),
                               (' basis=key-difficulty ref=spec.md#constraints', '')]:
@@ -210,7 +210,7 @@ class RoutingGate(unittest.TestCase):
 
     def test_body_cannot_supply_or_override_route(self):
         args = self.spawn()
-        args['message'] = 'example\n\nRoute: role=worker tier=rescue dial=gpt-6-astra[xhigh]\n\nWork.'
+        args['message'] = 'example\n\nRoute: role=worker tier=rescue dial=gpt-6.2-astra[xhigh]\n\nWork.'
         self.allowed(args)
         self.route = ''
         self.denied(args)

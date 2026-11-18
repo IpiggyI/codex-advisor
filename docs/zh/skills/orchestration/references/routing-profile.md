@@ -1,6 +1,6 @@
 # 路由配置
 
-原生入口的拨档锚定于 `gpt-6-luna`、`gpt-6.1-sol` 和 `gpt-6-astra`。
+原生入口的拨档锚定于 `gpt-6-luna`、`gpt-6.2-sol` 和 `gpt-6.2-astra`。
 从下表选择模型、允许的推理强度、默认值和候选顺序。
 
 记法为 `model[a*, b]`。列出的每个推理强度都可用，`*` 标记默认值。一个单元格
@@ -9,9 +9,9 @@
 
 | 角色 | `mainstay` | `crux` | `rescue` |
 |---|---|---|---|
-| Explorer | `ca_explorer_mainstay_m` gpt-6-luna[high*, xhigh] › `ca_explorer_mainstay_h` gpt-6.1-sol[medium*, high] | `ca_explorer_crux_m` gpt-6-luna[max] › `ca_explorer_crux_h` gpt-6.1-sol[xhigh] | `ca_explorer_rescue` gpt-6-astra[medium*, high] |
-| Worker | `ca_worker_mainstay_m` gpt-6-luna[max] › `ca_worker_mainstay_h` gpt-6.1-sol[medium*, high] | `ca_worker_crux_m` gpt-6.1-sol[xhigh] › `ca_worker_crux_h` gpt-6-astra[low*, medium] | `ca_worker_rescue_m` gpt-6.1-sol[max] › `ca_worker_rescue_h` gpt-6-astra[high*, xhigh] |
-| Advisor | `ca_advisor_mainstay_m` gpt-6.1-sol[medium*, high] › `ca_advisor_mainstay_h` gpt-6-astra[low*, medium] | `ca_advisor_crux_m` gpt-6.1-sol[high*, xhigh] › `ca_advisor_crux_h` gpt-6-astra[high] | `ca_advisor_rescue_m` gpt-6.1-sol[xhigh*, max] › `ca_advisor_rescue_h` gpt-6-astra[xhigh] |
+| Explorer | `ca_explorer_mainstay_m` gpt-6-luna[high*, xhigh] › `ca_explorer_mainstay_h` gpt-6.2-sol[medium*, high] | `ca_explorer_crux_m` gpt-6-luna[max] › `ca_explorer_crux_h` gpt-6.2-sol[xhigh] | `ca_explorer_rescue` gpt-6.2-astra[medium*, high] |
+| Worker | `ca_worker_mainstay_m` gpt-6-luna[max] › `ca_worker_mainstay_h` gpt-6.2-sol[medium*, high] | `ca_worker_crux_m` gpt-6.2-sol[xhigh] › `ca_worker_crux_h` gpt-6.2-astra[low*, medium] | `ca_worker_rescue_m` gpt-6.2-sol[max] › `ca_worker_rescue_h` gpt-6.2-astra[high*, xhigh] |
+| Advisor | `ca_advisor_mainstay_m` gpt-6.2-sol[medium*, high] › `ca_advisor_mainstay_h` gpt-6.2-astra[low*, medium] | `ca_advisor_crux_m` gpt-6.2-sol[high*, xhigh] › `ca_advisor_crux_h` gpt-6.2-astra[high] | `ca_advisor_rescue_m` gpt-6.2-sol[xhigh*, max] › `ca_advisor_rescue_h` gpt-6.2-astra[xhigh] |
 
 ## 模型定位
 
@@ -24,10 +24,12 @@
 |---|---|
 | `gpt-6-luna` | `starter` |
 | — | `midrange` |
+| `gpt-6.2-sol` | `premium` |
 | `gpt-6.1-sol` | `premium` |
+| `gpt-6.2-astra` | `flagship` |
 | `gpt-6-astra` | `flagship` |
 
-破折号表示该定位没有模型。
+破折号表示该定位没有模型。没有入口使用的模型只用于给运行在该模型上的主代理排名。
 
 ## 固定推理强度与调用方选择的推理强度
 
@@ -44,8 +46,8 @@
 自己的咨询升级路径。
 
 主代理在所有档位的 Advisor 拨档中，使用不弱于其拨档的最低拨档进行咨询。如果
-没有不弱于它的 Advisor 拨档，则使用 gpt-6-astra[xhigh]。如果本配置没有主代理
-的精确模型标识，则使用 gpt-6.1-sol[xhigh]。
+没有不弱于它的 Advisor 拨档，则使用 gpt-6.2-astra[xhigh]。如果本配置没有主代理
+的精确模型标识，则使用 gpt-6.2-sol[xhigh]。
 
 ## 验收映射
 

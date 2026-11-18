@@ -447,7 +447,7 @@ public class CodexFixture {
                 self.assertEqual(result['status'], 'failed', result)
                 self.assertEqual(result['code'], 'executor')
                 self.assertIsNone(result['actual'])
-                self.assertEqual(result['expected'], {'model': 'gpt-6.1-sol', 'effort': 'xhigh'})
+                self.assertEqual(result['expected'], {'model': 'gpt-6.2-sol', 'effort': 'xhigh'})
                 self.assertEqual(self.execution_details(result, 'completion'), {'nativeCode': 'other',
                                  'reason': 'missing_environment_variable',
                                  'environmentVariable': 'S2A_API_KEY', 'requestVerification': 'trace'})
@@ -484,13 +484,13 @@ public class CodexFixture {
         self.assertNotIn('EARLIEST_CONSTRAINT', json.dumps(result))
 
     def test_three_failures_disable_resumed_thread_before_native_execution(self):
-        records, meta, _ = fixture('gpt-6-astra', 'unknown')
+        records, meta, _ = fixture('gpt-6.2-astra', 'unknown')
         for count in range(1, 4):
             result = self.call(records, meta)
             self.assertEqual(result['code'], 'route')
             self.assertEqual(result['failureCount'], count)
             self.assertEqual(result['consultationDisabled'], count == 3)
-        records, meta, _ = fixture('gpt-6-astra', 'ultra')
+        records, meta, _ = fixture('gpt-6.2-astra', 'ultra')
         result = self.call(records, meta)
         self.assertEqual(result['code'], 'disabled')
         self.assertTrue(result['consultationDisabled'])
@@ -499,9 +499,9 @@ public class CodexFixture {
         self.assertFalse((self.root / 'injected.json').exists())
 
     def test_success_does_not_reset_cumulative_failures(self):
-        failed, failed_meta, _ = fixture('gpt-6-astra', 'unknown')
+        failed, failed_meta, _ = fixture('gpt-6.2-astra', 'unknown')
         self.call(failed, failed_meta)
-        records, meta, _ = fixture('gpt-6-astra', 'ultra')
+        records, meta, _ = fixture('gpt-6.2-astra', 'ultra')
         result = self.call(records, meta)
         self.assertEqual(result['status'], 'succeeded')
         self.assertEqual(result['failureCount'], 1)
@@ -511,7 +511,7 @@ public class CodexFixture {
 
     def check_consultation_switch(self, existing_count):
         if existing_count:
-            records, meta, _ = fixture('gpt-6-astra', 'unknown')
+            records, meta, _ = fixture('gpt-6.2-astra', 'unknown')
             self.assertEqual(self.call(records, meta)['failureCount'], 1)
         state = self.home / 'codex-advisor/consultation-failures.sqlite3'
         previous = state.read_bytes() if state.exists() else None
@@ -548,10 +548,10 @@ public class CodexFixture {
         self.check_consultation_switch(True)
 
     def test_failure_limit_is_scoped_to_thread_not_root_session(self):
-        failed, failed_meta, _ = fixture('gpt-6-astra', 'unknown')
+        failed, failed_meta, _ = fixture('gpt-6.2-astra', 'unknown')
         for _ in range(3):
             self.call(failed, failed_meta)
-        records, meta, _ = fixture('gpt-6-astra', 'ultra')
+        records, meta, _ = fixture('gpt-6.2-astra', 'ultra')
         new_thread = '44444444-4444-4444-4444-444444444444'
         records[0]['payload']['id'] = new_thread
         meta['threadId'] = meta['x-codex-turn-metadata']['thread_id'] = new_thread
@@ -777,21 +777,23 @@ def route_case(model, effort, role, expected):
 
 
 for name, values in {
-    'mainstay': ('gpt-6-luna', 'max', 'ca_worker_mainstay_m', ('gpt-6.1-sol', 'medium')),
-    'mainstay_sol_6_1': ('gpt-6.1-sol', 'high', 'ca_worker_mainstay_h', ('gpt-6.1-sol', 'high')),
-    'crux': ('gpt-6.1-sol', 'xhigh', 'ca_explorer_crux_h', ('gpt-6.1-sol', 'xhigh')),
-    'crux_astra': ('gpt-6-astra', 'low', 'ca_worker_crux_h', ('gpt-6-astra', 'high')),
-    'rescue': ('gpt-6-astra', 'high', 'ca_worker_rescue_h', ('gpt-6-astra', 'xhigh')),
-    'rescue_sol_6_1': ('gpt-6.1-sol', 'max', 'ca_worker_rescue_m', ('gpt-6.1-sol', 'max')),
-    'primary_astra': ('gpt-6-astra', 'xhigh', None, ('gpt-6-astra', 'xhigh')),
-    'primary_astra_max': ('gpt-6-astra', 'max', None, ('gpt-6-astra', 'xhigh')),
-    'primary_astra_ultra': ('gpt-6-astra', 'ultra', None, ('gpt-6-astra', 'xhigh')),
-    'primary_sol': ('gpt-6-sol', 'high', None, ('gpt-6.1-sol', 'xhigh')),
-    'primary_sol_6_1': ('gpt-6.1-sol', 'high', None, ('gpt-6.1-sol', 'high')),
-    'primary_sol_6_1_max': ('gpt-6.1-sol', 'max', None, ('gpt-6.1-sol', 'max')),
-    'primary_sol_6_1_ultra': ('gpt-6.1-sol', 'ultra', None, ('gpt-6.1-sol', 'xhigh')),
-    'primary_unknown': ('gpt-5.6-terra', 'high', None, ('gpt-6.1-sol', 'xhigh')),
-    'primary_medium': ('gpt-6-astra', 'medium', None, ('gpt-6-astra', 'medium')),
+    'mainstay': ('gpt-6-luna', 'max', 'ca_worker_mainstay_m', ('gpt-6.2-sol', 'medium')),
+    'mainstay_sol_6_2': ('gpt-6.2-sol', 'high', 'ca_worker_mainstay_h', ('gpt-6.2-sol', 'high')),
+    'crux': ('gpt-6.2-sol', 'xhigh', 'ca_explorer_crux_h', ('gpt-6.2-sol', 'xhigh')),
+    'crux_astra': ('gpt-6.2-astra', 'low', 'ca_worker_crux_h', ('gpt-6.2-astra', 'high')),
+    'rescue': ('gpt-6.2-astra', 'high', 'ca_worker_rescue_h', ('gpt-6.2-astra', 'xhigh')),
+    'rescue_sol_6_2': ('gpt-6.2-sol', 'max', 'ca_worker_rescue_m', ('gpt-6.2-sol', 'max')),
+    'primary_astra': ('gpt-6.2-astra', 'xhigh', None, ('gpt-6.2-astra', 'xhigh')),
+    'primary_astra_max': ('gpt-6.2-astra', 'max', None, ('gpt-6.2-astra', 'xhigh')),
+    'primary_astra_ultra': ('gpt-6.2-astra', 'ultra', None, ('gpt-6.2-astra', 'xhigh')),
+    'primary_sol': ('gpt-6-sol', 'high', None, ('gpt-6.2-sol', 'xhigh')),
+    'primary_sol_6_2': ('gpt-6.2-sol', 'high', None, ('gpt-6.2-sol', 'high')),
+    'primary_sol_6_2_max': ('gpt-6.2-sol', 'max', None, ('gpt-6.2-sol', 'max')),
+    'primary_sol_6_2_ultra': ('gpt-6.2-sol', 'ultra', None, ('gpt-6.2-sol', 'xhigh')),
+    'primary_unknown': ('gpt-5.6-terra', 'high', None, ('gpt-6.2-sol', 'xhigh')),
+    'primary_legacy_sol': ('gpt-6.1-sol', 'high', None, ('gpt-6.2-sol', 'high')),
+    'primary_legacy_astra': ('gpt-6-astra', 'xhigh', None, ('gpt-6.2-astra', 'xhigh')),
+    'primary_medium': ('gpt-6.2-astra', 'medium', None, ('gpt-6.2-astra', 'medium')),
 }.items():
     setattr(Boundary, 'test_route_' + name, route_case(*values))
 
@@ -818,7 +820,9 @@ def segment_case(mutation, expected=None):
 
 SEGMENT_ROWS = ('| `gpt-6-luna` | `starter` |\n'
                 '| — | `midrange` |\n'
+                '| `gpt-6.2-sol` | `premium` |\n'
                 '| `gpt-6.1-sol` | `premium` |\n'
+                '| `gpt-6.2-astra` | `flagship` |\n'
                 '| `gpt-6-astra` | `flagship` |\n')
 for name, mutation, expected in [
     ('missing_table', lambda p: p.replace(SEGMENT_ROWS, ''), None),
@@ -826,11 +830,11 @@ for name, mutation, expected in [
     ('duplicate_model', lambda p: p.replace(SEGMENT_ROWS, SEGMENT_ROWS + '| `gpt-6-luna` | `premium` |\n'), None),
     ('unknown_segment', lambda p: p.replace('| `gpt-6-luna` | `starter` |', '| `gpt-6-luna` | `unknown` |'), None),
     ('row_order', lambda p: p.replace(SEGMENT_ROWS, ''.join(reversed(SEGMENT_ROWS.splitlines(keepends=True)))),
-     ('gpt-6.1-sol', 'medium')),
-    ('same_segment', lambda p: p.replace('| `gpt-6.1-sol` | `premium` |', '| `gpt-6.1-sol` | `starter` |'),
-     ('gpt-6.1-sol', 'max')),
+     ('gpt-6.2-sol', 'medium')),
+    ('same_segment', lambda p: p.replace('| `gpt-6.2-sol` | `premium` |', '| `gpt-6.2-sol` | `starter` |'),
+     ('gpt-6.2-sol', 'max')),
     ('changed_segment', lambda p: p.replace('| `gpt-6-luna` | `starter` |', '| `gpt-6-luna` | `flagship` |'),
-     ('gpt-6-astra', 'xhigh')),
+     ('gpt-6.2-astra', 'xhigh')),
 ]:
     setattr(Boundary, 'test_segments_' + name, segment_case(mutation, expected))
 

@@ -1,6 +1,6 @@
 name = "ca_explorer_rescue"
-description = "Explorer，rescue 档：gpt-6-astra，由调用方传入 reasoning_effort。针对限定问题的只读证据；以 fork_turns none 生成。"
-model = "gpt-6-astra"
+description = "Explorer，rescue 档：gpt-6.2-astra，由调用方传入 reasoning_effort。针对限定问题的只读证据；以 fork_turns none 生成。"
+model = "gpt-6.2-astra"
 sandbox_mode = "read-only"
 
 developer_instructions = """

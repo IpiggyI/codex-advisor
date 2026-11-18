@@ -21,7 +21,7 @@ sys.path.insert(0, str(PLUGIN / 'scripts'))
 from consult_native import Server, catalog, configuration, windows_codex, execute
 from consult_context import Failure
 
-EXPECTED = {'model': 'gpt-6.1-sol', 'effort': 'xhigh'}
+EXPECTED = {'model': 'gpt-6.2-sol', 'effort': 'xhigh'}
 ADVICE = 'Preserve the caller history and continue the authorized test.'
 
 PROBE = '''import json, os, pathlib, sys

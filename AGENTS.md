@@ -40,7 +40,7 @@ Text that ships under `plugins/codex-advisor/**`, together with its `docs/zh/**`
 ### Canonical notation for the user's declarations
 
 The user often declares models and dials in loose notation: `6-sol`, `sol`, `GPT-6.1 Sol`, `astra[low, medium]`, `[low* medium]`. Every artifact writes them in canonical form, with no note on the original spelling:
-- models as the full id an entry template's `model` carries (`gpt-6-luna`, `gpt-6.1-sol`, `gpt-6-astra`);
+- models as the full id an entry template's `model` carries (`gpt-6-luna`, `gpt-6.2-sol`, `gpt-6.2-astra`);
 - dials as `model[a*, b]` (the routing profile's notation line); a multi-effort dial without `*` gets it on the first listed effort.
 
 Verbatim quotes of the user in specs and discussion records stay as written. Ask only when a loose name fits more than one model.

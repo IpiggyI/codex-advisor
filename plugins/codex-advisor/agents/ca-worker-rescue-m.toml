@@ -1,6 +1,6 @@
 name = "ca_worker_rescue_m"
-description = "Worker, rescue tier (default candidate): gpt-6.1-sol, effort fixed at max. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
-model = "gpt-6.1-sol"
+description = "Worker, rescue tier (default candidate): gpt-6.2-sol, effort fixed at max. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
+model = "gpt-6.2-sol"
 model_reasoning_effort = "max"
 
 developer_instructions = """

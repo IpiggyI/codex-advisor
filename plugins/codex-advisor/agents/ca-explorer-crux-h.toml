@@ -1,6 +1,6 @@
 name = "ca_explorer_crux_h"
-description = "Explorer, crux tier (stronger alternative): gpt-6.1-sol, effort fixed at xhigh. Read-only evidence for a scoped question; spawn with fork_turns none."
-model = "gpt-6.1-sol"
+description = "Explorer, crux tier (stronger alternative): gpt-6.2-sol, effort fixed at xhigh. Read-only evidence for a scoped question; spawn with fork_turns none."
+model = "gpt-6.2-sol"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 

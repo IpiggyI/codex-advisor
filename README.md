@@ -5,10 +5,10 @@ Codex Advisor is a Codex-only fork of
 Any primary can implement directly, delegate work, or combine both.
 Your primary model and reasoning effort remain your choice.
 
-Version 0.3.9 supplies seventeen native entries across `mainstay`, `crux`, and
+Version 0.3.10 supplies seventeen native entries across `mainstay`, `crux`, and
 `rescue`, a single routing profile, zero-argument process consultation, and
 hooks for posture injection and automatic dispatch verification.
-See the [Chinese version manual](docs/releases/0.3.9.html) for a complete guide.
+See the [Chinese version manual](docs/releases/0.3.10.html) for a complete guide.
 
 ## Install
 
@@ -22,6 +22,8 @@ on Windows also needs the native `codex.exe`; see
 Consultation request construction is qualified on Codex 0.169.0 on WSL and Windows;
 native route hooks are qualified on Codex 0.161.0. Host schema or cache-layout changes need renewed
 qualification rather than an assumed compatibility guarantee.
+Consultation on a `gpt-6.2-sol` or `gpt-6.2-astra` dial requires Codex 0.169.1 or later,
+because consultation reads the advisor model from the bundled catalog.
 
 For a provider configured with `env_key = "S2A_API_KEY"`, start Codex with that
 variable available. The plugin explicitly forwards it to the consultation MCP

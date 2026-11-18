@@ -1,6 +1,6 @@
 name = "ca_advisor_mainstay_h"
-description = "Advisor，mainstay 档更强备选：gpt-6-astra，由调用方传入 reasoning_effort。针对验收数据包的只读判断；以 fork_turns none 生成新线程。"
-model = "gpt-6-astra"
+description = "Advisor，mainstay 档更强备选：gpt-6.2-astra，由调用方传入 reasoning_effort。针对验收数据包的只读判断；以 fork_turns none 生成新线程。"
+model = "gpt-6.2-astra"
 sandbox_mode = "read-only"
 
 developer_instructions = """

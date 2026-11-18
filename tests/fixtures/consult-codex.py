@@ -18,7 +18,7 @@ if sys.argv[1:] == ['debug', 'models', '--bundled']:
           'supports_search_tool': True, 'use_tools_instructions': True,
           'use_responses_lite': False if scenario == 'image-omit-nonlite' or scenario.startswith('nonlite-') else
                                 None if scenario == 'image-omit-unknown-mode' else True}
-          for slug in ('gpt-6-astra', 'gpt-6.1-sol')]}))
+          for slug in ('gpt-6.2-astra', 'gpt-6.2-sol')]}))
     sys.exit(0)
 assert sys.argv[1] == 'app-server'
 settings = {}

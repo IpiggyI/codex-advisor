@@ -1,6 +1,6 @@
 name = "ca_worker_mainstay_h"
-description = "Worker, mainstay tier (stronger alternative): gpt-6.1-sol, the caller passes reasoning_effort. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
-model = "gpt-6.1-sol"
+description = "Worker, mainstay tier (stronger alternative): gpt-6.2-sol, the caller passes reasoning_effort. Owns a scoped implementation from a five-part packet; spawn with fork_turns none."
+model = "gpt-6.2-sol"
 
 developer_instructions = """
 Implement the OBJECTIVE within FILES AND OWNERSHIP, keeping INTERFACES and

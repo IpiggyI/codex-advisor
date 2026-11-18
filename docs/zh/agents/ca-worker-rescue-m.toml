@@ -1,6 +1,6 @@
 name = "ca_worker_rescue_m"
-description = "Worker，rescue 档默认候选：gpt-6.1-sol，effort 固定为 max。从五段数据包接手限定范围的实现；以 fork_turns none 生成。"
-model = "gpt-6.1-sol"
+description = "Worker，rescue 档默认候选：gpt-6.2-sol，effort 固定为 max。从五段数据包接手限定范围的实现；以 fork_turns none 生成。"
+model = "gpt-6.2-sol"
 model_reasoning_effort = "max"
 
 developer_instructions = """
