@@ -32,6 +32,15 @@ nothing and fails on drift (a differing or missing manifest file), listing each.
 Symlinked destinations or ancestors, non-regular destinations, non-directory
 ancestors, dot segments, and the filesystem root are refused before any write.
 Relative targets resolve against the current directory.
+
+On Windows, pass the target as a POSIX path, for example
+`sh "$plugin_dir/scripts/install-agents.sh" --target-dir /c/Users/<user>/.codex/agents`.
+Git `sh` treats a drive-letter path such as `C:\Users\<user>\.codex` as relative,
+so a Windows-form `CODEX_HOME` makes the installer write to and check a new
+directory under the current one, and both runs report success. A PowerShell
+started from WSL also inherits WSL's `CODEX_HOME`, so the default target is
+wrong there as well.
+
 [ADR-0008](../adr/0008-installer-deletes-no-old-filenames.md) records why the
 installer deletes no old filenames and when to revisit that.
 
