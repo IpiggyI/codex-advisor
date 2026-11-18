@@ -1,0 +1,1 @@
+{"cli":"0.169.1","host":"Windows","models":[{"slug":"gpt-6.2-sol","efforts":["low","medium","high","xhigh","max","ultra"],"use_responses_lite":true},{"slug":"gpt-6.2-astra","efforts":["low","medium","high","xhigh","max","ultra"],"use_responses_lite":true}]}

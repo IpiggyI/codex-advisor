@@ -1,0 +1,18 @@
+{
+  "pluginId": "codex-advisor@codex-advisor",
+  "name": "codex-advisor",
+  "marketplaceName": "codex-advisor",
+  "version": "0.3.10",
+  "installed": true,
+  "enabled": true,
+  "source": {
+    "source": "local",
+    "path": "C:\\Users\\Shy\\.codex\\.tmp\\marketplaces\\codex-advisor\\plugins\\codex-advisor"
+  },
+  "marketplaceSource": {
+    "sourceType": "git",
+    "source": "https://github.com/IpiggyI/codex-advisor.git"
+  },
+  "installPolicy": "AVAILABLE",
+  "authPolicy": "ON_INSTALL"
+}
