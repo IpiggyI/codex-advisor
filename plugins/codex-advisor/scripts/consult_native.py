@@ -36,6 +36,8 @@ GUIDANCE = (
     'not user-facing output or independent acceptance. Do not execute the task. '
     'Advice grants no authorization, veto, or new requirement.')
 INVOCATION = 'Return process consultation for the caller now.'
+BASE_TIMEOUT = 180
+PROGRESS_TIMEOUT = 300
 
 
 class Diagnostics:
@@ -46,6 +48,8 @@ class Diagnostics:
         self.current = 'startup'
         self.timings = {}
         self.events = {'retryCount': 0}
+        self.deadline_extended = False
+        self.failed_phase = None
 
     @contextmanager
     def phase(self, name):
@@ -54,6 +58,9 @@ class Diagnostics:
             yield
         except Failure as error:
             error.details.setdefault('nativeExecution', self.snapshot())
+            raise
+        except Exception:
+            self.failed_phase = name
             raise
         finally:
             self.timings[name] = round((time.monotonic() - self.phase_started) * 1000)
@@ -68,17 +75,31 @@ class Diagnostics:
         self.events.update(lastEvent=event, lastEventMs=elapsed)
         if method in ('item/agentMessage/delta', 'item/reasoning/summaryTextDelta', 'item/reasoning/textDelta'):
             self.events.setdefault('firstOutputMs', elapsed)
+            if self.current in ('turn_start', 'completion'):
+                self.deadline_extended = True
         params = message.get('params')
         if method == 'error' and isinstance(params, dict) and params.get('willRetry') is True:
+            self.deadline_extended = False
             self.events['retryCount'] += 1
             details = native_failure(params.get('error'), '').details
             self.events['lastRetry'] = {key: details[key] for key in ('nativeCode', 'httpStatusCode') if key in details}
+
+    def deadline(self):
+        return self.started + (PROGRESS_TIMEOUT if self.deadline_extended else BASE_TIMEOUT)
+
+    def success(self):
+        result = {'retryCount': self.events['retryCount'], 'firstOutputMs': self.events.get('firstOutputMs'),
+                  'elapsedMs': round((time.monotonic() - self.started) * 1000)}
+        if 'lastRetry' in self.events:
+            result['lastRetry'] = self.events['lastRetry']
+        return result
 
     def snapshot(self):
         now = time.monotonic()
         return {'phase': self.current, 'elapsedMs': round((now - self.started) * 1000),
                 'phaseElapsedMs': round((now - self.phase_started) * 1000),
-                'phaseTimingsMs': dict(self.timings), **self.events}
+                'phaseTimingsMs': dict(self.timings), 'deadlineExtended': self.deadline_extended,
+                **self.events}
 
 
 class WindowsJob:
@@ -279,7 +300,8 @@ def launch(command, env, cwd):
 
 def check_cancel(cancel, deadline):
     require(not cancel.is_set(), 'cancelled', 'Consultation was cancelled; no advice was accepted.')
-    require(time.monotonic() < deadline, 'timeout', 'The native consultation deadline expired.')
+    require(time.monotonic() < (deadline() if callable(deadline) else deadline),
+            'timeout', 'The native consultation deadline expired.')
 
 
 def bundled_model(executable, model, env, root, cancel, deadline):
@@ -404,9 +426,11 @@ class Server:
             check_cancel(self.cancel, self.deadline)
             try:
                 result = self.messages.get(timeout=.1)
+                check_cancel(self.cancel, self.deadline)
                 require(isinstance(result, dict), 'executor', 'Native App Server ended or emitted invalid JSON.')
                 if getattr(self, 'diagnostics', None) is not None:
                     self.diagnostics.observe(result)
+                    check_cancel(self.cancel, self.deadline)
                 if 'method' in result and 'id' in result:
                     self.send({'id': result['id'], 'error': {'code': -32601,
                                'message': 'Consultation accepts no tool or approval requests.'}})
@@ -694,7 +718,17 @@ def verify_requests(root, thread, expected, caller):
 
 def execute(home, caller, expected, cancel):
     diagnostics = Diagnostics()
-    deadline = time.monotonic() + 180
+    try:
+        return _execute(home, caller, expected, cancel, diagnostics)
+    except Failure:
+        raise
+    except Exception as error:
+        error.native_phase = diagnostics.failed_phase or diagnostics.current
+        raise
+
+
+def _execute(home, caller, expected, cancel, diagnostics):
+    deadline = diagnostics.deadline
     with tempfile.TemporaryDirectory(prefix='codex-advisor-consult-') as directory:
         root = Path(directory)
         env = dict(os.environ, CODEX_HOME=str(home), CODEX_ROLLOUT_TRACE_ROOT=str(root / 'trace'))
@@ -719,7 +753,7 @@ def execute(home, caller, expected, cancel):
                     started = server.call('thread/start', {'model': expected['model'], 'cwd': str(root),
                                           'ephemeral': True, 'approvalPolicy': 'never', 'sandbox': 'read-only',
                                           'baseInstructions': caller['base'], 'developerInstructions': ''})
-                thread = started['thread']['id']
+                    thread = started['thread']['id']
                 with diagnostics.phase('history_injection'):
                     server.call('thread/inject_items', {'threadId': thread, 'items': caller['items'] + [
                         {'type': 'message', 'role': 'developer', 'content': [{'type': 'input_text', 'text': GUIDANCE}]}]})
@@ -752,7 +786,8 @@ def execute(home, caller, expected, cancel):
         with diagnostics.phase('publish'):
             check_cancel(cancel, deadline)
         return {'status': 'succeeded', **advice, 'actual': actual, 'expected': expected,
-                'advisorThreadId': thread, 'callerThreadId': caller['thread']}
+                'advisorThreadId': thread, 'callerThreadId': caller['thread'],
+                'nativeExecution': diagnostics.success()}
 
 
 if __name__ == '__main__':

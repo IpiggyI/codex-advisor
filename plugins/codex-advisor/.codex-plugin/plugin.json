@@ -1,6 +1,6 @@
 {
   "name": "codex-advisor",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "description": "Seventeen native explorer, worker, and advisor entries across mainstay, crux, and rescue tiers, with context-aware process consultation, posture and dispatch hooks, and independent acceptance.",
   "author": {"name": "IpiggyI", "url": "https://github.com/IpiggyI"},
   "license": "MIT",

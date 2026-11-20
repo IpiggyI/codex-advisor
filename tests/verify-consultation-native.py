@@ -84,14 +84,13 @@ class HistoryPolicy(unittest.TestCase):
         call = {'type': 'tool_search_call', 'execution': 'server', 'arguments': None}
         result = {'type': 'tool_search_output', 'execution': 'server', 'status': 'completed', 'tools': []}
         self.assertEqual(validate_items([call, result]), [])
-        for index, field in ((0, 'arguments'), (0, 'execution'), (1, 'execution'), (1, 'status'), (1, 'tools')):
+        for index, field in ((0, 'execution'), (1, 'execution')):
             pair = copy.deepcopy([call, result])
             del pair[index][field]
             with self.assertRaises(Failure):
                 validate_items(pair)
-        for item in ({'type': 'reasoning'}, {'type': 'additional_tools', 'tools': []}):
-            with self.assertRaises(Failure):
-                validate_items([item])
+        with self.assertRaises(Failure):
+            validate_items([{'type': 'reasoning'}])
 
     def test_policy_controls_injection_and_comparison(self):
         item = {'type': 'web_search_call', 'id': 'web', 'status': 'completed',
@@ -435,6 +434,87 @@ class NativeLifecycle(unittest.TestCase):
 
     def test_success_publication_rejects_deadline_during_verification(self):
         self.check_success_publication(True)
+
+    def run_timed_execution(self, events, publish_at):
+        clock = [0]
+        server_type = native.Server
+
+        class TimedMessages:
+            def get(self, timeout):
+                clock[0], message = next(events)
+                if message is None:
+                    raise native.queue.Empty
+                return message
+
+        events = iter(events)
+
+        def make_server(env, root, values, cancel, deadline, executable):
+            server = server_type.__new__(server_type)
+            server.cancel, server.deadline = cancel, deadline
+            server.messages, server.pending = TimedMessages(), []
+            server.initialize = server.close = lambda: None
+            server.call = lambda *args: {'thread': {'id': 'advisor'}, 'turn': {'id': 'turn'}}
+            return server
+
+        def verify(*args):
+            clock[0] = publish_at
+            return EXPECTED
+
+        with mock.patch.object(native, 'catalog', return_value=(Path('models.json'), 'codex')), \
+                mock.patch.object(native, 'server_names', return_value=set()), \
+                mock.patch.object(native, 'Server', side_effect=make_server), \
+                mock.patch.object(native, 'verify_isolation'), \
+                mock.patch.object(native, 'verify_requests', side_effect=verify), \
+                mock.patch.object(native.time, 'monotonic', side_effect=lambda: clock[0]):
+            return native.execute(Path('unused'), CALLER, EXPECTED, threading.Event())
+
+    def test_current_attempt_output_extends_deadline_through_publish(self):
+        final, done = completed()
+        for method in ('item/agentMessage/delta', 'item/reasoning/summaryTextDelta',
+                       'item/reasoning/textDelta'):
+            with self.subTest(method=method):
+                result = self.run_timed_execution([(179, {'method': method}), (240, final), (241, done)], 242)
+                self.assertEqual(result['advice'], ADVICE['advice'])
+                self.assertEqual(result['nativeExecution'], {
+                    'retryCount': 0, 'firstOutputMs': 179000, 'elapsedMs': 242000})
+
+    def test_retry_withdraws_extension_until_new_output(self):
+        first = {'method': 'item/agentMessage/delta', 'params': {'delta': 'PRIVATE_OUTPUT'}}
+        retry = {'method': 'error', 'params': {'threadId': 'advisor', 'turnId': 'turn',
+                 'willRetry': True, 'error': {'message': 'PRIVATE_ERROR', 'codexErrorInfo': 'serverOverloaded'}}}
+        final, done = completed()
+        for retry_at in (170, 190):
+            with self.subTest(retry_at=retry_at):
+                events = [(160, first), (retry_at, retry), (max(180, retry_at), None)]
+                with self.assertRaises(Failure) as raised:
+                    self.run_timed_execution(events, 252)
+                self.assertEqual(raised.exception.code, 'timeout')
+                details = raised.exception.details['nativeExecution']
+                self.assertEqual(details['phase'], 'completion')
+                self.assertEqual(details['elapsedMs'], 1000 * max(180, retry_at))
+                self.assertEqual(details['retryCount'], 1)
+                self.assertEqual(details['firstOutputMs'], 160000)
+                self.assertFalse(details['deadlineExtended'])
+        result = self.run_timed_execution(
+            [(160, first), (170, retry), (179, first), (250, final), (251, done)], 252)
+        self.assertEqual(result['nativeExecution'], {'retryCount': 1, 'firstOutputMs': 160000,
+                         'elapsedMs': 252000, 'lastRetry': {'nativeCode': 'serverOverloaded'}})
+
+    def test_deadline_stops_no_output_at_base_and_progress_at_cap(self):
+        final, done = completed()
+        delta = {'method': 'item/agentMessage/delta'}
+        for events, phase, extended, elapsed in (
+                ([(180, None)], 'completion', False, 180000),
+                ([(180, delta)], 'completion', False, 180000),
+                ([(179, delta), (299, final), (300, done)], 'completion', True, 300000),
+                ([(179, delta), (298, final), (299, done)], 'publish', True, 300000)):
+            with self.subTest(phase=phase, events=events), self.assertRaises(Failure) as raised:
+                self.run_timed_execution(events, 300)
+            self.assertEqual(raised.exception.code, 'timeout')
+            details = raised.exception.details['nativeExecution']
+            self.assertEqual(details['phase'], phase)
+            self.assertEqual(details['elapsedMs'], elapsed)
+            self.assertIs(details['deadlineExtended'], extended)
 
 
 class NativeRequest(unittest.TestCase):

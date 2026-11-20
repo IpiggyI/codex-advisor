@@ -165,6 +165,50 @@ The corpus replay compares each boundary's reconstruction with and without the
 later records. The evidence is in
 [the diagnosis](../../.scratch/consultation-exec-yield/diagnosis.md).
 
+### Excluded payloads, trailing segment, and deadline
+
+Decided on 2026-11-20 for `0.3.12`, after a classification of every fail-closed
+check by what it protects. Request verification proves only that the advisor
+request equals the reconstruction, so a check stays fail-closed when the shape it
+rejects can change the history before the boundary. A check that guards only
+content outside that history is relaxed.
+
+- Excluded items (capability declarations, caller control items, and hosted tool
+  records) keep type recognition and pairing identity, including the tool search
+  `execution` field. Their payload shapes and content blocks no longer fail the
+  call, because these items enter neither injected nor expected history.
+  Retained items keep every check.
+- An undecodable final segment without a line terminator is ignored, because a
+  background caller's host can still be writing it when the server reads the
+  rollout. Every other undecodable line fails as `snapshot`, and the boundary
+  must be among the decoded records.
+- The native deadline is 180 seconds from start. Output from the current
+  inference attempt extends it to 300 seconds from start, and a native retry
+  withdraws the extension until the new attempt produces output. The MCP server
+  declares `tool_timeout_sec = 330`. Of 13 recorded timeouts with diagnostics,
+  two `xhigh` calls on Windows were still streaming at 179 seconds; the other 11
+  produced no output across 8 to 10 `responseStreamDisconnected` retries and
+  keep the base deadline. Codex CLI `0.170.0` parses the key: the server loads
+  with it and disappears when the value is invalid. No recorded consultation
+  call has lasted longer than about 197 seconds, so whether the host honors 330 seconds
+  is unverified.
+- `internal` failures report the consultation step, the exception class, the
+  innermost plugin frame as `file:line`, and the native phase, never the
+  exception text.
+
+Not adopted: falling back to the refreshed model catalog, because on CLI
+`0.170.0` its advisor entries differ from the bundled ones in instruction
+templates, `web_search_provider`, `input_modalities`, and `default_service_tier`,
+and the npm fallback already covers the recorded `catalog` failures; an
+effort-based deadline, because the progress rule already covers the late
+output and an effort rule would make no-output disconnects wait longer.
+Ending a call early after repeated disconnects is deferred: successful results
+carried no retry data before `0.3.12`, so no threshold has evidence. Successful
+results now report `retryCount`, `firstOutputMs`, `lastRetry`, and `elapsedMs`.
+The evidence is in [the audit](../../.scratch/consultation-robustness/audit.md),
+[the timeout diagnosis](../../.scratch/consultation-robustness/timeout.md), and
+[the plan](../../.scratch/consultation-robustness/plan.md).
+
 ## What this supersedes
 
 The quotations below are every complete sentence in ADR-0003, ADR-0004, and

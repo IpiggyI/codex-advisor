@@ -3,6 +3,7 @@
 
 import copy
 import base64
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -13,7 +14,9 @@ import sys
 import tempfile
 import threading
 import time
+import types
 import unittest
+from unittest import mock
 
 HERE = Path(__file__).resolve().parent
 PLUGIN = HERE.parent / 'plugins/codex-advisor'
@@ -177,7 +180,10 @@ public class CodexFixture {
         text = result['content'][0]['text']
         self.assertNotIn('\\u', text)
         if result['structuredContent']['status'] == 'succeeded':
-            self.assertTrue(text.startswith(result['structuredContent']['advice']))
+            structured = result['structuredContent']
+            actual = structured['actual']
+            self.assertEqual(text, f"{structured['advice'].strip()}\n\n{structured['kind']} | "
+                             f"{actual['model']}[{actual['effort']}]")
         else:
             self.assertTrue(text.startswith('Consultation failed: '))
             self.assertIn(result['structuredContent']['message'], text)
@@ -206,7 +212,7 @@ public class CodexFixture {
         config = json.loads((self.plugin / '.mcp.json').read_text())
         self.assertEqual(config, {'mcpServers': {'codex_advisor': {
             'command': 'sh', 'args': ['./scripts/run-python.sh', './scripts/process-consultation.py'],
-            'cwd': '.', 'env_vars': ['S2A_API_KEY']}}})
+            'cwd': '.', 'env_vars': ['S2A_API_KEY'], 'tool_timeout_sec': 330}}})
         manifest = json.loads((self.plugin / '.codex-plugin/plugin.json').read_text())
         self.assertEqual(manifest['mcpServers'], './.mcp.json')
         records, _, _ = fixture()
@@ -438,6 +444,22 @@ public class CodexFixture {
         self.assertEqual(self.execution_details(result, 'completion'),
                          {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503})
         self.assertNotIn('PRIVATE_NATIVE', json.dumps(result))
+
+    def test_success_metadata_and_text(self):
+        records, meta, _ = fixture()
+        for scenario, retries in (('plan', 0), ('retry-event', 1)):
+            with self.subTest(scenario=scenario):
+                result = self.call(records, meta, scenario)
+                self.assertEqual(result['status'], 'succeeded')
+                self.assertEqual(result['advice'], '保留最早约束，并执行下一项修改。')
+                metadata = dict(result['nativeExecution'])
+                elapsed = metadata.pop('elapsedMs')
+                self.assertIs(type(elapsed), int)
+                self.assertGreaterEqual(elapsed, 0)
+                expected = {'retryCount': retries, 'firstOutputMs': None}
+                if retries:
+                    expected['lastRetry'] = {'nativeCode': 'responseStreamDisconnected', 'httpStatusCode': 503}
+                self.assertEqual(metadata, expected)
 
     def test_missing_environment_error_has_actionable_cause(self):
         records, meta, _ = fixture()
@@ -948,6 +970,56 @@ for name, mutation, code in [
     ('agent_encrypted', lambda r, m: r.insert(-1, {'type': 'response_item', 'payload': dict(agent_item(), content=[{'type': 'encrypted_content', 'encrypted_content': ''}])}), 'unsupported_content'),
 ]:
     setattr(Boundary, 'test_reject_' + name, rejection_case(mutation, code))
+
+
+class InternalDiagnostics(unittest.TestCase):
+    def test_internal_errors_report_innermost_plugin_frame_without_exception_text(self):
+        scripts = PLUGIN / 'scripts'
+        spec = importlib.util.spec_from_file_location('process_consultation', scripts / 'process-consultation.py')
+        process = importlib.util.module_from_spec(spec)
+        with mock.patch.object(sys, 'path', [str(scripts), *sys.path]), \
+                mock.patch.object(sys, 'dont_write_bytecode', True):
+            spec.loader.exec_module(process)
+        context = sys.modules['consult_context']
+        native = sys.modules['consult_native']
+        _, meta, _ = fixture()
+        request = {'id': 1, 'params': {'name': 'process_consultation', '_meta': meta}}
+        secret = 'SECRET_HISTORY_TEXT'
+        server = types.SimpleNamespace(initialize=lambda: None, close=lambda: None,
+                                      call=lambda *args: {'thread': {'id': 'advisor'}, 'turn': {'id': 'turn'}})
+        with tempfile.TemporaryDirectory() as directory, \
+                mock.patch.object(process, 'caller_home', return_value=Path(directory)):
+            with mock.patch.object(context, 'caller_records', side_effect=KeyError(secret)):
+                reconstruction = process.MCP().consultation(request, threading.Event())
+            with mock.patch.object(process, 'reconstruct', return_value={'items': [], 'base': 'fixture'}), \
+                    mock.patch.object(process, 'route', return_value={'model': 'fixture', 'effort': 'low'}), \
+                    mock.patch.object(native, 'catalog', return_value=(Path('models.json'), 'codex')), \
+                    mock.patch.object(native, 'server_names', return_value=set()), \
+                    mock.patch.object(native, 'Server', return_value=server), \
+                    mock.patch.object(native, 'verify_isolation'), \
+                    mock.patch.object(native, 'completion', side_effect=KeyError(secret)):
+                execution = process.MCP().consultation(request, threading.Event())
+        for response, step, filename, phase in (
+                (reconstruction, 'reconstruct', 'consult_context.py', None),
+                (execution, 'execute', 'consult_native.py', 'completion')):
+            with self.subTest(step=step):
+                self.assertNotIn(secret, json.dumps(response))
+                payload = response['result']
+                self.assertTrue(payload['isError'])
+                result = payload['structuredContent']
+                self.assertEqual(result['code'], 'internal')
+                self.assertEqual(result['message'],
+                                 'Consultation encountered an unsupported host response or local I/O failure.')
+                details = dict(result['details'])
+                actual_file, line = details.pop('frame').split(':')
+                self.assertEqual(actual_file, filename)
+                source = (scripts / filename).read_text(encoding='utf-8').splitlines()
+                boundary = 'records = caller_records(' if phase is None else 'advice = completion('
+                self.assertIn(boundary, source[int(line) - 1])
+                expected = {'step': step, 'exception': 'KeyError'}
+                if phase is not None:
+                    expected['nativePhase'] = phase
+                self.assertEqual(details, expected)
 
 
 if __name__ == '__main__':

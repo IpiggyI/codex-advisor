@@ -140,6 +140,24 @@ def validate_items(items):
             disposition = policy.get('policy')
             require(policy.get('policy') != 'reject', 'unsupported_content', 'Rejected history type.')
             shape = policy.get('shape')
+            if shape == 'call':
+                call = pair_identity(item, policy)
+                require((call is not None and call not in pending and
+                         (isinstance(call, tuple) or call not in seen)),
+                        'pairing', 'Missing or duplicate tool call identity.')
+                pending[call] = (policy['pair'], index, kind, policy['policy'])
+                seen.add(call)
+            elif shape == 'result':
+                call = pair_identity(item, policy)
+                if call in pending:
+                    disposition = policy.get('call_policies', {}).get(pending[call][2], disposition)
+                if not standalone_output(item, policy):
+                    require(call is not None and call in pending and pending[call][0] == kind and
+                            pending[call][3] == disposition, 'pairing', 'A tool result has no matching call.')
+                    del pending[call]
+
+            if disposition in ('capability', 'control', 'hosted'):
+                continue
             if shape == 'message':
                 require(isinstance(item.get('role'), str),
                         'unsupported_content', 'Unsupported message role.')
@@ -156,10 +174,6 @@ def validate_items(items):
                 require(isinstance(item.get('role'), str) and isinstance(item.get('tools'), list),
                         'unsupported_content', 'Invalid tool inventory.')
             elif shape == 'call':
-                call = pair_identity(item, policy)
-                require((call is not None and call not in pending and
-                         (isinstance(call, tuple) or call not in seen)),
-                        'pairing', 'Missing or duplicate tool call identity.')
                 if policy.get('shell'):
                     require(isinstance(item.get('action'), dict) and isinstance(item.get('status'), str),
                             'unsupported_content', 'Invalid local shell call payload.')
@@ -167,17 +181,7 @@ def validate_items(items):
                     require((policy.get('search') and policy['argument'] in item) or
                             (isinstance(item.get(policy['argument']), str) and isinstance(item.get('name'), str)),
                             'unsupported_content', 'Invalid tool call payload.')
-                if call is not None:
-                    pending[call] = (policy['pair'], index, kind, policy['policy'])
-                    seen.add(call)
             elif shape == 'result':
-                call = pair_identity(item, policy)
-                if call in pending:
-                    disposition = policy.get('call_policies', {}).get(pending[call][2], disposition)
-                if not standalone_output(item, policy):
-                    require(call is not None and call in pending and pending[call][0] == kind and
-                            pending[call][3] == disposition, 'pairing', 'A tool result has no matching call.')
-                    del pending[call]
                 if policy.get('search'):
                     require(isinstance(item.get('status'), str) and isinstance(item.get('tools'), list),
                             'unsupported_content', 'Invalid tool inventory.')
@@ -191,8 +195,7 @@ def validate_items(items):
                 if shape == 'reasoning' and field == 'content' and item.get(field) is None:
                     continue
                 value[field] = validate_content(item.get(field), agent_message=shape == 'agent')
-            if disposition not in ('capability', 'control', 'hosted'):
-                retained.append(value)
+            retained.append(value)
         except Failure as error:
             raise diagnostic(error, 'item', kind, historyIndex=index)
     if pending:
@@ -247,10 +250,16 @@ def read_rollout(path, location):
     try:
         snapshot = path.read_bytes()
         records = []
-        for index, line in enumerate(snapshot.splitlines()):
+        lines = snapshot.splitlines(keepends=True)
+        for index, line in enumerate(lines):
             location['recordIndex'] = index
             if line.strip():
-                records.append(json.loads(line))
+                try:
+                    records.append(json.loads(line))
+                except ValueError:
+                    if index == len(lines) - 1 and not line.endswith((b'\n', b'\r')):
+                        break
+                    raise
                 if len(records) == 1 and isinstance(records[0], dict):
                     header = records[0].get('payload')
                     if isinstance(header, dict) and 'cli_version' in header:

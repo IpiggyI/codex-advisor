@@ -162,7 +162,9 @@ in the MCP metadata. When multiple file names contain the thread ID, it decodes 
 snapshot and requires exactly one with the matching thread and session header and
 the consultation item under the matching turn context. Selection precedes full
 history validation: an invalid matching snapshot cannot be discarded to resolve
-ambiguity. Undecodable candidates fail explicitly. If this search finds zero or
+ambiguity. An undecodable line fails as `snapshot`, except for an undecodable
+final segment with no line terminator. The consultation boundary must still
+be present in the decoded records. If this search finds zero or
 multiple matching snapshots, it fails with `candidateCount` and `matchingCount`;
 modification times do not select a snapshot. The selected bytes undergo the same
 complete validation as a single-file snapshot, without rereading or merging files. Reconstruction stops
@@ -179,8 +181,10 @@ and type-specific comparison normalization. Call/result pairs share one declarat
 are capability declarations and enter neither injected nor expected history.
 `configuration_update` and `compaction_trigger` are caller control items and also
 enter neither injected nor expected history. `web_search_call`,
-`image_generation_call`, and `local_shell_call` are hosted tool records: they are
-validated, then enter neither injected nor expected history. `local_shell_call`
+`image_generation_call`, and `local_shell_call` are hosted tool records and
+enter neither injected nor expected history. Excluded items undergo type recognition
+and pairing checks, including tool search `execution`. Their payload shapes and
+content blocks do not affect reconstruction. `local_shell_call`
 pairs with `function_call_output` through the same nonempty `call_id`; its result
 is excluded with the call. A missing identity or a pair with only one excluded
 member fails as `pairing`. Ordinary function call results remain preserved.
@@ -199,14 +203,14 @@ Lite image detail omission.
 Every request must omit tools or carry an empty tool list, both at request level
 and in every input item, regardless of its type. Non-Lite requests must prove an
 empty tool set with `request.tools == []` or an `additional_tools` item whose
-`tools == []`; only Responses Lite may omit both inventories. Declared shapes
+`tools == []`; only Responses Lite may omit both inventories. Retained declared shapes
 require only protocol-required fields, plus pairing and opaque-content invariants;
 optional fields may be absent.
 History failures report `stage` (`record`, `item`, `content`, or `request`), `type`,
 `recordIndex` and/or `historyIndex`, and `hostVersion` from `session_meta.cli_version`
 when available. Comparison failures also report the first differing field `path`,
 without field values or compared text. Unknown rollout records, retained events,
-rollback, invalid declared shapes, and incomplete tool pairs still fail explicitly.
+rollback, invalid retained shapes, and incomplete tool pairs still fail explicitly.
 
 Native MCP startup filters the host environment. The plugin's `.mcp.json`
 explicitly forwards `S2A_API_KEY` through `env_vars` for providers whose `env_key`
@@ -257,7 +261,10 @@ Within the caller's existing session record, the tool-call event is **started**.
 A returned MCP `structuredContent.status` of `succeeded`, with `isError=false`,
 means the output has exactly one valid `kind` and nonempty `advice`, and every
 observed request matched `expected` and `actual` model/effort. The result includes
-`callerThreadId` and `advisorThreadId`. A returned `status=failed`, with
+`callerThreadId` and `advisorThreadId`. Successful `structuredContent.nativeExecution`
+reports `retryCount`, `firstOutputMs` (null when no delta was observed), and
+`elapsedMs`. It also reports `lastRetry` when a retry occurred. The success
+text remains the advice followed by the kind and advisor dial. A returned `status=failed`, with
 `isError=true`, carries `code`, `message`, `expected`, and `actual` where observed;
 it contains no advice. Optional `details` locate the failing record or history
 item and retain qualified native error codes and HTTP status without copying
@@ -267,9 +274,15 @@ also reports `reason=missing_environment_variable`, the bounded variable name in
 No variable value is returned. Text content leads with readable advice or the
 failure reason; `structuredContent` carries the machine-readable outcome.
 
+Unexpected exceptions return `code=internal`. Their details report the consultation
+step, exception class, and innermost plugin script frame as a basename and line
+number. An exception escaping native execution also reports the native phase.
+The result omits the exception text, arguments, history, and output.
+
 Native failures include bounded `details.nativeExecution` diagnostics: the failing
 phase, elapsed milliseconds, phase durations, the last recognized native event and
 its time, the first text or reasoning delta time when observed, and the retry count.
+`deadlineExtended` records whether the extended deadline was active at failure.
 A retry can include only a qualified native error code and HTTP status. Event names
 outside the fixed diagnostic list appear as `other`; event bodies, output text,
 request payloads, credentials, and arbitrary error messages are never retained.
@@ -303,14 +316,17 @@ counter storage disables consultation with
 
 Errors, aborts, cancellation, context overflow, empty or malformed output, and
 mismatches all end in that failure result. Native `willRetry=true` notifications
-wait for the same turn's terminal result within the existing deadline. The
+start a new inference attempt within the same turn and restore the base deadline. The
 component starts no additional consultation attempt. Failed inference also checks
 available request traces to report observed model and effort. MCP
 cancellation terminates the native process tree and returns failure. Cancellation
 and deadlines remain effective while writing to a blocked native input pipe and
 while consuming buffered completion events. Completed MCP requests release their
 registry entries, and only active duplicate request IDs are refused. The native
-execution deadline is 180 seconds. Catalogs, request traces, captured outputs,
+execution deadline is 180 seconds from start. A text or reasoning delta from the
+current attempt extends it to 300 seconds from start. A retry after the base
+deadline expires immediately. The MCP server declares `tool_timeout_sec = 330`.
+Catalogs, request traces, captured outputs,
 logs, and native SQLite state stay in one temporary directory and are deleted when
 the call finishes or is cancelled. Only the bounded failure counters persist. The
 component writes no repository files, caller history, or credential files.

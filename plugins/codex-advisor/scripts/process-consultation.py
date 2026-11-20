@@ -6,6 +6,7 @@ from pathlib import Path
 import signal
 import sys
 import threading
+from traceback import walk_tb
 
 sys.dont_write_bytecode = True
 from consult_context import Failure, caller_home, identity, reconstruct, route
@@ -34,6 +35,17 @@ def result_text(result):
     return text
 
 
+def internal_details(error, step, scripts):
+    details = {'step': step, 'exception': type(error).__name__}
+    for frame, line in walk_tb(error.__traceback__):
+        path = Path(frame.f_code.co_filename).absolute()
+        if path.is_relative_to(scripts):
+            details['frame'] = f'{path.name}:{line}'
+    if step == 'execute' and hasattr(error, 'native_phase'):
+        details['nativePhase'] = error.native_phase
+    return details
+
+
 class MCP:
     def __init__(self):
         self.output_lock = threading.Lock()
@@ -57,6 +69,7 @@ class MCP:
 
     def consultation(self, request, cancel):
         expected = home = thread = None
+        step = 'switch'
         try:
             params = request.get('params', {})
             home = caller_home(self.plugin)
@@ -64,26 +77,34 @@ class MCP:
             if marker.exists():
                 raise Failure('switched_off', 'The user switched consultation off. ' + STOP_CALLING +
                               '\nDelete ' + str(marker) + ' to turn consultation back on for new threads.')
+            step = 'identity'
             identity(params.get('_meta'))
             thread = params['_meta']['threadId']
+            step = 'limits'
             if failure_count(home, thread) >= FAILURE_LIMIT:
                 raise Failure('disabled', 'Consultation is disabled after three failed calls. ' + STOP_CALLING)
+            step = 'arguments'
             if params.get('name') != TOOL['name'] or params.get('arguments', {}) != {}:
                 raise Failure('arguments', 'Process consultation accepts only an empty argument object.')
+            step = 'reconstruct'
             caller = reconstruct(home, params.get('_meta'))
+            step = 'route'
             expected = route(self.plugin, caller)
+            step = 'execute'
             result = execute(home, caller, expected, cancel)
         except Failure as error:
             result = {'status': 'failed', 'code': error.code, 'message': str(error),
                       'expected': expected, 'actual': error.actual}
             if error.details:
                 result['details'] = error.details
-        except Exception:
-            # Native output and source history may contain sensitive content.
+        except Exception as error:
             result = {'status': 'failed', 'code': 'internal',
                       'message': 'Consultation encountered an unsupported host response or local I/O failure.',
-                      'expected': expected, 'actual': None}
+                      'expected': expected, 'actual': None,
+                      'details': internal_details(error, step, self.plugin / 'scripts')}
         result = limit_result(result, home, thread)
+        if result['status'] == 'failed':
+            result.pop('nativeExecution', None)
         return {'id': request['id'], 'result': {'isError': result['status'] == 'failed',
                 'structuredContent': result, 'content': [{'type': 'text', 'text': result_text(result)}]}}
 

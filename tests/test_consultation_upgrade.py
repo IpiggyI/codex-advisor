@@ -73,13 +73,6 @@ class Policies(unittest.TestCase):
         ordinary = {'type': 'function_call', 'call_id': 'ordinary', 'name': 'tool', 'arguments': '{}'}
         result = {**output, 'call_id': 'ordinary'}
         self.assertEqual(validate_items([ordinary, result, call, output]), [ordinary, result])
-        for values in ([{**call, 'action': None}, output],
-                       [{**call, 'status': None}, output],
-                       [call, {**output, 'output': None}],
-                       [call, {**output, 'output': [{'type': 'input_text', 'text': None}]}]):
-            with self.subTest(values=values), self.assertRaises(Failure) as raised:
-                validate_items(values)
-            self.assertEqual(raised.exception.code, 'unsupported_content')
 
     def test_shell_requires_identity(self):
         call = {'type': 'local_shell_call', 'status': 'completed',
@@ -125,6 +118,70 @@ class Schema(unittest.TestCase):
 
 
 class Reconstruction(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.home = Path(directory.name)
+        sessions = self.home / 'sessions'
+        sessions.mkdir()
+        self.path = sessions / ('rollout-' + THREAD + '.jsonl')
+        self.meta = {'threadId': THREAD, 'sessionId': THREAD, 'itemId': 'second',
+                     'x-codex-turn-metadata': {'thread_id': THREAD, 'session_id': THREAD,
+                                              'turn_id': 'turn2', 'model': 'gpt-6.1-sol',
+                                              'reasoning_effort': 'low'}}
+
+    def snapshot(self, values):
+        return b''.join(json.dumps(value).encode() + b'\n' for value in values)
+
+    def test_excluded_payloads_reconstruct_and_retained_outputs_still_fail(self):
+        values = records()
+        self.path.write_bytes(self.snapshot(values))
+        expected = reconstruct(self.home, self.meta)
+        odd_block = [{'type': 'input_text', 'text': None}]
+        items = [{'type': 'additional_tools', 'role': 0, 'tools': None},
+                 {'type': 'configuration_update', 'content': odd_block},
+                 {'type': 'tool_search_call', 'execution': 'server', 'name': None},
+                 {'type': 'tool_search_output', 'execution': 'server', 'status': [], 'tools': False,
+                  'output': odd_block},
+                 {'type': 'local_shell_call', 'call_id': 'shell', 'action': [], 'status': 0},
+                 {'type': 'function_call_output', 'call_id': 'shell', 'output': odd_block},
+                 {'type': 'local_shell_call', 'call_id': 'second_shell'},
+                 {'type': 'function_call_output', 'call_id': 'second_shell', 'output': None}]
+        values[-1:-1] = [{'type': 'response_item', 'payload': item} for item in items]
+        self.path.write_bytes(self.snapshot(values))
+        self.assertEqual(reconstruct(self.home, self.meta), expected)
+        for oddity in (None, odd_block):
+            with self.subTest(oddity=oddity):
+                values[4]['payload']['output'] = oddity
+                self.path.write_bytes(self.snapshot(values))
+                with self.assertRaises(Failure) as raised:
+                    reconstruct(self.home, self.meta)
+                self.assertEqual(raised.exception.code, 'unsupported_content')
+                self.assertEqual(raised.exception.details['recordIndex'], 4)
+
+    def test_only_unterminated_undecodable_final_segment_is_ignored(self):
+        values = records()
+        snapshot = self.snapshot(values)
+        prefix, suffix = self.snapshot(values[:-1]), self.snapshot(values[-1:])
+        self.path.write_bytes(snapshot)
+        expected = reconstruct(self.home, self.meta)
+        self.path.write_bytes(snapshot.rstrip(b'\n'))
+        self.assertEqual(reconstruct(self.home, self.meta), expected)
+        for fragment in (b'{"type":', b'{"type":"\xe4'):
+            with self.subTest(fragment=fragment):
+                self.path.write_bytes(snapshot + fragment)
+                self.assertEqual(reconstruct(self.home, self.meta), expected)
+                for candidate in (snapshot + fragment + b'\n', snapshot + fragment + b'\r',
+                                  prefix + fragment + b'\n' + suffix):
+                    self.path.write_bytes(candidate)
+                    with self.assertRaises(Failure) as raised:
+                        reconstruct(self.home, self.meta)
+                    self.assertEqual(raised.exception.code, 'snapshot')
+        with self.assertRaises(Failure) as raised:
+            self.path.write_bytes(prefix + b'{"type":')
+            reconstruct(self.home, self.meta)
+        self.assertEqual(raised.exception.code, 'identity')
+
     def test_background_consultation_ignores_later_records(self):
         values = records()
         values[-1]['payload'].update(name='exec', input=(
@@ -136,21 +193,11 @@ class Reconstruction(unittest.TestCase):
                  {'type': 'reasoning', 'summary': [], 'encrypted_content': 'later reasoning'},
                  {'type': 'message', 'role': 'assistant', 'content': [
                      {'type': 'output_text', 'text': 'later message'}]}]
-        meta = {'threadId': THREAD, 'sessionId': THREAD, 'itemId': 'second',
-                'x-codex-turn-metadata': {'thread_id': THREAD, 'session_id': THREAD,
-                                         'turn_id': 'turn2', 'model': 'gpt-6.1-sol',
-                                         'reasoning_effort': 'low'}}
-        with tempfile.TemporaryDirectory() as directory:
-            home = Path(directory)
-            sessions = home / 'sessions'
-            sessions.mkdir()
-            path = sessions / ('rollout-' + THREAD + '.jsonl')
-            path.write_text(''.join(json.dumps(value) + '\n' for value in values), encoding='utf-8')
-            expected = reconstruct(home, meta)
-            with path.open('a', encoding='utf-8') as target:
-                for payload in later:
-                    target.write(json.dumps({'type': 'response_item', 'payload': payload}) + '\n')
-            self.assertEqual(reconstruct(home, meta), expected)
+        self.path.write_bytes(self.snapshot(values))
+        expected = reconstruct(self.home, self.meta)
+        values += [{'type': 'response_item', 'payload': payload} for payload in later]
+        self.path.write_bytes(self.snapshot(values))
+        self.assertEqual(reconstruct(self.home, self.meta), expected)
 
 
 class Corpus(unittest.TestCase):

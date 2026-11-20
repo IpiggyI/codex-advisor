@@ -19,6 +19,16 @@
 
 两种情况：WSL 三次反复断流，没有任何输出；Windows 两次在 `xhigh` 下第 131 至 139 秒才出现首个输出，随后撞上 180 秒总时限（`consult_native.py:697`）。超时成批出现（2026-10-28、11-02、11-17、11-18），中间有大量成功调用。
 
+### 补充扫描（2026-11-20）
+
+第二轮实施前重新扫描两台机器 2026-11 的全部会话记录，读取每个带 `nativeExecution` 的 `timeout` 结果，按诊断内容去重，共 13 次。比上表多出的 8 次来自同一时段的其他会话，包括车道和测试会话；上表只列出当时已归因的 5 次。
+
+- 2 次（Windows，`gpt-6.1-sol[xhigh]`）有输出：首个输出在 131 秒和 139 秒，最后事件是输出增量，时间为 179.9 秒和 179.0 秒，被截断时仍在输出。
+- 11 次（WSL，`gpt-6.1-sol[xhigh]`、`gpt-6.2-sol[high]`、`gpt-6.2-sol[medium]`、`gpt-6.2-astra[low]`）没有任何输出，重试 8 至 10 次，最后一次重试错误都是 `responseStreamDisconnected`。其中 7 次的最后事件在 114 至 122 秒，之后静默到时限；4 次在 172 至 179 秒。
+- 宿主等待过的最长咨询调用约 197 秒（返回插件自身的 `timeout`），没有更长的咨询调用记录。
+
+前 2 次能否在 300 秒内完成未知。
+
 ## 受控对照
 
 脚本：`probe.py`（同目录），用法 `python3 .scratch/consultation-robustness/probe.py ws,http <结果文件>`，每个逗号分隔项发起一次真实调用。直接调用当前工作树的 `consult_native.execute()`，使用 WSL 的 `~/.codex` 配置和提供方 `official`（`supports_websockets = true`），顾问档位 `gpt-6.2-sol[high]`，固定的两条合成历史。HTTP 组通过 `-c model_providers.official.supports_websockets=false` 关闭 WebSocket。
