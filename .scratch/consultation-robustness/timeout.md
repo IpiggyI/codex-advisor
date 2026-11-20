@@ -53,3 +53,7 @@
 3. **成批断流时尽快放弃。** 连续多次 `responseStreamDisconnected` 且没有任何输出时提前返回失败，不等满 180 秒。只缩短等待，不减少失败次数。
 
 不建议在没有新证据时更改提供方的 WebSocket 设置。
+
+## 成功调用的重试数据
+
+自 `0.3.12` 起成功结果带 `nativeExecution`。第一条记录（2026-11-20，Windows，`gpt-6.2-sol[medium]`）：4 次 `responseStreamDisconnected` 重试，首个输出 122406 毫秒，总耗时 123625 毫秒，成功。候选 3 的阈值若不超过 4 次重试，会把这次调用判为失败。

@@ -111,3 +111,9 @@
 | `python3 tests/consultation_native_corpus.py` | 11 类 11 项通过，仅覆盖 Responses Lite 模式（`evidence/native-corpus-0.3.12.json`） |
 
 未验证：宿主是否按 330 秒执行工具时限（没有超过约 197 秒的调用记录）；Windows 上的同等检查；安装后的真实咨询。提交、推送和两侧重装待用户授权。
+
+### 第二轮发布
+
+2026-11-20，用户授权“提交推送，重装，验收”。发布提交 `82f4e30` 已推送，两侧重装为 `0.3.12`，Desktop 自带 `codex.exe`（`0.169.0-alpha.11.1`）能加载新配置，两侧安装后的真实咨询均成功。记录见 `.scratch/release-0.3.12/acceptance.md`。
+
+Windows 验收调用经过 4 次 `responseStreamDisconnected` 重试、122 秒无输出后成功。这是“快速放弃”阈值的第一条反例数据：阈值不能低于 5 次重试。
