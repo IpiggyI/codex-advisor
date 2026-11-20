@@ -6,6 +6,7 @@ from contextlib import ExitStack
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 import tempfile
 
@@ -23,7 +24,8 @@ def failure(path, boundary, error):
     return {'file': path.name, 'boundaryIndex': boundary,
             'recordIndex': error.details.get('recordIndex', boundary),
             'stage': error.details.get('stage', 'record'), 'type': error.details.get('type'),
-            'code': error.code, 'message': str(error)}
+            'code': error.code, 'message': str(error),
+            **({'withLaterRecords': True} if error.details.get('withLaterRecords') else {})}
 
 
 class CallBatch:
@@ -74,7 +76,23 @@ class CallBatch:
                 self.invalid = True
 
 
-def replay_boundary(home, target, record, session, current):
+def compare_with_later_records(home, target, source, meta, expected):
+    offset = source.tell()
+    try:
+        shutil.copyfileobj(source, target)
+    finally:
+        source.seek(offset)
+    target.flush()
+    try:
+        actual = reconstruct(home, meta)
+        if actual != expected:
+            raise Failure('post_boundary', 'Later records changed the reconstructed context.')
+    except Failure as error:
+        error.details['withLaterRecords'] = True
+        raise
+
+
+def replay_boundary(home, target, record, session, current, *, source=None):
     offset = target.tell()
     payload = record['payload']
     # The boundary is excluded from history; a temporary id selects id-less host calls.
@@ -89,7 +107,10 @@ def replay_boundary(home, target, record, session, current):
                 'turn_id': current.get('turn_id'), 'model': current.get('model'),
                 'reasoning_effort': current.get('effort')}}
     try:
-        return reconstruct(home, meta)
+        expected = reconstruct(home, meta)
+        if source is not None and source.peek(1):
+            compare_with_later_records(home, target, source, meta, expected)
+        return expected
     finally:
         target.seek(offset)
         target.truncate()
@@ -140,10 +161,11 @@ def replay_file(path, home, counts, failures, design_rejections):
                 else:
                     counts['replayed'] += 1
                     try:
-                        replay_boundary(home, target, record, session, current)
+                        replay_boundary(home, target, record, session, current, source=source)
                         counts['passed'] += 1
                     except Failure as error:
-                        diagnostics = design_rejections if error.code == 'rollback' else failures
+                        diagnostics = (design_rejections if error.code == 'rollback'
+                                       and not error.details.get('withLaterRecords') else failures)
                         diagnostics.append(failure(path, index, error))
             target.write(line)
             batch.observe(record)

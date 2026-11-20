@@ -345,8 +345,6 @@ def _reconstruct(home, meta, location):
             if payload.get('id') == meta['itemId']:
                 require(payload.get('type') in ('function_call', 'custom_tool_call'),
                         'identity', 'Consultation boundary is not a tool call.')
-                require(not any(later.get('type') == 'response_item' for later in records[index + 1:]),
-                        'pairing', 'History changed beyond the unfinished consultation boundary.')
                 boundary = True
                 break
             items.append(payload)

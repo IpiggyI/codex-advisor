@@ -147,6 +147,24 @@ newly preserved hosted tool type needs one real request before release. The anal
 check: after each host upgrade, the schema diff and corpus replay of ticket 05
 find a host type without a policy or a real rollout that no longer reconstructs.
 
+### Consultation boundary
+
+Decided on 2026-11-20 for `0.3.11`; this replaces the rule that any
+`response_item` after the consultation boundary fails as `pairing`. Records
+after the boundary are ignored: they never enter the reconstructed history and
+never fail the call. The advice covers the caller's context up to the call. A
+caller that runs the consultation in the background, such as through code-mode
+`exec` with a short `yield_time_ms`, has its yield output and later work written
+to the rollout before the server reads it. All six recorded failures of the
+removed rule had that cause, on hosts `0.164.0`, `0.170.0`, and
+`0.169.0-alpha.11.1`; with later records present, each reconstructed exactly what
+a read at the boundary returns. The removed rule also detected a caller that had
+moved on and a direct call whose result the host had already written; neither
+affects the reconstructed context. Validation before the boundary is unchanged.
+The corpus replay compares each boundary's reconstruction with and without the
+later records. The evidence is in
+[the diagnosis](../../.scratch/consultation-exec-yield/diagnosis.md).
+
 ## What this supersedes
 
 The quotations below are every complete sentence in ADR-0003, ADR-0004, and

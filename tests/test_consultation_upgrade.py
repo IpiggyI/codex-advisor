@@ -13,7 +13,7 @@ from unittest import mock
 
 import consultation_schema_check as schema_check
 import consultation_corpus_replay as corpus
-from consult_context import Failure, ITEM_POLICY, comparable, validate_items
+from consult_context import Failure, ITEM_POLICY, comparable, reconstruct, validate_items
 from consult_native import verify_history
 
 THREAD = '11111111-1111-1111-1111-111111111111'
@@ -124,6 +124,35 @@ class Schema(unittest.TestCase):
         self.assertEqual(json.loads(output.getvalue())['missingTypes'], ['local_shell_call'])
 
 
+class Reconstruction(unittest.TestCase):
+    def test_background_consultation_ignores_later_records(self):
+        values = records()
+        values[-1]['payload'].update(name='exec', input=(
+            '// @exec: {"yield_time_ms": 1}\nawait tools.mcp__codex_advisor__process_consultation({});'))
+        later = [{'type': 'custom_tool_call_output', 'call_id': 'call2',
+                  'output': 'Script running with cell ID 2'},
+                 {'type': 'function_call', 'name': 'tool', 'arguments': '{}', 'call_id': 'call3'},
+                 {'type': 'function_call_output', 'call_id': 'call3', 'output': 'later output'},
+                 {'type': 'reasoning', 'summary': [], 'encrypted_content': 'later reasoning'},
+                 {'type': 'message', 'role': 'assistant', 'content': [
+                     {'type': 'output_text', 'text': 'later message'}]}]
+        meta = {'threadId': THREAD, 'sessionId': THREAD, 'itemId': 'second',
+                'x-codex-turn-metadata': {'thread_id': THREAD, 'session_id': THREAD,
+                                         'turn_id': 'turn2', 'model': 'gpt-6.1-sol',
+                                         'reasoning_effort': 'low'}}
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            sessions = home / 'sessions'
+            sessions.mkdir()
+            path = sessions / ('rollout-' + THREAD + '.jsonl')
+            path.write_text(''.join(json.dumps(value) + '\n' for value in values), encoding='utf-8')
+            expected = reconstruct(home, meta)
+            with path.open('a', encoding='utf-8') as target:
+                for payload in later:
+                    target.write(json.dumps({'type': 'response_item', 'payload': payload}) + '\n')
+            self.assertEqual(reconstruct(home, meta), expected)
+
+
 class Corpus(unittest.TestCase):
     def run_replay(self, values, extra=None):
         with tempfile.TemporaryDirectory() as directory:
@@ -163,7 +192,31 @@ class Corpus(unittest.TestCase):
         self.assertEqual(report['counts']['passed'], 2)
         self.assertEqual(report['failures'], [])
         self.assertEqual([m['x-codex-turn-metadata']['model'] for m in observed],
-                         ['gpt-6-sol', 'gpt-6.1-sol'])
+                         ['gpt-6-sol', 'gpt-6-sol', 'gpt-6.1-sol'])
+
+    def test_later_records_failure_or_context_difference_is_reported(self):
+        original = corpus.reconstruct
+
+        for code in ('rollback', 'post_boundary'):
+            def reconstruct(home, meta):
+                result = original(home, meta)
+                path, = (home / 'sessions').glob('*.jsonl')
+                if meta['itemId'] == 'second' or len(path.read_bytes().splitlines()) == 4:
+                    return result
+                if code == 'rollback':
+                    raise Failure(code, 'Synthetic rejection of later records.')
+                return {**result, 'base': 'PRIVATE_HISTORY_CHANGED'}
+
+            with self.subTest(code=code), mock.patch.object(corpus, 'reconstruct', side_effect=reconstruct):
+                report = self.run_replay(records())
+                self.assertEqual(report['counts']['replayed'], 2)
+                self.assertEqual(report['counts']['passed'], 1)
+                self.assertEqual(report['counts']['failures'], 1)
+                self.assertEqual(report['counts']['designRejections'], {})
+                error, = report['failures']
+                self.assertEqual(error['boundaryIndex'], 3)
+                self.assertEqual(error['code'], code)
+                self.assertTrue(error['withLaterRecords'])
 
     def test_skip_counts(self):
         values = records()
@@ -197,7 +250,7 @@ class Corpus(unittest.TestCase):
         self.assertEqual(report['counts']['replayed'], 2)
         self.assertEqual(report['counts']['passed'], 2)
         self.assertEqual(report['failures'], [])
-        self.assertEqual(len(observed), 2)
+        self.assertEqual(len(observed), 3)
         self.assertNotIn('second', observed)
         self.assertEqual(observed[-1], 'third')
 

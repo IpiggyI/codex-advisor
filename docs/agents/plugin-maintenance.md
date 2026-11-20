@@ -65,10 +65,13 @@ The corpus check runs production `reconstruct()` at sequential `function_call` a
 `custom_tool_call` boundaries in every rollout under `~/.codex/sessions` and existing
 `/mnt/c/Users/*/.codex/sessions` directories. Repeat `--root PATH` to replace the
 default roots. Each boundary uses the latest preceding turn context as MCP
-metadata and a truncated copy in a temporary home. An id-less boundary receives
-a temporary selection id; it is excluded from reconstructed history. Prior
-records remain unchanged. Legacy files without a session header and boundaries
-before any turn context or task-start event are skipped and counted.
+metadata and a copy in a temporary home. The check first reconstructs from the
+copy ending at the boundary. If that succeeds and later records exist, it
+reconstructs again with those records present and compares the complete results.
+An id-less boundary receives a temporary selection id and is excluded from
+reconstructed history. Prior records remain unchanged. Legacy files without a
+session header and boundaries before any turn context or task-start event are
+skipped and counted.
 Positions with an earlier declared call still awaiting its result are skipped as
 `parallelSkipped`, included in `boundariesSkipped`. The batch-start position is
 replayed. Pairing follows `ITEM_POLICY`, including capability and hosted calls;
@@ -76,8 +79,10 @@ compaction replaces the tracked history. Invalid pairing
 structures remain subject to production validation.
 
 Corpus output is JSON containing counts and failure locations, stages, types,
-codes, and messages, without history text. Failures with code `rollback` are
-deliberate design rejections: their diagnostics appear in `designRejections`,
+codes, and messages, without history text. A failure or difference in the second
+reconstruction is reported in `failures` with `withLaterRecords: true`.
+Truncated-copy failures with code `rollback` are deliberate design rejections:
+their diagnostics appear in `designRejections`,
 with counts by code in `counts.designRejections`, and do not change the exit
 status. Every other failure appears in `failures` and produces a nonzero exit
 status, identifying a reconstruction limit to investigate before release. Do not
