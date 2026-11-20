@@ -50,4 +50,11 @@
 | `python3 tests/consultation_corpus_replay.py` | 874 份记录；回放 33008 个位置，32913 通过，95 个回滚按设计拒绝，失败 0；跳过 8697 个位置（未验证）；12 分 18 秒 |
 | `python3 tests/consultation_native_corpus.py` | 11 类 11 项通过，仅覆盖 Responses Lite 模式 |
 
-未验证：Windows 上的同等检查、安装后的真实咨询、提交和推送、两侧重装。
+未验证：Windows 上的同等检查。
+
+## 发布
+
+2026-11-20，用户授权“提交推送，重装，验收”。发布提交 `387e0ce` 已推送，两侧重装为 `0.3.11`，
+两侧安装后以 `yield_time_ms: 1` 的真实咨询均成功。记录见 `.scratch/release-0.3.11/acceptance.md`。
+
+待用户决定：`audit.md` 的四项候选改动，`timeout.md` 的三项时限候选。
